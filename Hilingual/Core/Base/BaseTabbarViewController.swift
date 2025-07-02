@@ -1,5 +1,5 @@
 //
-//  ViewController.swift
+//  BaseTabbarViewController.swift
 //  Hilingual
 //
 //  Created by 성현주 on 7/2/25.
@@ -7,7 +7,7 @@
 
 import UIKit
 
-class ViewController: UIViewController {
+class BaseTabbarViewController: UITabBarController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
