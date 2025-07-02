@@ -11,11 +11,11 @@ import CombineMoya
 import Moya
 import Combine
 
-protocol HomeServiceProtocol {
+protocol HomeService {
     func fetchExchangeRate() -> AnyPublisher<HomeResponseDTO, Error>
 }
 
-final class HomeService: HomeServiceProtocol {
+final class DefaultHomeService: HomeService {
     private var provider = MoyaProvider<HomeAPI>(plugins: [MoyaLoggerPlugin()])
 
     init(provider: MoyaProvider<HomeAPI> = NetworkProvider.make()) {

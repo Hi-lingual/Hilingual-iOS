@@ -12,28 +12,15 @@ final class AppDIContainer {
     static let shared = AppDIContainer()
     private init() { }
 
-    // MARK: - Network
-    private func makeHomeService() -> HomeServiceProtocol {
-        return HomeService()
-    }
+    // MARK: - Domain Containers
 
-    // MARK: - Repository
-    private func makeHomeRepository() -> HomeRepository {
-        return DefaultHomeRepository(service: makeHomeService())
-    }
-
-    // MARK: - UseCase
-    private func makeHomeUseCase() -> HomeUseCase {
-        return DefaultHomeUseCase(repository: makeHomeRepository())
-    }
-
-    // MARK: - ViewModel
-    private func makeHomeViewModel() -> HomeViewModel {
-        return HomeViewModel(useCase: makeHomeUseCase())
-    }
+    private(set) var homeDIContainer = HomeDIContainer.shared
 
     // MARK: - Entry Point
+
     func makeHomeViewController() -> HomeViewController {
-        return HomeViewController(viewModel: makeHomeViewModel())
+        return homeDIContainer.makeHomeViewController()
     }
+
+    // 이후 각 화면별 생성 진입점도 여기에 선언하시면 됩니다.
 }

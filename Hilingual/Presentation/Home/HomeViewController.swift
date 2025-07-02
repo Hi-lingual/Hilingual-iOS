@@ -5,20 +5,18 @@
 //  Created by 성현주 on 7/2/25.
 //
 
-import UIKit
-import Combine
+import Foundation
 
-final class HomeViewController: BaseUIViewController {
+final class HomeViewController: BaseUIViewController<HomeViewModel> {
+
+    // MARK: - Properties
 
     private let mainView = HomeView()
-    private let viewModel: HomeViewModel
-    private var cancellables = Set<AnyCancellable>()
 
-    private let fetchTapSubject = PassthroughSubject<Void, Never>()
+    // MARK: - Init
 
-    init(viewModel: HomeViewModel) {
-        self.viewModel = viewModel
-        super.init(nibName: nil, bundle: nil)
+    override init(viewModel: HomeViewModel) {
+        super.init(viewModel: viewModel)
     }
 
     required init?(coder: NSCoder) {
@@ -29,24 +27,25 @@ final class HomeViewController: BaseUIViewController {
         self.view = mainView
     }
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        bind()
-        setupAction()
-    }
+    // MARK: - Bind
 
-    private func setupAction() {
-        mainView.fetchButton.addTarget(self, action: #selector(fetchTapped), for: .touchUpInside)
-    }
+    override func bind(viewModel: HomeViewModel) {
+        super.bind(viewModel: viewModel)
 
-    @objc private func fetchTapped() {
-        fetchTapSubject.send(())
-    }
-
-    private func bind() {
-        let input = HomeViewModel.Input(fetchButtonTapped: fetchTapSubject.eraseToAnyPublisher())
+        let input = makeInput()
         let output = viewModel.transform(input: input)
 
+        bindOutput(output)
+    }
+
+    private func makeInput() -> HomeViewModel.Input {
+        return HomeViewModel.Input(
+            fetchButtonTapped: mainView.fetchButton
+                .publisher(for: .touchUpInside)
+        )
+    }
+
+    private func bindOutput(_ output: HomeViewModel.Output) {
         output.rateText
             .receive(on: RunLoop.main)
             .sink { [weak self] text in

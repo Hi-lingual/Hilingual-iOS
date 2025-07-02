@@ -12,10 +12,10 @@ import Combine
 final class DefaultHomeRepository: HomeRepository {
 
     /// 외부 API 요청을 수행하는 서비스 => 네트워크 모듈로 분리
-    private let service: HomeServiceProtocol
+    private let service: HomeService
 
     ///생성자 주입
-    init(service: HomeServiceProtocol) {
+    init(service: HomeService) {
         self.service = service
     }
 
@@ -23,9 +23,9 @@ final class DefaultHomeRepository: HomeRepository {
     /// - 반환: 도메인 모델(HomeEntity)을 Publisher로 반환
     func fetchCurrentRate() -> AnyPublisher<HomeEntity, Error> {
         return service.fetchExchangeRate() //네트워크 모듈로 부터 환율 정보를 가지고옴요
-            .map { dto in
+            .map { DTO in
                 // DTO → Entity 변환 (Data Layer에서 수행하는게 맞습니다)
-                HomeEntity(exchangeRate: dto.data)
+                HomeEntity(exchangeRate: DTO.data)
             }
             .eraseToAnyPublisher()
     }

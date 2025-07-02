@@ -11,8 +11,4 @@ struct HomeResponseDTO: Decodable {
     let code: Int
     let message: String
     let data: String
-
-    func toEntity() -> HomeEntity {
-        return HomeEntity(exchangeRate: data)
-    }
 }

@@ -6,12 +6,28 @@
 //
 
 import UIKit
+import Combine
 
-class BaseUIViewController: UIViewController {
+class BaseUIViewController<VM: BaseViewBindable>: UIViewController {
 
     // MARK: - Properties
 
-    // MARK: - UI Components
+    public var cancellables = Set<AnyCancellable>()
+    public var viewModel: VM?
+
+    // MARK: - Init
+
+    public init(viewModel: VM) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+        bind(viewModel: viewModel)
+        HilingualLog.debug("[VC LifeCycle] \(Self.self) init")
+    }
+
+    @available(*, unavailable)
+    required public init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 
     // MARK: - Life Cycle
 
@@ -32,6 +48,12 @@ class BaseUIViewController: UIViewController {
 
     func setLayout() {}
 
+    //MARK: - Bind Method
+
+    open func bind(viewModel: VM) {
+        self.viewModel = viewModel
+    }
+
     // MARK: - Action Method
 
     func addTarget() {}
@@ -39,4 +61,10 @@ class BaseUIViewController: UIViewController {
     // MARK: - delegate Method
 
     func setDelegate() {}
+
+    // MARK: - Deinit
+
+    deinit {
+        HilingualLog.debug("[VC LifeCycle] \(Self.self) deinit")
+    }
 }

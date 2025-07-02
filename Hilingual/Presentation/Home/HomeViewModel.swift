@@ -7,20 +7,24 @@
 
 import Combine
 
-final class HomeViewModel: BaseViewModelType {
+final class HomeViewModel: BaseViewModel {
 
-    // MARK: - Input / Output
+    // MARK: - Input
+
     struct Input {
         let fetchButtonTapped: AnyPublisher<Void, Never>
     }
+
+    // MARK: - Output
 
     struct Output {
         let rateText: AnyPublisher<String, Never>
         let errorMessage: AnyPublisher<String, Never>
     }
 
+    // MARK: - Properties
+
     private let useCase: HomeUseCase
-    private var cancellables = Set<AnyCancellable>()
 
     private let rateSubject = PassthroughSubject<String, Never>()
     private let errorSubject = PassthroughSubject<String, Never>()
@@ -28,6 +32,8 @@ final class HomeViewModel: BaseViewModelType {
     init(useCase: HomeUseCase) {
         self.useCase = useCase
     }
+
+    // MARK: - Transform
 
     func transform(input: Input) -> Output {
         input.fetchButtonTapped

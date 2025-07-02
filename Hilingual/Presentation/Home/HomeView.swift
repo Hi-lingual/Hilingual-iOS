@@ -10,6 +10,8 @@ import SnapKit
 
 final class HomeView: BaseUIView {
 
+    //MARK: - UI Components
+
     let rateLabel: UILabel = {
         let label = UILabel()
         label.text = "환율을 조회해보세요"
@@ -27,16 +29,14 @@ final class HomeView: BaseUIView {
         return button
     }()
 
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        backgroundColor = .white
-        setupLayout()
-    }
+    //MARK: - Custom Method
 
-    private func setupLayout() {
+    override func setUI() {
         addSubview(rateLabel)
         addSubview(fetchButton)
+    }
 
+    override func setLayout() {
         rateLabel.snp.makeConstraints {
             $0.center.equalToSuperview()
         }
@@ -47,9 +47,5 @@ final class HomeView: BaseUIView {
             $0.width.equalTo(120)
             $0.height.equalTo(44)
         }
-    }
-
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
     }
 }
