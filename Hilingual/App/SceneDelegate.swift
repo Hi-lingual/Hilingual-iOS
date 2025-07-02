@@ -17,11 +17,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
 
         let window = UIWindow(windowScene: windowScene)
-        let vc = BaseTabbarViewController()
-        window.rootViewController = vc
+        let homeViewController = AppDIContainer.shared.makeHomeViewController()
+
+        window.rootViewController = homeViewController
         self.window = window
         window.makeKeyAndVisible()
     }
+
 
     func sceneDidDisconnect(_ scene: UIScene) {
         // Called as the scene is being released by the system.

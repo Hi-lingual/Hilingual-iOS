@@ -7,6 +7,7 @@
 
 import Foundation
 
+//도메인서 사용하는 엔티티
 struct HomeEntity {
-    let exchangeRate: Int
+    let exchangeRate: String
 }

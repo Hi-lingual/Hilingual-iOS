@@ -7,6 +7,7 @@
 
 import Combine
 
+//추상화된 레포지토리 실 구현은 data 레이어에 있어요
 protocol HomeRepository {
     func fetchCurrentRate() -> AnyPublisher<HomeEntity, Error>
 }
