@@ -14,24 +14,10 @@
 		E5C79B342E15282100E461C3 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5C79B262E15282100E461C3 /* AppDelegate.swift */; };
 		E5C79B352E15282100E461C3 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5C79B2D2E15282100E461C3 /* SceneDelegate.swift */; };
 		E5C84AC92E1538C700CBD669 /* AppDIContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5C84AC82E1538C700CBD669 /* AppDIContainer.swift */; };
-		E5C84AD22E1542D600CBD669 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5C84AD12E1542D600CBD669 /* LoginViewController.swift */; };
-		E5C84AD52E1542E500CBD669 /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5C84AD42E1542E500CBD669 /* HomeViewController.swift */; };
 		E5C84AD82E15430900CBD669 /* HomeDIContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5C84AD72E15430900CBD669 /* HomeDIContainer.swift */; };
-		E5C84ADA2E1543F700CBD669 /* WordBookViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5C84AD92E1543F700CBD669 /* WordBookViewController.swift */; };
-		E5C84ADC2E15440B00CBD669 /* CommunityViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5C84ADB2E15440B00CBD669 /* CommunityViewController.swift */; };
-		E5C84ADE2E15441500CBD669 /* MypageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5C84ADD2E15441500CBD669 /* MypageViewController.swift */; };
-		E5C84AE02E15444600CBD669 /* Button.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5C84ADF2E15444600CBD669 /* Button.swift */; };
-		E5C84AF02E15450D00CBD669 /* UIView+.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5C84AEF2E15450D00CBD669 /* UIView+.swift */; };
-		E5C84AF42E1548A300CBD669 /* BaseUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5C84AF32E1548A300CBD669 /* BaseUIView.swift */; };
-		E5C84AF62E1548CE00CBD669 /* BaseUiViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5C84AF52E1548CE00CBD669 /* BaseUiViewController.swift */; };
-		E5C84AF92E154A9200CBD669 /* BaseViewModelType.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5C84AF82E154A9200CBD669 /* BaseViewModelType.swift */; };
-		E5C84AFD2E15517600CBD669 /* LoginViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5C84AFC2E15517600CBD669 /* LoginViewModel.swift */; };
-		E5C84B042E1555FE00CBD669 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5C84B032E1555FE00CBD669 /* HomeView.swift */; };
 		E5C84B1C2E1558D400CBD669 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = E5C84B1B2E1558D400CBD669 /* SnapKit */; };
-		E5C84B2B2E156BD000CBD669 /* HomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5C84B2A2E156BD000CBD669 /* HomeViewModel.swift */; };
-		E5C84B392E15892900CBD669 /* HilingualLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5C84B382E15892900CBD669 /* HilingualLog.swift */; };
-		E5C84B3B2E158F0B00CBD669 /* UIControl+.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5C84B3A2E158F0B00CBD669 /* UIControl+.swift */; };
 		E5D5D0A92E171AC300DABE8D /* HilingualData in Frameworks */ = {isa = PBXBuildFile; productRef = E5D5D0A82E171AC300DABE8D /* HilingualData */; };
+		E5D5D0AC2E17289000DABE8D /* HilingualPresentation in Frameworks */ = {isa = PBXBuildFile; productRef = E5D5D0AB2E17289000DABE8D /* HilingualPresentation */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -57,23 +43,9 @@
 		E5C79B292E15282100E461C3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		E5C79B2D2E15282100E461C3 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		E5C84AC82E1538C700CBD669 /* AppDIContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDIContainer.swift; sourceTree = "<group>"; };
-		E5C84AD12E1542D600CBD669 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
-		E5C84AD42E1542E500CBD669 /* HomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
 		E5C84AD72E15430900CBD669 /* HomeDIContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeDIContainer.swift; sourceTree = "<group>"; };
-		E5C84AD92E1543F700CBD669 /* WordBookViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordBookViewController.swift; sourceTree = "<group>"; };
-		E5C84ADB2E15440B00CBD669 /* CommunityViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommunityViewController.swift; sourceTree = "<group>"; };
-		E5C84ADD2E15441500CBD669 /* MypageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MypageViewController.swift; sourceTree = "<group>"; };
-		E5C84ADF2E15444600CBD669 /* Button.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Button.swift; sourceTree = "<group>"; };
-		E5C84AEF2E15450D00CBD669 /* UIView+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+.swift"; sourceTree = "<group>"; };
-		E5C84AF32E1548A300CBD669 /* BaseUIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseUIView.swift; sourceTree = "<group>"; };
-		E5C84AF52E1548CE00CBD669 /* BaseUiViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseUiViewController.swift; sourceTree = "<group>"; };
-		E5C84AF82E154A9200CBD669 /* BaseViewModelType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseViewModelType.swift; sourceTree = "<group>"; };
-		E5C84AFC2E15517600CBD669 /* LoginViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewModel.swift; sourceTree = "<group>"; };
-		E5C84B032E1555FE00CBD669 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
-		E5C84B2A2E156BD000CBD669 /* HomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewModel.swift; sourceTree = "<group>"; };
-		E5C84B382E15892900CBD669 /* HilingualLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HilingualLog.swift; sourceTree = "<group>"; };
-		E5C84B3A2E158F0B00CBD669 /* UIControl+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIControl+.swift"; sourceTree = "<group>"; };
 		E5D5D0A72E171AA900DABE8D /* HilingualData */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = HilingualData; sourceTree = "<group>"; };
+		E5D5D0AA2E1727BB00DABE8D /* HilingualPresentation */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = HilingualPresentation; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -84,6 +56,7 @@
 				E5D5D0A92E171AC300DABE8D /* HilingualData in Frameworks */,
 				E5C2F3992E171575003DF6C4 /* HilingualDomain in Frameworks */,
 				E5C2F3952E170A01003DF6C4 /* HilingualNetwork in Frameworks */,
+				E5D5D0AC2E17289000DABE8D /* HilingualPresentation in Frameworks */,
 				E5C84B1C2E1558D400CBD669 /* SnapKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -104,6 +77,7 @@
 				E5C2F3932E1709DC003DF6C4 /* HilingualNetwork */,
 				E5D5D0A72E171AA900DABE8D /* HilingualData */,
 				E5C2F3972E171509003DF6C4 /* HilingualDomain */,
+				E5D5D0AA2E1727BB00DABE8D /* HilingualPresentation */,
 				E5C79B2F2E15282100E461C3 /* Hilingual */,
 				E5151BFF2E15DEA700497996 /* Frameworks */,
 				E5C79B0F2E15281900E461C3 /* Products */,
@@ -122,7 +96,6 @@
 			isa = PBXGroup;
 			children = (
 				E5C79B3B2E152AC800E461C3 /* App */,
-				E5C79B382E152AB700E461C3 /* Presentation */,
 				E5C79B3A2E152AC300E461C3 /* Core */,
 				E5C79B372E152AB100E461C3 /* Resource */,
 				E5C79B282E15282100E461C3 /* Info.plist */,
@@ -139,26 +112,10 @@
 			path = Resource;
 			sourceTree = "<group>";
 		};
-		E5C79B382E152AB700E461C3 /* Presentation */ = {
-			isa = PBXGroup;
-			children = (
-				E5C84ACE2E153D9500CBD669 /* Login */,
-				E5C84ACA2E153BEC00CBD669 /* Home */,
-				E5C84ACB2E153BFD00CBD669 /* WordBook */,
-				E5C84ACD2E153C2800CBD669 /* Community */,
-				E5C84ACC2E153C1C00CBD669 /* MyPage */,
-			);
-			path = Presentation;
-			sourceTree = "<group>";
-		};
 		E5C79B3A2E152AC300E461C3 /* Core */ = {
 			isa = PBXGroup;
 			children = (
-				E5C84B372E1588C400CBD669 /* Utils */,
 				E5C84AC12E15342F00CBD669 /* DIContainer */,
-				E5C84ABB2E152E5400CBD669 /* Base */,
-				E5C84AB82E152E0000CBD669 /* Components */,
-				E5C84AB72E152DF200CBD669 /* Extensions */,
 			);
 			path = Core;
 			sourceTree = "<group>";
@@ -173,90 +130,12 @@
 			path = App;
 			sourceTree = "<group>";
 		};
-		E5C84AB72E152DF200CBD669 /* Extensions */ = {
-			isa = PBXGroup;
-			children = (
-				E5C84AEF2E15450D00CBD669 /* UIView+.swift */,
-				E5C84B3A2E158F0B00CBD669 /* UIControl+.swift */,
-			);
-			path = Extensions;
-			sourceTree = "<group>";
-		};
-		E5C84AB82E152E0000CBD669 /* Components */ = {
-			isa = PBXGroup;
-			children = (
-				E5C84ADF2E15444600CBD669 /* Button.swift */,
-			);
-			path = Components;
-			sourceTree = "<group>";
-		};
-		E5C84ABB2E152E5400CBD669 /* Base */ = {
-			isa = PBXGroup;
-			children = (
-				E5C84AF82E154A9200CBD669 /* BaseViewModelType.swift */,
-				E5C84AF52E1548CE00CBD669 /* BaseUiViewController.swift */,
-				E5C84AF32E1548A300CBD669 /* BaseUIView.swift */,
-			);
-			path = Base;
-			sourceTree = "<group>";
-		};
 		E5C84AC12E15342F00CBD669 /* DIContainer */ = {
 			isa = PBXGroup;
 			children = (
 				E5C84AD72E15430900CBD669 /* HomeDIContainer.swift */,
 			);
 			path = DIContainer;
-			sourceTree = "<group>";
-		};
-		E5C84ACA2E153BEC00CBD669 /* Home */ = {
-			isa = PBXGroup;
-			children = (
-				E5C84B032E1555FE00CBD669 /* HomeView.swift */,
-				E5C84AD42E1542E500CBD669 /* HomeViewController.swift */,
-				E5C84B2A2E156BD000CBD669 /* HomeViewModel.swift */,
-			);
-			path = Home;
-			sourceTree = "<group>";
-		};
-		E5C84ACB2E153BFD00CBD669 /* WordBook */ = {
-			isa = PBXGroup;
-			children = (
-				E5C84AD92E1543F700CBD669 /* WordBookViewController.swift */,
-			);
-			path = WordBook;
-			sourceTree = "<group>";
-		};
-		E5C84ACC2E153C1C00CBD669 /* MyPage */ = {
-			isa = PBXGroup;
-			children = (
-				E5C84ADD2E15441500CBD669 /* MypageViewController.swift */,
-			);
-			path = MyPage;
-			sourceTree = "<group>";
-		};
-		E5C84ACD2E153C2800CBD669 /* Community */ = {
-			isa = PBXGroup;
-			children = (
-				E5C84ADB2E15440B00CBD669 /* CommunityViewController.swift */,
-			);
-			path = Community;
-			sourceTree = "<group>";
-		};
-		E5C84ACE2E153D9500CBD669 /* Login */ = {
-			isa = PBXGroup;
-			children = (
-				E5C84AD12E1542D600CBD669 /* LoginViewController.swift */,
-				E5C84AFC2E15517600CBD669 /* LoginViewModel.swift */,
-			);
-			path = Login;
-			sourceTree = "<group>";
-		};
-		E5C84B372E1588C400CBD669 /* Utils */ = {
-			isa = PBXGroup;
-			children = (
-				E5C84B382E15892900CBD669 /* HilingualLog.swift */,
-			);
-			path = Utils;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -281,6 +160,7 @@
 				E5C2F3942E170A01003DF6C4 /* HilingualNetwork */,
 				E5C2F3982E171575003DF6C4 /* HilingualDomain */,
 				E5D5D0A82E171AC300DABE8D /* HilingualData */,
+				E5D5D0AB2E17289000DABE8D /* HilingualPresentation */,
 			);
 			productName = Hilingual;
 			productReference = E5C79B0E2E15281900E461C3 /* Hilingual.app */;
@@ -340,25 +220,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E5C84AFD2E15517600CBD669 /* LoginViewModel.swift in Sources */,
-				E5C84AF92E154A9200CBD669 /* BaseViewModelType.swift in Sources */,
 				E5C84AC92E1538C700CBD669 /* AppDIContainer.swift in Sources */,
-				E5C84B392E15892900CBD669 /* HilingualLog.swift in Sources */,
 				E5C79B342E15282100E461C3 /* AppDelegate.swift in Sources */,
-				E5C84AF42E1548A300CBD669 /* BaseUIView.swift in Sources */,
-				E5C84ADC2E15440B00CBD669 /* CommunityViewController.swift in Sources */,
 				E5C79B352E15282100E461C3 /* SceneDelegate.swift in Sources */,
-				E5C84AD22E1542D600CBD669 /* LoginViewController.swift in Sources */,
-				E5C84ADE2E15441500CBD669 /* MypageViewController.swift in Sources */,
 				E5C84AD82E15430900CBD669 /* HomeDIContainer.swift in Sources */,
-				E5C84ADA2E1543F700CBD669 /* WordBookViewController.swift in Sources */,
-				E5C84AF62E1548CE00CBD669 /* BaseUiViewController.swift in Sources */,
-				E5C84B3B2E158F0B00CBD669 /* UIControl+.swift in Sources */,
-				E5C84AD52E1542E500CBD669 /* HomeViewController.swift in Sources */,
-				E5C84AF02E15450D00CBD669 /* UIView+.swift in Sources */,
-				E5C84B2B2E156BD000CBD669 /* HomeViewModel.swift in Sources */,
-				E5C84AE02E15444600CBD669 /* Button.swift in Sources */,
-				E5C84B042E1555FE00CBD669 /* HomeView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -598,6 +463,10 @@
 		E5D5D0A82E171AC300DABE8D /* HilingualData */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = HilingualData;
+		};
+		E5D5D0AB2E17289000DABE8D /* HilingualPresentation */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = HilingualPresentation;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

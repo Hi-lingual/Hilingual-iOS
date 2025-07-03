@@ -9,7 +9,7 @@ import Combine
 
 import HilingualDomain
 
-final class HomeViewModel: BaseViewModel {
+public final class HomeViewModel: BaseViewModel {
 
     // MARK: - Input
 
@@ -31,7 +31,7 @@ final class HomeViewModel: BaseViewModel {
     private let rateSubject = PassthroughSubject<String, Never>()
     private let errorSubject = PassthroughSubject<String, Never>()
 
-    init(useCase: HomeUseCase) {
+    public init(useCase: HomeUseCase) {
         self.useCase = useCase
     }
 

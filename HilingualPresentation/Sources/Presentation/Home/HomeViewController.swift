@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class HomeViewController: BaseUIViewController<HomeViewModel> {
+public final class HomeViewController: BaseUIViewController<HomeViewModel> {
 
     // MARK: - Properties
 
@@ -15,7 +15,7 @@ final class HomeViewController: BaseUIViewController<HomeViewModel> {
 
     // MARK: - Init
 
-    override init(viewModel: HomeViewModel) {
+    public override init(viewModel: HomeViewModel) {
         super.init(viewModel: viewModel)
     }
 
@@ -23,13 +23,13 @@ final class HomeViewController: BaseUIViewController<HomeViewModel> {
         fatalError("init(coder:) has not been implemented")
     }
 
-    override func loadView() {
+    public override func loadView() {
         self.view = mainView
     }
 
     // MARK: - Bind
 
-    override func bind(viewModel: HomeViewModel) {
+    public override func bind(viewModel: HomeViewModel) {
         super.bind(viewModel: viewModel)
 
         let input = makeInput()

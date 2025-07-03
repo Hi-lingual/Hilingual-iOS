@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import HilingualPresentation
 
 final class AppDIContainer {
 

@@ -8,7 +8,7 @@
 import UIKit
 import Combine
 
-class BaseUIViewController<VM: BaseViewBindable>: UIViewController {
+public class BaseUIViewController<VM: BaseViewBindable>: UIViewController {
 
     // MARK: - Properties
 
@@ -31,7 +31,7 @@ class BaseUIViewController<VM: BaseViewBindable>: UIViewController {
 
     // MARK: - Life Cycle
 
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
 

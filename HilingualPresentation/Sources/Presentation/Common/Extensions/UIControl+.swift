@@ -19,14 +19,14 @@ extension UIControl {
 
 // MARK: - Custom Publisher
 
-private struct UIControlPublisher: Publisher {
+private struct UIControlPublisher: @preconcurrency Publisher {
     typealias Output = Void
     typealias Failure = Never
 
     let control: UIControl
     let event: UIControl.Event
 
-    func receive<S: Subscriber>(subscriber: S) where S.Input == Output, S.Failure == Failure {
+    @MainActor func receive<S: Subscriber>(subscriber: S) where S.Input == Output, S.Failure == Failure {
         let subscription = UIControlSubscription(subscriber: subscriber, control: control, event: event)
         subscriber.receive(subscription: subscription)
     }
@@ -34,7 +34,8 @@ private struct UIControlPublisher: Publisher {
 
 // MARK: - Custom Subscription
 
-private final class UIControlSubscription<S: Subscriber>: Subscription where S.Input == Void {
+@MainActor
+private final class UIControlSubscription<S: Subscriber>: @preconcurrency Subscription where S.Input == Void {
     private var subscriber: S?
     private weak var control: UIControl?
     private let event: UIControl.Event

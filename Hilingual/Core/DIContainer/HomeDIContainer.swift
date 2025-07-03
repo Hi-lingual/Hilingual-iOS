@@ -10,6 +10,7 @@ import Foundation
 import HilingualNetwork
 import HilingualDomain
 import HilingualData
+import HilingualPresentation
 
 final class HomeDIContainer {
 
@@ -28,6 +29,7 @@ final class HomeDIContainer {
 
     // MARK: - UseCase
     private func makeHomeUseCase() -> HomeUseCase {
+        
         return DefaultHomeUseCase(repository: makeHomeRepository())
     }
 
