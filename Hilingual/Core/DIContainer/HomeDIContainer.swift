@@ -7,6 +7,8 @@
 
 import Foundation
 
+import HilingualNetwork
+
 final class HomeDIContainer {
 
     static let shared = HomeDIContainer()

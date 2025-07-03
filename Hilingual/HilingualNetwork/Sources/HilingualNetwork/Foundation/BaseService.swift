@@ -9,14 +9,14 @@ import Foundation
 import Combine
 import Moya
 
-class BaseService<API: TargetType> {
+public class BaseService<API: TargetType> {
     let provider: MoyaProvider<API>
 
-    init(provider: MoyaProvider<API> = MoyaProvider<API>(plugins: [MoyaLoggerPlugin()])) {
+    public init(provider: MoyaProvider<API> = NetworkProvider.make()) {
         self.provider = provider
     }
 
-    func request<T: Decodable>(_ target: API, as type: T.Type) -> AnyPublisher<T, NetworkError> {
+    public func request<T: Decodable>(_ target: API, as type: T.Type) -> AnyPublisher<T, NetworkError> {
         return Future<T, NetworkError> { [weak self] promise in
             self?.provider.request(target) { result in
                 switch result {

@@ -13,18 +13,18 @@ protocol BaseTargetType: TargetType { }
 
 extension BaseTargetType{
 
-    var baseURL: URL {
+    public var baseURL: URL {
         return URL(string: "https://98107e2c-a68e-4e89-bacf-85f13c9a1652.mock.pstmn.io")!
     }
 
-    var headers: [String : String]? {
+    public var headers: [String : String]? {
         let header = [
             "Content-Type": "application/json"
         ]
         return header
     }
 
-    var sampleData: Data {
+    public var sampleData: Data {
         return Data()
     }
 

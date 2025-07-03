@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E5C2F3952E170A01003DF6C4 /* HilingualNetwork in Frameworks */ = {isa = PBXBuildFile; productRef = E5C2F3942E170A01003DF6C4 /* HilingualNetwork */; };
 		E5C79B302E15282100E461C3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E5C79B272E15282100E461C3 /* Assets.xcassets */; };
 		E5C79B322E15282100E461C3 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E5C79B2A2E15282100E461C3 /* LaunchScreen.storyboard */; };
 		E5C79B342E15282100E461C3 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5C79B262E15282100E461C3 /* AppDelegate.swift */; };
@@ -33,14 +34,6 @@
 		E5C84B2B2E156BD000CBD669 /* HomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5C84B2A2E156BD000CBD669 /* HomeViewModel.swift */; };
 		E5C84B392E15892900CBD669 /* HilingualLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5C84B382E15892900CBD669 /* HilingualLog.swift */; };
 		E5C84B3B2E158F0B00CBD669 /* UIControl+.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5C84B3A2E158F0B00CBD669 /* UIControl+.swift */; };
-		E5D4B64D2E16472C00DCFD76 /* NetworkError.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5D4B6432E16472C00DCFD76 /* NetworkError.swift */; };
-		E5D4B64E2E16472C00DCFD76 /* MoyaLoggerPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5D4B6472E16472C00DCFD76 /* MoyaLoggerPlugin.swift */; };
-		E5D4B64F2E16472C00DCFD76 /* MoyaProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5D4B6482E16472C00DCFD76 /* MoyaProvider.swift */; };
-		E5D4B6502E16472C00DCFD76 /* HomeAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5D4B63F2E16472C00DCFD76 /* HomeAPI.swift */; };
-		E5D4B6512E16472C00DCFD76 /* BaseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5D4B6452E16472C00DCFD76 /* BaseService.swift */; };
-		E5D4B6522E16472C00DCFD76 /* HomeResponseDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5D4B6412E16472C00DCFD76 /* HomeResponseDTO.swift */; };
-		E5D4B6532E16472C00DCFD76 /* DefaultHomeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5D4B64A2E16472C00DCFD76 /* DefaultHomeService.swift */; };
-		E5D4B6542E16472C00DCFD76 /* BaseTargetType.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5D4B6462E16472C00DCFD76 /* BaseTargetType.swift */; };
 		E5D4B6572E16474B00DCFD76 /* Moya in Frameworks */ = {isa = PBXBuildFile; productRef = E5D4B6562E16474B00DCFD76 /* Moya */; };
 /* End PBXBuildFile section */
 
@@ -58,6 +51,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		E5C2F3932E1709DC003DF6C4 /* HilingualNetwork */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = HilingualNetwork; sourceTree = "<group>"; };
 		E5C79B0E2E15281900E461C3 /* Hilingual.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Hilingual.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E5C79B262E15282100E461C3 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E5C79B272E15282100E461C3 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -85,14 +79,6 @@
 		E5C84B2A2E156BD000CBD669 /* HomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewModel.swift; sourceTree = "<group>"; };
 		E5C84B382E15892900CBD669 /* HilingualLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HilingualLog.swift; sourceTree = "<group>"; };
 		E5C84B3A2E158F0B00CBD669 /* UIControl+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIControl+.swift"; sourceTree = "<group>"; };
-		E5D4B63F2E16472C00DCFD76 /* HomeAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeAPI.swift; sourceTree = "<group>"; };
-		E5D4B6412E16472C00DCFD76 /* HomeResponseDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeResponseDTO.swift; sourceTree = "<group>"; };
-		E5D4B6432E16472C00DCFD76 /* NetworkError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkError.swift; sourceTree = "<group>"; };
-		E5D4B6452E16472C00DCFD76 /* BaseService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseService.swift; sourceTree = "<group>"; };
-		E5D4B6462E16472C00DCFD76 /* BaseTargetType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseTargetType.swift; sourceTree = "<group>"; };
-		E5D4B6472E16472C00DCFD76 /* MoyaLoggerPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoyaLoggerPlugin.swift; sourceTree = "<group>"; };
-		E5D4B6482E16472C00DCFD76 /* MoyaProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoyaProvider.swift; sourceTree = "<group>"; };
-		E5D4B64A2E16472C00DCFD76 /* DefaultHomeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultHomeService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -100,6 +86,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E5C2F3952E170A01003DF6C4 /* HilingualNetwork in Frameworks */,
 				E5D4B6572E16474B00DCFD76 /* Moya in Frameworks */,
 				E5C84B1C2E1558D400CBD669 /* SnapKit in Frameworks */,
 			);
@@ -135,7 +122,7 @@
 		E5C79B2F2E15282100E461C3 /* Hilingual */ = {
 			isa = PBXGroup;
 			children = (
-				E5D4B64C2E16472C00DCFD76 /* Network */,
+				E5C2F3932E1709DC003DF6C4 /* HilingualNetwork */,
 				E5C79B3B2E152AC800E461C3 /* App */,
 				E5C79B382E152AB700E461C3 /* Presentation */,
 				E5C79B392E152ABE00E461C3 /* Domain */,
@@ -334,61 +321,6 @@
 			path = Utils;
 			sourceTree = "<group>";
 		};
-		E5D4B6402E16472C00DCFD76 /* API */ = {
-			isa = PBXGroup;
-			children = (
-				E5D4B63F2E16472C00DCFD76 /* HomeAPI.swift */,
-			);
-			path = API;
-			sourceTree = "<group>";
-		};
-		E5D4B6422E16472C00DCFD76 /* DTO */ = {
-			isa = PBXGroup;
-			children = (
-				E5D4B6412E16472C00DCFD76 /* HomeResponseDTO.swift */,
-			);
-			path = DTO;
-			sourceTree = "<group>";
-		};
-		E5D4B6442E16472C00DCFD76 /* Error */ = {
-			isa = PBXGroup;
-			children = (
-				E5D4B6432E16472C00DCFD76 /* NetworkError.swift */,
-			);
-			path = Error;
-			sourceTree = "<group>";
-		};
-		E5D4B6492E16472C00DCFD76 /* Foundation */ = {
-			isa = PBXGroup;
-			children = (
-				E5D4B6452E16472C00DCFD76 /* BaseService.swift */,
-				E5D4B6462E16472C00DCFD76 /* BaseTargetType.swift */,
-				E5D4B6472E16472C00DCFD76 /* MoyaLoggerPlugin.swift */,
-				E5D4B6482E16472C00DCFD76 /* MoyaProvider.swift */,
-			);
-			path = Foundation;
-			sourceTree = "<group>";
-		};
-		E5D4B64B2E16472C00DCFD76 /* Service */ = {
-			isa = PBXGroup;
-			children = (
-				E5D4B64A2E16472C00DCFD76 /* DefaultHomeService.swift */,
-			);
-			path = Service;
-			sourceTree = "<group>";
-		};
-		E5D4B64C2E16472C00DCFD76 /* Network */ = {
-			isa = PBXGroup;
-			children = (
-				E5D4B6402E16472C00DCFD76 /* API */,
-				E5D4B6422E16472C00DCFD76 /* DTO */,
-				E5D4B6442E16472C00DCFD76 /* Error */,
-				E5D4B6492E16472C00DCFD76 /* Foundation */,
-				E5D4B64B2E16472C00DCFD76 /* Service */,
-			);
-			path = Network;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -409,6 +341,7 @@
 			packageProductDependencies = (
 				E5C84B1B2E1558D400CBD669 /* SnapKit */,
 				E5D4B6562E16474B00DCFD76 /* Moya */,
+				E5C2F3942E170A01003DF6C4 /* HilingualNetwork */,
 			);
 			productName = Hilingual;
 			productReference = E5C79B0E2E15281900E461C3 /* Hilingual.app */;
@@ -481,14 +414,6 @@
 				E5C84AE22E15448B00CBD669 /* HomeRepository.swift in Sources */,
 				E5C84AD22E1542D600CBD669 /* LoginViewController.swift in Sources */,
 				E5C84ADE2E15441500CBD669 /* MypageViewController.swift in Sources */,
-				E5D4B64D2E16472C00DCFD76 /* NetworkError.swift in Sources */,
-				E5D4B64E2E16472C00DCFD76 /* MoyaLoggerPlugin.swift in Sources */,
-				E5D4B64F2E16472C00DCFD76 /* MoyaProvider.swift in Sources */,
-				E5D4B6502E16472C00DCFD76 /* HomeAPI.swift in Sources */,
-				E5D4B6512E16472C00DCFD76 /* BaseService.swift in Sources */,
-				E5D4B6522E16472C00DCFD76 /* HomeResponseDTO.swift in Sources */,
-				E5D4B6532E16472C00DCFD76 /* DefaultHomeService.swift in Sources */,
-				E5D4B6542E16472C00DCFD76 /* BaseTargetType.swift in Sources */,
 				E5C84AD82E15430900CBD669 /* HomeDIContainer.swift in Sources */,
 				E5C84ADA2E1543F700CBD669 /* WordBookViewController.swift in Sources */,
 				E5C84AE62E1544A300CBD669 /* HomeEntity.swift in Sources */,
@@ -731,6 +656,10 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		E5C2F3942E170A01003DF6C4 /* HilingualNetwork */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = HilingualNetwork;
+		};
 		E5C84B1B2E1558D400CBD669 /* SnapKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = E5C84B1A2E1558D400CBD669 /* XCRemoteSwiftPackageReference "SnapKit" */;

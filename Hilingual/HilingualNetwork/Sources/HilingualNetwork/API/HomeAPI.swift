@@ -8,20 +8,20 @@
 import Foundation
 import Moya
 
-enum HomeAPI {
+public enum HomeAPI {
     case getRate
 }
 
 extension HomeAPI: BaseTargetType {
-    var path: String {
+    public var path: String {
         return "/money"
     }
 
-    var method: Moya.Method {
+    public var method: Moya.Method {
         return .get
     }
 
-    var task: Task {
+    public var task: Task {
         return .requestPlain
     }
 }

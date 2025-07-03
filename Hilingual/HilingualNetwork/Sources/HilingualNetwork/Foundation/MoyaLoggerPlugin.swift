@@ -7,10 +7,10 @@
 
 import Moya
 
-final class MoyaLoggerPlugin: PluginType {
+public final class MoyaLoggerPlugin: PluginType {
 
     // MARK: - Request 보낼 시 호출
-    func willSend(_ request: RequestType, target: TargetType) {
+    public func willSend(_ request: RequestType, target: TargetType) {
         guard let httpRequest = request.request else {
             print("--> 유효하지 않은 요청")
             return
@@ -30,7 +30,7 @@ final class MoyaLoggerPlugin: PluginType {
     }
 
     // MARK: - Response 받을 시 호출
-    func didReceive(_ result: Result<Response, MoyaError>, target: TargetType) {
+    public func didReceive(_ result: Result<Response, MoyaError>, target: TargetType) {
         switch result {
         case let .success(response):
             self.onSucceed(response)

@@ -7,6 +7,8 @@
 
 import Combine
 
+import HilingualNetwork
+
 /// HomeRepository 프로토콜을 구현한 클래스
 /// - 역할: Network로부터 받은 DTO를 도메인 모델(Entity)로 변환하여 전달하는 녀석입니다!
 final class DefaultHomeRepository: HomeRepository {

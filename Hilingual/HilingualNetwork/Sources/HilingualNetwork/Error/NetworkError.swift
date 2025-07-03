@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum NetworkError: Error {
+public enum NetworkError: Error {
     case decoding
     case unauthorized
     case forbidden
@@ -18,7 +18,7 @@ enum NetworkError: Error {
     case unknown
 }
 
-struct ServerError: Decodable, Error {
+public struct ServerError: Decodable, Error {
     let code: Int
     let message: String
 }
