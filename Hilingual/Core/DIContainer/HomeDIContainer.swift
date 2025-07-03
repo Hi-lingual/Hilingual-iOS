@@ -8,6 +8,7 @@
 import Foundation
 
 import HilingualNetwork
+import HilingualDomain
 
 final class HomeDIContainer {
 

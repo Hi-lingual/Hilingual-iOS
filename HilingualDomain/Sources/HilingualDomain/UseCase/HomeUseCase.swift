@@ -8,19 +8,19 @@
 import Combine
 
 //인터페이스 외부에서는 이친구를 의존합니다
-protocol HomeUseCase {
+public protocol HomeUseCase {
     func fetchCurrentRate() -> AnyPublisher<HomeEntity, Error>
 }
 
 //실제 구현부 
-final class DefaultHomeUseCase: HomeUseCase {
+public final class DefaultHomeUseCase: HomeUseCase {
     private let repository: HomeRepository //추상화된 레포지토리 의존
 
-    init(repository: HomeRepository) {
+    public init(repository: HomeRepository) {
         self.repository = repository
     }
 
-    func fetchCurrentRate() -> AnyPublisher<HomeEntity, Error> {
+    public func fetchCurrentRate() -> AnyPublisher<HomeEntity, Error> {
         return repository.fetchCurrentRate() //레포지토리에 요청 조회좀 해주셈 ㅋㅋ
     }
 }

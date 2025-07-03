@@ -7,6 +7,8 @@
 
 import Combine
 
+import HilingualDomain
+
 final class HomeViewModel: BaseViewModel {
 
     // MARK: - Input
