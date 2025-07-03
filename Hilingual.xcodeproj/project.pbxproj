@@ -21,7 +21,6 @@
 		E5C84ADC2E15440B00CBD669 /* CommunityViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5C84ADB2E15440B00CBD669 /* CommunityViewController.swift */; };
 		E5C84ADE2E15441500CBD669 /* MypageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5C84ADD2E15441500CBD669 /* MypageViewController.swift */; };
 		E5C84AE02E15444600CBD669 /* Button.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5C84ADF2E15444600CBD669 /* Button.swift */; };
-		E5C84AE82E1544B900CBD669 /* DefaultHomeRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5C84AE72E1544B900CBD669 /* DefaultHomeRepository.swift */; };
 		E5C84AF02E15450D00CBD669 /* UIView+.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5C84AEF2E15450D00CBD669 /* UIView+.swift */; };
 		E5C84AF42E1548A300CBD669 /* BaseUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5C84AF32E1548A300CBD669 /* BaseUIView.swift */; };
 		E5C84AF62E1548CE00CBD669 /* BaseUiViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5C84AF52E1548CE00CBD669 /* BaseUiViewController.swift */; };
@@ -32,6 +31,7 @@
 		E5C84B2B2E156BD000CBD669 /* HomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5C84B2A2E156BD000CBD669 /* HomeViewModel.swift */; };
 		E5C84B392E15892900CBD669 /* HilingualLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5C84B382E15892900CBD669 /* HilingualLog.swift */; };
 		E5C84B3B2E158F0B00CBD669 /* UIControl+.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5C84B3A2E158F0B00CBD669 /* UIControl+.swift */; };
+		E5D5D0A92E171AC300DABE8D /* HilingualData in Frameworks */ = {isa = PBXBuildFile; productRef = E5D5D0A82E171AC300DABE8D /* HilingualData */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -64,7 +64,6 @@
 		E5C84ADB2E15440B00CBD669 /* CommunityViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommunityViewController.swift; sourceTree = "<group>"; };
 		E5C84ADD2E15441500CBD669 /* MypageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MypageViewController.swift; sourceTree = "<group>"; };
 		E5C84ADF2E15444600CBD669 /* Button.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Button.swift; sourceTree = "<group>"; };
-		E5C84AE72E1544B900CBD669 /* DefaultHomeRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultHomeRepository.swift; sourceTree = "<group>"; };
 		E5C84AEF2E15450D00CBD669 /* UIView+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+.swift"; sourceTree = "<group>"; };
 		E5C84AF32E1548A300CBD669 /* BaseUIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseUIView.swift; sourceTree = "<group>"; };
 		E5C84AF52E1548CE00CBD669 /* BaseUiViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseUiViewController.swift; sourceTree = "<group>"; };
@@ -74,6 +73,7 @@
 		E5C84B2A2E156BD000CBD669 /* HomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewModel.swift; sourceTree = "<group>"; };
 		E5C84B382E15892900CBD669 /* HilingualLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HilingualLog.swift; sourceTree = "<group>"; };
 		E5C84B3A2E158F0B00CBD669 /* UIControl+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIControl+.swift"; sourceTree = "<group>"; };
+		E5D5D0A72E171AA900DABE8D /* HilingualData */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = HilingualData; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -81,6 +81,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E5D5D0A92E171AC300DABE8D /* HilingualData in Frameworks */,
 				E5C2F3992E171575003DF6C4 /* HilingualDomain in Frameworks */,
 				E5C2F3952E170A01003DF6C4 /* HilingualNetwork in Frameworks */,
 				E5C84B1C2E1558D400CBD669 /* SnapKit in Frameworks */,
@@ -101,6 +102,7 @@
 			isa = PBXGroup;
 			children = (
 				E5C2F3932E1709DC003DF6C4 /* HilingualNetwork */,
+				E5D5D0A72E171AA900DABE8D /* HilingualData */,
 				E5C2F3972E171509003DF6C4 /* HilingualDomain */,
 				E5C79B2F2E15282100E461C3 /* Hilingual */,
 				E5151BFF2E15DEA700497996 /* Frameworks */,
@@ -121,7 +123,6 @@
 			children = (
 				E5C79B3B2E152AC800E461C3 /* App */,
 				E5C79B382E152AB700E461C3 /* Presentation */,
-				E5C79B3C2E152AD000E461C3 /* Data */,
 				E5C79B3A2E152AC300E461C3 /* Core */,
 				E5C79B372E152AB100E461C3 /* Resource */,
 				E5C79B282E15282100E461C3 /* Info.plist */,
@@ -170,22 +171,6 @@
 				E5C84AC82E1538C700CBD669 /* AppDIContainer.swift */,
 			);
 			path = App;
-			sourceTree = "<group>";
-		};
-		E5C79B3C2E152AD000E461C3 /* Data */ = {
-			isa = PBXGroup;
-			children = (
-				E5C79B3F2E152BBF00E461C3 /* Repository */,
-			);
-			path = Data;
-			sourceTree = "<group>";
-		};
-		E5C79B3F2E152BBF00E461C3 /* Repository */ = {
-			isa = PBXGroup;
-			children = (
-				E5C84AE72E1544B900CBD669 /* DefaultHomeRepository.swift */,
-			);
-			path = Repository;
 			sourceTree = "<group>";
 		};
 		E5C84AB72E152DF200CBD669 /* Extensions */ = {
@@ -295,6 +280,7 @@
 				E5C84B1B2E1558D400CBD669 /* SnapKit */,
 				E5C2F3942E170A01003DF6C4 /* HilingualNetwork */,
 				E5C2F3982E171575003DF6C4 /* HilingualDomain */,
+				E5D5D0A82E171AC300DABE8D /* HilingualData */,
 			);
 			productName = Hilingual;
 			productReference = E5C79B0E2E15281900E461C3 /* Hilingual.app */;
@@ -360,7 +346,6 @@
 				E5C84B392E15892900CBD669 /* HilingualLog.swift in Sources */,
 				E5C79B342E15282100E461C3 /* AppDelegate.swift in Sources */,
 				E5C84AF42E1548A300CBD669 /* BaseUIView.swift in Sources */,
-				E5C84AE82E1544B900CBD669 /* DefaultHomeRepository.swift in Sources */,
 				E5C84ADC2E15440B00CBD669 /* CommunityViewController.swift in Sources */,
 				E5C79B352E15282100E461C3 /* SceneDelegate.swift in Sources */,
 				E5C84AD22E1542D600CBD669 /* LoginViewController.swift in Sources */,
@@ -609,6 +594,10 @@
 			isa = XCSwiftPackageProductDependency;
 			package = E5C84B1A2E1558D400CBD669 /* XCRemoteSwiftPackageReference "SnapKit" */;
 			productName = SnapKit;
+		};
+		E5D5D0A82E171AC300DABE8D /* HilingualData */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = HilingualData;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
