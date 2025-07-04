@@ -6,22 +6,28 @@
 //
 
 import UIKit
+import HilingualPresentation
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
 
 
-    func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
+    func scene(_ scene: UIScene,
+               willConnectTo session: UISceneSession,
+               options connectionOptions: UIScene.ConnectionOptions) {
 
-        guard let windowScene = (scene as? UIWindowScene) else { return }
+        guard let windowScene = scene as? UIWindowScene else { return }
 
         let window = UIWindow(windowScene: windowScene)
-        let homeViewController = AppDIContainer.shared.makeHomeViewController()
 
-        window.rootViewController = homeViewController
-        self.window = window
+        let navigationController = UINavigationController()
+        let loginVC = AppDIContainer.shared.makeLoginViewController()
+        navigationController.setViewControllers([loginVC], animated: false)
+
+        window.rootViewController = navigationController
         window.makeKeyAndVisible()
+        self.window = window
     }
 
 

@@ -13,7 +13,6 @@
 		E5C79B342E15282100E461C3 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5C79B262E15282100E461C3 /* AppDelegate.swift */; };
 		E5C79B352E15282100E461C3 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5C79B2D2E15282100E461C3 /* SceneDelegate.swift */; };
 		E5C84AC92E1538C700CBD669 /* AppDIContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5C84AC82E1538C700CBD669 /* AppDIContainer.swift */; };
-		E5C84AD82E15430900CBD669 /* HomeDIContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5C84AD72E15430900CBD669 /* HomeDIContainer.swift */; };
 		E5C84B1C2E1558D400CBD669 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = E5C84B1B2E1558D400CBD669 /* SnapKit */; };
 		E5D5D0A92E171AC300DABE8D /* HilingualData in Frameworks */ = {isa = PBXBuildFile; productRef = E5D5D0A82E171AC300DABE8D /* HilingualData */; };
 		E5D5D0AC2E17289000DABE8D /* HilingualPresentation in Frameworks */ = {isa = PBXBuildFile; productRef = E5D5D0AB2E17289000DABE8D /* HilingualPresentation */; };
@@ -41,7 +40,6 @@
 		E5C79B292E15282100E461C3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		E5C79B2D2E15282100E461C3 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		E5C84AC82E1538C700CBD669 /* AppDIContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDIContainer.swift; sourceTree = "<group>"; };
-		E5C84AD72E15430900CBD669 /* HomeDIContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeDIContainer.swift; sourceTree = "<group>"; };
 		E5D5D0A72E171AA900DABE8D /* HilingualData */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = HilingualData; sourceTree = "<group>"; };
 		E5D5D0AA2E1727BB00DABE8D /* HilingualPresentation */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = HilingualPresentation; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -94,18 +92,9 @@
 			isa = PBXGroup;
 			children = (
 				E5C79B3B2E152AC800E461C3 /* App */,
-				E5C79B3A2E152AC300E461C3 /* Core */,
 				E5C79B282E15282100E461C3 /* Info.plist */,
 			);
 			path = Hilingual;
-			sourceTree = "<group>";
-		};
-		E5C79B3A2E152AC300E461C3 /* Core */ = {
-			isa = PBXGroup;
-			children = (
-				E5C84AC12E15342F00CBD669 /* DIContainer */,
-			);
-			path = Core;
 			sourceTree = "<group>";
 		};
 		E5C79B3B2E152AC800E461C3 /* App */ = {
@@ -117,14 +106,6 @@
 				E5C79B2A2E15282100E461C3 /* LaunchScreen.storyboard */,
 			);
 			path = App;
-			sourceTree = "<group>";
-		};
-		E5C84AC12E15342F00CBD669 /* DIContainer */ = {
-			isa = PBXGroup;
-			children = (
-				E5C84AD72E15430900CBD669 /* HomeDIContainer.swift */,
-			);
-			path = DIContainer;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -211,7 +192,6 @@
 				E5C84AC92E1538C700CBD669 /* AppDIContainer.swift in Sources */,
 				E5C79B342E15282100E461C3 /* AppDelegate.swift in Sources */,
 				E5C79B352E15282100E461C3 /* SceneDelegate.swift in Sources */,
-				E5C84AD82E15430900CBD669 /* HomeDIContainer.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
