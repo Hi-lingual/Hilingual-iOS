@@ -13,16 +13,6 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
 
     private let mainView = HomeView()
 
-    // MARK: - Init
-
-    public override init(viewModel: HomeViewModel) {
-        super.init(viewModel: viewModel)
-    }
-
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-
     public override func loadView() {
         self.view = mainView
     }

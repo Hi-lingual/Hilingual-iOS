@@ -1,5 +1,5 @@
 //
-//  BaseUiViewController.swift
+//  BaseUIViewController.swift
 //  Hilingual
 //
 //  Created by 성현주 on 7/2/25.
@@ -14,11 +14,13 @@ public class BaseUIViewController<VM: BaseViewBindable>: UIViewController {
 
     public var cancellables = Set<AnyCancellable>()
     public var viewModel: VM?
+    public let diContainer: any DIContainer  
 
     // MARK: - Init
 
-    public init(viewModel: VM) {
+    public init(viewModel: VM, diContainer: any DIContainer) {
         self.viewModel = viewModel
+        self.diContainer = diContainer
         super.init(nibName: nil, bundle: nil)
         bind(viewModel: viewModel)
         HilingualLog.debug("[VC LifeCycle] \(Self.self) init")
@@ -39,28 +41,20 @@ public class BaseUIViewController<VM: BaseViewBindable>: UIViewController {
         setLayout()
         addTarget()
         setDelegate()
-
     }
 
     // MARK: - Custom Method
 
-    func setUI() {}
-
-    func setLayout() {}
+    open func setUI() {}
+    open func setLayout() {}
+    open func addTarget() {}
+    open func setDelegate() {}
 
     //MARK: - Bind Method
 
     open func bind(viewModel: VM) {
         self.viewModel = viewModel
     }
-
-    // MARK: - Action Method
-
-    func addTarget() {}
-
-    // MARK: - delegate Method
-
-    func setDelegate() {}
 
     // MARK: - Deinit
 

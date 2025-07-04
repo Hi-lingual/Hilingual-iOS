@@ -6,6 +6,7 @@
 //
 
 import Foundation
+
 import HilingualDomain
 import HilingualData
 import HilingualNetwork
@@ -19,12 +20,11 @@ final class AppDIContainer: DIContainer {
     private init() { }
 
     public func makeHomeViewController() -> HomeViewController {
-        return HomeViewController(viewModel: makeHomeViewModel())
+        return HomeViewController(viewModel: makeHomeViewModel(), diContainer: self)
     }
 
     public func makeLoginViewController() -> LoginViewController {
-        let viewModel = LoginViewModel()
-        return LoginViewController(viewModel: viewModel, diContainer: self)
+        return LoginViewController(viewModel: makeLoginViewModel(), diContainer: self)
     }
 
 }
@@ -33,7 +33,10 @@ final class AppDIContainer: DIContainer {
 // MARK: - LoginDIContainer
 
 extension AppDIContainer {
-    ///로그인 DIContainer는 지금 뷰모델에 유스케이스가 없어서 간단합겁니다
+    ///로그인 DIContainer는 지금 뷰모델에 유스케이스가 없어서 간단한겁니다
+    private func makeLoginViewModel() -> LoginViewModel {
+        return LoginViewModel()
+    }
 
 }
 
