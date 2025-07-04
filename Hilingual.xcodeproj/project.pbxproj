@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		E5C2F3952E170A01003DF6C4 /* HilingualNetwork in Frameworks */ = {isa = PBXBuildFile; productRef = E5C2F3942E170A01003DF6C4 /* HilingualNetwork */; };
 		E5C2F3992E171575003DF6C4 /* HilingualDomain in Frameworks */ = {isa = PBXBuildFile; productRef = E5C2F3982E171575003DF6C4 /* HilingualDomain */; };
-		E5C79B302E15282100E461C3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E5C79B272E15282100E461C3 /* Assets.xcassets */; };
 		E5C79B322E15282100E461C3 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E5C79B2A2E15282100E461C3 /* LaunchScreen.storyboard */; };
 		E5C79B342E15282100E461C3 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5C79B262E15282100E461C3 /* AppDelegate.swift */; };
 		E5C79B352E15282100E461C3 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5C79B2D2E15282100E461C3 /* SceneDelegate.swift */; };
@@ -38,7 +37,6 @@
 		E5C2F3972E171509003DF6C4 /* HilingualDomain */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = HilingualDomain; sourceTree = "<group>"; };
 		E5C79B0E2E15281900E461C3 /* Hilingual.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Hilingual.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E5C79B262E15282100E461C3 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		E5C79B272E15282100E461C3 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E5C79B282E15282100E461C3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E5C79B292E15282100E461C3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		E5C79B2D2E15282100E461C3 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -97,19 +95,9 @@
 			children = (
 				E5C79B3B2E152AC800E461C3 /* App */,
 				E5C79B3A2E152AC300E461C3 /* Core */,
-				E5C79B372E152AB100E461C3 /* Resource */,
 				E5C79B282E15282100E461C3 /* Info.plist */,
 			);
 			path = Hilingual;
-			sourceTree = "<group>";
-		};
-		E5C79B372E152AB100E461C3 /* Resource */ = {
-			isa = PBXGroup;
-			children = (
-				E5C79B272E15282100E461C3 /* Assets.xcassets */,
-				E5C79B2A2E15282100E461C3 /* LaunchScreen.storyboard */,
-			);
-			path = Resource;
 			sourceTree = "<group>";
 		};
 		E5C79B3A2E152AC300E461C3 /* Core */ = {
@@ -126,6 +114,7 @@
 				E5C79B262E15282100E461C3 /* AppDelegate.swift */,
 				E5C79B2D2E15282100E461C3 /* SceneDelegate.swift */,
 				E5C84AC82E1538C700CBD669 /* AppDIContainer.swift */,
+				E5C79B2A2E15282100E461C3 /* LaunchScreen.storyboard */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -208,7 +197,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E5C79B302E15282100E461C3 /* Assets.xcassets in Resources */,
 				E5C79B322E15282100E461C3 /* LaunchScreen.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

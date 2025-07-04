@@ -20,6 +20,13 @@ final class HomeView: BaseUIView {
         return label
     }()
 
+    let iconImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFit
+        imageView.image = UIImage(named: "Image", in: .module, compatibleWith: nil)
+        return imageView
+    }()
+
     let fetchButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("환율 조회", for: .normal)
@@ -32,8 +39,7 @@ final class HomeView: BaseUIView {
     //MARK: - Custom Method
 
     override func setUI() {
-        addSubview(rateLabel)
-        addSubview(fetchButton)
+        addSubviews(rateLabel,fetchButton,iconImageView)
     }
 
     override func setLayout() {
@@ -46,6 +52,12 @@ final class HomeView: BaseUIView {
             $0.centerX.equalToSuperview()
             $0.width.equalTo(120)
             $0.height.equalTo(44)
+        }
+
+        iconImageView.snp.makeConstraints {
+            $0.top.equalTo(fetchButton.snp.bottom).offset(20)
+            $0.centerX.equalToSuperview()
+            $0.width.height.equalTo(100)
         }
     }
 }
