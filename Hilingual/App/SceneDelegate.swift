@@ -21,11 +21,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
         let window = UIWindow(windowScene: windowScene)
 
-        let navigationController = UINavigationController()
-        let loginVC = AppDIContainer.shared.makeLoginViewController()
-        navigationController.setViewControllers([loginVC], animated: false)
+        let appDI = AppDIContainer.shared
+        let loginVC = appDI.makeLoginViewController()
+        let navigation = UINavigationController(rootViewController: loginVC)
 
-        window.rootViewController = navigationController
+        window.rootViewController = navigation
         window.makeKeyAndVisible()
         self.window = window
     }
