@@ -23,6 +23,7 @@ public class BaseUIViewController<VM: BaseViewBindable>: UIViewController {
         self.diContainer = diContainer
         super.init(nibName: nil, bundle: nil)
         bind(viewModel: viewModel)
+        setupNavigationBar()
         HilingualLog.debug("[VC LifeCycle] \(Self.self) init")
     }
 
@@ -54,6 +55,19 @@ public class BaseUIViewController<VM: BaseViewBindable>: UIViewController {
 
     open func bind(viewModel: VM) {
         self.viewModel = viewModel
+    }
+
+    // MARK: - Navigation Method
+
+    open func navigationType() -> NavigationType? {
+        return nil
+    }
+
+    @objc open func backButtonTapped() {
+        navigationController?.popViewController(animated: true)
+    }
+
+    @objc open func menuButtonTapped() {
     }
 
     // MARK: - Deinit

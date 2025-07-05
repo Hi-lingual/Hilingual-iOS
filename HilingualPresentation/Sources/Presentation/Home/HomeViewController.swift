@@ -17,6 +17,10 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         self.view = mainView
     }
 
+    public override func navigationType() -> NavigationType? {
+            return .backTitleMenu("나의 단어장")
+        }
+
     // MARK: - Bind
 
     public override func bind(viewModel: HomeViewModel) {
