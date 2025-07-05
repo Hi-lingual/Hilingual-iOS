@@ -24,6 +24,9 @@ let package = Package(
                 .product(name: "SnapKit", package: "SnapKit")
             ],
             path: "Sources/Presentation",
+            resources: [
+                .process("Common/Resources/Font")
+            ]
         )
     ]
 )
