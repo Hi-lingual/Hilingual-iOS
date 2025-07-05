@@ -8,11 +8,30 @@
 import UIKit
 
 extension UIFont {
-
-    enum Family: String {
+    
+    enum Family: String, CaseIterable {
         case Bold, ExtraBold, ExtraLight, Heavy, Light, Medium, Regular, SemiBold, Thin
     }
-
+    
+    public static func registerSuitFonts() {
+        for weight in Family.allCases {
+            guard let fontURL = Bundle.module.url(forResource: "SUIT-\(weight.rawValue)", withExtension: "ttf") else {
+                print("Fail to finding SUIT-\(weight.rawValue).ttf file.")
+                continue
+            }
+            var error: Unmanaged<CFError>?
+            if !CTFontManagerRegisterFontsForURL(fontURL as CFURL, .process, &error) {
+                if let cfError = error?.takeRetainedValue() {
+                    print("Fail to register SUIT-\(weight.rawValue).ttf \(cfError)")
+                } else {
+                    print("Fail to register SUIT-\(weight.rawValue).ttf with unknown error")
+                }
+            } else {
+                print("Successfully registered SUIT-\(weight.rawValue).ttf")
+            }
+        }
+    }
+    
     static func suit(weight: Family = .Regular, size: CGFloat) -> UIFont {
         if let font = UIFont(name: "SUIT-\(weight.rawValue)", size: size) {
             return font
@@ -21,7 +40,7 @@ extension UIFont {
             return .systemFont(ofSize: size)
         }
     }
-
+    
     enum SuitStyle {
         case head_b_20
         case head_sb_20
@@ -43,7 +62,7 @@ extension UIFont {
         case caption_m_12
         case caption_r_12
     }
-
+    
     static func suit(_ style: SuitStyle) -> UIFont {
         switch style {
         case .head_b_20: return .suit(weight: .Bold, size: 20)
@@ -61,7 +80,7 @@ extension UIFont {
         case .body_sb_14: return .suit(weight: .SemiBold, size: 14)
         case .body_m_14: return .suit(weight: .Medium, size: 14)
         case .body_sb_12: return .suit(weight: .SemiBold, size: 12)
-        
+            
         case .caption_r_14: return .suit(weight: .Regular, size: 14)
         case .caption_m_12: return .suit(weight: .Medium, size: 12)
         case .caption_r_12: return .suit(weight: .Regular, size: 12)

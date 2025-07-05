@@ -23,7 +23,10 @@ let package = Package(
                 "HilingualDomain", 
                 .product(name: "SnapKit", package: "SnapKit")
             ],
-            path: "Sources/Presentation"
+            path: "Sources/Presentation",
+            resources: [
+                .process("Common/Resources/Font")
+            ]
         )
     ]
 )
