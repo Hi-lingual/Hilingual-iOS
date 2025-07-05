@@ -23,7 +23,7 @@ let package = Package(
                 "HilingualDomain", 
                 .product(name: "SnapKit", package: "SnapKit")
             ],
-            path: "Sources/Presentation"
+            path: "Sources/Presentation",
         )
     ]
 )
