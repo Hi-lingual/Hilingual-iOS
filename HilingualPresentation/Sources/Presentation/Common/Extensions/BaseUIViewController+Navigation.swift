@@ -41,11 +41,11 @@ public extension BaseUIViewController {
         case .backTitleMenu(let title):
             navigationItem.titleView = makeTitleLabel(title)
             navigationItem.leftBarButtonItem = makeBarButton(
-                imageName: "chevron.left",
+                imageName: "ic_arrow_left_black_24_ios",
                 action: #selector(backButtonTapped)
             )
             navigationItem.rightBarButtonItem = makeBarButton(
-                imageName: "ellipsis",
+                imageName: "ic_more_24_ios", 
                 action: #selector(menuButtonTapped)
             )
 
@@ -75,15 +75,18 @@ public extension BaseUIViewController {
 
     private func makeBarButton(imageName: String, action: Selector) -> UIBarButtonItem {
         let button = UIButton(type: .system)
-        let image = UIImage(systemName: imageName)?.withRenderingMode(.alwaysTemplate)
+
+        let image = UIImage(named: imageName, in: .module, compatibleWith: nil)?
+            .withRenderingMode(.alwaysOriginal)
 
         button.setImage(image, for: .normal)
         button.tintColor = .black
         button.addTarget(self, action: action, for: .touchUpInside)
-
-        button.frame = CGRect(x: 0, y: 0, width: 24, height: 24)
-        button.imageView?.contentMode = .scaleAspectFit
+        button.frame = CGRect(x: 0, y: 0, width: 32, height: 32)
+        button.contentHorizontalAlignment = .fill
+        button.contentVerticalAlignment = .fill
 
         return UIBarButtonItem(customView: button)
     }
+
 }
