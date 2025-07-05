@@ -9,9 +9,9 @@ import UIKit
 import SnapKit
 
 enum CTAButtonStyle {
-    case enabledText(String)                      // isEnabled 따라 배경색 변경
-    case staticText(String)                       // 검정 배경 고정 + 텍스트
-    case staticIconText(iconName: String, text: String) // 검정 배경 고정 + 아이콘 + 텍스트
+    case enabledText(String)
+    case staticText(String)
+    case staticIconText(iconName: String, text: String)
 }
 
 final class CTAButton: UIButton {
