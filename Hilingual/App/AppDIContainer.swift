@@ -14,7 +14,7 @@ import HilingualPresentation
 
 // MARK: - DIContainer Entry Point
 
-final class AppDIContainer: DIContainer {
+final class AppDIContainer: ViewControllerFactory {
 
     static let shared = AppDIContainer()
     private init() { }

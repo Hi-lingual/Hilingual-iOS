@@ -14,11 +14,11 @@ public class BaseUIViewController<VM: BaseViewBindable>: UIViewController {
 
     public var cancellables = Set<AnyCancellable>()
     public var viewModel: VM?
-    public let diContainer: any DIContainer  
+    public let diContainer: any ViewControllerFactory
 
     // MARK: - Init
 
-    public init(viewModel: VM, diContainer: any DIContainer) {
+    public init(viewModel: VM, diContainer: any ViewControllerFactory) {
         self.viewModel = viewModel
         self.diContainer = diContainer
         super.init(nibName: nil, bundle: nil)

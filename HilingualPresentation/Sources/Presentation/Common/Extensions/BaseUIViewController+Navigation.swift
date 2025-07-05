@@ -33,7 +33,7 @@ public extension BaseUIViewController {
         case .backTitle(let title):
             navigationItem.titleView = makeTitleLabel(title)
             navigationItem.leftBarButtonItem = makeBarButton(
-                imageName: "chevron.left",
+                imageName: "ic_arrow_left_black_24_ios",
                 action: #selector(backButtonTapped)
             )
             navigationItem.rightBarButtonItem = nil
@@ -52,7 +52,7 @@ public extension BaseUIViewController {
         case .backOnly:
             navigationItem.titleView = nil
             navigationItem.leftBarButtonItem = makeBarButton(
-                imageName: "chevron.left",
+                imageName: "ic_arrow_left_black_24_ios",
                 action: #selector(backButtonTapped)
             )
             navigationItem.rightBarButtonItem = nil
