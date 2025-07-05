@@ -11,15 +11,23 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
 
     // MARK: - Properties
 
-    private let mainView = HomeView()
+    private let homeView = HomeView()
 
-    public override func loadView() {
-        self.view = mainView
+    // MARK: - Custom Method
+
+    public override func setUI() {
+        view.addSubviews(homeView)
+    }
+
+    public override func setLayout() {
+        homeView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
     }
 
     public override func navigationType() -> NavigationType? {
-            return .backTitleMenu("나의 단어장")
-        }
+        return .backTitleMenu("나의 단어장")
+    }
 
     // MARK: - Bind
 
@@ -34,7 +42,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
 
     private func makeInput() -> HomeViewModel.Input {
         return HomeViewModel.Input(
-            fetchButtonTapped: mainView.fetchButton
+            fetchButtonTapped: homeView.fetchButton
                 .publisher(for: .touchUpInside)
         )
     }
@@ -43,7 +51,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         output.rateText
             .receive(on: RunLoop.main)
             .sink { [weak self] text in
-                self?.mainView.rateLabel.text = text
+                self?.homeView.rateLabel.text = text
             }
             .store(in: &cancellables)
     }

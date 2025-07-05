@@ -11,15 +11,27 @@ import Combine
 
 public final class LoginViewController: BaseUIViewController<LoginViewModel> {
 
-    private let mainView = LoginView()
+    // MARK: - Properties
 
-    public override func loadView() {
-        self.view = mainView
+    private let loginview = LoginView()
+
+    // MARK: - Custom Method
+
+    public override func setUI() {
+        view.addSubviews(loginview)
     }
+
+    public override func setLayout() {
+        loginview.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+    }
+
+    // MARK: - Bind
 
     public override func bind(viewModel: LoginViewModel) {
         let input = LoginViewModel.Input(
-            loginButtonTapped: mainView.loginButton.publisher(for: .touchUpInside)
+            loginButtonTapped: loginview.loginButton.publisher(for: .touchUpInside)
         )
 
         let output = viewModel.transform(input: input)
