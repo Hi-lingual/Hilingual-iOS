@@ -119,3 +119,31 @@ final class Chip: UIView {
         }
     }
 }
+
+@available(iOS 17.0, *)
+fileprivate final class ChipPreviewViewController: UIViewController {
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        let chip1 = Chip(type: .adjective)
+        let chip2 = Chip(type: .noun)
+        
+        view.addSubviews(chip1, chip2)
+        
+        chip1.snp.makeConstraints {
+            $0.centerY.equalToSuperview()
+            $0.trailing.equalTo(view.snp.centerX).offset(-4)
+        }
+        
+        chip2.snp.makeConstraints {
+            $0.centerY.equalToSuperview()
+            $0.leading.equalTo(view.snp.centerX).offset(4)
+        }
+    }
+}
+
+@available(iOS 17.0, *)
+#Preview {
+    ChipPreviewViewController()
+}
