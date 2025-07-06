@@ -57,8 +57,8 @@ final class CTAButton: UIButton {
     
     
     private func setupLayout() {
-        snp.makeConstraints { make in
-            make.height.equalTo(56)
+        snp.makeConstraints {
+            $0.height.equalTo(56)
         }
     }
     
@@ -96,24 +96,24 @@ final class CTAButton: UIButton {
     private func setupTextLabel(_ text: String) {
         textLabel.text = text
         addSubview(textLabel)
-        textLabel.snp.makeConstraints { make in
-            make.center.equalToSuperview()
+        textLabel.snp.makeConstraints {
+            $0.center.equalToSuperview()
         }
     }
 
     private func setupStackView(iconName: String, text: String) {
         iconView.image = UIImage(named: iconName, in: .module, compatibleWith: nil)
         iconView.contentMode = .scaleAspectFit
-        iconView.snp.makeConstraints { make in
-            make.width.height.equalTo(16)
+        iconView.snp.makeConstraints {
+            $0.width.height.equalTo(16)
         }
 
         textLabel.text = text
         stackView.addArrangedSubview(iconView)
         stackView.addArrangedSubview(textLabel)
         addSubview(stackView)
-        stackView.snp.makeConstraints { make in
-            make.center.equalToSuperview()
+        stackView.snp.makeConstraints {
+            $0.center.equalToSuperview()
         }
     }
     
