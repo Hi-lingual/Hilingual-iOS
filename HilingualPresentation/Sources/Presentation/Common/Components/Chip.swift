@@ -66,6 +66,56 @@ enum ChipType {
         case .phrase, .clause, .expression: return .gray400
         default:
             return .white
+            
+        }
+    }
+}
+
+final class Chip: UIView {
+    
+    // MARK: - Properties
+    
+    private let label: UILabel = {
+        let label = UILabel()
+        label.font = .suit(.caption_m_12)
+        label.textAlignment = .center
+        label.numberOfLines = 1
+        return label
+    }()
+    
+    // MARK: - Lifecycle
+    
+    init(type: ChipType) {
+        super.init(frame: .zero)
+        setStyle(with: type)
+        setUI()
+        setLayout()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    // MARK: - Setup Methods
+    
+    private func setStyle(with type: ChipType) {
+        backgroundColor = type.backgroundColor
+        layer.cornerRadius = 10
+        clipsToBounds = true
+        
+        label.text = type.title
+        label.textColor = type.textColor
+    }
+    
+    private func setUI() {
+        addSubview(label)
+    }
+    
+    private func setLayout() {
+        label.snp.makeConstraints {
+            $0.center.equalToSuperview()
+            $0.verticalEdges.equalToSuperview().inset(2)
+            $0.horizontalEdges.equalToSuperview().inset(6)
         }
     }
 }
