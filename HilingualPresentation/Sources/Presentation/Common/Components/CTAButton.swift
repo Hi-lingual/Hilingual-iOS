@@ -42,11 +42,7 @@ final class CTAButton: UIButton {
         setupLayout()
         configure(with: style)
         
-        if let isEnabled = isEnabled {
-            self.isEnabled = isEnabled
-        } else {
-            self.isEnabled = autoBackground ? false : true
-        }
+        self.isEnabled = autoBackground ? false : true
         
         if autoBackground {
             updateBackgroundColor()
@@ -83,15 +79,9 @@ final class CTAButton: UIButton {
         switch style {
         case .TextButton(let text):
             setupTextLabel(text)
-            if autoBackground {
-                updateBackgroundColor()
-            } else {
-                backgroundColor = .hilingualBlack
-            }
-
+            
         case .IconTextButton(let iconName, let text):
             setupStackView(iconName: iconName, text: text)
-            backgroundColor = .hilingualBlack
         }
     }
 
