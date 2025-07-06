@@ -114,7 +114,7 @@ final class Chip: UIView {
     private func setLayout() {
         label.snp.makeConstraints {
             $0.center.equalToSuperview()
-            $0.verticalEdges.equalToSuperview().inset(2)
+            $0.verticalEdges.equalToSuperview().inset(2.5)
             $0.horizontalEdges.equalToSuperview().inset(6)
         }
     }
