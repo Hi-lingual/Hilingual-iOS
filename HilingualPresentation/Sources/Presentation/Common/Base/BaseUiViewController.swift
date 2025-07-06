@@ -1,5 +1,5 @@
 //
-//  BaseUiViewController.swift
+//  BaseUIViewController.swift
 //  Hilingual
 //
 //  Created by 성현주 on 7/2/25.
@@ -14,13 +14,16 @@ public class BaseUIViewController<VM: BaseViewBindable>: UIViewController {
 
     public var cancellables = Set<AnyCancellable>()
     public var viewModel: VM?
+    public let diContainer: any ViewControllerFactory
 
     // MARK: - Init
 
-    public init(viewModel: VM) {
+    public init(viewModel: VM, diContainer: any ViewControllerFactory) {
         self.viewModel = viewModel
+        self.diContainer = diContainer
         super.init(nibName: nil, bundle: nil)
         bind(viewModel: viewModel)
+        setupNavigationBar()
         HilingualLog.debug("[VC LifeCycle] \(Self.self) init")
     }
 
@@ -39,14 +42,14 @@ public class BaseUIViewController<VM: BaseViewBindable>: UIViewController {
         setLayout()
         addTarget()
         setDelegate()
-
     }
 
     // MARK: - Custom Method
 
-    func setUI() {}
-
-    func setLayout() {}
+    open func setUI() {}
+    open func setLayout() {}
+    open func addTarget() {}
+    open func setDelegate() {}
 
     //MARK: - Bind Method
 
@@ -54,13 +57,18 @@ public class BaseUIViewController<VM: BaseViewBindable>: UIViewController {
         self.viewModel = viewModel
     }
 
-    // MARK: - Action Method
+    // MARK: - Navigation Method
 
-    func addTarget() {}
+    open func navigationType() -> NavigationType? {
+        return nil
+    }
 
-    // MARK: - delegate Method
+    @objc open func backButtonTapped() {
+        navigationController?.popViewController(animated: true)
+    }
 
-    func setDelegate() {}
+    @objc open func menuButtonTapped() {
+    }
 
     // MARK: - Deinit
 
