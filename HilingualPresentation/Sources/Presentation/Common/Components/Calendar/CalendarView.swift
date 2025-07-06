@@ -27,6 +27,10 @@ final class CalendarView: UIView {
         didSet { collectionView.reloadData() }
     }
 
+    var rowCount: Int {
+        return Int(ceil(Double(days.count) / 7.0))
+    }
+
     // MARK: - UI Components
 
     private let containerView = UIView()
@@ -70,6 +74,15 @@ final class CalendarView: UIView {
     override func layoutSubviews() {
         super.layoutSubviews()
         updateItemSize()
+    }
+
+    override var intrinsicContentSize: CGSize {
+        let rowHeight: CGFloat = 34
+        let lineSpacing: CGFloat = 14
+        let weekHeight: CGFloat = 20
+        let rowCount = self.rowCount
+        let totalHeight = weekHeight + CGFloat(rowCount) * rowHeight + CGFloat(max(0, rowCount - 1)) * lineSpacing + 8
+        return CGSize(width: UIView.noIntrinsicMetric, height: totalHeight)
     }
 
     // MARK: - Setup Methods
@@ -148,10 +161,29 @@ final class CalendarView: UIView {
         flowLayout.itemSize = CGSize(width: width, height: 34)
     }
 
+    // MARK: - Public API
+
     func reload(for date: Date) {
         currentDate = date
         generateDays()
         collectionView.reloadData()
+        invalidateIntrinsicContentSize()
+    }
+
+    func moveToNextMonth() {
+        if let next = calendar.date(byAdding: .month, value: 1, to: currentDate) {
+            reload(for: next)
+        }
+    }
+
+    func moveToPreviousMonth() {
+        if let prev = calendar.date(byAdding: .month, value: -1, to: currentDate) {
+            reload(for: prev)
+        }
+    }
+
+    func setSelectedDate(_ date: Date) {
+        selectedDate = date
     }
 }
 
@@ -186,10 +218,6 @@ extension CalendarView: UICollectionViewDataSource, UICollectionViewDelegate {
 
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         selectedDate = days[indexPath.item]
-    }
-    
-    func setSelectedDate(_ date: Date) {
-        selectedDate = date
     }
 }
 

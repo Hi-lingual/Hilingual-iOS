@@ -1,10 +1,3 @@
-//
-//  CalendarViewController.swift
-//  HilingualPresentation
-//
-//  Created by 조영서 on 7/7/25.
-//
-
 import UIKit
 import SnapKit
 
@@ -13,6 +6,16 @@ final class CalendarViewController: UIViewController {
     // MARK: - Properties
 
     private let calendarView = CalendarView()
+    private let nextButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("다음 달 ▶️", for: .normal)
+        return button
+    }()
+    private let prevButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("◀️ 이전 달", for: .normal)
+        return button
+    }()
 
     // MARK: - Lifecycle
 
@@ -28,13 +31,27 @@ final class CalendarViewController: UIViewController {
 
     private func setupUI() {
         view.addSubview(calendarView)
+        view.addSubview(nextButton)
+        view.addSubview(prevButton)
+
+        nextButton.addTarget(self, action: #selector(nextMonthTapped), for: .touchUpInside)
+        prevButton.addTarget(self, action: #selector(prevMonthTapped), for: .touchUpInside)
     }
 
     private func setupLayout() {
         calendarView.snp.makeConstraints {
             $0.top.equalTo(view.safeAreaLayoutGuide).offset(20)
             $0.leading.trailing.equalToSuperview().inset(16)
-            $0.height.equalTo(300)
+        }
+
+        nextButton.snp.makeConstraints {
+            $0.top.equalTo(calendarView.snp.bottom).offset(16)
+            $0.trailing.equalTo(calendarView)
+        }
+
+        prevButton.snp.makeConstraints {
+            $0.top.equalTo(calendarView.snp.bottom).offset(16)
+            $0.leading.equalTo(calendarView)
         }
     }
 
@@ -50,8 +67,17 @@ final class CalendarViewController: UIViewController {
             calendarView.setSelectedDate(plus1)
         }
     }
-}
 
+    // MARK: - Actions
+
+    @objc private func nextMonthTapped() {
+        calendarView.moveToNextMonth()
+    }
+
+    @objc private func prevMonthTapped() {
+        calendarView.moveToPreviousMonth()
+    }
+}
 
 @available(iOS 17.0, *)
 #Preview {
