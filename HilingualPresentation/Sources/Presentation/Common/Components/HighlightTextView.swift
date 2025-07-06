@@ -1,0 +1,121 @@
+//
+//  HighlightTextView.swift
+//  HilingualPresentation
+//
+//  Created by 진소은 on 7/6/25.
+//
+
+import UIKit
+import SnapKit
+
+final class HighlightTextView: BaseUIView {
+    
+    // MARK: - UI Properties
+    
+    struct DiffRange {
+        let start: Int
+        let end: Int
+    }
+    
+    private var originalText: String = ""
+    private var highlightText: String = ""
+    private var diffRanges: [DiffRange] = []
+    private var image: UIImage?
+    private var isHighlightingEnabled: Bool = true
+    
+    
+    // MARK: - UI Components
+    
+    let diaryImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFill
+        imageView.layer.cornerRadius = 8
+        imageView.clipsToBounds = true
+        return imageView
+    }()
+    
+    let textView: UITextView = {
+        let textView = UITextView()
+        textView.font = .suit(.body_r_16)
+        textView.isScrollEnabled = false
+        textView.textColor = .hilingualBlack
+        return textView
+    }()
+    
+    let textCountLabel: UILabel = {
+        let label = UILabel()
+        label.font = .suit(.caption_r_12)
+        label.textColor = .gray400
+        return label
+    }()
+    
+    // MARK: - Custom Method
+    
+    override func setUI() {
+        addSubviews(diaryImageView, textView, textCountLabel)
+    }
+    
+    override func setLayout() {
+        diaryImageView.snp.makeConstraints {
+            $0.top.leading.trailing.equalToSuperview().inset(12)
+            $0.height.equalTo(diaryImageView.snp.width).multipliedBy(0.6)
+        }
+        
+        textView.snp.makeConstraints {
+            $0.top.equalTo(diaryImageView.snp.bottom).offset(12)
+            $0.leading.trailing.equalToSuperview().inset(12)
+        }
+        
+        textCountLabel.snp.makeConstraints {
+            $0.top.equalTo(textView.snp.bottom).offset(12)
+            $0.trailing.equalToSuperview().inset(12)
+        }
+    }
+    
+    func configure(image:UIImage? = nil, originalText: String, highlightText: String, diffRanges: [DiffRange], isHighlightingEnabled: Bool) {
+        if let image = image {
+            diaryImageView.image = image
+            diaryImageView.isHidden = false
+        } else {
+            diaryImageView.isHidden = true
+            diaryImageView.snp.makeConstraints {
+                $0.height.equalTo(0)
+            }
+            textView.snp.makeConstraints {
+                $0.top.equalToSuperview().inset(12)
+            }
+        }
+        
+        self.originalText = originalText
+        self.highlightText = highlightText
+        self.diffRanges = diffRanges
+        self.isHighlightingEnabled = isHighlightingEnabled
+        toggleText()
+    }
+    
+    func highlightCorrections(textType: String, diffRanges: [DiffRange]) {
+        let attributedString = NSMutableAttributedString(string: textType)
+        
+        for range in diffRanges {
+            let nsRange = NSRange(location: range.start, length: range.end - range.start)
+            attributedString.addAttribute(
+                .foregroundColor,
+                value: UIColor.hilingualOrange,
+                range: nsRange
+            )
+        }
+        textView.attributedText = attributedString
+    }
+    
+    func toggleText() {
+        if isHighlightingEnabled {
+            highlightCorrections(textType: highlightText, diffRanges: diffRanges)
+            textCountLabel.text = "\(highlightText.count)/1500"
+        } else {
+            textView.text = originalText
+            textView.textColor = .hilingualBlack
+            textCountLabel.text = "\(originalText.count)/1000"
+        }
+        isHighlightingEnabled.toggle()
+    }
+}
