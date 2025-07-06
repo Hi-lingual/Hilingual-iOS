@@ -44,20 +44,23 @@ final class CTAButton: UIButton {
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupStyle()
-        snp.makeConstraints { make in
-            make.height.equalTo(56)
-        }
+        setupLayout()
     }
     
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         setupStyle()
+        setupLayout()
+    }
+    
+    // MARK: - Setup Methods
+    
+    
+    private func setupLayout() {
         snp.makeConstraints { make in
             make.height.equalTo(56)
         }
     }
-    
-    // MARK: - Setup Methods
     
     private func setupStyle() {
         layer.cornerRadius = 8
@@ -75,40 +78,42 @@ final class CTAButton: UIButton {
         switch style {
         case .enabledText(let text):
             autoBackground = true
-            textLabel.text = text
-            addSubview(textLabel)
-            textLabel.snp.makeConstraints { make in
-                make.center.equalToSuperview()
-            }
+            setupTextLabel(text)
             isEnabled = false
             
         case .staticText(let text):
             autoBackground = false
-            textLabel.text = text
-            addSubview(textLabel)
-            textLabel.snp.makeConstraints { make in
-                make.center.equalToSuperview()
-            }
+            setupTextLabel(text)
             backgroundColor = .hilingualBlack
             
         case .staticIconText(let iconName, let text):
             autoBackground = false
-            iconView.image = UIImage(named: iconName, in: .module, compatibleWith: nil)
-            iconView.contentMode = .scaleAspectFit
-            iconView.snp.makeConstraints { make in
-                make.width.height.equalTo(16)
-            }
-            
-            textLabel.text = text
-            
-            stackView.addArrangedSubview(iconView)
-            stackView.addArrangedSubview(textLabel)
-            addSubview(stackView)
-            stackView.snp.makeConstraints { make in
-                make.center.equalToSuperview()
-            }
-            
+            setupStackView(iconName: iconName, text: text)
             backgroundColor = .hilingualBlack
+        }
+    }
+
+    private func setupTextLabel(_ text: String) {
+        textLabel.text = text
+        addSubview(textLabel)
+        textLabel.snp.makeConstraints { make in
+            make.center.equalToSuperview()
+        }
+    }
+
+    private func setupStackView(iconName: String, text: String) {
+        iconView.image = UIImage(named: iconName, in: .module, compatibleWith: nil)
+        iconView.contentMode = .scaleAspectFit
+        iconView.snp.makeConstraints { make in
+            make.width.height.equalTo(16)
+        }
+
+        textLabel.text = text
+        stackView.addArrangedSubview(iconView)
+        stackView.addArrangedSubview(textLabel)
+        addSubview(stackView)
+        stackView.snp.makeConstraints { make in
+            make.center.equalToSuperview()
         }
     }
     
