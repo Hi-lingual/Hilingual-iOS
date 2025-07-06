@@ -9,9 +9,8 @@ import UIKit
 import SnapKit
 
 enum CTAButtonStyle {
-    case enabledText(String)
-    case staticText(String)
-    case staticIconText(iconName: String, text: String)
+    case TextButton(String)
+    case IconTextButton(iconName: String, text: String)
 }
 
 final class CTAButton: UIButton {
@@ -35,26 +34,32 @@ final class CTAButton: UIButton {
             }
         }
     }
-    
-    convenience init(style: CTAButtonStyle) {
-        self.init(frame: .zero)
+
+    init(style: CTAButtonStyle, autoBackground: Bool = false, isEnabled: Bool? = nil) {
+        super.init(frame: .zero)
+        self.autoBackground = autoBackground
+        setupStyle()
+        setupLayout()
         configure(with: style)
+        
+        if let isEnabled = isEnabled {
+            self.isEnabled = isEnabled
+        } else {
+            self.isEnabled = autoBackground ? false : true
+        }
+        
+        if autoBackground {
+            updateBackgroundColor()
+        } else {
+            backgroundColor = .hilingualBlack
+        }
     }
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        setupStyle()
-        setupLayout()
-    }
-    
+
     required init?(coder: NSCoder) {
-        super.init(coder: coder)
-        setupStyle()
-        setupLayout()
+        fatalError("init(coder:) has not been implemented")
     }
     
     // MARK: - Setup Methods
-    
     
     private func setupLayout() {
         snp.makeConstraints {
@@ -76,18 +81,15 @@ final class CTAButton: UIButton {
     
     private func configure(with style: CTAButtonStyle) {
         switch style {
-        case .enabledText(let text):
-            autoBackground = true
+        case .TextButton(let text):
             setupTextLabel(text)
-            isEnabled = false
-            
-        case .staticText(let text):
-            autoBackground = false
-            setupTextLabel(text)
-            backgroundColor = .hilingualBlack
-            
-        case .staticIconText(let iconName, let text):
-            autoBackground = false
+            if autoBackground {
+                updateBackgroundColor()
+            } else {
+                backgroundColor = .hilingualBlack
+            }
+
+        case .IconTextButton(let iconName, let text):
             setupStackView(iconName: iconName, text: text)
             backgroundColor = .hilingualBlack
         }
