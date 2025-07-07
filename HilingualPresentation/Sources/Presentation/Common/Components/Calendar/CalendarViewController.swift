@@ -8,12 +8,12 @@ final class CalendarViewController: UIViewController {
     private let calendarView = CalendarView()
     private let nextButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("다음 달 ▶️", for: .normal)
+        button.setTitle("다음달 ㄱㄱ", for: .normal)
         return button
     }()
     private let prevButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("◀️ 이전 달", for: .normal)
+        button.setTitle("이전달 ㄱㄱ", for: .normal)
         return button
     }()
 

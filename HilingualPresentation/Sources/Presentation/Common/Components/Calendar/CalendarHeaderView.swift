@@ -15,7 +15,7 @@ final class CalendarHeaderView: UIView {
     private let textLabel: UILabel = {
         let label = UILabel()
         label.font = .suit(.head_b_18)
-        label.text = "2024년 7월"
+        label.text = "2025년 7월"
         label.textColor = .black
         return label
     }()
@@ -27,7 +27,7 @@ final class CalendarHeaderView: UIView {
         return imageView
     }()
 
-    private let centerStack: UIStackView = {
+    private let monthStack: UIStackView = {
         let stack = UIStackView()
         stack.axis = .horizontal
         stack.spacing = 4
@@ -49,7 +49,7 @@ final class CalendarHeaderView: UIView {
         return button
     }()
 
-    private let navStack: UIStackView = {
+    private let buttonStack: UIStackView = {
         let stack = UIStackView()
         stack.axis = .horizontal
         stack.spacing = 4
@@ -73,43 +73,24 @@ final class CalendarHeaderView: UIView {
 
     private func setupUI() {
         
-        centerStack.addArrangedSubview(textLabel)
-        centerStack.addArrangedSubview(iconView)
+        monthStack.addArrangedSubview(textLabel)
+        monthStack.addArrangedSubview(iconView)
         
-        navStack.addArrangedSubview(previousButton)
-        navStack.addArrangedSubview(nextButton)
+        buttonStack.addArrangedSubview(previousButton)
+        buttonStack.addArrangedSubview(nextButton)
 
-        addSubview(navStack)
-        addSubview(centerStack)
+        addSubview(buttonStack)
+        addSubview(monthStack)
     }
 
     private func setupLayout() {
-        centerStack.snp.makeConstraints {
+        monthStack.snp.makeConstraints {
             $0.leading.equalToSuperview()
         }
 
-        navStack.snp.makeConstraints {
+        buttonStack.snp.makeConstraints {
             $0.trailing.equalToSuperview()
         }
-    }
-
-    // MARK: - Public API
-
-    func setDateText(_ text: String) {
-        textLabel.text = text
-    }
-
-    func setPreviousAction(target: Any?, action: Selector) {
-        previousButton.addTarget(target, action: action, for: .touchUpInside)
-    }
-
-    func setNextAction(target: Any?, action: Selector) {
-        nextButton.addTarget(target, action: action, for: .touchUpInside)
-    }
-
-    func setTapAction(target: Any?, action: Selector) {
-        centerStack.isUserInteractionEnabled = true
-        centerStack.addGestureRecognizer(UITapGestureRecognizer(target: target, action: action))
     }
 }
 
