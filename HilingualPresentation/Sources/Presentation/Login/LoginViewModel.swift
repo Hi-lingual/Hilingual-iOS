@@ -35,6 +35,7 @@ public final class LoginViewModel: BaseViewModel {
             }
             .store(in: &cancellables)
 
+        //TODO: - 도메인 모듈에 위치
         let nicknameState = input.nicknameChanged
             .removeDuplicates()
             .map { nickname -> TextField.State in
