@@ -79,8 +79,7 @@ final class CalendarHeaderView: UIView {
         buttonStack.addArrangedSubview(previousButton)
         buttonStack.addArrangedSubview(nextButton)
 
-        addSubview(buttonStack)
-        addSubview(monthStack)
+        addSubviews(buttonStack, monthStack)
     }
 
     private func setupLayout() {
