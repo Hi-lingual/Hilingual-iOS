@@ -80,7 +80,7 @@ final class CalendarHeaderView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 
-    // MARK: - Setup
+    // MARK: - Setup Methods
 
     private func setupUI() {
         let stack = UIStackView(arrangedSubviews: [textLabel, iconView])
@@ -120,6 +120,7 @@ final class CalendarHeaderView: UIView {
 
     // MARK: - Actions
 
+    //상위 ViewController가 없어서 일단 직접 루트 VC를 찾아 present 중. 나중에 바꿀거에요!!!
     @objc private func monthButtonTapped() {
         let pickerVC = MonthPickerViewController()
         pickerVC.onDateSelected = { [weak self] selectedDate in

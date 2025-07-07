@@ -12,8 +12,8 @@ final class CalendarView: UIView {
 
     // MARK: - Properties
     
+    //CalendarHeaderView한테 알려줌
     var onMonthChanged: ((Date) -> Void)?
-
 
     private let calendar = Calendar.current
     private var currentDate = Date()
