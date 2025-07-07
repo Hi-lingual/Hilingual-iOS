@@ -6,6 +6,7 @@
 //
 
 public protocol ViewControllerFactory {
+    func makeTabBarViewController() -> TabBarViewController
     func makeLoginViewController() -> LoginViewController
     func makeHomeViewController() -> HomeViewController
 }
