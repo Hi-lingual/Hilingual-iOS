@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  TextField.swift
 //  HilingualPresentation
 //
 //  Created by 성현주 on 7/8/25.
@@ -104,7 +104,7 @@ final class TextField: BaseUIView {
         }
     }
 
-    // MARK: - Private Methods
+    // MARK: - Custom Methods
 
     override func setUI() {
         backgroundColor = .clear
@@ -130,6 +130,8 @@ final class TextField: BaseUIView {
             $0.edges.equalToSuperview()
         }
     }
+
+    // MARK: - Private Methods
 
     private func setAction() {
         textField.addTarget(self, action: #selector(textDidChange), for: .editingChanged)
