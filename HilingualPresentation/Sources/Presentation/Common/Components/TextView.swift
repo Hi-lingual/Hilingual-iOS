@@ -12,7 +12,12 @@ final class TextView: UIView {
     // MARK: - Properties
     
     var maxCharacterCount: Int = 1000
+    
     var onTextCountChanged: ((Int) -> Void)?
+    
+    var text: String {
+        return textView.text
+    }
     
     // MARK: - UI Components
     
@@ -98,6 +103,11 @@ final class TextView: UIView {
         placeholderLabel.isHidden = !textView.text.isEmpty
         
         onTextCountChanged?(count)
+    }
+    
+    func configure(text: String) {
+        textView.text = text
+        updateUI()
     }
 }
 
