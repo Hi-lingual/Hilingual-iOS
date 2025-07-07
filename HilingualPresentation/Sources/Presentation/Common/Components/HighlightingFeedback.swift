@@ -20,6 +20,7 @@ final class HighlightingFeedback: UIView {
         label.textColor = .gray700
         label.numberOfLines = 0
         label.textAlignment = .left
+        label.lineBreakMode = .byClipping
         return label
     }()
     
@@ -29,6 +30,7 @@ final class HighlightingFeedback: UIView {
         label.textColor = .hilingualOrange
         label.numberOfLines = 0
         label.textAlignment = .left
+        label.lineBreakMode = .byClipping
         return label
     }()
     
@@ -44,7 +46,7 @@ final class HighlightingFeedback: UIView {
         label.textColor = .hilingualBlack
         label.numberOfLines = 0
         label.textAlignment = .left
-        label.lineBreakMode = .byClipping
+        label.lineBreakMode = .byCharWrapping
         return label
     }()
     
