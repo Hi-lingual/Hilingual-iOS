@@ -19,14 +19,18 @@ final class CalendarView: UIView {
     }
 
     private var days: [Date] = []
+
+    // 특정 날짜에 표시 (dotView)
     var filledDates: [Date] = [] {
         didSet { collectionView.reloadData() }
     }
 
+    // 선택된 날짜에 표시 (bubbleView)
     private var selectedDate: Date? {
         didSet { collectionView.reloadData() }
     }
-
+    
+    // 소수점 무조건 올림해서 week 줄 수 계산함
     var rowCount: Int {
         return Int(ceil(Double(days.count) / 7.0))
     }
@@ -49,6 +53,7 @@ final class CalendarView: UIView {
         return layout
     }()
 
+    //다시보자
     private lazy var collectionView: UICollectionView = {
         let cv = UICollectionView(frame: .zero, collectionViewLayout: flowLayout)
         cv.isScrollEnabled = false
@@ -71,11 +76,13 @@ final class CalendarView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 
+    // 높이 변경 반영
     override func layoutSubviews() {
         super.layoutSubviews()
-        updateItemSize()
+        CellSize()
     }
 
+    // 동적으로 달력 높이 계산 (줄 수가 매번 다르니까)
     override var intrinsicContentSize: CGSize {
         let rowHeight: CGFloat = 34
         let lineSpacing: CGFloat = 14
@@ -91,7 +98,11 @@ final class CalendarView: UIView {
         addSubview(containerView)
         containerView.addSubview(weekStackView)
         containerView.addSubview(collectionView)
+        
+        setupWeekLabels()
+    }
 
+    private func setupWeekLabels() {
         ["일", "월", "화", "수", "목", "금", "토"].forEach { symbol in
             let label = UILabel()
             label.text = symbol
@@ -109,7 +120,7 @@ final class CalendarView: UIView {
 
         weekStackView.snp.makeConstraints {
             $0.top.leading.trailing.equalToSuperview()
-            $0.height.equalTo(20)
+            $0.height.equalTo(15)
         }
 
         collectionView.snp.makeConstraints {
@@ -126,12 +137,13 @@ final class CalendarView: UIView {
         let range = calendar.range(of: .day, in: .month, for: currentDate)!
         let firstOfMonthWeekday = calendar.component(.weekday, from: startOfMonth)
         let firstWeekday = calendar.firstWeekday
-        let offset = (firstOfMonthWeekday - firstWeekday + 7) % 7
+        // 이번 달 1일이 첫 줄에서 몇 칸 뒤에 시작할지 계산
+        let firstCell = (firstOfMonthWeekday - firstWeekday + 7) % 7
 
-        // 이전 달 날짜
-        if offset > 0 {
-            for i in 0..<offset {
-                if let date = calendar.date(byAdding: .day, value: -offset + i, to: startOfMonth) {
+        // 앞쪽 이전 달 날짜 채우기
+        if firstCell > 0 {
+            for i in 0..<firstCell {
+                if let date = calendar.date(byAdding: .day, value: -firstCell + i, to: startOfMonth) {
                     days.append(date)
                 }
             }
@@ -144,25 +156,28 @@ final class CalendarView: UIView {
             }
         }
 
-        // 다음 달 날짜 주 단위 맞춤
-        let remainder = days.count % 7
-        if remainder > 0 {
-            let extra = 7 - remainder
-            for i in 1...extra {
-                if let date = calendar.date(byAdding: .day, value: i, to: days.last!) {
-                    days.append(date)
+        // 뒷부분 담달 날짜 채우기 
+        let nextMonth = days.count % 7
+        if nextMonth > 0 {
+            let extra = 7 - nextMonth
+            if let baseDate = calendar.date(byAdding: .day, value: 1, to: days.last!) {
+                for i in 0..<extra {
+                    if let date = calendar.date(byAdding: .day, value: i, to: baseDate) {
+                        days.append(date)
+                    }
                 }
             }
         }
     }
 
-    private func updateItemSize() {
+    // 셀 크기 계산
+    private func CellSize() {
         let width = containerView.bounds.width / 7
         flowLayout.itemSize = CGSize(width: width, height: 34)
     }
 
-    // MARK: - Public API
-
+    // MARK: - 외부 로직들
+    
     func reload(for date: Date) {
         currentDate = date
         generateDays()
@@ -190,14 +205,12 @@ final class CalendarView: UIView {
 // MARK: - Extensions
 
 extension CalendarView: UICollectionViewDataSource, UICollectionViewDelegate {
-
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return days.count
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CustomCalendarCell", for: indexPath) as! CustomCalendarCell
-
         let date = days[indexPath.item]
         let day = calendar.component(.day, from: date)
         let isToday = calendar.isDateInToday(date)
@@ -212,7 +225,6 @@ extension CalendarView: UICollectionViewDataSource, UICollectionViewDelegate {
             isFilled: isFilled,
             isWithinMonth: isWithinMonth
         )
-
         return cell
     }
 
