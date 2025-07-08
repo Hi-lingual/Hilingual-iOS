@@ -30,6 +30,10 @@ final class CalendarView: UIView {
         didSet { collectionView.reloadData() }
     }
     
+    var rowCount: Int {
+        return Int(ceil(Double(days.count) / 7.0))
+    }
+    
     // MARK: - UI Components
 
     private let containerView = UIView()
@@ -74,10 +78,22 @@ final class CalendarView: UIView {
         super.layoutSubviews()
         updateItemSize()
     }
+    
+    override var intrinsicContentSize: CGSize {
+        let rowHeight: CGFloat = 34
+        let lineSpacing: CGFloat = 14
+        let weekHeight: CGFloat = 20
+        let rowCount = self.rowCount
+        let totalHeight = weekHeight + CGFloat(rowCount) * rowHeight + CGFloat(max(0, rowCount - 1)) * lineSpacing + 8
+        return CGSize(width: UIView.noIntrinsicMetric, height: totalHeight)
+    }
 
     // MARK: - Setup Methods
 
     private func setupUI() {
+
+        backgroundColor = .white
+
         addSubview(containerView)
         containerView.addSubview(weekStackView)
         containerView.addSubview(collectionView)
@@ -155,6 +171,7 @@ final class CalendarView: UIView {
         currentDate = date
         generateDays()
         collectionView.reloadData()
+        invalidateIntrinsicContentSize()
     }
 }
 
