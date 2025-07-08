@@ -31,6 +31,10 @@ final class AppDIContainer: ViewControllerFactory {
         return LoginViewController(viewModel: makeLoginViewModel(), diContainer: self)
     }
 
+    func makeOnboardingViewController() -> HilingualPresentation.OnBoardingViewController {
+        return OnBoardingViewController(viewModel: makeOnBoardingViewModel(), diContainer: self)
+    }
+
 }
 
 
@@ -55,6 +59,14 @@ extension AppDIContainer {
     }
 }
 
+// MARK: - OnBoardingDiContainer
+
+extension AppDIContainer {
+
+    private func makeOnBoardingViewModel() -> OnBoardingViewModel {
+        OnBoardingViewModel()
+    }
+}
 
 // MARK: - HomeDIContainer
 
