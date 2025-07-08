@@ -64,7 +64,10 @@ public final class LoginViewController: BaseUIViewController<LoginViewModel> {
                 print("Apple 로그인 성공")
                 print("identityToken: \(identityToken)")
                 print("userId: \(userId)")
-                // TODO: 서버 API 호출 또는 화면 전환
+
+                // TODO: 서버 API 호출 또는 화면 전환 -> 임시 
+                let homeVC = self.diContainer.makeTabBarViewController()
+                changeRootVC(homeVC, animated: false)
             }
             .store(in: &cancellables)
     }

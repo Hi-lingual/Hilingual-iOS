@@ -36,7 +36,7 @@ public final class TabBarViewController: UITabBarController {
 
     private func setupViewControllers() {
         let homeVC = makeTabItem(
-            viewController: factory.makeLoginViewController(),
+            viewController: factory.makeHomeViewController(),
             title: "홈",
             selectedImageName: "ic_home_black_24_ios",
             unselectedImageName: "ic_home_gray_24_ios"
