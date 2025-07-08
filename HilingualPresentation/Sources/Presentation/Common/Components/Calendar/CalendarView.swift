@@ -16,7 +16,7 @@ final class CalendarView: UIView {
     var onMonthChanged: ((Date) -> Void)?
 
     private let calendar = Calendar.current
-    private var currentDate = Date()
+    public var currentDate = Date()
     private var startOfMonth: Date {
         calendar.date(from: calendar.dateComponents([.year, .month], from: currentDate))!
     }

@@ -158,7 +158,6 @@ final class CalendarHeaderView: UIView {
     }
 }
 
-
 #Preview {
     CalendarHeaderView()
 }

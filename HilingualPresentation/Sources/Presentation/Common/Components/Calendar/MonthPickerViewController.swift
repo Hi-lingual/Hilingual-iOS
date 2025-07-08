@@ -40,13 +40,13 @@ final class MonthPickerViewController: UIViewController {
     private func setupLayout() {
         datePicker.snp.makeConstraints {
             $0.top.equalToSuperview().offset(16)
-            $0.leading.trailing.equalToSuperview()
+            $0.horizontalEdges.equalToSuperview().inset(16)
         }
         
         applyButton.snp.makeConstraints {
             $0.top.equalTo(datePicker.snp.bottom).offset(19)
             $0.leading.equalToSuperview().offset(16)
-            $0.trailing.equalToSuperview().inset(16)
+            $0.horizontalEdges.equalToSuperview().inset(16)
         }
     }
 
