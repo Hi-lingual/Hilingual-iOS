@@ -26,10 +26,10 @@ final class CalendarView: UIView {
         didSet { collectionView.reloadData() }
     }
 
-    public var selected: Date? {
-        return selectedDate
+    public var selectedDate: Date? {
+        didSet { collectionView.reloadData() }
     }
-
+    
     // MARK: - UI Components
 
     private let containerView = UIView()
@@ -150,7 +150,7 @@ final class CalendarView: UIView {
         let width = containerView.bounds.width / 7
         flowLayout.itemSize = CGSize(width: width, height: 34)
     }
-
+    
     func reload(for date: Date) {
         currentDate = date
         generateDays()
@@ -197,5 +197,5 @@ extension CalendarView: UICollectionViewDataSource, UICollectionViewDelegate {
 }
 
 #Preview {
-    CalendarView()
+CalendarView()
 }
