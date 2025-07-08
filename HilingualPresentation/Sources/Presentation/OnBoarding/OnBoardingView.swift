@@ -13,7 +13,7 @@ final class OnBoardingView: BaseUIView {
     //MARK: - UI Components
 
     let startButton: CTAButton = {
-        let button =  CTAButton(style: .TextButton("적용하기"), autoBackground: false)
+        let button =  CTAButton(style: .TextButton("적용하기"), autoBackground: true)
         return button
     }()
 

@@ -19,6 +19,7 @@ public final class OnBoardingViewModel: BaseViewModel {
 
     public struct Output {
         let nicknameState: AnyPublisher<TextField.State, Never>
+        let isNextButtonEnabled: AnyPublisher<Bool, Never>
     }
 
     // MARK: - Private
@@ -34,8 +35,7 @@ public final class OnBoardingViewModel: BaseViewModel {
     // MARK: - Transform
 
     public func transform(input: Input) -> Output {
-        let nicknameState = input.nicknameChanged
-            .removeDuplicates()
+        let nicknameStateSubject = input.nicknameChanged
             .map { [weak self] nickname -> TextField.State in
                 guard let self = self else { return .normal }
 
@@ -47,11 +47,23 @@ public final class OnBoardingViewModel: BaseViewModel {
                 case .containsInvalidCharacters:
                     return .error("특수문자와 이모지는 사용할 수 없어요.")
                 case .valid:
-                    return .success("좋은 닉네임이에요!")
+                    return .success("좋은데?ㅋㅋ")
                 }
             }
-            .eraseToAnyPublisher()
+            .share()
 
-        return Output(nicknameState: nicknameState)
+        let isNextButtonEnabled = nicknameStateSubject
+            .map { state in
+                if case .success = state {
+                    return true
+                } else {
+                    return false
+                }
+            }
+        
+        return Output(
+            nicknameState: nicknameStateSubject.eraseToAnyPublisher(),
+            isNextButtonEnabled: isNextButtonEnabled.eraseToAnyPublisher()
+        )
     }
 }

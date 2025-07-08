@@ -50,6 +50,12 @@ public final class OnBoardingViewController: BaseUIViewController<OnBoardingView
                 self?.onBoardingView.nicknameTextField.updateState(state)
             }
             .store(in: &cancellables)
+
+        output.isNextButtonEnabled
+            .sink { [weak self] isEnabled in
+                self?.onBoardingView.startButton.isEnabled = isEnabled
+            }
+            .store(in: &cancellables)
     }
 
     @objc private func nicknameDidChange() {
