@@ -62,9 +62,14 @@ extension AppDIContainer {
 // MARK: - OnBoardingDiContainer
 
 extension AppDIContainer {
+    //TODO: - api 연결하면 Service연결
+
+    private func makeOnBoardingUseCase() -> OnBoardingUseCase {
+        DefaultOnBoardingUseCase()
+    }
 
     private func makeOnBoardingViewModel() -> OnBoardingViewModel {
-        OnBoardingViewModel()
+        OnBoardingViewModel(useCase: makeOnBoardingUseCase())
     }
 }
 

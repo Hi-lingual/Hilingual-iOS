@@ -6,8 +6,8 @@
 //
 
 import Foundation
-import Foundation
 import Combine
+import HilingualDomain
 
 public final class OnBoardingViewModel: BaseViewModel {
 
@@ -21,30 +21,37 @@ public final class OnBoardingViewModel: BaseViewModel {
         let nicknameState: AnyPublisher<TextField.State, Never>
     }
 
-    // MARK: - Subjects
+    // MARK: - Private
+
+    private let useCase: OnBoardingUseCase
+
+    // MARK: - Init
+
+    public init(useCase: OnBoardingUseCase) {
+        self.useCase = useCase
+    }
 
     // MARK: - Transform
 
     public func transform(input: Input) -> Output {
-
-        //TODO: - 도메인 모듈에 위치
         let nicknameState = input.nicknameChanged
             .removeDuplicates()
-            .map { nickname -> TextField.State in
-                if nickname.isEmpty {
+            .map { [weak self] nickname -> TextField.State in
+                guard let self = self else { return .normal }
+
+                switch useCase.validate(nickname) {
+                case .empty:
                     return .normal
-                } else if nickname.count < 2 {
-                    return .error("2자 이상 입력해주세요")
-                } else if nickname == "sereal" {
-                    return .error("사용할 수 없는 닉네임입니다")
-                } else {
-                    return .success("사용 가능한 닉네임이에요!")
+                case .tooShort:
+                    return .error("닉네임은 최소 2자 이상이어야 해요.")
+                case .containsInvalidCharacters:
+                    return .error("특수문자와 이모지는 사용할 수 없어요.")
+                case .valid:
+                    return .success("좋은 닉네임이에요!")
                 }
             }
             .eraseToAnyPublisher()
 
-        return Output(
-            nicknameState: nicknameState
-        )
+        return Output(nicknameState: nicknameState)
     }
 }
