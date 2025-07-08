@@ -85,7 +85,13 @@ final class TextField: BaseUIView {
     // MARK: - Public Methods
 
     func setPlaceholder(_ text: String) {
-        textField.placeholder = text
+        textField.attributedPlaceholder = NSAttributedString(
+            string: text,
+            attributes: [
+                .foregroundColor: UIColor.gray400,
+                .font: UIFont.suit(.body_m_16)
+            ]
+        )
     }
 
     func updateState(_ state: State) {

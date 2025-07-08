@@ -31,19 +31,47 @@ final class AppDIContainer: ViewControllerFactory {
         return LoginViewController(viewModel: makeLoginViewModel(), diContainer: self)
     }
 
+    func makeOnboardingViewController() -> HilingualPresentation.OnBoardingViewController {
+        return OnBoardingViewController(viewModel: makeOnBoardingViewModel(), diContainer: self)
+    }
+
 }
 
 
 // MARK: - LoginDIContainer
 
 extension AppDIContainer {
-    ///로그인 DIContainer는 지금 뷰모델에 유스케이스가 없어서 간단한겁니다
-    private func makeLoginViewModel() -> LoginViewModel {
-        return LoginViewModel()
+
+    private func makeAppleLoginService() -> AppleLoginService {
+        DefaultAppleLoginService()
     }
 
+    private func makeAppleLoginRepository() -> AppleLoginRepository {
+        DefaultAppleLoginRepository(service: makeAppleLoginService())
+    }
+
+    private func makeAppleLoginUseCase() -> AppleLoginUseCase {
+        DefaultAppleLoginUseCase(repository: makeAppleLoginRepository())
+    }
+
+    private func makeLoginViewModel() -> LoginViewModel {
+        LoginViewModel(useCase: makeAppleLoginUseCase())
+    }
 }
 
+// MARK: - OnBoardingDiContainer
+
+extension AppDIContainer {
+    //TODO: - api 연결하면 Service연결
+
+    private func makeOnBoardingUseCase() -> OnBoardingUseCase {
+        DefaultOnBoardingUseCase()
+    }
+
+    private func makeOnBoardingViewModel() -> OnBoardingViewModel {
+        OnBoardingViewModel(useCase: makeOnBoardingUseCase())
+    }
+}
 
 // MARK: - HomeDIContainer
 
