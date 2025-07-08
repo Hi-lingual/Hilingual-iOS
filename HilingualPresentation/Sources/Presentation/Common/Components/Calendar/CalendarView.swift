@@ -79,6 +79,7 @@ final class CalendarView: UIView {
         updateItemSize()
     }
     
+    //높이 계산 로직!
     override var intrinsicContentSize: CGSize {
         let rowHeight: CGFloat = 34
         let lineSpacing: CGFloat = 14
