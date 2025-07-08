@@ -13,7 +13,6 @@
 		E5C79B342E15282100E461C3 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5C79B262E15282100E461C3 /* AppDelegate.swift */; };
 		E5C79B352E15282100E461C3 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5C79B2D2E15282100E461C3 /* SceneDelegate.swift */; };
 		E5C84AC92E1538C700CBD669 /* AppDIContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5C84AC82E1538C700CBD669 /* AppDIContainer.swift */; };
-		E5C84B1C2E1558D400CBD669 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = E5C84B1B2E1558D400CBD669 /* SnapKit */; };
 		E5D5D0A92E171AC300DABE8D /* HilingualData in Frameworks */ = {isa = PBXBuildFile; productRef = E5D5D0A82E171AC300DABE8D /* HilingualData */; };
 		E5D5D0AC2E17289000DABE8D /* HilingualPresentation in Frameworks */ = {isa = PBXBuildFile; productRef = E5D5D0AB2E17289000DABE8D /* HilingualPresentation */; };
 /* End PBXBuildFile section */
@@ -54,7 +53,6 @@
 				E5C2F3992E171575003DF6C4 /* HilingualDomain in Frameworks */,
 				E5C2F3952E170A01003DF6C4 /* HilingualNetwork in Frameworks */,
 				E5D5D0AC2E17289000DABE8D /* HilingualPresentation in Frameworks */,
-				E5C84B1C2E1558D400CBD669 /* SnapKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -128,7 +126,6 @@
 			);
 			name = Hilingual;
 			packageProductDependencies = (
-				E5C84B1B2E1558D400CBD669 /* SnapKit */,
 				E5C2F3942E170A01003DF6C4 /* HilingualNetwork */,
 				E5C2F3982E171575003DF6C4 /* HilingualDomain */,
 				E5D5D0A82E171AC300DABE8D /* HilingualData */,
@@ -163,7 +160,6 @@
 			mainGroup = E5C79B052E15281900E461C3;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				E5C84B1A2E1558D400CBD669 /* XCRemoteSwiftPackageReference "SnapKit" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = E5C79B0F2E15281900E461C3 /* Products */;
@@ -413,17 +409,6 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCRemoteSwiftPackageReference section */
-		E5C84B1A2E1558D400CBD669 /* XCRemoteSwiftPackageReference "SnapKit" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/SnapKit/SnapKit";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 5.7.1;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
-
 /* Begin XCSwiftPackageProductDependency section */
 		E5C2F3942E170A01003DF6C4 /* HilingualNetwork */ = {
 			isa = XCSwiftPackageProductDependency;
@@ -432,11 +417,6 @@
 		E5C2F3982E171575003DF6C4 /* HilingualDomain */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = HilingualDomain;
-		};
-		E5C84B1B2E1558D400CBD669 /* SnapKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = E5C84B1A2E1558D400CBD669 /* XCRemoteSwiftPackageReference "SnapKit" */;
-			productName = SnapKit;
 		};
 		E5D5D0A82E171AC300DABE8D /* HilingualData */ = {
 			isa = XCSwiftPackageProductDependency;
