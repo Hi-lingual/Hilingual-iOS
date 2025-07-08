@@ -18,6 +18,11 @@ final class LoginView: UIView {
         return button
     }()
 
+    let customTextfield: TextField = {
+        let textfield = TextField()
+        return textfield
+    }()
+
     // MARK: - Init
 
     override init(frame: CGRect) {
@@ -33,10 +38,15 @@ final class LoginView: UIView {
     // MARK: - Layout
 
     private func setupLayout() {
-        addSubview(loginButton)
+        addSubviews(loginButton, customTextfield)
 
         loginButton.snp.makeConstraints {
             $0.center.equalToSuperview()
+        }
+        customTextfield.snp.makeConstraints {
+            $0.centerX.equalToSuperview()
+            $0.horizontalEdges.equalToSuperview().inset(20)
+            $0.top.equalTo(loginButton.snp.bottom)
         }
     }
 }

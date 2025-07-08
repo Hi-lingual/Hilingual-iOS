@@ -37,6 +37,7 @@ public class BaseUIViewController<VM: BaseViewBindable>: UIViewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
+        self.hideKeyboardWhenTappedAround()
 
         setUI()
         setLayout()

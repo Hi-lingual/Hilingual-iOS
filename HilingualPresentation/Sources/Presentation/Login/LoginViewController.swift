@@ -11,11 +11,8 @@ import Combine
 
 public final class LoginViewController: BaseUIViewController<LoginViewModel> {
 
-    // MARK: - Properties
-
     private let loginview = LoginView()
-
-    // MARK: - Custom Method
+    private let nicknameSubject = PassthroughSubject<String, Never>()
 
     public override func setUI() {
         view.addSubviews(loginview)
@@ -27,11 +24,16 @@ public final class LoginViewController: BaseUIViewController<LoginViewModel> {
         }
     }
 
-    // MARK: - Bind
-
     public override func bind(viewModel: LoginViewModel) {
+        loginview.customTextfield.textField.addTarget(
+            self,
+            action: #selector(nicknameDidChange),
+            for: .editingChanged
+        )
+
         let input = LoginViewModel.Input(
-            loginButtonTapped: loginview.loginButton.publisher(for: .touchUpInside)
+            loginButtonTapped: loginview.loginButton.publisher(for: .touchUpInside),
+            nicknameChanged: nicknameSubject.eraseToAnyPublisher()
         )
 
         let output = viewModel.transform(input: input)
@@ -43,5 +45,15 @@ public final class LoginViewController: BaseUIViewController<LoginViewModel> {
                 self.navigationController?.pushViewController(homeVC, animated: true)
             }
             .store(in: &cancellables)
+
+        output.nicknameState
+            .sink { [weak self] state in
+                self?.loginview.customTextfield.updateState(state)
+            }
+            .store(in: &cancellables)
+    }
+
+    @objc private func nicknameDidChange() {
+        nicknameSubject.send(loginview.customTextfield.text)
     }
 }
