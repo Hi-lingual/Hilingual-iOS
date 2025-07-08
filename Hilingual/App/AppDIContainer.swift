@@ -19,6 +19,10 @@ final class AppDIContainer: ViewControllerFactory {
     static let shared = AppDIContainer()
     private init() { }
 
+    public func makeTabBarViewController() -> HilingualPresentation.TabBarViewController {
+        return TabBarViewController(diContainer: self)
+    }
+
     public func makeHomeViewController() -> HomeViewController {
         return HomeViewController(viewModel: makeHomeViewModel(), diContainer: self)
     }
