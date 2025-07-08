@@ -5,48 +5,27 @@
 //  Created by 성현주 on 7/5/25.
 //
 
-import UIKit
-import SnapKit
+import AuthenticationServices
 
-final class LoginView: UIView {
+final class LoginView: BaseUIView {
 
-    // MARK: - UI
-
-    let loginButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setTitle("로그인", for: .normal)
-        return button
-    }()
-
-    let customTextfield: TextField = {
-        let textfield = TextField()
-        return textfield
-    }()
-
-    // MARK: - Init
-
+    let appleLoginButton = ASAuthorizationAppleIDButton()
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
-        backgroundColor = .white
-        setupLayout()
+        setupUI()
     }
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
-    // MARK: - Layout
-
-    private func setupLayout() {
-        addSubviews(loginButton, customTextfield)
-
-        loginButton.snp.makeConstraints {
+    private func setupUI() {
+        addSubview(appleLoginButton)
+        appleLoginButton.snp.makeConstraints {
             $0.center.equalToSuperview()
-        }
-        customTextfield.snp.makeConstraints {
-            $0.centerX.equalToSuperview()
-            $0.horizontalEdges.equalToSuperview().inset(20)
-            $0.top.equalTo(loginButton.snp.bottom)
+            $0.height.equalTo(50)
+            $0.width.equalTo(280)
         }
     }
 }

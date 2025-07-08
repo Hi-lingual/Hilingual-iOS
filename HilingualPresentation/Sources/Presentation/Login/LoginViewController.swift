@@ -6,54 +6,66 @@
 //
 
 import Foundation
-import UIKit
 import Combine
 
 public final class LoginViewController: BaseUIViewController<LoginViewModel> {
 
-    private let loginview = LoginView()
-    private let nicknameSubject = PassthroughSubject<String, Never>()
+    // MARK: - Properties
+
+    private let loginView = LoginView()
+
+    // MARK: - UI 설정
 
     public override func setUI() {
-        view.addSubviews(loginview)
+        view.addSubviews(loginView)
     }
 
     public override func setLayout() {
-        loginview.snp.makeConstraints { make in
+        loginView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
     }
 
-    public override func bind(viewModel: LoginViewModel) {
-        loginview.customTextfield.textField.addTarget(
-            self,
-            action: #selector(nicknameDidChange),
-            for: .editingChanged
-        )
+    // MARK: - Navigation 설정 (필요 시)
 
-        let input = LoginViewModel.Input(
-            loginButtonTapped: loginview.loginButton.publisher(for: .touchUpInside),
-            nicknameChanged: nicknameSubject.eraseToAnyPublisher()
-        )
-
-        let output = viewModel.transform(input: input)
-
-        output.navigateToHome
-            .sink { [weak self] in
-                guard let self = self else { return }
-                let homeVC = self.diContainer.makeHomeViewController()
-                self.navigationController?.pushViewController(homeVC, animated: true)
-            }
-            .store(in: &cancellables)
-
-        output.nicknameState
-            .sink { [weak self] state in
-                self?.loginview.customTextfield.updateState(state)
-            }
-            .store(in: &cancellables)
+    public override func navigationType() -> NavigationType? {
+        return nil  // 로그인 화면은 일반적으로 뒤로가기 없음
     }
 
-    @objc private func nicknameDidChange() {
-        nicknameSubject.send(loginview.customTextfield.text)
+    // MARK: - Bind
+
+    public override func bind(viewModel: LoginViewModel) {
+        super.bind(viewModel: viewModel)
+
+        let input = makeInput()
+        let output = viewModel.transform(input: input)
+
+        bindOutput(output)
+    }
+
+    private func makeInput() -> LoginViewModel.Input {
+        return LoginViewModel.Input(
+            loginTapped: loginView.appleLoginButton.publisher(for: .touchUpInside)
+        )
+    }
+
+    private func bindOutput(_ output: LoginViewModel.Output) {
+        output.loginResult
+            .receive(on: RunLoop.main)
+            .sink { completion in
+                switch completion {
+                case .finished:
+                    break
+                case .failure(let error):
+                    print("로그인 실패: \(error)")
+                    // TODO: 에러 토스트 또는 Alert
+                }
+            } receiveValue: { identityToken, userId in
+                print("Apple 로그인 성공")
+                print("identityToken: \(identityToken)")
+                print("userId: \(userId)")
+                // TODO: 서버 API 호출 또는 화면 전환
+            }
+            .store(in: &cancellables)
     }
 }

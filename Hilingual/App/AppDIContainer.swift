@@ -37,11 +37,22 @@ final class AppDIContainer: ViewControllerFactory {
 // MARK: - LoginDIContainer
 
 extension AppDIContainer {
-    ///로그인 DIContainer는 지금 뷰모델에 유스케이스가 없어서 간단한겁니다
-    private func makeLoginViewModel() -> LoginViewModel {
-        return LoginViewModel()
+
+    private func makeAppleLoginService() -> AppleLoginService {
+        DefaultAppleLoginService()
     }
 
+    private func makeAppleLoginRepository() -> AppleLoginRepository {
+        DefaultAppleLoginRepository(service: makeAppleLoginService())
+    }
+
+    private func makeAppleLoginUseCase() -> AppleLoginUseCase {
+        DefaultAppleLoginUseCase(repository: makeAppleLoginRepository())
+    }
+
+    private func makeLoginViewModel() -> LoginViewModel {
+        LoginViewModel(useCase: makeAppleLoginUseCase())
+    }
 }
 
 
