@@ -26,8 +26,8 @@ final class CalendarView: UIView {
         didSet { collectionView.reloadData() }
     }
 
-    private var selectedDate: Date? {
-        didSet { collectionView.reloadData() }
+    public var selected: Date? {
+        return selectedDate
     }
 
     // MARK: - UI Components
