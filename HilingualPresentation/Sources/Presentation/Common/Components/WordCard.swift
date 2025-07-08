@@ -13,8 +13,8 @@ struct PhraseData {
 
 enum WordCardType {
     case basic
-    case recommend
-    case diary
+    case withExample
+    case withDate
 }
 
 final class WordCard: UIView {
@@ -81,7 +81,7 @@ final class WordCard: UIView {
                 $0.bottom.equalToSuperview().inset(12)
             }
             
-        case .recommend:
+        case .withExample:
             phraseLabel.font = .suit(.body_sb_16)
             explanationLabel.font = .suit(.body_b_14)
             
@@ -110,7 +110,7 @@ final class WordCard: UIView {
                 }
             }
             
-        case .diary:
+        case .withDate:
             phraseLabel.font = .suit(.body_m_20)
             explanationLabel.font = .suit(.body_m_14)
             
