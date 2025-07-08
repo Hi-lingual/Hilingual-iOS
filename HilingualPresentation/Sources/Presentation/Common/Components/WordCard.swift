@@ -133,7 +133,7 @@ final class WordCard: UIView {
                 $0.leading.trailing.equalToSuperview().inset(24)
             }
             savedDateLabel.snp.makeConstraints {
-                $0.top.equalTo(explanationLabel.snp.bottom).offset(8)
+                $0.top.equalTo(explanationLabel.snp.bottom).offset(80)
                 $0.trailing.equalToSuperview().inset(24)
                 $0.bottom.equalToSuperview().inset(40)
             }
