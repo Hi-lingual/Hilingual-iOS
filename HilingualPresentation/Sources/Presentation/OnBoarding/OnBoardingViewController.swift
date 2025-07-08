@@ -27,6 +27,8 @@ public final class OnBoardingViewController: BaseUIViewController<OnBoardingView
         }
     }
 
+    // MARK: - Navigation
+
     public override func navigationType() -> NavigationType? {
         return .titleOnly("프로필 작성")
     }
@@ -40,23 +42,45 @@ public final class OnBoardingViewController: BaseUIViewController<OnBoardingView
             for: .editingChanged
         )
 
-        let input = OnBoardingViewModel.Input(
-            nicknameChanged: nicknameSubject.eraseToAnyPublisher()
-        )
+        let input = makeInput()
         let output = viewModel.transform(input: input)
 
+        bindOutput(output)
+    }
+
+    private func makeInput() -> OnBoardingViewModel.Input {
+        return OnBoardingViewModel.Input(
+            nicknameChanged: nicknameSubject.eraseToAnyPublisher(),
+            startTapped: onBoardingView.startButton.publisher(for: .touchUpInside)
+        )
+    }
+
+    private func bindOutput(_ output: OnBoardingViewModel.Output) {
         output.nicknameState
+            .receive(on: RunLoop.main)
             .sink { [weak self] state in
                 self?.onBoardingView.nicknameTextField.updateState(state)
             }
             .store(in: &cancellables)
 
-        output.isNextButtonEnabled
+        output.startButtonEnabled
+            .receive(on: RunLoop.main)
             .sink { [weak self] isEnabled in
                 self?.onBoardingView.startButton.isEnabled = isEnabled
             }
             .store(in: &cancellables)
+
+        output.signUpResult
+            .receive(on: RunLoop.main)
+            .sink { [weak self] in
+                guard let self else { return }
+                let homeVC = diContainer.makeTabBarViewController()
+                changeRootVC(homeVC, animated: false)
+            }
+            .store(in: &cancellables)
     }
+
+    // MARK: - Action
 
     @objc
     private func nicknameDidChange() {

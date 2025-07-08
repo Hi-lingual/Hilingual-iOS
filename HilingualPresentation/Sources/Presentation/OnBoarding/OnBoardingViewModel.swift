@@ -13,18 +13,21 @@ public final class OnBoardingViewModel: BaseViewModel {
 
     // MARK: - Input / Output
 
-    public struct Input {
+    struct Input {
         let nicknameChanged: AnyPublisher<String, Never>
+        let startTapped: AnyPublisher<Void, Never>
     }
 
-    public struct Output {
+    struct Output {
         let nicknameState: AnyPublisher<TextField.State, Never>
-        let isNextButtonEnabled: AnyPublisher<Bool, Never>
+        let startButtonEnabled: AnyPublisher<Bool, Never>
+        let signUpResult: AnyPublisher<Void, Never>
     }
 
     // MARK: - Private
 
     private let useCase: OnBoardingUseCase
+    private let navigateToHomeSubject = PassthroughSubject<Void, Never>()
 
     // MARK: - Init
 
@@ -34,7 +37,7 @@ public final class OnBoardingViewModel: BaseViewModel {
 
     // MARK: - Transform
 
-    public func transform(input: Input) -> Output {
+    func transform(input: Input) -> Output {
         let nicknameStateSubject = input.nicknameChanged
             .map { [weak self] nickname -> TextField.State in
                 guard let self = self else { return .normal }
@@ -60,10 +63,19 @@ public final class OnBoardingViewModel: BaseViewModel {
                     return false
                 }
             }
-        
+
+        //TODO: - api 연결 성공하면, 화면전환
+        input.startTapped
+            .combineLatest(nicknameStateSubject)
+            .sink { [weak self] _ in
+                self?.navigateToHomeSubject.send()
+            }
+            .store(in: &cancellables)
+
         return Output(
             nicknameState: nicknameStateSubject.eraseToAnyPublisher(),
-            isNextButtonEnabled: isNextButtonEnabled.eraseToAnyPublisher()
+            startButtonEnabled: isNextButtonEnabled.eraseToAnyPublisher(),
+            signUpResult: navigateToHomeSubject.eraseToAnyPublisher()
         )
     }
 }

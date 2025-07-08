@@ -26,10 +26,10 @@ public final class LoginViewController: BaseUIViewController<LoginViewModel> {
         }
     }
 
-    // MARK: - Navigation 설정 (필요 시)
+    // MARK: - Navigation
 
     public override func navigationType() -> NavigationType? {
-        return nil  // 로그인 화면은 일반적으로 뒤로가기 없음
+        return nil
     }
 
     // MARK: - Bind
@@ -65,9 +65,10 @@ public final class LoginViewController: BaseUIViewController<LoginViewModel> {
                 print("identityToken: \(identityToken)")
                 print("userId: \(userId)")
 
-                // TODO: 서버 API 호출 또는 화면 전환 -> 임시 
-                let homeVC = self.diContainer.makeTabBarViewController()
-                changeRootVC(homeVC, animated: false)
+                // TODO: 서버 API 호출 또는 화면 전환 + 분기 처리 -> 임시
+                /// 기존 유저라면, 텝바 신규 유저면 로그인
+                let onBoardingVC = self.diContainer.makeOnboardingViewController()
+                self.navigationController?.pushViewController(onBoardingVC, animated: true)
             }
             .store(in: &cancellables)
     }
