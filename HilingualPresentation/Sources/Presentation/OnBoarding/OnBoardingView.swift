@@ -10,33 +10,71 @@ import SnapKit
 
 final class OnBoardingView: BaseUIView {
 
-    //MARK: - UI Components
+    // MARK: - UI Components
+
+    let profileImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.image = UIImage(named: "img_profile_normal_ios", in: .module, compatibleWith: nil)
+        imageView.layer.cornerRadius = 60
+        imageView.clipsToBounds = true
+        imageView.contentMode = .scaleAspectFill
+        imageView.backgroundColor = .gray100
+        imageView.layer.borderWidth = 1
+        imageView.layer.borderColor = UIColor.gray200.cgColor
+        return imageView
+    }()
 
     let startButton: CTAButton = {
-        let button =  CTAButton(style: .TextButton("적용하기"), autoBackground: true)
-        return button
+        CTAButton(style: .TextButton("적용하기"), autoBackground: true)
+    }()
+
+    let nickNameLabel: UILabel = {
+        let label = UILabel()
+        label.font = .suit(.body_sb_16)
+        label.textAlignment = .left
+        label.textColor = .black
+        label.text = "닉네임"
+        return label
     }()
 
     let nicknameTextField: TextField = {
         let textfield = TextField()
+        textfield.setPlaceholder("한글, 영문, 숫자 조합만 가능")
         return textfield
     }()
 
-    //MARK: - Custom Method
+    private lazy var nicknameStackView: UIStackView = {
+        let stack = UIStackView(arrangedSubviews: [nickNameLabel, nicknameTextField])
+        stack.axis = .vertical
+        stack.spacing = 4
+        return stack
+    }()
+
+    // MARK: - Custom Method
 
     override func setUI() {
-        addSubviews(startButton,nicknameTextField)
+        addSubviews(
+            profileImageView,
+            nicknameStackView,
+            startButton
+        )
     }
 
     override func setLayout() {
-        startButton.snp.makeConstraints {
-            $0.center.equalToSuperview()
-            $0.trailing.equalToSuperview().inset(24)
-            $0.height.equalTo(48)
-        }
-        nicknameTextField.snp.makeConstraints {
+        profileImageView.snp.makeConstraints {
+            $0.top.equalTo(safeAreaLayoutGuide.snp.top).offset(28)
             $0.centerX.equalToSuperview()
-            $0.top.equalToSuperview().inset(100)
+            $0.width.height.equalTo(120)
+        }
+
+        nicknameStackView.snp.makeConstraints {
+            $0.top.equalTo(profileImageView.snp.bottom).offset(54)
+            $0.horizontalEdges.equalToSuperview().inset(24)
+        }
+
+        startButton.snp.makeConstraints {
+            $0.centerX.equalToSuperview()
+            $0.bottom.equalToSuperview().inset(50)
             $0.horizontalEdges.equalToSuperview().inset(24)
         }
     }

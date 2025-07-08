@@ -58,7 +58,8 @@ public final class OnBoardingViewController: BaseUIViewController<OnBoardingView
             .store(in: &cancellables)
     }
 
-    @objc private func nicknameDidChange() {
+    @objc
+    private func nicknameDidChange() {
         nicknameSubject.send(onBoardingView.nicknameTextField.text)
     }
 }

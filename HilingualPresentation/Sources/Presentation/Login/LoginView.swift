@@ -17,7 +17,6 @@ final class LoginView: BaseUIView {
     private let logoImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.image = UIImage(named: "img_logo_ios", in: .module, compatibleWith: nil)
-
         imageView.contentMode = .scaleAspectFit
         return imageView
     }()
