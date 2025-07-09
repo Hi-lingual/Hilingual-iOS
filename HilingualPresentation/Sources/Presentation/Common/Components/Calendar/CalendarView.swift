@@ -155,8 +155,9 @@ final class CalendarView: UIView {
         let remainder = days.count % 7
         if remainder > 0 {
             let extra = 7 - remainder
+            guard let lastDate = days.last else { return }
             for i in 1...extra {
-                if let date = calendar.date(byAdding: .day, value: i, to: days.last!) {
+                if let date = calendar.date(byAdding: .day, value: i, to: lastDate) {
                     days.append(date)
                 }
             }
