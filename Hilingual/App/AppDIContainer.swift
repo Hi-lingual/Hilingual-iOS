@@ -17,7 +17,14 @@ import HilingualPresentation
 final class AppDIContainer: ViewControllerFactory {
 
     static let shared = AppDIContainer()
-    private init() { }
+
+    private init() {
+        injectBaseURL()
+    }
+
+    private func injectBaseURL() {
+        NetworkEnvironment.shared = AppBaseURLProvider()
+    }
 
     public func makeTabBarViewController() -> HilingualPresentation.TabBarViewController {
         return TabBarViewController(diContainer: self)
