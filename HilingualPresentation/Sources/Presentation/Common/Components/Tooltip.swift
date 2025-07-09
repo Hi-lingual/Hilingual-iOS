@@ -61,14 +61,14 @@ final class Tooltip: UIView {
         
         tooltipLabel.snp.makeConstraints {
             $0.verticalEdges.equalTo(tooltip).inset(8)
-            $0.horizontalEdges.equalToSuperview().inset(14.5)
+            $0.horizontalEdges.equalToSuperview().inset(14)
         }
         
         triangleView.snp.makeConstraints {
             $0.top.equalTo(tooltip.snp.bottom)
             $0.centerX.equalToSuperview()
-            $0.width.equalTo(12)
-            $0.height.equalTo(8)
+            $0.width.equalTo(13)
+            $0.height.equalTo(7)
             $0.bottom.equalToSuperview()
         }
     }
@@ -87,32 +87,28 @@ final class Tooltip: UIView {
 final class TriangleView: UIView {
     override func draw(_ rect: CGRect) {
         super.draw(rect)
-
-        let width = rect.width
-        let height = rect.height
-        let radius: CGFloat = 1
-
-        let topLeft = CGPoint(x: 0, y: 0)
-        let topRight = CGPoint(x: width, y: 0)
-        let bottomLeft = CGPoint(x: (width / 2) - radius, y: height - radius)
-        let bottomRight = CGPoint(x: (width / 2) + radius, y: height - radius)
-        let control = CGPoint(x: width / 2, y: height + radius)
-
+        
+        let width: CGFloat = 13
+        let height: CGFloat = 7
         let path = UIBezierPath()
-        path.move(to: topLeft)
-        path.addLine(to: bottomLeft)
-        path.addQuadCurve(to: bottomRight, controlPoint: control)
-        path.addLine(to: topRight)
+        
+        path.move(to: CGPoint(x: width / 2, y: height))
+        path.addLine(to: CGPoint(x: 0, y: 0))
+        path.addLine(to: CGPoint(x: width, y: 0))
         path.close()
-
+        
         let shapeLayer = CAShapeLayer()
         shapeLayer.path = path.cgPath
         shapeLayer.fillColor = UIColor.hilingualBlack.cgColor
+        
         layer.sublayers?.forEach { $0.removeFromSuperlayer() }
         layer.addSublayer(shapeLayer)
     }
+    
+    override var intrinsicContentSize: CGSize {
+        return CGSize(width: 13, height: 7)
+    }
 }
-
 // MARK: - Preview
 
 @available(iOS 17.0, *)
