@@ -61,7 +61,7 @@ final class CalendarHeaderView: UIView {
     private let buttonStack: UIStackView = {
         let stack = UIStackView()
         stack.axis = .horizontal
-        stack.spacing = 4
+        stack.spacing = 12
         stack.alignment = .center
         return stack
     }()
@@ -75,7 +75,7 @@ final class CalendarHeaderView: UIView {
         setupActions()
         textLabel.text = CalendarHeaderView.format(date: currentDate)
     }
-
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -83,6 +83,13 @@ final class CalendarHeaderView: UIView {
     // MARK: - Setup Methods
 
     private func setupUI() {
+        
+        backgroundColor = .white
+        
+        layer.cornerRadius = 12
+        layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
+        layer.masksToBounds = true
+
         let stack = UIStackView(arrangedSubviews: [textLabel, iconView])
         stack.axis = .horizontal
         stack.spacing = 4
@@ -102,16 +109,20 @@ final class CalendarHeaderView: UIView {
 
     private func setupLayout() {
         monthButton.snp.makeConstraints {
-            $0.leading.equalToSuperview()
+            $0.top.equalTo(safeAreaLayoutGuide).inset(16)
+            $0.leading.equalToSuperview().inset(16)
             $0.centerY.equalToSuperview()
+            $0.bottom.equalToSuperview().inset(12)
         }
 
         buttonStack.snp.makeConstraints {
-            $0.trailing.equalToSuperview()
+            $0.top.equalTo(safeAreaLayoutGuide).inset(16)
+            $0.trailing.equalToSuperview().inset(16)
             $0.centerY.equalToSuperview()
+            $0.bottom.equalToSuperview().inset(12)
         }
     }
-
+    
     private func setupActions() {
         monthButton.addTarget(self, action: #selector(monthButtonTapped), for: .touchUpInside)
         previousButton.addTarget(self, action: #selector(previousButtonTapped), for: .touchUpInside)
