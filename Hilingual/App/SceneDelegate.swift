@@ -21,7 +21,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let window = UIWindow(windowScene: windowScene)
 
         let appDI = AppDIContainer.shared
-        let loginVC = appDI.makeLoginViewController()
+        let loginVC = appDI.makeTabBarViewController()
         let navigation = UINavigationController(rootViewController: loginVC)
 
         window.rootViewController = navigation
