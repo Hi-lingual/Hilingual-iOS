@@ -34,6 +34,10 @@ final class AppDIContainer: ViewControllerFactory {
     func makeOnboardingViewController() -> HilingualPresentation.OnBoardingViewController {
         return OnBoardingViewController(viewModel: makeOnBoardingViewModel(), diContainer: self)
     }
+    
+    func makeDiaryWritingViewController() -> HilingualPresentation.DiaryWritingViewController {
+        return DiaryWritingViewController(viewModel: makeDiaryWritingViewModel(), diContainer: self)
+    }
 
 }
 
@@ -70,6 +74,14 @@ extension AppDIContainer {
 
     private func makeOnBoardingViewModel() -> OnBoardingViewModel {
         OnBoardingViewModel(useCase: makeOnBoardingUseCase())
+    }
+}
+
+// MARK: - DiaryDIContainer
+
+extension AppDIContainer {
+    private func makeDiaryWritingViewModel() -> DiaryWritingViewModel {
+        return DiaryWritingViewModel()
     }
 }
 
