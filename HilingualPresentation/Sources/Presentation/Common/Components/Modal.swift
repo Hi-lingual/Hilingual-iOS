@@ -54,14 +54,13 @@ final class Modal: UIView {
     // MARK: - Setup Methods
     
     private func setStyle() {
-        backgroundColor = .dim
-        let tap = UITapGestureRecognizer(target: self, action: #selector(dismissSelf))
+        let tap = UITapGestureRecognizer(target: self, action: #selector(dismissModal))
         self.addGestureRecognizer(tap)
     }
     
     private func setUI() {
-        addSubviews(modalSheetView, modalLabel)
-        modalSheetView.addSubview(stackView)
+        addSubview(modalSheetView)
+        modalSheetView.addSubviews(modalLabel, stackView)
     }
     
     private func setLayout() {
@@ -106,23 +105,42 @@ final class Modal: UIView {
         }
     }
     
+    public func show(in view: UIView) {
+        view.addSubview(self)
+        self.snp.makeConstraints { $0.edges.equalToSuperview() }
+        layoutIfNeeded()
+        
+        modalSheetView.transform = CGAffineTransform(translationX: 0, y: modalSheetView.frame.height)
+        self.backgroundColor = .clear
+        
+        UIView.animate(withDuration: 0.3, delay: 0, options: [.curveEaseOut]) {
+            self.modalSheetView.transform = .identity
+            self.backgroundColor = UIColor.dim
+        }
+    }
+    
     // MARK: - Private Methods
     
-    @objc private func dismissSelf() {
-        self.removeFromSuperview()
+    @objc private func dismissModal() {
+        UIView.animate(withDuration: 0.2, animations: {
+            self.modalSheetView.transform = CGAffineTransform(translationX: 0, y: self.modalSheetView.frame.height)
+            self.backgroundColor = UIColor.dim.withAlphaComponent(0)
+        }, completion: { _ in
+            self.removeFromSuperview()
+        })
     }
 }
 
 // MARK: - Preview
 
 final class ModalPreviewViewController: UIViewController {
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+
         let modal = Modal()
         modal.configure(
-            title: "이미지 선택하기",
+            title: "이미지 선택",
             items: [
                 ("카메라로 사진 찍기", UIImage(resource: .icCamera24Ios), {
                     print("카메라 선택")
@@ -132,14 +150,11 @@ final class ModalPreviewViewController: UIViewController {
                 })
             ]
         )
-        
-        view.addSubview(modal)
-        modal.snp.makeConstraints {
-            $0.edges.equalToSuperview()
-        }
+        modal.show(in: self.view)
     }
 }
 
+@available(iOS 17.0, *)
 #Preview {
     ModalPreviewViewController()
 }
