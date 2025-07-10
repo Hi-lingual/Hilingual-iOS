@@ -99,7 +99,16 @@ final class HomeView: BaseUIView {
 
 #Preview {
     let view = HomeView()
+    
+    view.profileView.updateView(
+        nickname: "영돌이",
+        profileImageURL: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRkp6rJALpEwmvjDRzTmLZvkIvnItXqRu34BQ&s",
+        totalDiaries: 12,
+        streak: 4
+    )
+    
     let today = Date()
+    view.selectedInfo.setSelectedDate(today)
     view.selectedInfo.updateView(
         for: today,
         isWritten: false,
@@ -109,5 +118,6 @@ final class HomeView: BaseUIView {
             en: "What surprised you today?"
         )
     )
+
     return view
 }
