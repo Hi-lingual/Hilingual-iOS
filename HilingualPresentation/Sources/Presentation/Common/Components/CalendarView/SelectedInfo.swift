@@ -14,13 +14,16 @@ final class SelectedInfo: UIView {
 
     // MARK: - UI Components
 
-    private let selectedDateView = SelectedDateView()
-    private let cardTopicView = CardTopicView()
-    private let cardPreview = CardPreview()
+    internal let selectedDateView = SelectedDateView()
+    internal let cardTopicView = CardTopicView()
+    internal let cardPreview = CardPreview()
+    private let emptyDiaryView = EmptyDiaryView()
+    private let diaryLockView = DiaryLockView()
+
     
     private let selectedDayLabel: UILabel = {
         let label = UILabel()
-        label.text = "8월 21일 목요일"
+        label.text = ""
         label.font = .suit(.head_b_16)
         label.textColor = .black
         return label
@@ -71,39 +74,6 @@ final class SelectedInfo: UIView {
         stack.alignment = .center
         return stack
     }()
-    
-//    private let headerStack: UIStackView = {
-//        let stack = UIStackView()
-//        stack.axis = .horizontal
-//        stack.alignment = .fill
-//        return stack
-//    }()
-    
-    private let emptyDiaryLabel: UILabel = {
-        let label = UILabel()
-        label.text = "작성된 일기가 없어요.\n좋은 하루 보내셨기를 바라요!"
-        label.font = .suit(.body_sb_14)
-        label.textColor = .gray400
-        label.numberOfLines = 2
-        label.textAlignment = .center
-        return label
-    }()
-    
-    private let emptyDiaryView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.contentMode = .scaleAspectFit
-        imageView.image = UIImage(named: "img_diary_empty_ios", in: .module, compatibleWith: nil)
-        return imageView
-    }()
-    
-    private let emptyDiaryStack: UIStackView = {
-        let stack = UIStackView()
-        stack.axis = .vertical
-        stack.spacing = 8
-        stack.alignment = .center
-        stack.backgroundColor = .white
-        return stack
-    }()
 
     // MARK: - Lifecycle
 
@@ -127,10 +97,10 @@ final class SelectedInfo: UIView {
             dot,
             selectedDayStack,
             timeLeftStack,
-            //headerStack,
             cardTopicView,
             cardPreview,
-            emptyDiaryStack
+            emptyDiaryView,
+            diaryLockView
         )
         
         selectedDayStack.addArrangedSubviews(
@@ -143,20 +113,12 @@ final class SelectedInfo: UIView {
             iconView,
             timeLeftLabel
         )
-        
-//        headerStack.addArrangedSubviews(
-//            selectedDayStack,
-//            timeLeftStack
-//        )
-        
-        emptyDiaryStack.addArrangedSubviews(
-            emptyDiaryView,
-            emptyDiaryLabel
-        )
 
         cardTopicView.isHidden = true
         cardPreview.isHidden = true
-        emptyDiaryStack.isHidden = true
+        emptyDiaryView.isHidden = true
+        diaryLockView.isHidden = true
+
     }
 
     private func setupLayout() {
@@ -168,44 +130,75 @@ final class SelectedInfo: UIView {
         selectedDayStack.snp.makeConstraints {
             $0.top.equalTo(safeAreaLayoutGuide).inset(8)
             $0.leading.equalToSuperview().inset(16)
-            $0.centerY.equalToSuperview()
+            $0.height.equalTo(20)
             $0.bottom.equalToSuperview().inset(12)
         }
 
         timeLeftStack.snp.makeConstraints {
             $0.top.equalTo(safeAreaLayoutGuide).inset(8)
             $0.trailing.equalToSuperview().inset(16)
-            $0.centerY.equalToSuperview()
+            $0.height.equalTo(20)
             $0.bottom.equalToSuperview().inset(12)
         }
      
-        cardTopicView.snp.makeConstraints {
-            $0.top.equalTo(timeLeftStack.snp.bottom).offset(12)
-            $0.horizontalEdges.bottom.equalToSuperview()
-        }
-
-        cardPreview.snp.makeConstraints {
-            $0.top.equalTo(timeLeftStack.snp.bottom).offset(12)
-            $0.horizontalEdges.bottom.equalToSuperview()
-        }
-
-        emptyDiaryStack.snp.makeConstraints {
-            $0.top.equalTo(timeLeftStack.snp.bottom).offset(12)
-            $0.horizontalEdges.bottom.equalToSuperview()
+        [cardTopicView, cardPreview, emptyDiaryView, diaryLockView].forEach {
+            $0.snp.makeConstraints {
+                $0.top.equalTo(timeLeftStack.snp.bottom).offset(12)
+                $0.horizontalEdges.bottom.equalToSuperview()
+            }
         }
     }
 
-    // MARK: - Private Methods
+    
+    // MARK: - Public Methods
 
     func updateView(
+        for date: Date,
         isWritten: Bool,
         remainingTime: Int,
+        createdAt: String? = nil,
         topicData: (kor: String, en: String)? = nil,
         diaryData: String? = nil
     ) {
         cardTopicView.isHidden = true
         cardPreview.isHidden = true
-        emptyDiaryStack.isHidden = true
+        emptyDiaryView.isHidden = true
+        diaryLockView.isHidden = true
+
+        setSelectedDate(date)
+
+        // 미래 날짜 처리
+        let today = Calendar.current.startOfDay(for: Date())
+        let selectedDay = Calendar.current.startOfDay(for: date)
+
+        if selectedDay > today {
+            diaryLockView.isHidden = false
+            notWrittenLabel.text = "작성불가"
+            notWrittenLabel.textColor = .gray300
+            timeLeftLabel.text = ""
+            return
+        }
+
+        notWrittenLabel.text = isWritten ? "작성완료" : "미작성"
+        notWrittenLabel.textColor = isWritten ? .hilingualBlue : .gray300
+        timeLeftLabel.textColor = isWritten ? .gray300 : .black
+
+        if let createdAt = createdAt {
+            let formatter = DateFormatter()
+            formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
+            formatter.locale = Locale(identifier: "ko_KR")
+            if let date = formatter.date(from: createdAt) {
+                let displayFormatter = DateFormatter()
+                displayFormatter.dateFormat = "HH:mm"
+                timeLeftLabel.text = displayFormatter.string(from: date)
+            }
+        } else {
+            let hours = remainingTime / 60
+            let fullText = "\(hours)시간 남았어요"
+            let attributed = NSMutableAttributedString(string: fullText)
+            attributed.addAttribute(.foregroundColor, value: UIColor.hilingualOrange, range: NSRange(location: 0, length: "\(hours)".count))
+            timeLeftLabel.attributedText = attributed
+        }
 
         if isWritten {
             cardPreview.isHidden = false
@@ -217,9 +210,71 @@ final class SelectedInfo: UIView {
                     cardTopicView.configure(kor: topic.kor, en: topic.en)
                 }
             } else {
-                emptyDiaryStack.isHidden = false
+                emptyDiaryView.isHidden = false
             }
         }
     }
+
+    func setSelectedDate(_ date: Date) {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "ko_KR")
+        formatter.dateFormat = "M월 d일 EEEE"
+        selectedDayLabel.text = formatter.string(from: date)
+    }
 }
 
+// 일기 작성가능
+#Preview {
+    let view = SelectedInfo()
+    let today = Date()
+    view.updateView(
+        for: today,
+        isWritten: false,
+        remainingTime: 120,
+        topicData: (
+            kor: "오늘 당신을 놀라게 한 일이 있었나요?",
+            en: "What surprised you today?"
+        )
+    )
+    return view
+}
+
+// 일기 확인 뷰 (홈뷰 버전)
+#Preview {
+    let view = SelectedInfo()
+    let today = Date()
+    view.setSelectedDate(today)
+    view.updateView(
+        for: today,
+        isWritten: true,
+        remainingTime: 0,
+        createdAt: "2025-07-10T21:30:00",
+        diaryData: "Today was the most stressful day in 2025 for me. It was the team building day at SOPT. I dreaded this day because I didn't know what to expe"
+    )
+    return view
+}
+
+// 시간 초과
+#Preview {
+    let view = SelectedInfo()
+    let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: Date())!
+    view.updateView(
+        for: yesterday,
+        isWritten: false,
+        remainingTime: 0
+    )
+    return view
+}
+
+
+// 미래 날짜
+#Preview {
+    let view = SelectedInfo()
+    let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: Date())!
+    view.updateView(
+        for: tomorrow,
+        isWritten: false,
+        remainingTime: 0
+    )
+    return view
+}
