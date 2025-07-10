@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SnapKit
 
 enum ChipType {
     case me
