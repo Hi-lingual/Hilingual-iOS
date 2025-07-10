@@ -217,13 +217,8 @@ final class HomeView: BaseUIView {
             $0.height.equalTo(4)
         }
         
-        selectedDateView.snp.makeConstraints {
-            $0.top.equalTo(divider.snp.bottom)
-            $0.horizontalEdges.equalToSuperview()
-        }
-        
         selectedInfo.snp.makeConstraints {
-            $0.top.equalTo(selectedDateView.snp.bottom)
+            $0.top.equalTo(divider.snp.bottom)
             $0.horizontalEdges.equalToSuperview()
             $0.bottom.equalToSuperview()
         }
