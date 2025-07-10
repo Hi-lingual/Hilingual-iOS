@@ -8,10 +8,7 @@
 import UIKit
 import SnapKit
 
-// MARK: - SegmentedControl
-
 final class SegmentedControl: UIView {
-    // MARK: - UI Components
 
     private let segmentedControl: UnderlineSegmentedControl
     private let pageViewController: UIPageViewController
@@ -29,8 +26,6 @@ final class SegmentedControl: UIView {
         }
     }
 
-    // MARK: - Initializer
-
     init(viewControllers: [UIViewController],
          titles: [String],
          parentViewController: UIViewController) {
@@ -44,26 +39,22 @@ final class SegmentedControl: UIView {
 
         super.init(frame: .zero)
 
-        SetUI()
-        setLayout()
+        setupUI()
+        setupLayout()
         configurePageViewController()
+        bindSegmentControl()
     }
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
-    // MARK: - Setup
-
-    private func SetUI() {
+    private func setupUI() {
         addSubview(segmentedControl)
         addSubview(pageViewController.view)
-
-        segmentedControl.selectedSegmentIndex = 0
-        segmentedControl.addTarget(self, action: #selector(segmentedValueChanged(_:)), for: .valueChanged)
     }
 
-    private func setLayout() {
+    private func setupLayout() {
         segmentedControl.snp.makeConstraints {
             $0.top.leading.trailing.equalToSuperview()
             $0.height.equalTo(48)
@@ -86,10 +77,10 @@ final class SegmentedControl: UIView {
         pageViewController.didMove(toParent: parentVC)
     }
 
-    // MARK: - Action
-
-    @objc private func segmentedValueChanged(_ sender: UISegmentedControl) {
-        currentPage = sender.selectedSegmentIndex
+    private func bindSegmentControl() {
+        segmentedControl.didSelectIndex = { [weak self] index in
+            self?.currentPage = index
+        }
     }
 }
 
@@ -123,56 +114,6 @@ extension SegmentedControl: UIPageViewControllerDelegate, UIPageViewControllerDa
             return
         }
         currentPage = index
-        segmentedControl.selectedSegmentIndex = index
-    }
-}
-
-// MARK: - UnderlineSegmentedControl
-
-final class UnderlineSegmentedControl: UISegmentedControl {
-    private let underlineView = UIView()
-
-    override init(items: [Any]?) {
-        super.init(items: items)
-        setStyle()
-        setUnderline()
-    }
-
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-
-    private func setStyle() {
-        let image = UIImage()
-        setBackgroundImage(image, for: .normal, barMetrics: .default)
-        setDividerImage(image, forLeftSegmentState: .normal, rightSegmentState: .normal, barMetrics: .default)
-        tintColor = .clear
-        
-        setTitleTextAttributes([
-            .foregroundColor: UIColor.black,
-            .font: UIFont.suit(.head_b_18)
-        ], for: .normal)
-    }
-
-    private func setUnderline() {
-        underlineView.backgroundColor = .black
-        underlineView.layer.cornerRadius = 1
-        underlineView.clipsToBounds = true
-        
-        addSubview(underlineView)
-    }
-
-    override func layoutSubviews() {
-        super.layoutSubviews()
-
-        let segmentWidth = bounds.width / CGFloat(numberOfSegments)
-        let xPosition = CGFloat(selectedSegmentIndex) * segmentWidth
-
-        underlineView.frame = CGRect(
-            x: xPosition + 4,
-            y: bounds.height - 3,
-            width: segmentWidth - 8,
-            height: 3,
-        )
+        segmentedControl.selectedIndex = index
     }
 }
