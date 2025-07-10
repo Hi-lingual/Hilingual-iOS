@@ -101,6 +101,23 @@ final class DiaryWritingView: BaseUIView {
     
     let dropdown = Dropdown()
     
+    let modal: Modal = {
+        let modal = Modal()
+        modal.isHidden = true
+        modal.configure(
+            title: "이미지 선택하기",
+            items: [
+                ("카메라로 사진 찍기", UIImage(resource: .icCamera24Ios), {
+                    print("카메라 선택")
+                }),
+                ("갤러리에서 선택하기", UIImage(resource: .icGallary24Ios), {
+                    print("갤러리 선택")
+                })
+            ]
+        )
+        return modal
+    }()
+    
     //MARK: - LifeCycle
     
     override init(frame: CGRect) {
@@ -119,7 +136,7 @@ final class DiaryWritingView: BaseUIView {
     
     override func setUI() {
         headerStackView.addArrangedSubviews(dateLabel, textScanButton)
-        addSubviews(scrollView, feedbackButton)
+        addSubviews(scrollView, feedbackButton, modal)
         scrollView.addSubview(contentView)
         contentView.addSubviews(
             headerStackView, dropdown, textView,
@@ -190,10 +207,15 @@ final class DiaryWritingView: BaseUIView {
             $0.centerX.equalToSuperview()
             $0.bottom.equalTo(feedbackButton.snp.top).offset(-4)
         }
+        
+        modal.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
     }
     
     private func addTarget() {
         deleteImageButton.addTarget(self, action: #selector(deleteImage), for: .touchUpInside)
+        textScanButton.addTarget(self, action: #selector(showModal), for: .touchUpInside)
     }
     
     // MARK: - Private Methods
@@ -215,6 +237,11 @@ final class DiaryWritingView: BaseUIView {
         selectedImageView.isHidden = true
         deleteImageButton.isHidden = true
         cameraButton.isHidden = false
+    }
+    
+    @objc private func showModal() {
+        modal.isHidden = false
+        modal.showAnimation()
     }
 
     // MARK: - Keyboard Handling
