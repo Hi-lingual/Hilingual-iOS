@@ -10,8 +10,16 @@ import Combine
 import HilingualDomain
 import HilingualNetwork
 
-//public final class DefaultOnBoardingRepository: OnBoardingRepository {
-//    public func isNicknameAvailable(_ nickname: String) -> AnyPublisher<Bool, any Error> {
-//        return AnyPublisher<Bool, any Error>
-//    }
-//}
+public final class DefaultOnBoardingRepository: OnBoardingRepository {
+
+    private let service: OnBoardingService
+
+    public init(service: OnBoardingService) {
+        self.service = service
+    }
+    
+    public func isNicknameAvailable(_ nickname: String) -> AnyPublisher<Bool, any Error> {
+        service.checkNicknameDuplication(nickname: nickname)
+    }
+}
+

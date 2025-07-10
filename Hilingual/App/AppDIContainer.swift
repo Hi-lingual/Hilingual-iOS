@@ -17,7 +17,14 @@ import HilingualPresentation
 final class AppDIContainer: ViewControllerFactory {
 
     static let shared = AppDIContainer()
-    private init() { }
+
+    private init() {
+        injectBaseURL()
+    }
+
+    private func injectBaseURL() {
+        NetworkEnvironment.shared = AppBaseURLProvider()
+    }
 
     public func makeTabBarViewController() -> HilingualPresentation.TabBarViewController {
         return TabBarViewController(diContainer: self)
@@ -66,10 +73,17 @@ extension AppDIContainer {
 // MARK: - OnBoardingDiContainer
 
 extension AppDIContainer {
-    //TODO: - api 연결하면 Service연결
+    
+    private func makeOnBoardingService() -> OnBoardingService {
+        DefaultOnBoardingService()
+    }
+
+    private func makeOnBoardingRepository() -> OnBoardingRepository {
+        DefaultOnBoardingRepository(service: makeOnBoardingService())
+    }
 
     private func makeOnBoardingUseCase() -> OnBoardingUseCase {
-        DefaultOnBoardingUseCase()
+        DefaultOnBoardingUseCase(onBoardingRepository: makeOnBoardingRepository())
     }
 
     private func makeOnBoardingViewModel() -> OnBoardingViewModel {

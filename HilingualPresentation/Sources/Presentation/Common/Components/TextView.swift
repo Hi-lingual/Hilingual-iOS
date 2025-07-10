@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SnapKit
 
 @MainActor
 protocol TextViewDelegate: AnyObject {
