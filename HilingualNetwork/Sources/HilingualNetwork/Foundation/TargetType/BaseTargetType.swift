@@ -19,7 +19,8 @@ extension BaseTargetType{
     
     public var headers: [String : String]? {
         let header = [
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "Authorization": "Bearer \(UserDefaultHandler.accessToken)"
         ]
         return header
     }
@@ -27,6 +28,4 @@ extension BaseTargetType{
     public var sampleData: Data {
         return Data()
     }
-
-    //TODO: - Token 관련 로직 추가
 }
