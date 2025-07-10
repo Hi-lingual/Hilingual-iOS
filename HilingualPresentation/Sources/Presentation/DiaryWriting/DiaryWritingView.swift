@@ -59,16 +59,39 @@ final class DiaryWritingView: BaseUIView {
     
     let cameraButton: UIButton = {
         let button = UIButton(type: .system)
-        var config = UIButton.Configuration.plain()
+        var config = UIButton.Configuration.filled()
         
         config.image = UIImage(resource: .icCamera20Ios)
         config.contentInsets = NSDirectionalEdgeInsets(top: 28, leading: 28, bottom: 28, trailing: 28)
+        config.baseBackgroundColor = .gray100
         
         button.configuration = config
         button.layer.cornerRadius = 8
         button.clipsToBounds = true
         button.backgroundColor = .gray100
         
+        return button
+    }()
+    
+    private let selectedImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFill
+        imageView.clipsToBounds = true
+        imageView.isHidden = true
+        imageView.layer.cornerRadius = 8
+        return imageView
+    }()
+
+    private let deleteImageButton: UIButton = {
+        let button = UIButton(type: .custom)
+        
+        button.backgroundColor = .gray700
+        button.layer.cornerRadius = 9
+        button.clipsToBounds = true
+        
+        button.setImage(UIImage(resource:.btClose10Ios).withRenderingMode(.alwaysOriginal), for: .normal)
+        button.imageEdgeInsets = UIEdgeInsets(top: 4, left: 4, bottom: 4, right: 4)
+        button.isHidden = true
         return button
     }()
     
@@ -85,6 +108,7 @@ final class DiaryWritingView: BaseUIView {
         setUI()
         setLayout()
         setTopic()
+        addTarget()
     }
     
     required init?(coder: NSCoder) {
@@ -99,7 +123,8 @@ final class DiaryWritingView: BaseUIView {
         scrollView.addSubview(contentView)
         contentView.addSubviews(
             headerStackView, dropdown, textView,
-            cameraButton, tooltip
+            cameraButton, tooltip,
+            selectedImageView, deleteImageButton
         )
     }
     
@@ -143,6 +168,18 @@ final class DiaryWritingView: BaseUIView {
             $0.bottom.equalToSuperview().inset(20)
         }
         
+        selectedImageView.snp.makeConstraints {
+            $0.top.equalTo(textView.snp.bottom).offset(12)
+            $0.leading.equalTo(textView)
+            $0.size.equalTo(80)
+        }
+
+        deleteImageButton.snp.makeConstraints {
+            $0.top.equalTo(selectedImageView).offset(-7)
+            $0.trailing.equalTo(selectedImageView).offset(6)
+            $0.size.equalTo(18)
+        }
+        
         feedbackButton.snp.makeConstraints {
             $0.bottom.equalToSuperview().inset(50)
             $0.centerX.equalToSuperview()
@@ -155,6 +192,10 @@ final class DiaryWritingView: BaseUIView {
         }
     }
     
+    private func addTarget() {
+        deleteImageButton.addTarget(self, action: #selector(deleteImage), for: .touchUpInside)
+    }
+    
     // MARK: - Private Methods
     
     private func setTopic() {
@@ -162,6 +203,20 @@ final class DiaryWritingView: BaseUIView {
         dropdown.topicKor = "오늘 당신을 놀라게 한 일이 있었나요?"
     }
     
+    func setImage(_ image: UIImage) {
+        selectedImageView.image = image
+        selectedImageView.isHidden = false
+        deleteImageButton.isHidden = false
+        cameraButton.isHidden = true
+    }
+        
+    @objc private func deleteImage() {
+        selectedImageView.image = nil
+        selectedImageView.isHidden = true
+        deleteImageButton.isHidden = true
+        cameraButton.isHidden = false
+    }
+
     // MARK: - Keyboard Handling
     
     override func didMoveToWindow() {

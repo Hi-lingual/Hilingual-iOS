@@ -8,6 +8,8 @@
 import Foundation
 import Combine
 
+import PhotosUI
+
 public final class DiaryWritingViewController: BaseUIViewController<DiaryWritingViewModel>, TextViewDelegate {
     
     // MARK: - Properties
@@ -25,6 +27,16 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
         diaryWritingView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
+    }
+    
+    public override func addTarget() {
+        diaryWritingView.cameraButton.addTarget(self, action: #selector(cameraButtonTapped), for: .touchUpInside)
+    }
+    
+    // MARK: - Private Methods
+    
+    @objc private func cameraButtonTapped() {
+        presentImagePicker()
     }
     
     // MARK: - Navigation
@@ -59,5 +71,29 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
     
     func textView(_ textView: TextView, didChangeTextCount count: Int) {
         textCountSubject.send(count)
+    }
+}
+
+extension DiaryWritingViewController: PHPickerViewControllerDelegate {
+    func presentImagePicker() {
+        var config = PHPickerConfiguration()
+        config.selectionLimit = 1
+        config.filter = .images
+        
+        let picker = PHPickerViewController(configuration: config)
+        picker.delegate = self
+        present(picker, animated: true)
+    }
+    
+    public func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+        picker.dismiss(animated: true)
+        guard let itemProvider = results.first?.itemProvider, itemProvider.canLoadObject(ofClass: UIImage.self) else { return }
+
+        itemProvider.loadObject(ofClass: UIImage.self) { [weak self] image, error in
+            guard let image = image as? UIImage else { return }
+            DispatchQueue.main.async {
+                self?.diaryWritingView.setImage(image)
+            }
+        }
     }
 }
