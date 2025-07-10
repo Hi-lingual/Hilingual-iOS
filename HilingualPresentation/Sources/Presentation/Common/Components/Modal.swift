@@ -105,28 +105,23 @@ final class Modal: UIView {
         }
     }
     
-    public func show(in view: UIView) {
-        view.addSubview(self)
-        self.snp.makeConstraints { $0.edges.equalToSuperview() }
-        layoutIfNeeded()
-        
+    // MARK: - Animation
+    
+    public func showAnimation() {
         modalSheetView.transform = CGAffineTransform(translationX: 0, y: modalSheetView.frame.height)
         self.backgroundColor = .clear
-        
         UIView.animate(withDuration: 0.3, delay: 0, options: [.curveEaseOut]) {
             self.modalSheetView.transform = .identity
             self.backgroundColor = UIColor.dim
         }
     }
     
-    // MARK: - Private Methods
-    
     @objc private func dismissModal() {
         UIView.animate(withDuration: 0.2, animations: {
             self.modalSheetView.transform = CGAffineTransform(translationX: 0, y: self.modalSheetView.frame.height)
             self.backgroundColor = UIColor.dim.withAlphaComponent(0)
         }, completion: { _ in
-            self.removeFromSuperview()
+            self.isHidden = true
         })
     }
 }
@@ -134,11 +129,12 @@ final class Modal: UIView {
 // MARK: - Preview
 
 final class ModalPreviewViewController: UIViewController {
+    
+    private let modal = Modal()
 
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-
-        let modal = Modal()
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
         modal.configure(
             title: "이미지 선택",
             items: [
@@ -150,7 +146,15 @@ final class ModalPreviewViewController: UIViewController {
                 })
             ]
         )
-        modal.show(in: self.view)
+        
+        view.addSubview(modal)
+        modal.snp.makeConstraints { $0.edges.equalToSuperview() }
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        modal.showAnimation()
     }
 }
 
