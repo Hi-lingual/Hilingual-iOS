@@ -12,6 +12,9 @@ final class DiaryWritingView: BaseUIView {
     
     //MARK: - UI Components
     
+    private let scrollView = UIScrollView()
+    private let contentView = UIView()
+    
     let dateLabel: UILabel = {
         let label = UILabel()
         label.text = "6월 20일 금요일"
@@ -34,13 +37,13 @@ final class DiaryWritingView: BaseUIView {
         config.imagePadding = 4
         config.baseForegroundColor = .gray500
         config.contentInsets = NSDirectionalEdgeInsets(top: 4, leading: 8, bottom: 4, trailing: 8)
-
+        
         button.configuration = config
         button.layer.borderWidth = 1
         button.layer.borderColor = UIColor.gray200.cgColor
         button.layer.cornerRadius = 8
         button.clipsToBounds = true
-
+        
         return button
     }()
     
@@ -83,7 +86,7 @@ final class DiaryWritingView: BaseUIView {
         setLayout()
         setTopic()
     }
-
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -92,37 +95,52 @@ final class DiaryWritingView: BaseUIView {
     
     override func setUI() {
         headerStackView.addArrangedSubviews(dateLabel, textScanButton)
-        addSubviews(headerStackView, textView, cameraButton, feedbackButton, tooltip, dropdown)
+        addSubviews(scrollView, feedbackButton)
+        scrollView.addSubview(contentView)
+        contentView.addSubviews(
+            headerStackView, dropdown, textView,
+            cameraButton, tooltip
+        )
     }
-
+    
     override func setLayout() {
+        scrollView.snp.makeConstraints {
+            $0.top.leading.trailing.equalToSuperview()
+            $0.bottom.equalTo(feedbackButton.snp.top)
+        }
+        
+        contentView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+            $0.width.equalTo(scrollView)
+        }
+        
         textScanButton.snp.makeConstraints {
             $0.width.equalTo(125)
             $0.height.equalTo(32)
         }
         
         headerStackView.snp.makeConstraints {
-            $0.top.equalToSuperview().offset(121) // 네비게이션 바에 따라 변경
+            $0.top.equalToSuperview().offset(16)
             $0.horizontalEdges.equalToSuperview().inset(16)
-            $0.width.equalTo(343)
         }
         
         dropdown.snp.makeConstraints {
             $0.top.equalTo(headerStackView.snp.bottom).offset(16)
             $0.centerX.equalToSuperview()
-            $0.width.equalTo(343)
+            $0.horizontalEdges.equalToSuperview().inset(16)
         }
         
         textView.snp.makeConstraints {
             $0.top.equalTo(dropdown.snp.bottom).offset(8)
             $0.centerX.equalToSuperview()
-            $0.width.equalTo(343)
+            $0.horizontalEdges.equalToSuperview().inset(16)
             $0.height.equalTo(292)
         }
         
         cameraButton.snp.makeConstraints {
             $0.top.equalTo(textView.snp.bottom).offset(12)
             $0.leading.equalTo(textView)
+            $0.bottom.equalToSuperview().inset(20)
         }
         
         feedbackButton.snp.makeConstraints {
@@ -137,9 +155,51 @@ final class DiaryWritingView: BaseUIView {
         }
     }
     
+    // MARK: - Private Methods
+    
     private func setTopic() {
         dropdown.topicEn = "What surprised you today?"
         dropdown.topicKor = "오늘 당신을 놀라게 한 일이 있었나요?"
+    }
+    
+    // MARK: - Keyboard Handling
+    
+    override func didMoveToWindow() {
+        super.didMoveToWindow()
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(_:)), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(_:)), name: UIResponder.keyboardWillHideNotification, object: nil)
+    }
+    
+    @objc private func keyboardWillShow(_ notification: Notification) {
+        guard
+            let keyboardFrameInScreen = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect,
+            let window = window
+        else { return }
+
+        let keyboardFrameInView = window.convert(keyboardFrameInScreen, to: self)
+        let keyboardHeight = keyboardFrameInView.height
+        
+        scrollView.contentInset.bottom = keyboardHeight
+        scrollView.verticalScrollIndicatorInsets.bottom = keyboardHeight
+
+        let textViewFrameInSelf = textView.convert(textView.bounds, to: self)
+        let textViewBottomY = textViewFrameInSelf.maxY
+
+        let keyboardTopY = self.bounds.height - keyboardHeight
+
+        let desiredSpacing: CGFloat = 12
+        let targetBottomY = keyboardTopY - desiredSpacing
+
+        let offset = textViewBottomY - targetBottomY
+        if offset > 0 {
+            let newOffsetY = scrollView.contentOffset.y + offset
+            scrollView.setContentOffset(CGPoint(x: 0, y: newOffsetY), animated: true)
+        }
+    }
+    
+    @objc private func keyboardWillHide(_ notification: Notification) {
+        scrollView.contentInset.bottom = 0
+        scrollView.verticalScrollIndicatorInsets.bottom = 0
     }
 }
 
