@@ -27,6 +27,9 @@ final class TextView: UIView {
         textView.font = .suit(.body_r_16)
         textView.textColor = .black
         textView.isScrollEnabled = true
+        textView.autocorrectionType = .no
+        textView.spellCheckingType = .no
+        textView.returnKeyType = .done
         textView.layer.borderColor = UIColor.hilingualBlack.cgColor
         return textView
     }()
@@ -127,6 +130,11 @@ extension TextView: UITextViewDelegate {
     }
     
     func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
+        if text == "\n" {
+            textView.resignFirstResponder()
+            return false
+        }
+        
         guard let currentText = textView.text else { return true }
         
         if let stringRange = Range(range, in: currentText) {
