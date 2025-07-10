@@ -72,6 +72,13 @@ final class SelectedInfo: UIView {
         return stack
     }()
     
+//    private let headerStack: UIStackView = {
+//        let stack = UIStackView()
+//        stack.axis = .horizontal
+//        stack.alignment = .fill
+//        return stack
+//    }()
+    
     private let emptyDiaryLabel: UILabel = {
         let label = UILabel()
         label.text = "작성된 일기가 없어요.\n좋은 하루 보내셨기를 바라요!"
@@ -113,12 +120,14 @@ final class SelectedInfo: UIView {
     // MARK: - Setup Methods
 
     private func setupUI() {
-        backgroundColor = .hilingualBlack
+        
+        backgroundColor = .white
         
         addSubviews(
             dot,
             selectedDayStack,
             timeLeftStack,
+            //headerStack,
             cardTopicView,
             cardPreview,
             emptyDiaryStack
@@ -135,11 +144,16 @@ final class SelectedInfo: UIView {
             timeLeftLabel
         )
         
+//        headerStack.addArrangedSubviews(
+//            selectedDayStack,
+//            timeLeftStack
+//        )
+        
         emptyDiaryStack.addArrangedSubviews(
             emptyDiaryView,
             emptyDiaryLabel
         )
-    
+
         cardTopicView.isHidden = true
         cardPreview.isHidden = true
         emptyDiaryStack.isHidden = true
@@ -164,17 +178,19 @@ final class SelectedInfo: UIView {
             $0.centerY.equalToSuperview()
             $0.bottom.equalToSuperview().inset(12)
         }
-        
+     
         cardTopicView.snp.makeConstraints {
-            $0.top.equalTo(selectedDayStack.snp.bottom)
+            $0.top.equalTo(timeLeftStack.snp.bottom).offset(12)
             $0.horizontalEdges.bottom.equalToSuperview()
         }
 
         cardPreview.snp.makeConstraints {
+            $0.top.equalTo(timeLeftStack.snp.bottom).offset(12)
             $0.horizontalEdges.bottom.equalToSuperview()
         }
 
         emptyDiaryStack.snp.makeConstraints {
+            $0.top.equalTo(timeLeftStack.snp.bottom).offset(12)
             $0.horizontalEdges.bottom.equalToSuperview()
         }
     }
@@ -206,3 +222,4 @@ final class SelectedInfo: UIView {
         }
     }
 }
+
