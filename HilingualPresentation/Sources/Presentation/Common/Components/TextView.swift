@@ -167,14 +167,6 @@ fileprivate final class PreviewViewController: UIViewController {
         customTextView.onTextCountChanged = { [weak self] count in
             self?.countDisplayLabel.text = "현재 글자 수: \(count)"
         }
-        
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
-        tapGesture.cancelsTouchesInView = false
-        view.addGestureRecognizer(tapGesture)
-    }
-    
-    @objc private func dismissKeyboard() {
-        view.endEditing(true)
     }
 }
 
