@@ -10,9 +10,16 @@ import Foundation
 import Moya
 import Combine
 
-//TODO: - 실 구현 연결
 public protocol OnBoardingService {
+    func checkNicknameDuplication(nickname: String) -> AnyPublisher<Bool, Error>
 }
 
-public final class DefaultOnBoardingService: OnBoardingService {
+public final class DefaultOnBoardingService: BaseService<OnBoardingAPI>,OnBoardingService {
+    public func checkNicknameDuplication(nickname: String) -> AnyPublisher<Bool, Error> {
+           return request(.checkNickname(nickname: nickname), as: OnBoardingResponseDTO.self)
+            .map { $0.data.isAvailable }
+            .mapError { $0 as Error }
+            .eraseToAnyPublisher()
+       }
+
 }

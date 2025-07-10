@@ -14,6 +14,7 @@ final class TextField: BaseUIView {
         case normal
         case error(String)
         case success(String)
+        case wait
     }
 
     // MARK: - Public Properties
@@ -71,6 +72,30 @@ final class TextField: BaseUIView {
         return stack
     }()
 
+    private let loadingIndicator: UIActivityIndicatorView = {
+        let indicator = UIActivityIndicatorView(style: .medium)
+        indicator.hidesWhenStopped = true
+        return indicator
+    }()
+
+    private let rightStackView: UIStackView = {
+        let stack = UIStackView()
+        stack.axis = .horizontal
+        stack.spacing = 8
+        stack.alignment = .center
+        return stack
+    }()
+
+    private lazy var rightContainerView: UIView = {
+        let view = UIView()
+        view.addSubview(rightStackView)
+        rightStackView.snp.makeConstraints {
+            $0.edges.equalToSuperview().inset(14)
+        }
+        return view
+    }()
+
+
     // MARK: - Init
 
     override init(frame: CGRect) {
@@ -99,16 +124,27 @@ final class TextField: BaseUIView {
         case .normal:
             textField.layer.borderColor = UIColor.clear.cgColor
             messageLabel.text = ""
+            stopLoading()
+
         case .error(let message):
             textField.layer.borderColor = UIColor.systemRed.cgColor
             messageLabel.text = message
             messageLabel.textColor = .systemRed
+            stopLoading()
+
         case .success(let message):
             textField.layer.borderColor = UIColor.clear.cgColor
             messageLabel.text = message
             messageLabel.textColor = .hilingualBlue
+            stopLoading()
+
+        case .wait:
+            textField.layer.borderColor = UIColor.clear.cgColor
+            messageLabel.text = ""
+            startLoading()
         }
     }
+
 
     // MARK: - Custom Methods
 
@@ -121,6 +157,8 @@ final class TextField: BaseUIView {
 
         messageStack.addArrangedSubview(messageLabel)
         messageStack.addArrangedSubview(characterCountLabel)
+
+        rightStackView.addArrangedSubview(loadingIndicator)
 
         textField.addTarget(self, action: #selector(textDidChange), for: .editingChanged)
 
@@ -152,6 +190,18 @@ final class TextField: BaseUIView {
         let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: 12, height: 0))
         textField.leftView = paddingView
         textField.leftViewMode = .always
+    }
+
+    private func startLoading() {
+        loadingIndicator.startAnimating()
+        textField.rightView = rightContainerView
+        textField.rightViewMode = .always
+    }
+
+    private func stopLoading() {
+        loadingIndicator.stopAnimating()
+        textField.rightView = nil
+        textField.rightViewMode = .never
     }
 
     @objc
