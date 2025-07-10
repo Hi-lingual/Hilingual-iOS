@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  OnBoardingResponseDTO.swift
 //  HilingualNetwork
 //
 //  Created by 성현주 on 7/9/25.
