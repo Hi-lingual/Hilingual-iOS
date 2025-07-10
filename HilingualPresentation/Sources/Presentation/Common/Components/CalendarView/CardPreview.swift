@@ -34,7 +34,9 @@ final class CardPreview: UIView {
             in: .module,
             compatibleWith: nil
         )
-        imageView.contentMode = .scaleAspectFit
+        imageView.contentMode = .scaleAspectFill
+        imageView.clipsToBounds = true
+        imageView.layer.cornerRadius = 8
         return imageView
     }()
 
@@ -72,6 +74,7 @@ final class CardPreview: UIView {
     }
 
     private func setupLayout() {
+        
         previewLine.snp.makeConstraints {
             $0.size.equalTo(CGSize(width: 3, height: 74))
         }
@@ -85,7 +88,7 @@ final class CardPreview: UIView {
         previewImage.snp.makeConstraints {
             $0.trailing.equalToSuperview().inset(16)
             $0.centerY.equalToSuperview()
-            $0.size.equalTo(40)
+            $0.width.height.equalTo(74)
         }
     }
 
@@ -114,6 +117,19 @@ final class CardPreview: UIView {
     }
 }
 
+
+//#Preview {
+//    let view = CardPreview()
+//    view.configure(type: .textOnly(text: "우갸갸갸갸갸갸"))
+//    return view
+//        .previewLayout(.sizeThatFits)
+//        .frame(width: 360, height: 120)
+//}
+
 #Preview {
-    CardPreview()
+    let view = CardPreview()
+    view.configure(
+        type: .textWithImage(text: nil, imageUrl: nil)
+    )
+    return view
 }
