@@ -72,7 +72,7 @@ final class DiaryWritingView: BaseUIView {
         return button
     }()
     
-    private let feedbackButton = CTAButton(style: .TextButton("피드백 요청"), autoBackground: true)
+    let feedbackButton = CTAButton(style: .TextButton("피드백 요청"), autoBackground: true)
     
     let tooltip = Tooltip("10자 이상 작성해야 피드백 요청이 가능해요!")
     
