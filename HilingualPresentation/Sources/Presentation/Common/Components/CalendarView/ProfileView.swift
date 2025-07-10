@@ -7,12 +7,12 @@
 
 import UIKit
 import SnapKit
+import Kingfisher
 
 final class ProfileView: UIView {
 
     private let nameLabel: UILabel = {
         let label = UILabel()
-        label.text = "하링이"
         label.font = .suit(.head_b_18)
         label.textColor = .white
         return label
@@ -20,7 +20,7 @@ final class ProfileView: UIView {
     
     private let profileImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.contentMode = .scaleAspectFit
+        imageView.contentMode = .scaleAspectFill
         imageView.layer.cornerRadius = 23
         imageView.clipsToBounds = true
         imageView.image = UIImage(named: "img_profile_normal_ios", in: .module, compatibleWith: nil)
@@ -36,7 +36,6 @@ final class ProfileView: UIView {
     
     private let totalLabel: UILabel = {
         let label = UILabel()
-        label.text = "총 15편"
         label.font = .suit(.caption_m_12)
         label.textColor = .white
         return label
@@ -91,6 +90,8 @@ final class ProfileView: UIView {
     }
 
     private func setupUI() {
+        
+        backgroundColor = .black
 
         addSubviews(profileImageView, profileStack)
         
@@ -124,8 +125,25 @@ final class ProfileView: UIView {
             $0.bottom.equalToSuperview()
         }
     }
+    
+    func updateView(nickname: String, profileImageURL: String?, totalDiaries: Int, streak: Int) {
+        nameLabel.text = nickname
+        totalLabel.text = "총 \(totalDiaries)편"
+        streakLabel.text = "\(streak)일 연속 작성 중"
+        
+        if let urlString = profileImageURL, let url = URL(string: urlString) {
+            profileImageView.kf.setImage(with: url)
+        }
+    }
 }
 
 #Preview {
-    ProfileView()
+    let view = ProfileView()
+    view.updateView(
+        nickname: "영돌이",
+        profileImageURL: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRkp6rJALpEwmvjDRzTmLZvkIvnItXqRu34BQ&s",
+        totalDiaries: 12,
+        streak: 4
+    )
+    return view
 }
