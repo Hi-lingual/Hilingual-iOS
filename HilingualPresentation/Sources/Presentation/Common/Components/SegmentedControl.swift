@@ -66,11 +66,11 @@ final class SegmentedControl: UIView {
     private func setLayout() {
         segmentedControl.snp.makeConstraints {
             $0.top.leading.trailing.equalToSuperview()
-            $0.height.equalTo(44)
+            $0.height.equalTo(48)
         }
 
         pageViewController.view.snp.makeConstraints {
-            $0.top.equalTo(segmentedControl.snp.bottom).offset(4)
+            $0.top.equalTo(segmentedControl.snp.bottom)
             $0.leading.trailing.bottom.equalToSuperview()
         }
     }
@@ -147,10 +147,18 @@ final class UnderlineSegmentedControl: UISegmentedControl {
         setBackgroundImage(image, for: .normal, barMetrics: .default)
         setDividerImage(image, forLeftSegmentState: .normal, rightSegmentState: .normal, barMetrics: .default)
         tintColor = .clear
+        
+        setTitleTextAttributes([
+            .foregroundColor: UIColor.black,
+            .font: UIFont.suit(.head_b_18)
+        ], for: .normal)
     }
 
     private func setUnderline() {
-        underlineView.backgroundColor = .systemBlue
+        underlineView.backgroundColor = .black
+        underlineView.layer.cornerRadius = 1
+        underlineView.clipsToBounds = true
+        
         addSubview(underlineView)
     }
 
@@ -161,10 +169,10 @@ final class UnderlineSegmentedControl: UISegmentedControl {
         let xPosition = CGFloat(selectedSegmentIndex) * segmentWidth
 
         underlineView.frame = CGRect(
-            x: xPosition,
-            y: bounds.height - 2,
-            width: segmentWidth,
-            height: 2
+            x: xPosition + 4,
+            y: bounds.height - 3,
+            width: segmentWidth - 8,
+            height: 3,
         )
     }
 }
