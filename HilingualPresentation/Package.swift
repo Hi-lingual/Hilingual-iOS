@@ -14,6 +14,7 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/SnapKit/SnapKit.git", from: "5.6.0"),
+        .package(url: "https://github.com/onevcat/Kingfisher.git", from: "8.4.0"),
         .package(name: "HilingualDomain", path: "../HilingualDomain")
     ],
     targets: [
@@ -21,7 +22,8 @@ let package = Package(
             name: "HilingualPresentation",
             dependencies: [
                 "HilingualDomain", 
-                .product(name: "SnapKit", package: "SnapKit")
+                .product(name: "SnapKit", package: "SnapKit"),
+                .product(name: "Kingfisher", package: "Kingfisher")
             ],
             path: "Sources/Presentation",
             resources: [
