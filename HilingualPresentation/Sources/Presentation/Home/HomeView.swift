@@ -52,6 +52,7 @@ final class HomeView: BaseUIView {
         profileView.snp.makeConstraints {
             $0.top.equalTo(safeAreaLayoutGuide).inset(8)
             $0.horizontalEdges.equalToSuperview()
+            $0.height.equalTo(46)
         }
                 
         headerView.snp.makeConstraints {
