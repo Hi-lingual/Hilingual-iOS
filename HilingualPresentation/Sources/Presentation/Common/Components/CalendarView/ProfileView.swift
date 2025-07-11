@@ -57,7 +57,6 @@ final class ProfileView: UIView {
     
     private let streakLabel: UILabel = {
         let label = UILabel()
-        label.text = "6일 연속 작성 중"
         label.font = .suit(.caption_m_12)
         label.textColor = .white
         return label
@@ -83,6 +82,8 @@ final class ProfileView: UIView {
         super.init(frame: frame)
         setupUI()
         setupLayout()
+        //기본값 적용
+        updateView()
     }
 
     required init?(coder: NSCoder) {
@@ -112,16 +113,18 @@ final class ProfileView: UIView {
         }
         
         profileImageView.snp.makeConstraints {
+            $0.leading.equalToSuperview().inset(16)
             $0.width.height.equalTo(46)
         }
         
         profileStack.snp.makeConstraints {
-            $0.leading.equalTo(profileImageView.snp.trailing).offset(16)
+            $0.centerY.equalTo(profileImageView.snp.centerY)
+            $0.leading.equalTo(profileImageView.snp.trailing).offset(8)
         }
     }
     
     func updateView(
-        nickname: String = "닉네임을 입력해주세요",
+        nickname: String = "하링이",
         profileImageURL: String? = nil,
         totalDiaries: Int = 0,
         streak: Int = 0
