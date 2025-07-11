@@ -108,10 +108,8 @@ final class ProfileView: UIView {
     
     private func setupLayout() {
         
-        backgroundColor = .hilingualBlack
-        
         dot.snp.makeConstraints {
-            $0.size.equalTo(CGSize(width: 2, height: 2))
+            $0.size.equalTo(2)
         }
         
         profileImageView.snp.makeConstraints {
