@@ -14,7 +14,14 @@ public final class LoginViewController: BaseUIViewController<LoginViewModel> {
 
     private let loginView = LoginView()
 
-    // MARK: - UI 설정
+    //MARK: - Life cycle
+
+    public override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        loginView.startSplashAnimation()
+    }
+
+    // MARK: - Custom Layout
 
     public override func setUI() {
         view.addSubviews(loginView)

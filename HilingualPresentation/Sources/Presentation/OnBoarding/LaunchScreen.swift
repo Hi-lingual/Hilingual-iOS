@@ -37,9 +37,9 @@ extension LaunchScreen {
     }
 
     private func setLayout() {
-        logoImageView.snp.makeConstraints { make in
-            make.center.equalToSuperview()
-            make.width.equalToSuperview().multipliedBy(0.5)
+        logoImageView.snp.makeConstraints {
+            $0.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(180)
+            $0.centerX.equalToSuperview()
         }
     }
 }
