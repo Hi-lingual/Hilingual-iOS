@@ -75,7 +75,7 @@ final class LoginView: BaseUIView {
         }
         
         characterImageView.snp.makeConstraints {
-            $0.bottom.equalTo(appleLoginButton.snp.top)
+            $0.bottom.equalTo(appleLoginButton.snp.top).offset(1)
             $0.centerX.equalToSuperview()
         }
 
