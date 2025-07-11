@@ -85,11 +85,13 @@ final class HomeView: BaseUIView {
     
     // MARK: - Binding
 
+    // 캘린더 하나로 묶기
     private func bindCalendar() {
         headerView.onMonthChanged = { [weak self] newDate in
             self?.calendarView.reload(for: newDate)
         }
 
+        //선택된 날짜 반영
         calendarView.onDateSelected = { [weak self] date in
             self?.selectedInfo.setSelectedDate(date)
         }
