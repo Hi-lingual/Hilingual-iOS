@@ -68,8 +68,6 @@ final class DiaryWritingView: BaseUIView {
         button.configuration = config
         button.layer.cornerRadius = 8
         button.clipsToBounds = true
-        button.backgroundColor = .gray100
-        
         return button
     }()
     
@@ -182,6 +180,7 @@ final class DiaryWritingView: BaseUIView {
         cameraButton.snp.makeConstraints {
             $0.top.equalTo(textView.snp.bottom).offset(12)
             $0.leading.equalTo(textView)
+            $0.size.equalTo(80)
             $0.bottom.equalToSuperview().inset(20)
         }
         
