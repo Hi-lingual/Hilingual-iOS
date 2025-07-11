@@ -57,7 +57,6 @@ final class ProfileView: UIView {
     
     private let streakLabel: UILabel = {
         let label = UILabel()
-        label.text = "6일 연속 작성 중"
         label.font = .suit(.caption_m_12)
         label.textColor = .white
         return label
@@ -83,6 +82,8 @@ final class ProfileView: UIView {
         super.init(frame: frame)
         setupUI()
         setupLayout()
+        //기본값 적용
+        updateView()
     }
 
     required init?(coder: NSCoder) {
@@ -91,8 +92,6 @@ final class ProfileView: UIView {
 
     private func setupUI() {
         
-        backgroundColor = .black
-
         addSubviews(profileImageView, profileStack)
         
         profileStack.addArrangedSubviews(
@@ -109,6 +108,8 @@ final class ProfileView: UIView {
     
     private func setupLayout() {
         
+        backgroundColor = .hilingualBlack
+        
         dot.snp.makeConstraints {
             $0.size.equalTo(CGSize(width: 2, height: 2))
         }
@@ -119,20 +120,25 @@ final class ProfileView: UIView {
         }
         
         profileStack.snp.makeConstraints {
-            $0.top.equalToSuperview()
             $0.centerY.equalTo(profileImageView.snp.centerY)
-            $0.leading.equalTo(profileImageView.snp.trailing).offset(16)
-            $0.bottom.equalToSuperview()
+            $0.leading.equalTo(profileImageView.snp.trailing).offset(8)
         }
     }
     
-    func updateView(nickname: String, profileImageURL: String?, totalDiaries: Int, streak: Int) {
+    func updateView(
+        nickname: String = "하링이",
+        profileImageURL: String? = nil,
+        totalDiaries: Int = 0,
+        streak: Int = 0
+    ) {
         nameLabel.text = nickname
         totalLabel.text = "총 \(totalDiaries)편"
         streakLabel.text = "\(streak)일 연속 작성 중"
         
         if let urlString = profileImageURL, let url = URL(string: urlString) {
             profileImageView.kf.setImage(with: url)
+        } else {
+            profileImageView.image = UIImage(named: "img_profile_normal_ios", in: .module, compatibleWith: nil)
         }
     }
 }
