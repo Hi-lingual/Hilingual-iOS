@@ -73,6 +73,15 @@ final class SelectedInfo: UIView {
         stack.alignment = .center
         return stack
     }()
+    
+    private let spacer = UIView()
+    
+    private let headerStack: UIStackView = {
+        let stack = UIStackView()
+        stack.axis = .horizontal
+        stack.alignment = .center
+        return stack
+    }()
 
     // MARK: - Lifecycle
 
@@ -93,9 +102,7 @@ final class SelectedInfo: UIView {
         backgroundColor = .white
         
         addSubviews(
-            dot,
-            selectedDayStack,
-            timeLeftStack,
+            headerStack,
             cardTopicView,
             cardPreview,
             emptyDiaryView,
@@ -112,6 +119,15 @@ final class SelectedInfo: UIView {
             iconView,
             timeLeftLabel
         )
+        
+        headerStack.addArrangedSubviews(
+            selectedDayStack,
+            spacer,
+            timeLeftStack
+        )
+        
+        spacer.setContentHuggingPriority(.defaultLow, for: .horizontal)
+        spacer.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
 
         cardTopicView.isHidden = true
         cardPreview.isHidden = true
@@ -123,26 +139,17 @@ final class SelectedInfo: UIView {
     private func setupLayout() {
         
         dot.snp.makeConstraints {
-            $0.size.equalTo(CGSize(width: 2, height: 2))
+            $0.size.equalTo(2)
         }
         
-        selectedDayStack.snp.makeConstraints {
-            $0.top.equalTo(safeAreaLayoutGuide).inset(8)
-            $0.leading.equalToSuperview().inset(16)
-            $0.height.equalTo(20)
-            $0.bottom.equalToSuperview().inset(12)
-        }
-
-        timeLeftStack.snp.makeConstraints {
-            $0.top.equalTo(safeAreaLayoutGuide).inset(8)
-            $0.trailing.equalToSuperview().inset(16)
-            $0.height.equalTo(20)
-            $0.bottom.equalToSuperview().inset(12)
+        headerStack.snp.makeConstraints {
+            $0.top.equalToSuperview().inset(12)
+            $0.horizontalEdges.equalToSuperview().inset(16)
         }
      
         [cardTopicView, cardPreview, emptyDiaryView, diaryLockView].forEach {
             $0.snp.makeConstraints {
-                $0.top.equalTo(timeLeftStack.snp.bottom)
+                $0.top.equalTo(headerStack.snp.bottom)
                 $0.horizontalEdges.bottom.equalToSuperview()
             }
         }
@@ -249,7 +256,7 @@ final class SelectedInfo: UIView {
         isWritten: true,
         remainingTime: 0,
         createdAt: "2025-07-10T21:30:00",
-        diaryData: "Today was the most stressful day in 2025 for me. It was the team building day at SOPT. I dreaded this day because I didn't know what to expe"
+        diaryData: "Today was the most stressful "
     )
     return view
 }
