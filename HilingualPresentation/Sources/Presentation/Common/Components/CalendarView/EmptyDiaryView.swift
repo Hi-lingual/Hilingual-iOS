@@ -57,6 +57,7 @@ final class EmptyDiaryView: UIView {
 
     private func setupLayout() {
         emptyDiaryStack.snp.makeConstraints {
+            $0.top.equalTo(12)
             $0.edges.equalToSuperview()
         }
     }

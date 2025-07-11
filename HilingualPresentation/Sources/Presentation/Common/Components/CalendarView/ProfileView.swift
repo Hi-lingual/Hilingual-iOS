@@ -114,12 +114,12 @@ final class ProfileView: UIView {
         }
         
         profileImageView.snp.makeConstraints {
-            $0.top.equalToSuperview()
             $0.leading.equalToSuperview().inset(16)
             $0.width.height.equalTo(46)
         }
         
         profileStack.snp.makeConstraints {
+            $0.top.equalToSuperview()
             $0.centerY.equalTo(profileImageView.snp.centerY)
             $0.leading.equalTo(profileImageView.snp.trailing).offset(16)
             $0.bottom.equalToSuperview()

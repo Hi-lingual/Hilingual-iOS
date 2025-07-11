@@ -121,8 +121,8 @@ final class CardTopicView: UIView {
         }
 
         topicStack.snp.makeConstraints {
-            $0.horizontalEdges.equalToSuperview().inset(12)
             $0.top.equalTo(12)
+            $0.horizontalEdges.equalToSuperview().inset(12)
         }
 
         topicEnLabel.snp.makeConstraints {
@@ -134,12 +134,14 @@ final class CardTopicView: UIView {
         }
 
         cardStack.snp.makeConstraints {
+            $0.top.equalTo(12)
             $0.horizontalEdges.equalToSuperview().inset(16)
         }
         
         diaryAddButton.snp.makeConstraints {
             $0.top.equalTo(cardStack.snp.bottom).offset(12)
             $0.horizontalEdges.equalToSuperview().inset(16)
+            $0.bottom.equalToSuperview()
         }
     }
     
@@ -161,6 +163,6 @@ final class CardTopicView: UIView {
 
 #Preview {
     let view = CardTopicView()
-    view.configure(kor: nil, en: nil) 
+    view.configure(kor: nil, en: nil)
     return view
 }
