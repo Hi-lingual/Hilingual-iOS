@@ -124,3 +124,95 @@ final class HomeView: BaseUIView {
 
     return view
 }
+
+#Preview("일기 주제 추천") {
+    let view = HomeView()
+
+    view.profileView.updateView(
+        nickname: "영돌이",
+        profileImageURL: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRkp6rJALpEwmvjDRzTmLZvkIvnItXqRu34BQ&s",
+        totalDiaries: 12,
+        streak: 4
+    )
+
+    let today = Date()
+    view.selectedInfo.setSelectedDate(today)
+    view.selectedInfo.updateView(
+        for: today,
+        isWritten: false,
+        remainingTime: 120,
+        topicData: (
+            kor: "오늘 당신을 놀라게 한 일이 있었나요?",
+            en: "What surprised you today?"
+        )
+    )
+
+    return view
+}
+
+#Preview("작성된 일기 프리뷰") {
+    let view = HomeView()
+
+    view.profileView.updateView(
+        nickname: "영서",
+        profileImageURL: nil,
+        totalDiaries: 30,
+        streak: 15
+    )
+
+    let today = Date()
+    view.selectedInfo.setSelectedDate(today)
+    view.selectedInfo.updateView(
+        for: today,
+        isWritten: true,
+        remainingTime: 0,
+        createdAt: "2025-07-10T21:30:00",
+        diaryData: "Today was 어쩌구 저ㄱ쩌구"
+    )
+
+    return view
+}
+
+
+#Preview("일기 작성 불가") {
+    let view = HomeView()
+
+    view.profileView.updateView(
+        nickname: "바보",
+        profileImageURL: nil,
+        totalDiaries: 3,
+        streak: 0
+    )
+
+    let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: Date())!
+    view.selectedInfo.setSelectedDate(yesterday)
+    view.selectedInfo.updateView(
+        for: yesterday,
+        isWritten: false,
+        remainingTime: 0
+    )
+
+    return view
+}
+
+
+#Preview("미래 날짜 선택 시") {
+    let view = HomeView()
+
+    view.profileView.updateView(
+        nickname: "하이링구얼",
+        profileImageURL: nil,
+        totalDiaries: 0,
+        streak: 0
+    )
+
+    let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: Date())!
+    view.selectedInfo.setSelectedDate(tomorrow)
+    view.selectedInfo.updateView(
+        for: tomorrow,
+        isWritten: false,
+        remainingTime: 0
+    )
+
+    return view
+}
