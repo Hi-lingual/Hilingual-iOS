@@ -111,7 +111,6 @@ final class TriangleView: UIView {
 }
 // MARK: - Preview
 
-@available(iOS 17.0, *)
 fileprivate final class TooltipPreviewViewController: UIViewController {
 
     override func viewDidLoad() {
@@ -127,7 +126,6 @@ fileprivate final class TooltipPreviewViewController: UIViewController {
     }
 }
 
-@available(iOS 17.0, *)
 #Preview {
     TooltipPreviewViewController()
 }

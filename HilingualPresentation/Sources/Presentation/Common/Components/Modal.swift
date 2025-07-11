@@ -158,7 +158,6 @@ final class ModalPreviewViewController: UIViewController {
     }
 }
 
-@available(iOS 17.0, *)
 #Preview {
     ModalPreviewViewController()
 }

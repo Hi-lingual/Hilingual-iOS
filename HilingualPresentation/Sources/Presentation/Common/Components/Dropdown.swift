@@ -173,7 +173,6 @@ final class Dropdown: UIView {
 
 // MARK: - Preview
 
-@available(iOS 17.0, *)
 #Preview {
     let dropdown = Dropdown()
     return dropdown

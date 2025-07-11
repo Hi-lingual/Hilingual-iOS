@@ -285,7 +285,7 @@ final class DiaryWritingView: BaseUIView {
 }
 
 //MARK: - Preview
-@available(iOS 17.0, *)
+
 #Preview {
     DiaryWritingView()
 }
