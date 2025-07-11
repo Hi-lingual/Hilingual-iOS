@@ -10,18 +10,16 @@ import Combine
 
 public protocol OnBoardingUseCase {
     func validate(_ nickname: String) -> NicknameValidationResult
-//    func checkDuplicate(_ nickname: String) -> AnyPublisher<Bool, Error>
+    func checkDuplicate(_ nickname: String) -> AnyPublisher<Bool, Error>
 }
 
 public final class DefaultOnBoardingUseCase: OnBoardingUseCase {
-//    private let onBoardingRepository: OnBoardingRepository
-//
-//    public init(onBoardingRepository: OnBoardingRepository) {
-//        self.onBoardingRepository = onBoardingRepository
-//    }
+    private let onBoardingRepository: OnBoardingRepository
 
-    public init() {
+    public init(onBoardingRepository: OnBoardingRepository) {
+        self.onBoardingRepository = onBoardingRepository
     }
+
 
     public func validate(_ nickname: String) -> NicknameValidationResult {
         if nickname.isEmpty {
@@ -35,9 +33,9 @@ public final class DefaultOnBoardingUseCase: OnBoardingUseCase {
         }
     }
 
-//    public func checkDuplicate(_ nickname: String) -> AnyPublisher<Bool, Error> {
-//        return onBoardingRepository.isNicknameAvailable(nickname)
-//    }
+    public func checkDuplicate(_ nickname: String) -> AnyPublisher<Bool, Error> {
+        return onBoardingRepository.isNicknameAvailable(nickname)
+    }
 }
 
 //MARK: - Extension
