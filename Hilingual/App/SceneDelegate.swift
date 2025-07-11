@@ -28,7 +28,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) {
             let appDI = AppDIContainer.shared
-            let loginVC = appDI.makeLoginViewController()
+            let loginVC = appDI.makeTabBarViewController()
             let navigation = UINavigationController(rootViewController: loginVC)
             navigation.setNavigationBarHidden(true, animated: false)
             navigation.view.layoutIfNeeded()

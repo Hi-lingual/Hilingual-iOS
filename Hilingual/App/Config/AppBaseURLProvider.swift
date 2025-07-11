@@ -16,4 +16,10 @@ struct AppBaseURLProvider: BaseURLProvider {
         }
         return url
     }
+    var token: String {
+        guard let token = Bundle.main.infoDictionary?["TOKEN"] as? String else {
+            fatalError("TOKEN이 Info.plist에 정의 안됨 ㅋ")
+        }
+        return token
+    }
 }

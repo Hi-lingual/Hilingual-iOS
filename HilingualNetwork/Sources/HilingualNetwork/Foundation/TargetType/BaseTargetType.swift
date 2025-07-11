@@ -20,7 +20,8 @@ extension BaseTargetType{
     public var headers: [String : String]? {
         let header = [
             "Content-Type": "application/json",
-            "Authorization": "Bearer \(UserDefaultHandler.accessToken)"
+            //TODO: - 토큰 변경
+            "Authorization": "Bearer \(NetworkEnvironment.shared.token)"
         ]
         return header
     }
