@@ -14,7 +14,6 @@ final class SelectedInfo: UIView {
 
     // MARK: - UI Components
 
-    internal let selectedDateView = SelectedDateView()
     internal let cardTopicView = CardTopicView()
     internal let cardPreview = CardPreview()
     private let emptyDiaryView = EmptyDiaryView()
@@ -165,6 +164,7 @@ final class SelectedInfo: UIView {
         emptyDiaryView.isHidden = true
         diaryLockView.isHidden = true
 
+        // 선택된 날짜 반영
         setSelectedDate(date)
 
         // 미래 날짜 처리
@@ -239,7 +239,7 @@ final class SelectedInfo: UIView {
     return view
 }
 
-// 일기 확인 뷰 (홈뷰 버전)
+// 일기 확인
 #Preview {
     let view = SelectedInfo()
     let today = Date()
