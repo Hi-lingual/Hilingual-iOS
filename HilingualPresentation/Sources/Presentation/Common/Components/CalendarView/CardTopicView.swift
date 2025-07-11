@@ -67,6 +67,8 @@ final class CardTopicView: UIView {
     }()
     
     private let bottomSpacer = UIView()
+    
+    private let diaryAddButton = CTAButton(style: .IconTextButton(iconName: "ic_plus_16_ios", text: "일기 작성하기"))
 
     // MARK: - Initialization
 
@@ -105,7 +107,7 @@ final class CardTopicView: UIView {
 
         topicKorLabel.isHidden = true
 
-        addSubviews(cardStack)
+        addSubviews(cardStack, diaryAddButton)
     }
 
     private func setupLayout() {
@@ -132,6 +134,11 @@ final class CardTopicView: UIView {
         }
 
         cardStack.snp.makeConstraints {
+            $0.horizontalEdges.equalToSuperview().inset(16)
+        }
+        
+        diaryAddButton.snp.makeConstraints {
+            $0.top.equalTo(cardStack.snp.bottom).offset(12)
             $0.horizontalEdges.equalToSuperview().inset(16)
         }
     }
