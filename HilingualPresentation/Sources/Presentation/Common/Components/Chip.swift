@@ -152,7 +152,6 @@ final class Chip: UIView {
     }
 }
 
-@available(iOS 17.0, *)
 fileprivate final class ChipPreviewViewController: UIViewController {
     
     override func viewDidLoad() {
@@ -175,7 +174,6 @@ fileprivate final class ChipPreviewViewController: UIViewController {
     }
 }
 
-@available(iOS 17.0, *)
 #Preview {
     ChipPreviewViewController()
 }

@@ -8,13 +8,18 @@
 import UIKit
 import SnapKit
 
+@MainActor
+protocol TextViewDelegate: AnyObject {
+    func textView(_ textView: TextView, didChangeTextCount count: Int)
+}
+
 final class TextView: UIView {
     
     // MARK: - Properties
     
     var maxCharacterCount: Int = 1000
     
-    var onTextCountChanged: ((Int) -> Void)?
+    weak var delegate: TextViewDelegate?
     
     var text: String {
         return textView.text
@@ -28,6 +33,10 @@ final class TextView: UIView {
         textView.font = .suit(.body_r_16)
         textView.textColor = .black
         textView.isScrollEnabled = true
+        textView.autocorrectionType = .no
+        textView.spellCheckingType = .no
+        textView.returnKeyType = .done
+        textView.layer.borderWidth = 0
         textView.layer.borderColor = UIColor.hilingualBlack.cgColor
         return textView
     }()
@@ -103,7 +112,7 @@ final class TextView: UIView {
         countLabel.text = "\(count)/\(maxCharacterCount)"
         placeholderLabel.isHidden = !textView.text.isEmpty
         
-        onTextCountChanged?(count)
+        delegate?.textView(self, didChangeTextCount: count)
     }
     
     func configure(text: String) {
@@ -128,6 +137,11 @@ extension TextView: UITextViewDelegate {
     }
     
     func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
+        if text == "\n" {
+            textView.resignFirstResponder()
+            return false
+        }
+        
         guard let currentText = textView.text else { return true }
         
         if let stringRange = Range(range, in: currentText) {
@@ -136,42 +150,4 @@ extension TextView: UITextViewDelegate {
         }
         return true
     }
-}
-
-
-// MARK: - PreView
-
-@available(iOS 17.0, *)
-fileprivate final class PreviewViewController: UIViewController {
-    
-    private let countDisplayLabel = UILabel()
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        view.backgroundColor = .white
-        
-        let customTextView = TextView()
-        view.addSubview(customTextView)
-        customTextView.snp.makeConstraints {
-            $0.center.equalToSuperview()
-            $0.width.equalTo(343)
-            $0.height.equalTo(292)
-        }
-        
-        countDisplayLabel.text = "현재 글자 수: 0"
-        view.addSubview(countDisplayLabel)
-        countDisplayLabel.snp.makeConstraints {
-            $0.top.equalTo(customTextView.snp.bottom).offset(16)
-            $0.centerX.equalToSuperview()
-        }
-        
-        customTextView.onTextCountChanged = { [weak self] count in
-            self?.countDisplayLabel.text = "현재 글자 수: \(count)"
-        }
-    }
-}
-
-@available(iOS 17.0, *)
-#Preview {
-    PreviewViewController()
 }
