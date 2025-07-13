@@ -13,20 +13,23 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
 
     private let homeView = HomeView()
 
-    // MARK: - Custom Method
+    // MARK: - Life Cycle
 
     public override func setUI() {
-            super.setUI()
-            view.addSubview(homeView)
-            
-            let today = Date()
-            homeView.calendarView.selectedDate = today
-            homeView.selectedInfo.setSelectedDate(today)
-        }
+        super.setUI()
+        view.addSubview(homeView)
+
+        let today = Date()
+        homeView.calendarView.selectedDate = today
+        homeView.selectedInfo.setSelectedDate(today)
+    }
 
     public override func setLayout() {
         homeView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
     }
+
+    // MARK: - Bind
+    // 예: onDateSelected, viewModel?.diaryStatePublisher 등
 }
