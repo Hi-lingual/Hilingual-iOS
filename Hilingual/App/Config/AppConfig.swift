@@ -7,4 +7,5 @@
 
 import Foundation
 
-let BASE_URL = Bundle.main.infoDictionary?["BASE_URL"] as? String ?? "api.odcloud.kr/api"
+let BASE_URL = Bundle.main.infoDictionary?["BASE_URL"] as? String ?? ""
+let TOKEN = Bundle.main.infoDictionary?["TOKEN"] as? String ?? ""
