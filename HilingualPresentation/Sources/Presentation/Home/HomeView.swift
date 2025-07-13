@@ -100,31 +100,6 @@ final class HomeView: BaseUIView {
 }
 
 
-#Preview {
-    let view = HomeView()
-    
-    view.profileView.updateView(
-        nickname: "영돌이",
-        profileImageURL: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRkp6rJALpEwmvjDRzTmLZvkIvnItXqRu34BQ&s",
-        totalDiaries: 12,
-        streak: 4
-    )
-    
-    let today = Date()
-    view.selectedInfo.setSelectedDate(today)
-    view.selectedInfo.updateView(
-        for: today,
-        isWritten: false,
-        remainingTime: 720,
-        topicData: (
-            kor: "오늘 당신을 놀라게 한 일이 있었나요?",
-            en: "What surprised you today?"
-        )
-    )
-
-    return view
-}
-
 #Preview("일기 주제 추천") {
     let view = HomeView()
 
@@ -167,7 +142,7 @@ final class HomeView: BaseUIView {
         isWritten: true,
         remainingTime: 0,
         createdAt: "2025-07-10T21:30:00",
-        diaryData: "Today was 어쩌구 저ㄱ쩌구"
+        diaryData: "Today was the most stressful day in 2025 for me. It was the team building day at SOPT. I dreaded this day because I didn't know what to expect. The process was complicated and the group(?) was 공개 in that day, so setting the team in advance was impossible. However, after the long team building I was able to be with the people I wanted which was such a relief. I know it's just the start, but I am already excited."
     )
 
     return view
