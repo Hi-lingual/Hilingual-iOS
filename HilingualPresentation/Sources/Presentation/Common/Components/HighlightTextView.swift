@@ -39,6 +39,7 @@ final class HighlightTextView: BaseUIView {
         textView.font = .suit(.body_r_16)
         textView.isScrollEnabled = false
         textView.textColor = .hilingualBlack
+//        textView.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
         return textView
     }()
     
@@ -53,6 +54,9 @@ final class HighlightTextView: BaseUIView {
     
     override func setUI() {
         addSubviews(diaryImageView, textView, textCountLabel)
+        textView.isUserInteractionEnabled = false
+        self.backgroundColor = .white
+        self.layer.cornerRadius = 12
     }
     
     override func setLayout() {
@@ -69,6 +73,7 @@ final class HighlightTextView: BaseUIView {
         textCountLabel.snp.makeConstraints {
             $0.top.equalTo(textView.snp.bottom).offset(12)
             $0.trailing.equalToSuperview().inset(12)
+            $0.bottom.equalToSuperview().inset(12)
         }
     }
     
@@ -94,16 +99,20 @@ final class HighlightTextView: BaseUIView {
     }
     
     func highlightCorrections(textType: String, diffRanges: [DiffRange]) {
-        let attributedString = NSMutableAttributedString(string: textType)
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.lineHeightMultiple = 1.4
+        
+        let attributedString = NSMutableAttributedString(string: textType, attributes: [
+            .font: UIFont.suit(.body_r_16),
+            .paragraphStyle: paragraphStyle,
+            .foregroundColor: UIColor.hilingualBlack
+        ])
         
         for range in diffRanges {
             let nsRange = NSRange(location: range.start, length: range.end - range.start)
-            attributedString.addAttribute(
-                .foregroundColor,
-                value: UIColor.hilingualOrange,
-                range: nsRange
-            )
+            attributedString.addAttribute(.foregroundColor, value: UIColor.hilingualOrange, range: nsRange)
         }
+        
         textView.attributedText = attributedString
     }
     
