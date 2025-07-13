@@ -99,7 +99,6 @@ final class HomeView: BaseUIView {
     }
 }
 
-
 #Preview("일기 주제 추천") {
     let view = HomeView()
 
