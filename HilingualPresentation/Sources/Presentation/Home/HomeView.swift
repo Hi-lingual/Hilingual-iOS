@@ -45,6 +45,7 @@ final class HomeView: BaseUIView {
         )
 
         bindCalendar()
+        
     }
         
     override func setLayout() {
@@ -146,7 +147,6 @@ final class HomeView: BaseUIView {
 
     return view
 }
-
 
 #Preview("일기 작성 불가") {
     let view = HomeView()

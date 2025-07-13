@@ -16,16 +16,17 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     // MARK: - Custom Method
 
     public override func setUI() {
-        view.addSubviews(homeView)
-    }
+            super.setUI()
+            view.addSubview(homeView)
+            
+            let today = Date()
+            homeView.calendarView.selectedDate = today
+            homeView.selectedInfo.setSelectedDate(today)
+        }
 
     public override func setLayout() {
         homeView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
     }
-    
-//    public override func bind(viewModel: HomeViewModel) {
-//        homeView.bind(viewModel: viewModel)
-//    }
 }
