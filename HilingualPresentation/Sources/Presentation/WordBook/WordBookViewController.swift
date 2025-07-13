@@ -64,9 +64,11 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
             items: [
                 ("최신순", UIImage(systemName: "arrow.down"), { [weak self] in
                     self?.sortSubject.send(.latest)
+                    self?.wordBookView.tableView.reloadData()
                 }),
                 ("가나다순", UIImage(systemName: "textformat.abc"), { [weak self] in
                     self?.sortSubject.send(.alphabetical)
+                    self?.wordBookView.tableView.reloadData()
                 })
             ]
         )
