@@ -12,7 +12,7 @@ public enum OnBoardingAPI {
     case checkNickname(nickname: String)
 }
 
-extension OnBoardingAPI: BaseTargetType {
+extension OnBoardingAPI: NoAuthorizeTargetType {
 
     public var path: String {
         switch self {

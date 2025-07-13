@@ -19,22 +19,29 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = scene as? UIWindowScene else { return }
 
         let window = UIWindow(windowScene: windowScene)
-
-        let appDI = AppDIContainer.shared
-        let loginVC = appDI.makeOnboardingViewController()
-        let navigation = UINavigationController(rootViewController: loginVC)
-
-        window.rootViewController = navigation
-        window.makeKeyAndVisible()
+        window.backgroundColor = .white
         self.window = window
+
+        let launchScreenVC = LaunchScreen()
+        window.rootViewController = launchScreenVC
+        window.makeKeyAndVisible()
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) {
+            let appDI = AppDIContainer.shared
+            let loginVC = appDI.makeTabBarViewController()
+            let navigation = UINavigationController(rootViewController: loginVC)
+            navigation.setNavigationBarHidden(true, animated: false)
+            navigation.view.layoutIfNeeded()
+
+            UIView.transition(with: window,
+                              duration: 0.5,
+                              options: [.transitionCrossDissolve],
+                              animations: {
+                window.rootViewController = navigation
+            }, completion: nil)
+        }
     }
 
-    func sceneDidDisconnect(_ scene: UIScene) {
-        // Called as the scene is being released by the system.
-        // This occurs shortly after the scene enters the background, or when its session is discarded.
-        // Release any resources associated with this scene that can be re-created the next time the scene connects.
-        // The scene may re-connect later, as its session was not necessarily discarded (see `application:didDiscardSceneSessions` instead).
-    }
 
     func sceneDidBecomeActive(_ scene: UIScene) {
         // Called when the scene has moved from an inactive state to an active state.

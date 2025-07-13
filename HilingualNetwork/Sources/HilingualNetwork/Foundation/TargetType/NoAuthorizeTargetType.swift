@@ -1,22 +1,22 @@
 //
-//  BaseTargetType.swift
-//  Hilingual
+//  NoAuthorizeTargetType.swift
+//  HilingualNetwork
 //
-//  Created by 성현주 on 7/2/25.
+//  Created by 성현주 on 7/11/25.
 //
 
 import Foundation
 
 import Moya
 
-public protocol BaseTargetType: TargetType {}
+public protocol NoAuthorizeTargetType: TargetType {}
 
-extension BaseTargetType{
+extension NoAuthorizeTargetType {
 
     public var baseURL: URL {
         return NetworkEnvironment.shared.baseURL
     }
-    
+
     public var headers: [String : String]? {
         let header = [
             "Content-Type": "application/json"
@@ -27,6 +27,4 @@ extension BaseTargetType{
     public var sampleData: Data {
         return Data()
     }
-
-    //TODO: - Token 관련 로직 추가
 }
