@@ -108,9 +108,16 @@ final class CardPreview: UIView {
         case .textOnly(let text):
             originalText.text = text ?? "일기를 불러오지 못했습니다."
             previewImage.isHidden = true
+            
+            previewImage.snp.remakeConstraints {
+                $0.trailing.equalToSuperview()
+                $0.centerY.equalToSuperview()
+                $0.size.equalTo(0)
+            }
 
         case .textWithImage(let text, let imageUrl):
             originalText.text = text ?? "일기를 불러오지 못했습니다."
+
             previewImage.isHidden = false
             if let urlString = imageUrl, let url = URL(string: urlString) {
                 previewImage.kf.setImage(with: url)
