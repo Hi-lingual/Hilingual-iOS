@@ -52,7 +52,8 @@ final class WordDetailDialog: UIView {
 
     private func setLayout() {
         dialogContainerView.snp.makeConstraints {
-            $0.center.equalToSuperview()
+            $0.centerX.equalToSuperview()
+            $0.bottom.equalToSuperview().inset(40)
             $0.leading.trailing.equalToSuperview().inset(16)
         }
 
@@ -98,22 +99,4 @@ final class WordDetailDialog: UIView {
             self.alpha = 1
         })
     }
-}
-
-
-#Preview {
-    let dialog = WordDetailDialog()
-    let dummy = PhraseData(
-        phraseId: 1,
-        phraseType: ["동사", "숙어"],
-        phrase: "end up ~ing",
-        explanation: "결국 ~하게 되다",
-        example: nil,
-        isMarked: true,
-        created_at: "2025-06-12"
-    )
-
-    dialog.configure(data: dummy)
-    dialog.isHidden = false
-    return dialog
 }

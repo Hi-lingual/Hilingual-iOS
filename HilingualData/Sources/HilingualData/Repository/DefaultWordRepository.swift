@@ -33,10 +33,10 @@ public final class DefaultWordRepository: WordBookRepository {
                             phraseId: wordDTO.phraseId,
                             phraseType: wordDTO.phraseType,
                             phrase: wordDTO.phrase,
-                            explanation: "",     // TODO: API 응답에 포함되면 채워주세요
-                            example: nil,         // TODO: API 응답에 포함되면 채워주세요
-                            isMarked: false,      // TODO: 북마크 여부, 이후 필드 추가 필요
-                            createdAt: nil        // TODO: 날짜 응답 필드 추가되면 채워주세요
+                            explanation: "",
+                            example: nil,
+                            isMarked: false,
+                            createdAt: nil     
                         )
                     }
                     return (group.group, items)
@@ -44,4 +44,21 @@ public final class DefaultWordRepository: WordBookRepository {
             }
             .eraseToAnyPublisher()
     }
+
+    public func fetchWordDetail(id: Int) -> AnyPublisher<WordEntity, Error> {
+        return service.fetchWordDetail(id: id)
+            .map { dto in
+                WordEntity(
+                    phraseId: dto.phraseId,
+                    phraseType: dto.phraseType,
+                    phrase: dto.phrase,
+                    explanation: dto.explaination,
+                    example: nil,
+                    isMarked: false,
+                    createdAt: dto.created_at
+                )
+            }
+            .eraseToAnyPublisher()
+    }
+
 }

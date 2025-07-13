@@ -5,6 +5,13 @@
 //  Created by 성현주 on 7/2/25.
 //
 
+//
+//  WordBookViewController.swift
+//  Hilingual
+//
+//  Created by 성현주 on 7/2/25.
+//
+
 import UIKit
 import Combine
 import HilingualDomain
@@ -14,8 +21,14 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
     private let wordBookView = WordBookView()
     private var fullWordList: [(String, [PhraseData])] = []
     private var filteredWordList: [(String, [PhraseData])] = []
+
     private let sortSubject = PassthroughSubject<SortOption, Never>()
+    private let selectedWordIdSubject = PassthroughSubject<Int, Never>()
+
     private let modal = Modal()
+    private let wordDetailDialog = WordDetailDialog()
+
+    // MARK: - Lifecycle
 
     public override func loadView() {
         self.view = wordBookView
@@ -30,11 +43,14 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
     public override func viewDidLoad() {
         super.viewDidLoad()
 
-        /// 텝바 위로 올리기 위해 설정
         if let tabView = tabBarController?.view {
             modal.isHidden = true
             tabView.addSubview(modal)
             modal.snp.makeConstraints { $0.edges.equalToSuperview() }
+
+            wordDetailDialog.isHidden = true
+            tabView.addSubview(wordDetailDialog)
+            wordDetailDialog.snp.makeConstraints { $0.edges.equalToSuperview() }
         }
     }
 
@@ -47,7 +63,8 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
     public override func bind(viewModel: WordBookViewModel) {
         let input = WordBookViewModel.Input(
             viewDidLoad: Just(()).eraseToAnyPublisher(),
-            sortChanged: sortSubject.eraseToAnyPublisher()
+            sortChanged: sortSubject.eraseToAnyPublisher(),
+            selectedWordId: selectedWordIdSubject.eraseToAnyPublisher()
         )
 
         let output = viewModel.transform(input: input)
@@ -61,7 +78,17 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
                 self?.wordBookView.tableView.reloadData()
             }
             .store(in: &cancellables)
+
+        output.wordDetail
+            .receive(on: RunLoop.main)
+            .sink { [weak self] detail in
+                self?.wordDetailDialog.configure(data: detail)
+                self?.wordDetailDialog.showAnimation()
+            }
+            .store(in: &cancellables)
     }
+
+    // MARK: - Private Helpers
 
     private func updateViewState() {
         let isEmpty = fullWordList.allSatisfy { $0.1.isEmpty }
@@ -110,10 +137,10 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
     }
 }
 
-
 // MARK: - UITableViewDataSource & UITableViewDelegate
 
 extension WordBookViewController: UITableViewDataSource, UITableViewDelegate {
+
     public func numberOfSections(in tableView: UITableView) -> Int {
         return filteredWordList.count
     }
@@ -144,6 +171,11 @@ extension WordBookViewController: UITableViewDataSource, UITableViewDelegate {
 
         header.configure(title: filteredWordList[section].0)
         return header
+    }
+
+    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let item = filteredWordList[indexPath.section].1[indexPath.row]
+        selectedWordIdSubject.send(item.phraseId)
     }
 }
 

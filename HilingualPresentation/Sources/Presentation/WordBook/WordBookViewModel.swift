@@ -7,7 +7,6 @@
 
 import Foundation
 import Combine
-
 import HilingualDomain
 
 public final class WordBookViewModel: BaseViewModel {
@@ -17,10 +16,12 @@ public final class WordBookViewModel: BaseViewModel {
     public struct Input {
         let viewDidLoad: AnyPublisher<Void, Never>
         let sortChanged: AnyPublisher<SortOption, Never>
+        let selectedWordId: AnyPublisher<Int, Never>
     }
 
     public struct Output {
         let wordList: AnyPublisher<[(date: String, items: [PhraseData])], Never>
+        let wordDetail: AnyPublisher<PhraseData, Never>
     }
 
     // MARK: - Dependencies
@@ -30,6 +31,7 @@ public final class WordBookViewModel: BaseViewModel {
     // MARK: - State
 
     private let wordListSubject = CurrentValueSubject<[(date: String, items: [PhraseData])], Never>([])
+    private let wordDetailSubject = PassthroughSubject<PhraseData, Never>()
     private var currentSortOption: SortOption = .alphabetical
 
     // MARK: - Init
@@ -54,10 +56,19 @@ public final class WordBookViewModel: BaseViewModel {
             }
             .store(in: &cancellables)
 
-        return Output(wordList: wordListSubject.eraseToAnyPublisher())
+        input.selectedWordId
+            .sink { [weak self] id in
+                self?.fetchWordDetail(id: id)
+            }
+            .store(in: &cancellables)
+
+        return Output(
+            wordList: wordListSubject.eraseToAnyPublisher(),
+            wordDetail: wordDetailSubject.eraseToAnyPublisher()
+        )
     }
 
-    // MARK: - Fetch
+    // MARK: - Private Fetch Methods
 
     private func fetchWords(sort: SortOption) {
         fetchWordListUseCase.execute(sort: sort)
@@ -84,25 +95,38 @@ public final class WordBookViewModel: BaseViewModel {
             .store(in: &cancellables)
     }
 
-//    private func fetchWords(sort: SortOption) {
-//        // 임시 테스트용 빈 배열 주입
-//        let emptyList: [(String, [WordEntity])] = []
-//
-//        let emptyPhraseData: [(String, [PhraseData])] = emptyList.map { (date, entities) in
-//            let mapped = entities.map { entity in
-//                PhraseData(
-//                    phraseId: entity.phraseId,
-//                    phraseType: entity.phraseType,
-//                    phrase: entity.phrase,
-//                    explanation: entity.explanation,
-//                    example: entity.example,
-//                    isMarked: entity.isMarked,
-//                    created_at: entity.createdAt
-//                )
-//            }
-//            return (date, mapped)
-//        }
-//
-//        self.wordListSubject.send(emptyPhraseData)
-//    }
+    private func fetchWordDetail(id: Int) {
+        // 🔽 실제 API 호출은 주석 처리
+    //    fetchWordListUseCase.getWordDetail(id: id)
+    //        .map { entity in
+    //            PhraseData(
+    //                phraseId: entity.phraseId,
+    //                phraseType: entity.phraseType,
+    //                phrase: entity.phrase,
+    //                explanation: entity.explanation,
+    //                example: entity.example,
+    //                isMarked: entity.isMarked,
+    //                created_at: entity.createdAt
+    //            )
+    //        }
+    //        .sink(receiveCompletion: { _ in },
+    //              receiveValue: { [weak self] phrase in
+    //                  self?.wordDetailSubject.send(phrase)
+    //              })
+    //        .store(in: &cancellables)
+
+        // ✅ 테스트용 더미 데이터
+        let dummy = PhraseData(
+            phraseId: id,
+            phraseType: ["동사", "숙어"],
+            phrase: "end up ~ing",
+            explanation: "결국 ~하게 되다",
+            example: "He ended up quitting his job.",
+            isMarked: true,
+            created_at: "25.06.12"
+        )
+
+        wordDetailSubject.send(dummy)
+    }
+
 }

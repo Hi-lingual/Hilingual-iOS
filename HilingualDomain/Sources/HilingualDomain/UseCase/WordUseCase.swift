@@ -9,6 +9,7 @@ import Combine
 
 public protocol WordBookUseCase {
     func execute(sort: SortOption) -> AnyPublisher<[(date: String, items: [WordEntity])], Error>
+    func getWordDetail(id: Int) -> AnyPublisher<WordEntity, Error>
 }
 
 public final class DefaultWordBookUseCase: WordBookUseCase {
@@ -21,5 +22,8 @@ public final class DefaultWordBookUseCase: WordBookUseCase {
 
     public func execute(sort: SortOption) -> AnyPublisher<[(date: String, items: [WordEntity])], Error> {
         return repository.fetchWords(sort: sort)
+    }
+    public func getWordDetail(id: Int) -> AnyPublisher<WordEntity, Error> {
+        return repository.fetchWordDetail(id: id)
     }
 }

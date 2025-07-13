@@ -8,13 +8,18 @@
 import Moya
 
 public enum WordBookAPI {
-    case fetchWordList(sort: Int) 
+    case fetchWordList(sort: Int)
+    case fetchWordDetail(id: Int)
 }
 
 extension WordBookAPI: BaseTargetType {
-
     public var path: String {
-        return "/voca"
+        switch self {
+        case .fetchWordList:
+            return "/voca"
+        case .fetchWordDetail(let id):
+            return "/voca/\(id)"
+        }
     }
 
     public var method: Moya.Method {
@@ -25,6 +30,8 @@ extension WordBookAPI: BaseTargetType {
         switch self {
         case .fetchWordList(let sort):
             return .requestParameters(parameters: ["sort": sort], encoding: URLEncoding.queryString)
+        case .fetchWordDetail:
+            return .requestPlain
         }
     }
 }
