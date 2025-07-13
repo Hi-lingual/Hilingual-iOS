@@ -111,14 +111,12 @@ final class CalendarHeaderView: UIView {
         monthButton.snp.makeConstraints {
             $0.top.equalTo(safeAreaLayoutGuide).inset(16)
             $0.leading.equalToSuperview().inset(16)
-            $0.centerY.equalToSuperview()
             $0.bottom.equalToSuperview().inset(12)
         }
 
         buttonStack.snp.makeConstraints {
             $0.top.equalTo(safeAreaLayoutGuide).inset(16)
             $0.trailing.equalToSuperview().inset(16)
-            $0.centerY.equalToSuperview()
             $0.bottom.equalToSuperview().inset(12)
         }
     }
