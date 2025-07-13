@@ -44,7 +44,7 @@ public final class TabBarViewController: UITabBarController {
 
     // TODO: - 실제 뷰컨으로 바꿔주세요.
         let vocabVC = makeTabItem(
-            viewController: factory.makeHomeViewController(),
+            viewController: factory.makeWordBookViewController(),
             title: "단어장",
             selectedImageName: "ic_book_black_24_ios",
             unselectedImageName: "ic_book_gray_24_ios"

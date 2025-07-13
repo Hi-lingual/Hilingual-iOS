@@ -14,7 +14,7 @@ public enum WordBookAPI {
 extension WordBookAPI: BaseTargetType {
 
     public var path: String {
-        return "/api/words"
+        return "/voca"
     }
 
     public var method: Moya.Method {
