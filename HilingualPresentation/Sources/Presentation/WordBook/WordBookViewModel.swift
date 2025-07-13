@@ -58,30 +58,50 @@ public final class WordBookViewModel: BaseViewModel {
 
     // MARK: - Fetch
 
+//    private func fetchWords(sort: SortOption) {
+//        fetchWordListUseCase.execute(sort: sort)
+//            .map { wordList in
+//                wordList.map { (date, items) in
+//                    let phraseDataList = items.map { entity in
+//                        PhraseData(
+//                            phraseId: entity.phraseId,
+//                            phraseType: entity.phraseType,
+//                            phrase: entity.phrase,
+//                            explanation: entity.explanation,
+//                            example: entity.example,
+//                            isMarked: entity.isMarked,
+//                            created_at: entity.createdAt
+//                        )
+//                    }
+//                    return (date: date, items: phraseDataList)
+//                }
+//            }
+//            .replaceError(with: [])
+//            .sink { [weak self] result in
+//                self?.wordListSubject.send(result)
+//            }
+//            .store(in: &cancellables)
+//    }
+
     private func fetchWords(sort: SortOption) {
-        fetchWordListUseCase.execute(sort: sort)
-            .map { wordList in
-                wordList.map { (date, items) in
-                    let phraseDataList = items.map { entity in
-                        PhraseData(
-                            phraseId: entity.phraseId,
-                            phraseType: entity.phraseType,
-                            phrase: entity.phrase,
-                            explanation: entity.explanation,
-                            example: entity.example,
-                            isMarked: entity.isMarked,
-                            created_at: entity.createdAt
-                        )
-                    }
-                    return (date: date, items: phraseDataList)
-                }
+        // 임시 테스트용 빈 배열 주입
+        let emptyList: [(String, [WordEntity])] = []
+
+        let emptyPhraseData: [(String, [PhraseData])] = emptyList.map { (date, entities) in
+            let mapped = entities.map { entity in
+                PhraseData(
+                    phraseId: entity.phraseId,
+                    phraseType: entity.phraseType,
+                    phrase: entity.phrase,
+                    explanation: entity.explanation,
+                    example: entity.example,
+                    isMarked: entity.isMarked,
+                    created_at: entity.createdAt
+                )
             }
-            .replaceError(with: []) // 에러 발생 시 빈 리스트 반환
-            .sink { [weak self] result in
-                self?.wordListSubject.send(result)
-            }
-            .store(in: &cancellables)
+            return (date, mapped)
+        }
+
+        self.wordListSubject.send(emptyPhraseData)
     }
-
-
 }

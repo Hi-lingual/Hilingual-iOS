@@ -7,6 +7,12 @@
 
 import Foundation
 
+public struct WordBookResponseWrapperDTO: Decodable {
+    public let code: Int
+    public let data: WordBookResponseDTO
+    public let message: String
+}
+
 public struct WordBookResponseDTO: Decodable {
     public let count: Int
     public let wordList: [WordGroupDTO]

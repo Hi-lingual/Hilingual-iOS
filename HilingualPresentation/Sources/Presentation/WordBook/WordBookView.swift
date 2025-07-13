@@ -12,12 +12,7 @@ final class WordBookView: BaseUIView {
 
     // MARK: - UI Components
 
-    private let navigationContainer: UIView = {
-        let container = UIView()
-        container.backgroundColor = .black
-        return container
-    }()
-
+    private let navigationContainer = UIView()
 
     private let titleLabel: UILabel = {
         let label = UILabel()
@@ -37,13 +32,7 @@ final class WordBookView: BaseUIView {
         return searchBar
     }()
 
-    private let statusStackView: UIStackView = {
-        let stack = UIStackView()
-        stack.axis = .horizontal
-        stack.distribution = .equalSpacing
-        stack.alignment = .center
-        return stack
-    }()
+    private let statusStackView = UIStackView()
 
     let totalCountLabel: UILabel = {
         let label = UILabel()
@@ -65,23 +54,66 @@ final class WordBookView: BaseUIView {
         let table = UITableView(frame: .zero, style: .grouped)
         table.separatorStyle = .none
         table.backgroundColor = .gray100
-        table.register(WordBookCell.self, forCellReuseIdentifier: WordBookCell.identifier)
-        table.register(WordBookHeaderView.self, forHeaderFooterViewReuseIdentifier: WordBookHeaderView.identifier)
         table.sectionHeaderHeight = UITableView.automaticDimension
         table.estimatedSectionHeaderHeight = 44
+        table.register(WordBookCell.self, forCellReuseIdentifier: WordBookCell.identifier)
+        table.register(WordBookHeaderView.self, forHeaderFooterViewReuseIdentifier: WordBookHeaderView.identifier)
         return table
+    }()
+
+    let emptyView: UIView = {
+        let view = UIView()
+        view.isHidden = true
+
+        let emptyImageView = UIImageView()
+        emptyImageView.image = UIImage(named: "img_word_ios", in: .module, compatibleWith: nil)
+        emptyImageView.contentMode = .scaleAspectFit
+
+        let emptyLabel = UILabel()
+        emptyLabel.text = "아직 단어가 추가되지 않았어요."
+        emptyLabel.font = .suit(.head_m_18)
+        emptyLabel.textColor = .gray500
+        emptyLabel.textAlignment = .center
+
+        let emptyButton = CTAButton(style: .TextButton("일기 쓰고 단어 추가하기"), autoBackground: false)
+
+        view.addSubviews(emptyImageView,emptyLabel,emptyButton)
+
+        emptyImageView.snp.makeConstraints {
+            $0.top.equalToSuperview()
+            $0.centerX.equalToSuperview()
+        }
+
+        emptyLabel.snp.makeConstraints {
+            $0.top.equalTo(emptyImageView.snp.bottom).offset(8)
+            $0.centerX.equalToSuperview()
+        }
+
+        emptyButton.snp.makeConstraints {
+            $0.top.equalTo(emptyLabel.snp.bottom).offset(16)
+            $0.height.equalTo(46)
+            $0.horizontalEdges.equalToSuperview()
+            $0.centerX.equalToSuperview()
+        }
+
+        return view
     }()
 
     // MARK: - Setup
 
     override func setUI() {
+        navigationContainer.backgroundColor = .black
+        statusStackView.axis = .horizontal
+        statusStackView.distribution = .equalSpacing
+        statusStackView.alignment = .center
         statusStackView.addArrangedSubview(totalCountLabel)
         statusStackView.addArrangedSubview(sortButton)
 
         addSubviews(
             navigationContainer,
             statusStackView,
-            tableView
+            tableView,
+            emptyView
         )
 
         navigationContainer.addSubviews(
@@ -116,6 +148,12 @@ final class WordBookView: BaseUIView {
         tableView.snp.makeConstraints {
             $0.top.equalTo(statusStackView.snp.bottom).offset(8)
             $0.leading.trailing.bottom.equalToSuperview()
+        }
+
+        emptyView.snp.makeConstraints {
+            $0.centerX.equalToSuperview()
+            $0.top.equalTo(statusStackView.snp.bottom).offset(80)
+            $0.horizontalEdges.equalToSuperview().inset(100)
         }
     }
 }

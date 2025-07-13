@@ -11,18 +11,18 @@ import HilingualDomain
 
 public final class WordBookViewController: BaseUIViewController<WordBookViewModel> {
 
-    // MARK: - Properties
-
     private let wordBookView = WordBookView()
     private var fullWordList: [(String, [PhraseData])] = []
     private var filteredWordList: [(String, [PhraseData])] = []
     private let sortSubject = PassthroughSubject<SortOption, Never>()
 
-    // MARK: - LifeCycle
-
     public override func loadView() {
         self.view = wordBookView
         wordBookView.sortButton.addTarget(self, action: #selector(didTapSort), for: .touchUpInside)
+
+        if let emptyButton = wordBookView.emptyView.viewWithTag(999) as? UIButton {
+            emptyButton.addTarget(self, action: #selector(didTapEmptyAdd), for: .touchUpInside)
+        }
     }
 
     public override func setDelegate() {
@@ -44,15 +44,19 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
             .sink { [weak self] wordList in
                 self?.fullWordList = wordList
                 self?.filteredWordList = wordList
+                self?.updateViewState()
                 self?.wordBookView.tableView.reloadData()
             }
             .store(in: &cancellables)
     }
 
-    // MARK: - Actions
+    private func updateViewState() {
+        let isEmpty = fullWordList.allSatisfy { $0.1.isEmpty }
+        wordBookView.tableView.isHidden = isEmpty
+        wordBookView.emptyView.isHidden = !isEmpty
+    }
 
-    @objc
-    private func didTapSort() {
+    @objc private func didTapSort() {
         let modal = Modal()
         modal.configure(
             title: "정렬 기준 선택",
@@ -68,7 +72,9 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
         modal.show(in: self.view)
     }
 
-    // MARK: - Filtering
+    @objc private func didTapEmptyAdd() {
+        print("일기 쓰러 이동") // TODO: push WriteDiaryViewController 등으로 이동
+    }
 
     private func filterWords(for keyword: String) {
         guard !keyword.isEmpty else {
@@ -87,10 +93,7 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
     }
 }
 
-// MARK: - UITableViewDelegate & DataSource
-
 extension WordBookViewController: UITableViewDataSource, UITableViewDelegate {
-
     public func numberOfSections(in tableView: UITableView) -> Int {
         return filteredWordList.count
     }
@@ -123,8 +126,6 @@ extension WordBookViewController: UITableViewDataSource, UITableViewDelegate {
         return header
     }
 }
-
-// MARK: - UISearchBarDelegate
 
 extension WordBookViewController: UISearchBarDelegate {
     public func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {

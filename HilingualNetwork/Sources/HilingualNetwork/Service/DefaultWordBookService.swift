@@ -10,12 +10,12 @@ import Combine
 import Moya
 
 public protocol WordBookService {
-    func fetchWordList(sort: Int) -> AnyPublisher<WordBookResponseDTO, Error>
+    func fetchWordList(sort: Int) -> AnyPublisher<WordBookResponseWrapperDTO, Error>
 }
 
 public final class DefaultWordBookService: BaseService<WordBookAPI>, WordBookService {
-    public func fetchWordList(sort: Int) -> AnyPublisher<WordBookResponseDTO, Error> {
-        return request(.fetchWordList(sort: sort), as: WordBookResponseDTO.self)
+    public func fetchWordList(sort: Int) -> AnyPublisher<WordBookResponseWrapperDTO, Error> {
+        return request(.fetchWordList(sort: sort), as: WordBookResponseWrapperDTO.self)
             .mapError { $0 as Error }
             .eraseToAnyPublisher()
     }
