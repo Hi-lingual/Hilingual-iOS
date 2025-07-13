@@ -42,8 +42,6 @@ final class WordBookView: BaseUIView {
         return searchBar
     }()
 
-    private let statusStackView = UIStackView()
-
     let totalCountLabel: UILabel = {
         let label = UILabel()
         label.text = "총 0개"
@@ -58,6 +56,24 @@ final class WordBookView: BaseUIView {
         button.setTitleColor(.gray500, for: .normal)
         button.titleLabel?.font = .suit(.body_m_14)
         return button
+    }()
+
+    private lazy var statusHeaderView: UIView = {
+        let container = UIView()
+        container.backgroundColor = .clear
+
+        let stack = UIStackView(arrangedSubviews: [totalCountLabel, sortButton])
+        stack.axis = .horizontal
+        stack.alignment = .center
+        stack.distribution = .equalSpacing
+
+        container.addSubview(stack)
+        stack.snp.makeConstraints {
+            $0.top.bottom.equalToSuperview().inset(12)
+            $0.leading.trailing.equalToSuperview().inset(16)
+        }
+
+        return container
     }()
 
     let tableView: UITableView = {
@@ -112,23 +128,19 @@ final class WordBookView: BaseUIView {
 
     override func setUI() {
         navigationContainer.backgroundColor = .black
-        statusStackView.axis = .horizontal
-        statusStackView.distribution = .equalSpacing
-        statusStackView.alignment = .center
-        statusStackView.addArrangedSubview(totalCountLabel)
-        statusStackView.addArrangedSubview(sortButton)
 
         addSubviews(
             navigationContainer,
-            statusStackView,
             tableView,
-            emptyView,
+            emptyView
         )
 
         navigationContainer.addSubviews(
             titleLabel,
             searchBar
         )
+
+        tableView.tableHeaderView = statusHeaderView
     }
 
     override func setLayout() {
@@ -147,20 +159,21 @@ final class WordBookView: BaseUIView {
             $0.leading.trailing.equalToSuperview().inset(8)
         }
 
-        statusStackView.snp.makeConstraints {
-            $0.top.equalTo(navigationContainer.snp.bottom).offset(16)
-            $0.horizontalEdges.equalToSuperview().inset(16)
-        }
-
         tableView.snp.makeConstraints {
-            $0.top.equalTo(statusStackView.snp.bottom).offset(8)
+            $0.top.equalTo(navigationContainer.snp.bottom)
             $0.leading.trailing.bottom.equalToSuperview()
         }
 
         emptyView.snp.makeConstraints {
             $0.centerX.equalToSuperview()
-            $0.top.equalTo(statusStackView.snp.bottom).offset(80)
+            $0.top.equalTo(tableView.snp.top).offset(80)
             $0.horizontalEdges.equalToSuperview().inset(100)
         }
+
+        layoutIfNeeded()
+        let headerSize = statusHeaderView.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize)
+        statusHeaderView.frame = CGRect(origin: .zero, size: headerSize)
+        tableView.tableHeaderView = statusHeaderView
+
     }
 }

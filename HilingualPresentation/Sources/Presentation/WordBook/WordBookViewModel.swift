@@ -7,6 +7,7 @@
 
 import Foundation
 import Combine
+
 import HilingualDomain
 
 public final class WordBookViewModel: BaseViewModel {
@@ -96,7 +97,6 @@ public final class WordBookViewModel: BaseViewModel {
     }
 
     private func fetchWordDetail(id: Int) {
-        // 🔽 실제 API 호출은 주석 처리
     //    fetchWordListUseCase.getWordDetail(id: id)
     //        .map { entity in
     //            PhraseData(
@@ -114,8 +114,6 @@ public final class WordBookViewModel: BaseViewModel {
     //                  self?.wordDetailSubject.send(phrase)
     //              })
     //        .store(in: &cancellables)
-
-        // ✅ 테스트용 더미 데이터
         let dummy = PhraseData(
             phraseId: id,
             phraseType: ["동사", "숙어"],
