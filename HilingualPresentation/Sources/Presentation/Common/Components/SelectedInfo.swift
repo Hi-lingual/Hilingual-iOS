@@ -187,6 +187,7 @@ final class SelectedInfo: UIView {
         notWrittenLabel.text = isWritten ? "작성완료" : "미작성"
         notWrittenLabel.textColor = isWritten ? .hilingualBlue : .gray300
         timeLeftLabel.textColor = isWritten ? .gray300 : .black
+        iconView.isHidden = isWritten
         timeLeftStack.isHidden = !isWritten && remainingTime == 0
 
         // 시간 표시
@@ -241,60 +242,4 @@ final class SelectedInfo: UIView {
         formatter.dateFormat = "M월 d일 EEEE"
         selectedDayLabel.text = formatter.string(from: date)
     }
-}
-
-// 일기 작성가능
-#Preview {
-    let view = SelectedInfo()
-    let today = Date()
-    view.updateView(
-        for: today,
-        isWritten: false,
-        remainingTime: 120,
-        topicData: (
-            kor: "오늘 당신을 놀라게 한 일이 있었나요?",
-            en: "What surprised you today?"
-        )
-    )
-    return view
-}
-
-// 일기 확인
-#Preview {
-    let view = SelectedInfo()
-    let today = Date()
-    view.setSelectedDate(today)
-    view.updateView(
-        for: today,
-        isWritten: true,
-        remainingTime: 0,
-        createdAt: "2025-07-10T21:30:00",
-        diaryData: "Today was the most stressful "
-    )
-    return view
-}
-
-// 시간 초과
-#Preview {
-    let view = SelectedInfo()
-    let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: Date())!
-    view.updateView(
-        for: yesterday,
-        isWritten: false,
-        remainingTime: 0
-    )
-    return view
-}
-
-
-// 미래 날짜
-#Preview {
-    let view = SelectedInfo()
-    let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: Date())!
-    view.updateView(
-        for: tomorrow,
-        isWritten: false,
-        remainingTime: 0
-    )
-    return view
 }
