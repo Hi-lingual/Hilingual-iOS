@@ -10,4 +10,7 @@ public protocol ViewControllerFactory {
     func makeLoginViewController() -> LoginViewController
     func makeOnboardingViewController() -> OnBoardingViewController
     func makeHomeViewController() -> HomeViewController
+    func makeDiaryDetailViewController() -> DiaryDetailViewController
+    func makeFeedbackViewController() -> FeedbackViewController
+    func makeVocaViewController() -> VocaViewController
 }
