@@ -7,6 +7,7 @@
 
 import UIKit
 import Combine
+import HilingualDomain
 
 public final class WordBookViewController: BaseUIViewController<WordBookViewModel> {
 
@@ -15,9 +16,13 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
     private let wordBookView = WordBookView()
     private var fullWordList: [(String, [PhraseData])] = []
     private var filteredWordList: [(String, [PhraseData])] = []
+    private let sortSubject = PassthroughSubject<SortOption, Never>()
+
+    // MARK: - LifeCycle
 
     public override func loadView() {
         self.view = wordBookView
+        wordBookView.sortButton.addTarget(self, action: #selector(didTapSort), for: .touchUpInside)
     }
 
     public override func setDelegate() {
@@ -27,7 +32,11 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
     }
 
     public override func bind(viewModel: WordBookViewModel) {
-        let input = WordBookViewModel.Input(viewDidLoad: Just(()).eraseToAnyPublisher())
+        let input = WordBookViewModel.Input(
+            viewDidLoad: Just(()).eraseToAnyPublisher(),
+            sortChanged: sortSubject.eraseToAnyPublisher()
+        )
+
         let output = viewModel.transform(input: input)
 
         output.wordList
@@ -39,6 +48,27 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
             }
             .store(in: &cancellables)
     }
+
+    // MARK: - Actions
+
+    @objc
+    private func didTapSort() {
+        let modal = Modal()
+        modal.configure(
+            title: "정렬 기준 선택",
+            items: [
+                ("최신순", UIImage(systemName: "arrow.down"), { [weak self] in
+                    self?.sortSubject.send(.latest)
+                }),
+                ("가나다순", UIImage(systemName: "textformat.abc"), { [weak self] in
+                    self?.sortSubject.send(.alphabetical)
+                })
+            ]
+        )
+        modal.show(in: self.view)
+    }
+
+    // MARK: - Filtering
 
     private func filterWords(for keyword: String) {
         guard !keyword.isEmpty else {
@@ -57,7 +87,7 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
     }
 }
 
-// MARK: - UITableView\\Delegate
+// MARK: - UITableViewDelegate & DataSource
 
 extension WordBookViewController: UITableViewDataSource, UITableViewDelegate {
 

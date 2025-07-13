@@ -202,7 +202,19 @@ extension AppDIContainer {
 // MARK: - WordBookDIContainer
 
 extension AppDIContainer {
+    private func makeWordBookService() -> WordBookService {
+        return DefaultWordBookService()
+    }
+
+    private func makeWordBookRepository() -> WordBookRepository {
+        return DefaultWordRepository(service: makeWordBookService())
+    }
+
+    private func makeWordBookUseCase() -> WordBookUseCase {
+        return DefaultWordBookUseCase(repository: makeWordBookRepository())
+    }
+
     private func makeWordBookViewmodel() -> WordBookViewModel {
-        return WordBookViewModel()
+        return WordBookViewModel(fetchWordListUseCase: makeWordBookUseCase())
     }
 }
