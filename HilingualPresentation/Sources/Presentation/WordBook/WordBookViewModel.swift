@@ -33,7 +33,7 @@ public final class WordBookViewModel: BaseViewModel {
 
     private let wordListSubject = CurrentValueSubject<[(date: String, items: [PhraseData])], Never>([])
     private let wordDetailSubject = PassthroughSubject<PhraseData, Never>()
-    private var currentSortOption: SortOption = .alphabetical
+    private var currentSortOption: SortOption = .latest
 
     // MARK: - Init
 

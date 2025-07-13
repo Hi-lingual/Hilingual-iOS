@@ -75,9 +75,13 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
                 self?.fullWordList = wordList
                 self?.filteredWordList = wordList
                 self?.updateViewState()
+
+                //TODO: - 서버에서 갯수 카운트하도록 변경
+                self?.wordBookView.totalCountLabel.text = "총 \(wordList.reduce(0) { $0 + $1.1.count })개"
                 self?.wordBookView.tableView.reloadData()
             }
             .store(in: &cancellables)
+
 
         output.wordDetail
             .receive(on: RunLoop.main)
@@ -96,16 +100,19 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
         wordBookView.emptyView.isHidden = !isEmpty
     }
 
-    @objc private func didTapSort() {
+    @objc
+    private func didTapSort() {
         modal.configure(
             title: "정렬 기준 선택",
             items: [
                 ("최신순", UIImage(named: "ic_arrow_down_16_ios", in: .module, compatibleWith: nil), { [weak self] in
                     self?.sortSubject.send(.latest)
+                    self?.wordBookView.sortButton.setTitle("↑ 최신순", for: .normal)
                     self?.modal.isHidden = true
                 }),
                 ("가나다순", UIImage(named: "ic_arrow_down_16_ios", in: .module, compatibleWith: nil), { [weak self] in
                     self?.sortSubject.send(.alphabetical)
+                    self?.wordBookView.sortButton.setTitle("ㄱ 가나다순", for: .normal)
                     self?.modal.isHidden = true
                 })
             ]
@@ -114,6 +121,7 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
         modal.isHidden = false
         modal.showAnimation()
     }
+
 
     @objc private func didTapEmptyAdd() {
         print("일기 쓰러 이동") // TODO: WriteDiaryViewController로 push
