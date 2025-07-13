@@ -7,7 +7,6 @@
 
 import UIKit
 import Combine
-
 import HilingualDomain
 
 public final class WordBookViewController: BaseUIViewController<WordBookViewModel> {
@@ -16,13 +15,26 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
     private var fullWordList: [(String, [PhraseData])] = []
     private var filteredWordList: [(String, [PhraseData])] = []
     private let sortSubject = PassthroughSubject<SortOption, Never>()
+    private let modal = Modal()
 
     public override func loadView() {
         self.view = wordBookView
+
         wordBookView.sortButton.addTarget(self, action: #selector(didTapSort), for: .touchUpInside)
 
         if let emptyButton = wordBookView.emptyView.viewWithTag(999) as? UIButton {
             emptyButton.addTarget(self, action: #selector(didTapEmptyAdd), for: .touchUpInside)
+        }
+    }
+
+    public override func viewDidLoad() {
+        super.viewDidLoad()
+
+        /// 텝바 위로 올리기 위해 설정
+        if let tabView = tabBarController?.view {
+            modal.isHidden = true
+            tabView.addSubview(modal)
+            modal.snp.makeConstraints { $0.edges.equalToSuperview() }
         }
     }
 
@@ -58,25 +70,26 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
     }
 
     @objc private func didTapSort() {
-        let modal = Modal()
         modal.configure(
             title: "정렬 기준 선택",
             items: [
-                ("최신순", UIImage(systemName: "arrow.down"), { [weak self] in
+                ("최신순", UIImage(named: "ic_arrow_down_16_ios", in: .module, compatibleWith: nil), { [weak self] in
                     self?.sortSubject.send(.latest)
-                    self?.wordBookView.tableView.reloadData()
+                    self?.modal.isHidden = true
                 }),
-                ("가나다순", UIImage(systemName: "textformat.abc"), { [weak self] in
+                ("가나다순", UIImage(named: "ic_arrow_down_16_ios", in: .module, compatibleWith: nil), { [weak self] in
                     self?.sortSubject.send(.alphabetical)
-                    self?.wordBookView.tableView.reloadData()
+                    self?.modal.isHidden = true
                 })
             ]
         )
-        modal.show(in: self.view)
+
+        modal.isHidden = false
+        modal.showAnimation()
     }
 
     @objc private func didTapEmptyAdd() {
-        print("일기 쓰러 이동") // TODO: push WriteDiaryViewController 등으로 이동
+        print("일기 쓰러 이동") // TODO: WriteDiaryViewController로 push
     }
 
     private func filterWords(for keyword: String) {
@@ -92,9 +105,13 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
             }
             return filtered.isEmpty ? nil : (date, filtered)
         }
+
         wordBookView.tableView.reloadData()
     }
 }
+
+
+// MARK: - UITableViewDataSource & UITableViewDelegate
 
 extension WordBookViewController: UITableViewDataSource, UITableViewDelegate {
     public func numberOfSections(in tableView: UITableView) -> Int {
@@ -129,6 +146,8 @@ extension WordBookViewController: UITableViewDataSource, UITableViewDelegate {
         return header
     }
 }
+
+// MARK: - UISearchBarDelegate
 
 extension WordBookViewController: UISearchBarDelegate {
     public func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {

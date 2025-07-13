@@ -31,13 +31,14 @@ final class WordBookView: BaseUIView {
         searchBar.searchTextField.clipsToBounds = true
         searchBar.searchTextField.font = .suit(.body_m_16)
         searchBar.updateHeight(height: 46)
-        let placeholderText = "단어나 표현을 검색해주세요"
         let attributes: [NSAttributedString.Key: Any] = [
             .foregroundColor: UIColor.gray400,
             .font: UIFont.suit(.body_m_16)
         ]
-        searchBar.searchTextField.attributedPlaceholder = NSAttributedString(string: placeholderText, attributes: attributes)
-
+        searchBar.searchTextField.attributedPlaceholder = NSAttributedString(
+            string: "단어나 표현을 검색해주세요",
+            attributes: attributes
+        )
         return searchBar
     }()
 
@@ -86,7 +87,7 @@ final class WordBookView: BaseUIView {
 
         let emptyButton = CTAButton(style: .TextButton("일기 쓰고 단어 추가하기"), autoBackground: false)
 
-        view.addSubviews(emptyImageView,emptyLabel,emptyButton)
+        view.addSubviews(emptyImageView, emptyLabel, emptyButton)
 
         emptyImageView.snp.makeConstraints {
             $0.top.equalToSuperview()
@@ -103,6 +104,7 @@ final class WordBookView: BaseUIView {
             $0.horizontalEdges.equalToSuperview()
             $0.centerX.equalToSuperview()
         }
+
         return view
     }()
 
@@ -120,7 +122,7 @@ final class WordBookView: BaseUIView {
             navigationContainer,
             statusStackView,
             tableView,
-            emptyView
+            emptyView,
         )
 
         navigationContainer.addSubviews(
@@ -161,5 +163,4 @@ final class WordBookView: BaseUIView {
             $0.horizontalEdges.equalToSuperview().inset(100)
         }
     }
-
 }

@@ -126,15 +126,6 @@ final class Modal: UIView {
     }
 }
 
-extension Modal {
-    public func show(in parentView: UIView) {
-        parentView.addSubview(self)
-        self.snp.makeConstraints { $0.edges.equalToSuperview() }
-        self.isHidden = false
-        self.showAnimation()
-    }
-}
-
 // MARK: - Preview
 
 final class ModalPreviewViewController: UIViewController {
