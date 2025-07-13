@@ -140,14 +140,3 @@ final class ProfileView: UIView {
         }
     }
 }
-
-#Preview {
-    let view = ProfileView()
-    view.updateView(
-        nickname: "영돌이",
-        profileImageURL: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRkp6rJALpEwmvjDRzTmLZvkIvnItXqRu34BQ&s",
-        totalDiaries: 12,
-        streak: 4
-    )
-    return view
-}
