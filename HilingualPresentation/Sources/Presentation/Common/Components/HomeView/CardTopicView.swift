@@ -76,6 +76,7 @@ final class CardTopicView: UIView {
         super.init(frame: frame)
         setupUI()
         setupLayout()
+        addTargets()
     }
 
     required init?(coder: NSCoder) {
@@ -147,6 +148,14 @@ final class CardTopicView: UIView {
     
     // MARK: - Actions
 
+    private func addTargets() {
+        iconButton.addTarget(
+            self,
+            action: #selector(didTapChangeTopic),
+            for: .touchUpInside
+        )
+    }
+    
     @objc private func didTapChangeTopic() {
         let isEnglishVisible = !topicEnLabel.isHidden
         topicEnLabel.isHidden = isEnglishVisible
