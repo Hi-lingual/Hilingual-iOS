@@ -131,7 +131,9 @@ final class SelectedInfo: UIView {
         cardPreview.isHidden = true
         emptyDiaryView.isHidden = true
         diaryLockView.isHidden = true
-
+        
+        iconView.isHidden = true
+        timeLeftStack.isHidden = true
     }
 
     private func setupLayout() {
