@@ -9,6 +9,10 @@ import UIKit
 import SnapKit
 
 final class CardTopicView: UIView {
+    
+    // MARK: - Callback
+
+    var onTapWriteDiary: (() -> Void)?
 
     // MARK: - UI Components
 
@@ -149,18 +153,28 @@ final class CardTopicView: UIView {
     // MARK: - Actions
 
     private func addTargets() {
-        iconButton.addTarget(
-            self,
-            action: #selector(didTapChangeTopic),
-            for: .touchUpInside
-        )
-    }
+            iconButton.addTarget(
+                self,
+                action: #selector(didTapChangeTopic),
+                for: .touchUpInside
+            )
+
+            diaryAddButton.addTarget(
+                self,
+                action: #selector(didTapWriteDiary),
+                for: .touchUpInside
+            )
+        }
     
     @objc private func didTapChangeTopic() {
         let isEnglishVisible = !topicEnLabel.isHidden
         topicEnLabel.isHidden = isEnglishVisible
         topicKorLabel.isHidden = !isEnglishVisible
     }
+    
+    @objc private func didTapWriteDiary() {
+            onTapWriteDiary?()
+        }
     
     // MARK: - Configuration
     
