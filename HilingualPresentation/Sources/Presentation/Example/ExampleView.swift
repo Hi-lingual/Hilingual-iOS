@@ -8,7 +8,7 @@
 import UIKit
 import SnapKit
 
-final class ExampleView.: BaseUIView {
+final class ExampleView: BaseUIView {
 
     //MARK: - UI Components
 

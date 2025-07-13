@@ -7,20 +7,20 @@
 
 import Foundation
 
-public final class ExampleViewController: BaseUIViewController<HomeViewModel> {
+public final class ExampleViewController: BaseUIViewController<ExampleViewModel> {
 
     // MARK: - Properties
 
-    private let homeView = HomeView()
+    private let exampleView = ExampleView()
 
     // MARK: - Custom Method
 
     public override func setUI() {
-        view.addSubviews(homeView)
+        view.addSubviews(exampleView)
     }
 
     public override func setLayout() {
-        homeView.snp.makeConstraints { make in
+        exampleView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
     }
@@ -31,7 +31,7 @@ public final class ExampleViewController: BaseUIViewController<HomeViewModel> {
 
     // MARK: - Bind
 
-    public override func bind(viewModel: HomeViewModel) {
+    public override func bind(viewModel: ExampleViewModel) {
         super.bind(viewModel: viewModel)
 
         let input = makeInput()
@@ -40,18 +40,18 @@ public final class ExampleViewController: BaseUIViewController<HomeViewModel> {
         bindOutput(output)
     }
 
-    private func makeInput() -> HomeViewModel.Input {
-        return HomeViewModel.Input(
-            fetchButtonTapped: homeView.fetchButton
+    private func makeInput() -> ExampleViewModel.Input {
+        return ExampleViewModel.Input(
+            fetchButtonTapped: exampleView.fetchButton
                 .publisher(for: .touchUpInside)
         )
     }
 
-    private func bindOutput(_ output: HomeViewModel.Output) {
+    private func bindOutput(_ output: ExampleViewModel.Output) {
         output.rateText
             .receive(on: RunLoop.main)
             .sink { [weak self] text in
-                self?.homeView.rateLabel.text = text
+                self?.exampleView.rateLabel.text = text
             }
             .store(in: &cancellables)
     }
