@@ -84,7 +84,11 @@ final class CardPreview: UIView {
             $0.centerY.equalToSuperview()
             $0.height.equalTo(74)
         }
-
+        
+        originalText.snp.makeConstraints {
+            $0.trailing.lessThanOrEqualTo(previewImage.snp.leading).offset(-8)
+        }
+        
         previewImage.snp.makeConstraints {
             $0.trailing.equalToSuperview().inset(16)
             $0.centerY.equalToSuperview()
@@ -102,11 +106,11 @@ final class CardPreview: UIView {
     func configure(type: CardPreviewType) {
         switch type {
         case .textOnly(let text):
-            originalText.text = text ?? "Today was 어쩌구"
+            originalText.text = text ?? "일기를 불러오지 못했습니다."
             previewImage.isHidden = true
 
         case .textWithImage(let text, let imageUrl):
-            originalText.text = text ?? "Today was 어쩌구"
+            originalText.text = text ?? "일기를 불러오지 못했습니다."
             previewImage.isHidden = false
             if let urlString = imageUrl, let url = URL(string: urlString) {
                 previewImage.kf.setImage(with: url)
@@ -115,12 +119,4 @@ final class CardPreview: UIView {
             }
         }
     }
-}
-
-#Preview {
-    let view = CardPreview()
-    view.configure(
-        type: .textWithImage(text: nil, imageUrl: nil)
-    )
-    return view
 }
