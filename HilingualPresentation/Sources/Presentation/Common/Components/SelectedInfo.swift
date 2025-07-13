@@ -37,7 +37,6 @@ final class SelectedInfo: UIView {
     
     private let notWrittenLabel: UILabel = {
         let label = UILabel()
-        label.text = "미작성"
         label.font = .suit(.caption_m_12)
         label.textColor = .gray300
         return label
@@ -60,7 +59,6 @@ final class SelectedInfo: UIView {
 
     private let timeLeftLabel: UILabel = {
         let label = UILabel()
-        label.text = "48시간 남았어요"
         label.font = .suit(.body_sb_14)
         label.textColor = .black
         return label
@@ -155,7 +153,6 @@ final class SelectedInfo: UIView {
         }
     }
 
-    
     // MARK: - Public Methods
 
     func updateView(
@@ -166,60 +163,76 @@ final class SelectedInfo: UIView {
         topicData: (kor: String, en: String)? = nil,
         diaryData: String? = nil
     ) {
-        cardTopicView.isHidden = true
-        cardPreview.isHidden = true
-        emptyDiaryView.isHidden = true
-        diaryLockView.isHidden = true
-
-        // 선택된 날짜 반영
+        
+        // 초기화
+        [cardTopicView, cardPreview, emptyDiaryView, diaryLockView].forEach {
+            $0.isHidden = true
+        }
+        
         setSelectedDate(date)
 
-        // 미래 날짜 처리
         let today = Calendar.current.startOfDay(for: Date())
         let selectedDay = Calendar.current.startOfDay(for: date)
 
+        // 1. 미래 날짜일 경우
         if selectedDay > today {
-            diaryLockView.isHidden = false
             notWrittenLabel.text = "작성불가"
             notWrittenLabel.textColor = .gray300
-            timeLeftLabel.text = ""
+            timeLeftStack.isHidden = true
+            diaryLockView.isHidden = false
             return
         }
 
+        // 2. 작성완료, 미작성일 경우
         notWrittenLabel.text = isWritten ? "작성완료" : "미작성"
         notWrittenLabel.textColor = isWritten ? .hilingualBlue : .gray300
         timeLeftLabel.textColor = isWritten ? .gray300 : .black
+        timeLeftStack.isHidden = !isWritten && remainingTime == 0
 
-        if let createdAt = createdAt {
-            let formatter = DateFormatter()
-            formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
-            formatter.locale = Locale(identifier: "ko_KR")
-            if let date = formatter.date(from: createdAt) {
-                let displayFormatter = DateFormatter()
-                displayFormatter.dateFormat = "HH:mm"
-                timeLeftLabel.text = displayFormatter.string(from: date)
-            }
+        // 시간 표시
+        if let createdAt = createdAt, isWritten {
+            timeLeftLabel.text = formatCreatedAt(createdAt)
         } else {
-            let hours = remainingTime / 60
-            let fullText = "\(hours)시간 남았어요"
-            let attributed = NSMutableAttributedString(string: fullText)
-            attributed.addAttribute(.foregroundColor, value: UIColor.hilingualOrange, range: NSRange(location: 0, length: "\(hours)".count))
-            timeLeftLabel.attributedText = attributed
+            timeLeftLabel.attributedText = formatRemainingTime(remainingTime)
         }
 
+        // 상태별 View 처리
         if isWritten {
             cardPreview.isHidden = false
             cardPreview.configure(type: .textWithImage(text: diaryData ?? "", imageUrl: "https://..."))
-        } else {
-            if remainingTime > 0 {
-                cardTopicView.isHidden = false
-                if let topic = topicData {
-                    cardTopicView.configure(kor: topic.kor, en: topic.en)
-                }
-            } else {
-                emptyDiaryView.isHidden = false
+        } else if remainingTime > 0 {
+            cardTopicView.isHidden = false
+            if let topic = topicData {
+                cardTopicView.configure(kor: topic.kor, en: topic.en)
             }
+        } else {
+            emptyDiaryView.isHidden = false
         }
+    }
+
+    // MARK: - Helpers
+    
+    private func formatCreatedAt(_ createdAt: String) -> String? {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
+        formatter.locale = Locale(identifier: "ko_KR")
+        guard let date = formatter.date(from: createdAt) else { return nil }
+
+        let displayFormatter = DateFormatter()
+        displayFormatter.dateFormat = "HH:mm"
+        return displayFormatter.string(from: date)
+    }
+
+    private func formatRemainingTime(_ remainingTime: Int) -> NSAttributedString {
+        let hours = remainingTime / 60
+        let fullText = "\(hours)시간 남았어요"
+        let attributed = NSMutableAttributedString(string: fullText)
+        attributed.addAttribute(
+            .foregroundColor,
+            value: UIColor.hilingualOrange,
+            range: NSRange(location: 0, length: "\(hours)".count)
+        )
+        return attributed
     }
 
     func setSelectedDate(_ date: Date) {
