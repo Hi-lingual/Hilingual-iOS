@@ -62,7 +62,3 @@ final class DiaryLockView: UIView {
         }
     }
 }
-
-#Preview {
-    DiaryLockView()
-}

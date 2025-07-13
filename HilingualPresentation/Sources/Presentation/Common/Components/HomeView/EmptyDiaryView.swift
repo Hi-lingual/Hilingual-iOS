@@ -62,7 +62,3 @@ final class EmptyDiaryView: UIView {
         }
     }
 }
-
-#Preview {
-    EmptyDiaryView()
-}
