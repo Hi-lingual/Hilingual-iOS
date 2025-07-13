@@ -61,6 +61,10 @@ final class AppDIContainer: ViewControllerFactory {
     func makeLoadingViewController() -> HilingualPresentation.LoadingViewController {
         return LoadingViewController(viewModel: makeLoadingViewModel(), diContainer: self)
     }
+    public func makeWordBookViewController() -> WordBookViewController {
+        return WordBookViewController(viewModel: makeWordBookViewmodel(), diContainer: self)
+    }
+
 }
 // MARK: - SplashDIContainer
 
@@ -191,5 +195,14 @@ extension AppDIContainer {
 extension AppDIContainer {
     private func makeLoadingViewModel() -> LoadingViewModel {
         return LoadingViewModel()
+    }
+}
+
+
+// MARK: - WordBookDIContainer
+
+extension AppDIContainer {
+    private func makeWordBookViewmodel() -> WordBookViewModel {
+        return WordBookViewModel()
     }
 }

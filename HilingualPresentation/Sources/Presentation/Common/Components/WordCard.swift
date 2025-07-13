@@ -52,7 +52,7 @@ final class WordCard: UIView {
         data.phraseType.compactMap { chipType(from: $0) }
             .map { Chip(type: $0) }
             .forEach { chipStackView.addArrangedSubview($0) }
-        
+
         phraseLabel.text = data.phrase
         explanationLabel.text = data.explanation
         savedDateLabel.text = "\(data.createdAt) 일기에서 저장됨"
@@ -105,7 +105,7 @@ final class WordCard: UIView {
                 $0.leading.trailing.equalToSuperview().inset(12)
                 $0.bottom.equalToSuperview().inset(12)
             }
-            
+
         case .withDate:
             phraseLabel.font = .suit(.body_m_20)
             explanationLabel.font = .suit(.body_m_14)
@@ -134,7 +134,7 @@ final class WordCard: UIView {
             savedDateLabel.snp.remakeConstraints {
                 $0.top.equalTo(explanationLabel.snp.bottom).offset(80)
                 $0.trailing.equalToSuperview().inset(24)
-                $0.bottom.equalToSuperview().inset(40)
+                $0.bottom.equalToSuperview().inset(12)
             }
         }
     }
