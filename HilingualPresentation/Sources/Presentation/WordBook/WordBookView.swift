@@ -29,6 +29,15 @@ final class WordBookView: BaseUIView {
         searchBar.searchTextField.backgroundColor = .white
         searchBar.searchTextField.layer.cornerRadius = 8
         searchBar.searchTextField.clipsToBounds = true
+        searchBar.searchTextField.font = .suit(.body_m_16)
+        searchBar.updateHeight(height: 46)
+        let placeholderText = "단어나 표현을 검색해주세요"
+        let attributes: [NSAttributedString.Key: Any] = [
+            .foregroundColor: UIColor.gray400,
+            .font: UIFont.suit(.body_m_16)
+        ]
+        searchBar.searchTextField.attributedPlaceholder = NSAttributedString(string: placeholderText, attributes: attributes)
+
         return searchBar
     }()
 
@@ -38,7 +47,7 @@ final class WordBookView: BaseUIView {
         let label = UILabel()
         label.text = "총 0개"
         label.textColor = .gray500
-        label.font = .systemFont(ofSize: 14)
+        label.font = .suit(.body_m_14)
         return label
     }()
 
@@ -46,7 +55,7 @@ final class WordBookView: BaseUIView {
         let button = UIButton()
         button.setTitle("↑ 최신순", for: .normal)
         button.setTitleColor(.gray500, for: .normal)
-        button.titleLabel?.font = .systemFont(ofSize: 14)
+        button.titleLabel?.font = .suit(.body_m_14)
         return button
     }()
 
@@ -91,11 +100,9 @@ final class WordBookView: BaseUIView {
 
         emptyButton.snp.makeConstraints {
             $0.top.equalTo(emptyLabel.snp.bottom).offset(16)
-            $0.height.equalTo(46)
             $0.horizontalEdges.equalToSuperview()
             $0.centerX.equalToSuperview()
         }
-
         return view
     }()
 
@@ -125,24 +132,22 @@ final class WordBookView: BaseUIView {
     override func setLayout() {
         navigationContainer.snp.makeConstraints {
             $0.top.leading.trailing.equalToSuperview()
-            $0.height.equalTo(132)
+            $0.bottom.equalTo(searchBar.snp.bottom).offset(12)
         }
 
         titleLabel.snp.makeConstraints {
-            $0.top.equalToSuperview().offset(52)
+            $0.top.equalTo(safeAreaLayoutGuide).offset(12)
             $0.leading.equalToSuperview().offset(16)
         }
 
         searchBar.snp.makeConstraints {
-            $0.top.equalTo(titleLabel.snp.bottom).offset(8)
-            $0.leading.trailing.equalToSuperview().inset(16)
-            $0.height.equalTo(46)
+            $0.top.equalTo(titleLabel.snp.bottom).offset(17)
+            $0.leading.trailing.equalToSuperview().inset(8)
         }
 
         statusStackView.snp.makeConstraints {
-            $0.top.equalTo(navigationContainer.snp.bottom).offset(8)
-            $0.leading.trailing.equalToSuperview().inset(16)
-            $0.height.equalTo(20)
+            $0.top.equalTo(navigationContainer.snp.bottom).offset(16)
+            $0.horizontalEdges.equalToSuperview().inset(16)
         }
 
         tableView.snp.makeConstraints {
@@ -156,4 +161,5 @@ final class WordBookView: BaseUIView {
             $0.horizontalEdges.equalToSuperview().inset(100)
         }
     }
+
 }
