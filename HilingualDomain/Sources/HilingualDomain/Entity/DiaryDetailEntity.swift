@@ -12,7 +12,7 @@ public struct DiaryDetailEntity {
     let data: CorrectionData?
     let message: String
     
-    struct CorrectionData {
+    public struct CorrectionData {
         let date: String
         let image: String
         let originalFullText: String
@@ -20,7 +20,7 @@ public struct DiaryDetailEntity {
         let diffRanges: DiffRange
     }
     
-    struct DiffRange {
+    public struct DiffRange {
         let start: Int
         let end: Int
         let originalText: String
