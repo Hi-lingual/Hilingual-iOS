@@ -40,7 +40,7 @@ final class CardTopicView: UIView {
     private let topicStack: UIStackView = {
         let stack = UIStackView()
         stack.axis = .horizontal
-        stack.alignment = .fill
+        stack.alignment = .center
         return stack
     }()
 
@@ -64,7 +64,7 @@ final class CardTopicView: UIView {
         let stack = UIStackView()
         stack.axis = .vertical
         stack.alignment = .leading
-        stack.spacing = 4
+        stack.spacing = 8
         stack.backgroundColor = .gray100
         stack.layer.cornerRadius = 8
         return stack
@@ -88,8 +88,7 @@ final class CardTopicView: UIView {
     // MARK: - UI Setup
 
     private func setupUI() {
-        backgroundColor = .white
-
+        
         iconButton.addTarget(
             self,
             action: #selector(didTapChangeTopic),
@@ -123,7 +122,6 @@ final class CardTopicView: UIView {
 
         topicStack.snp.makeConstraints {
             $0.horizontalEdges.equalToSuperview().inset(12)
-            $0.height.equalTo(28)
         }
 
         cardStack.snp.makeConstraints {

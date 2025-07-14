@@ -32,7 +32,6 @@ final class DiaryLockView: UIView {
         stack.axis = .vertical
         stack.spacing = 8
         stack.alignment = .center
-        stack.backgroundColor = .white
         return stack
     }()
 
@@ -47,7 +46,7 @@ final class DiaryLockView: UIView {
     }
 
     private func setupUI() {
-        backgroundColor = .white
+
         addSubview(diaryLockStack)
         diaryLockStack.addArrangedSubviews(
             diaryLockView,

@@ -32,7 +32,6 @@ final class EmptyDiaryView: UIView {
         stack.axis = .vertical
         stack.spacing = 8
         stack.alignment = .center
-        stack.backgroundColor = .white
         return stack
     }()
 
@@ -47,7 +46,6 @@ final class EmptyDiaryView: UIView {
     }
 
     private func setupUI() {
-        backgroundColor = .white
         addSubview(emptyDiaryStack)
         emptyDiaryStack.addArrangedSubviews(
             emptyDiaryView,

@@ -63,8 +63,7 @@ final class CardPreview: UIView {
     // MARK: - Setup Methods
 
     private func setupUI() {
-        backgroundColor = .white
-
+        
         cardStack.addArrangedSubviews(
             previewLine,
             originalText
@@ -74,24 +73,21 @@ final class CardPreview: UIView {
     }
 
     private func setupLayout() {
-        
+
         previewLine.snp.makeConstraints {
             $0.size.equalTo(CGSize(width: 3, height: 74))
         }
 
         cardStack.snp.makeConstraints {
             $0.leading.equalToSuperview().inset(16)
-            $0.centerY.equalToSuperview()
-            $0.height.equalTo(74)
         }
         
         originalText.snp.makeConstraints {
-            $0.trailing.lessThanOrEqualTo(previewImage.snp.leading).offset(-8)
+            $0.trailing.equalTo(previewImage.snp.leading).offset(-8)
         }
         
         previewImage.snp.makeConstraints {
             $0.trailing.equalToSuperview().inset(16)
-            $0.centerY.equalToSuperview()
             $0.size.equalTo(74)
         }
     }
@@ -110,7 +106,7 @@ final class CardPreview: UIView {
             previewImage.isHidden = true
             
             originalText.snp.remakeConstraints {
-                $0.trailing.lessThanOrEqualTo(previewImage.snp.leading).offset(-16)
+                $0.trailing.equalTo(previewImage.snp.leading).offset(-16)
             }
             
             previewImage.snp.remakeConstraints {

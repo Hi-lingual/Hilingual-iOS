@@ -75,7 +75,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                     remainingTime: 0,
                     createdAt: "2025-07-08T20:15:00",
                     diaryData: "Today was the most stressful day in 2025 for me. It was the team building day at SOPT. I dreaded this day because I didn't know what to expect. The process was complicated and the group(?) was 공개 in that day, so setting the team in advance was impossible. However, after the long team building I was able to be with the people I wanted which was such a relief. I know it's just the start, but I am already excited.",
-                    imageURL: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRkp6rJALpEwmvjDRzTmLZvkIvnItXqRu34BQ&s"
+                    //imageURL: //"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRkp6rJALpEwmvjDRzTmLZvkIvnItXqRu34BQ&s"
                 )
         } else if calendar.isDate(date, inSameDayAs: tomorrow) {
             // 내일: 작성 불가
