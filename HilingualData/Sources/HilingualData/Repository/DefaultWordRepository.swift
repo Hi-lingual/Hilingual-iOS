@@ -28,10 +28,10 @@ public final class DefaultWordRepository: WordBookRepository {
                             phraseId: wordDTO.phraseId,
                             phraseType: wordDTO.phraseType,
                             phrase: wordDTO.phrase,
-                            explanation: "",
+                            explanation: nil,
                             example: nil,
-                            isMarked: false,
-                            createdAt: nil     
+                            isMarked: wordDTO.isBookmarked,
+                            createdAt: nil
                         )
                     }
                     return (group.group, items)
@@ -39,6 +39,7 @@ public final class DefaultWordRepository: WordBookRepository {
             }
             .eraseToAnyPublisher()
     }
+
 
     public func fetchWordDetail(id: Int) -> AnyPublisher<WordEntity, Error> {
         return service.fetchWordDetail(id: id)

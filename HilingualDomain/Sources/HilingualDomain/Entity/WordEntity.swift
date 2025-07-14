@@ -16,7 +16,7 @@ public struct WordEntity: Equatable, Hashable {
     public let phraseId: Int
     public let phraseType: [String]
     public let phrase: String
-    public let explanation: String
+    public let explanation: String?
     public let example: String?
     public let isMarked: Bool
     public let createdAt: String?
@@ -25,7 +25,7 @@ public struct WordEntity: Equatable, Hashable {
         phraseId: Int,
         phraseType: [String],
         phrase: String,
-        explanation: String,
+        explanation: String?,
         example: String?,
         isMarked: Bool,
         createdAt: String?

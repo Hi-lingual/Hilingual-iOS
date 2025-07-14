@@ -27,6 +27,7 @@ public struct WordDTO: Decodable {
     public let phraseId: Int
     public let phrase: String
     public let phraseType: [String]
+    public let isBookmarked: Bool
 }
 
 //MARK: - WordDetail
