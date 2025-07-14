@@ -17,7 +17,7 @@ final class DiaryWritingView: BaseUIView {
     
     let dateLabel: UILabel = {
         let label = UILabel()
-        label.text = "6월 20일 금요일"
+        label.text = ""
         label.font = .suit(.body_sb_16)
         label.textAlignment = .center
         label.textColor = .gray850
@@ -242,7 +242,22 @@ final class DiaryWritingView: BaseUIView {
         modal.isHidden = false
         modal.showAnimation()
     }
-
+    
+    func updateView(
+        for date: Date
+    ) {
+        setSelectedDate(date)
+    }
+    
+    // MARK: - Binding
+    
+    func setSelectedDate(_ date: Date) {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "ko_KR")
+        formatter.dateFormat = "M월 d일 EEEE"
+        dateLabel.text = formatter.string(from: date)
+    }
+    
     // MARK: - Keyboard Handling
     
     override func didMoveToWindow() {

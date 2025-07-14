@@ -17,6 +17,7 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
     private let diaryWritingView = DiaryWritingView()
     private let dialog = Dialog()
     private let textCountSubject = PassthroughSubject<Int, Never>()
+    let selectedDate = Date()
     
     // MARK: - LifeCycle
     
@@ -29,6 +30,7 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
     
     public override func setUI() {
         view.addSubviews(diaryWritingView, dialog)
+        diaryWritingView.updateView(for: selectedDate)
     }
     
     public override func setLayout() {
