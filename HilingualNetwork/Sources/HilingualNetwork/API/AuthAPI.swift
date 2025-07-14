@@ -9,12 +9,17 @@ import Moya
 
 public enum AuthAPI {
     case socialLogin(provider: String, providerToken: String)
+    case refreshToken(refreshToken: String)
 }
 
 extension AuthAPI: NoAuthorizeTargetType {
-
     public var path: String {
-        return "/auth/login"
+        switch self {
+        case .socialLogin:
+            return "/auth/login"
+        case .refreshToken:
+            return "/auth/refresh"
+        }
     }
 
     public var method: Moya.Method {
@@ -25,6 +30,8 @@ extension AuthAPI: NoAuthorizeTargetType {
         switch self {
         case let .socialLogin(provider, _):
             return .requestJSONEncodable(["provider": provider])
+        case .refreshToken:
+            return .requestPlain
         }
     }
 
@@ -34,6 +41,11 @@ extension AuthAPI: NoAuthorizeTargetType {
             return [
                 "Content-Type": "application/json",
                 "Provider-Token": token
+            ]
+        case let .refreshToken(refreshToken):
+            return [
+                "Content-Type": "application/json",
+                "Authorization": "Bearer \(refreshToken)"
             ]
         }
     }
