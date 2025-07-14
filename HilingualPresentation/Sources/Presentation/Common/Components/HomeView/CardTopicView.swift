@@ -9,6 +9,10 @@ import UIKit
 import SnapKit
 
 final class CardTopicView: UIView {
+    
+    // MARK: - Callback
+
+    var onTapWriteDiary: (() -> Void)?
 
     // MARK: - UI Components
 
@@ -36,7 +40,7 @@ final class CardTopicView: UIView {
     private let topicStack: UIStackView = {
         let stack = UIStackView()
         stack.axis = .horizontal
-        stack.alignment = .fill
+        stack.alignment = .center
         return stack
     }()
 
@@ -60,14 +64,12 @@ final class CardTopicView: UIView {
         let stack = UIStackView()
         stack.axis = .vertical
         stack.alignment = .leading
-        stack.spacing = 4
+        stack.spacing = 8
         stack.backgroundColor = .gray100
         stack.layer.cornerRadius = 8
         return stack
     }()
-    
-    private let bottomSpacer = UIView()
-    
+        
     private let diaryAddButton = CTAButton(style: .IconTextButton(iconName: "ic_plus_16_ios", text: "일기 작성하기"))
 
     // MARK: - Initialization
@@ -86,8 +88,7 @@ final class CardTopicView: UIView {
     // MARK: - UI Setup
 
     private func setupUI() {
-        backgroundColor = .white
-
+        
         iconButton.addTarget(
             self,
             action: #selector(didTapChangeTopic),
@@ -102,11 +103,13 @@ final class CardTopicView: UIView {
         cardStack.addArrangedSubviews(
             topicStack,
             topicEnLabel,
-            topicKorLabel,
-            bottomSpacer
+            topicKorLabel
         )
 
         topicKorLabel.isHidden = true
+        
+        cardStack.isLayoutMarginsRelativeArrangement = true
+        cardStack.layoutMargins = UIEdgeInsets(top: 12, left: 12, bottom: 12, right: 12)
 
         addSubviews(cardStack, diaryAddButton)
     }
@@ -116,26 +119,12 @@ final class CardTopicView: UIView {
         iconButton.snp.makeConstraints {
             $0.width.height.equalTo(20)
         }
-        
-        bottomSpacer.snp.makeConstraints {
-            $0.height.equalTo(12)
-        }
 
         topicStack.snp.makeConstraints {
-            $0.top.equalTo(12)
-            $0.horizontalEdges.equalToSuperview().inset(12)
-        }
-
-        topicEnLabel.snp.makeConstraints {
-            $0.horizontalEdges.equalToSuperview().inset(12)
-        }
-
-        topicKorLabel.snp.makeConstraints {
             $0.horizontalEdges.equalToSuperview().inset(12)
         }
 
         cardStack.snp.makeConstraints {
-            $0.top.equalTo(12)
             $0.horizontalEdges.equalToSuperview().inset(16)
         }
         
@@ -149,18 +138,28 @@ final class CardTopicView: UIView {
     // MARK: - Actions
 
     private func addTargets() {
-        iconButton.addTarget(
-            self,
-            action: #selector(didTapChangeTopic),
-            for: .touchUpInside
-        )
-    }
+            iconButton.addTarget(
+                self,
+                action: #selector(didTapChangeTopic),
+                for: .touchUpInside
+            )
+
+            diaryAddButton.addTarget(
+                self,
+                action: #selector(didTapWriteDiary),
+                for: .touchUpInside
+            )
+        }
     
     @objc private func didTapChangeTopic() {
         let isEnglishVisible = !topicEnLabel.isHidden
         topicEnLabel.isHidden = isEnglishVisible
         topicKorLabel.isHidden = !isEnglishVisible
     }
+    
+    @objc private func didTapWriteDiary() {
+            onTapWriteDiary?()
+        }
     
     // MARK: - Configuration
     
