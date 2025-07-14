@@ -11,11 +11,6 @@ import Combine
 import HilingualDomain
 import HilingualNetwork
 
-import Foundation
-import Combine
-import HilingualDomain
-import HilingualNetwork
-
 public final class DefaultWordRepository: WordBookRepository {
 
     private let service: WordBookService
@@ -60,5 +55,9 @@ public final class DefaultWordRepository: WordBookRepository {
             }
             .eraseToAnyPublisher()
     }
+
+    public func toggleBookmark(phraseId: Int, isBookmarked: Bool) -> AnyPublisher<Void, Error> {
+            return service.toggleBookmark(phraseId: phraseId, isBookmarked: isBookmarked)
+        }
 
 }
