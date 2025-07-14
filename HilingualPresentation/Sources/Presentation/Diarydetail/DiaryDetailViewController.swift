@@ -83,6 +83,7 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
             title: "AI 피드백",
             items: [
                 ("신고하기", UIImage(resource: .icReport24Ios), { [weak self] in
+                    self?.modal.isHidden = true
                     self?.showDialog()
                 })
             ]
