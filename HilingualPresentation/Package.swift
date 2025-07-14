@@ -15,6 +15,7 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/SnapKit/SnapKit.git", from: "5.6.0"),
         .package(url: "https://github.com/onevcat/Kingfisher.git", from: "8.4.0"),
+        .package(url: "https://github.com/airbnb/lottie-spm.git", from: "4.5.2"),
         .package(name: "HilingualDomain", path: "../HilingualDomain")
     ],
     targets: [
@@ -23,11 +24,13 @@ let package = Package(
             dependencies: [
                 "HilingualDomain", 
                 .product(name: "SnapKit", package: "SnapKit"),
-                .product(name: "Kingfisher", package: "Kingfisher")
+                .product(name: "Kingfisher", package: "Kingfisher"),
+                .product(name: "Lottie", package: "lottie-spm")
             ],
             path: "Sources/Presentation",
             resources: [
-                .process("Common/Resources/Font")
+                .process("Common/Resources/Font"),
+                .process("Common/Resources/Lottie")
             ]
         )
     ]
