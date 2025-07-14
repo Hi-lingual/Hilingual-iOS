@@ -2,20 +2,19 @@
 //  PhraseEntity.swift
 //  HilingualDomain
 //
-//  Created by 진소은 on 7/14/25.
+//  Created by 진소은 on 7/9/25.
 //
 
-
-struct PhraseEntity {
+public struct PhraseEntity {
     let code: Int
     let data: PhraseData
     let message: String
-
-    struct PhraseData {
+    
+    public struct PhraseData {
         let phraseList: PhraseList
     }
-
-    struct PhraseList {
+ 
+    public struct PhraseList {
         let phraseId: Int64
         let phraseType: [String]
         let phrase: String
@@ -24,3 +23,4 @@ struct PhraseEntity {
         let isMarked: Bool
     }
 }
+
