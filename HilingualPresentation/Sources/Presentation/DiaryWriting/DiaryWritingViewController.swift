@@ -31,12 +31,18 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
     
     public override func addTarget() {
         diaryWritingView.cameraButton.addTarget(self, action: #selector(cameraButtonTapped), for: .touchUpInside)
+        diaryWritingView.feedbackButton.addTarget(self, action: #selector(feedbackButtonTapped), for: .touchUpInside)
     }
     
     // MARK: - Private Methods
     
     @objc private func cameraButtonTapped() {
         presentImagePicker()
+    }
+    
+    @objc private func feedbackButtonTapped() {
+        let loadingVC = self.diContainer.makeLoadingViewController()
+        navigationController?.pushViewController(loadingVC, animated: true)
     }
     
     // MARK: - Navigation
