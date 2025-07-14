@@ -44,7 +44,7 @@ final class WordCard: UIView {
 
     // MARK: - Configure
 
-    func configure(type: WordCardType, data: PhraseData.PhraseList) {
+    func configure(type: WordCardType, data: PhraseData) {
         isMarked = data.isMarked
         
         // Chip 초기화 및 추가
