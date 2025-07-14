@@ -15,7 +15,7 @@ struct PhraseData: Codable {
     }
 
     struct PhraseList: Codable {
-        let phraseId: Int64
+        let phraseId: Int
         let phraseType: [String]
         let phrase: String
         let explanation: String
