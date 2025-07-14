@@ -17,11 +17,11 @@ extension WordBookAPI: BaseTargetType {
     public var path: String {
         switch self {
         case .fetchWordList:
-            return "/api/v1/words"
+            return "/voca"
         case .fetchWordDetail(let id):
-            return "/api/v1/words/\(id)"
+            return "/voca/\(id)"
         case .toggleBookmark(let phraseId, _):
-            return "/api/v1/words/\(phraseId)/bookmark"
+            return "/diaries/\(phraseId)"
         }
     }
 
