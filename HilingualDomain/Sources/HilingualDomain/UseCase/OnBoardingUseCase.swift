@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  OnBoardingUseCase.swift
 //  HilingualDomain
 //
 //  Created by 성현주 on 7/8/25.

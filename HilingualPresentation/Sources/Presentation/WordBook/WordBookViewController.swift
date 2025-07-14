@@ -5,25 +5,25 @@
 //  Created by 성현주 on 7/2/25.
 //
 
-//
-//  WordBookViewController.swift
-//  Hilingual
-//
-//  Created by 성현주 on 7/2/25.
-//
-
 import UIKit
 import Combine
 import HilingualDomain
 
 public final class WordBookViewController: BaseUIViewController<WordBookViewModel> {
 
+    // MARK: - View & State
+
     private let wordBookView = WordBookView()
     private var fullWordList: [(String, [PhraseData])] = []
     private var filteredWordList: [(String, [PhraseData])] = []
 
+    // MARK: - Inputs
+
     private let sortSubject = PassthroughSubject<SortOption, Never>()
     private let selectedWordIdSubject = PassthroughSubject<Int, Never>()
+    private let bookmarkToggledSubject = PassthroughSubject<(Int, Bool), Never>()
+
+    // MARK: - UI Components
 
     private let modal = Modal()
     private let wordDetailDialog = WordDetailDialog()
@@ -64,7 +64,8 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
         let input = WordBookViewModel.Input(
             viewDidLoad: Just(()).eraseToAnyPublisher(),
             sortChanged: sortSubject.eraseToAnyPublisher(),
-            selectedWordId: selectedWordIdSubject.eraseToAnyPublisher()
+            selectedWordId: selectedWordIdSubject.eraseToAnyPublisher(),
+            bookmarkToggled: bookmarkToggledSubject.eraseToAnyPublisher()
         )
 
         let output = viewModel.transform(input: input)
@@ -76,12 +77,10 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
                 self?.filteredWordList = wordList
                 self?.updateViewState()
 
-                //TODO: - 서버에서 갯수 카운트하도록 변경
                 self?.wordBookView.totalCountLabel.text = "총 \(wordList.reduce(0) { $0 + $1.1.count })개"
                 self?.wordBookView.tableView.reloadData()
             }
             .store(in: &cancellables)
-
 
         output.wordDetail
             .receive(on: RunLoop.main)
@@ -122,8 +121,8 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
         modal.showAnimation()
     }
 
-
-    @objc private func didTapEmptyAdd() {
+    @objc
+    private func didTapEmptyAdd() {
         print("일기 쓰러 이동") // TODO: WriteDiaryViewController로 push
     }
 
@@ -167,6 +166,11 @@ extension WordBookViewController: UITableViewDataSource, UITableViewDelegate {
 
         let item = filteredWordList[indexPath.section].1[indexPath.row]
         cell.configure(with: item, type: .withDate)
+
+        cell.onBookmarkToggled = { [weak self] isMarked in
+            self?.bookmarkToggledSubject.send((item.phraseId, isMarked))
+        }
+
         return cell
     }
 

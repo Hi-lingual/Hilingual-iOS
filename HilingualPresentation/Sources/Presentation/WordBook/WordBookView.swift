@@ -10,7 +10,7 @@ import SnapKit
 
 final class WordBookView: BaseUIView {
 
-    // MARK: - UI Components
+    //MARK: - UI Components
 
     private let navigationContainer = UIView()
 
@@ -124,7 +124,7 @@ final class WordBookView: BaseUIView {
         return view
     }()
 
-    // MARK: - Setup
+    // MARK: - Custom Method
 
     override func setUI() {
         navigationContainer.backgroundColor = .black

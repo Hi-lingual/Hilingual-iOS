@@ -214,7 +214,11 @@ extension AppDIContainer {
         return DefaultWordBookUseCase(repository: makeWordBookRepository())
     }
 
+    private func makeToggleBookmarkUseCase() -> ToggleBookmarkUseCase {
+        return DefaultToggleBookmarkUseCase(repository: makeWordBookRepository())
+    }
+
     private func makeWordBookViewmodel() -> WordBookViewModel {
-        return WordBookViewModel(fetchWordListUseCase: makeWordBookUseCase())
+        return WordBookViewModel(fetchWordListUseCase: makeWordBookUseCase(), toggleBookmarkUseCase: makeToggleBookmarkUseCase())
     }
 }
