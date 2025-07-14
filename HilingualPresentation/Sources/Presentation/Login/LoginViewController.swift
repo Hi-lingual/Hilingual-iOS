@@ -62,7 +62,7 @@ public final class LoginViewController: BaseUIViewController<LoginViewModel> {
             .sink { [weak self] in
                 guard let self else { return }
                 let homeVC = self.diContainer.makeTabBarViewController()
-                //self.changeRootVC(homeVC, animated: true)
+                self.navigationController?.pushViewController(homeVC, animated: true)
             }
             .store(in: &cancellables)
 

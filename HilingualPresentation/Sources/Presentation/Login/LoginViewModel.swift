@@ -46,17 +46,12 @@ public final class LoginViewModel: BaseViewModel {
 
     public func transform(input: Input) -> Output {
         let loginFlow: AnyPublisher<Void, Never> = input.loginTapped
-            .flatMap { [weak self] _ -> AnyPublisher<Void, Never> in
-                guard let self = self else {
-                    return Empty<Void, Never>().eraseToAnyPublisher()
+            .flatMap { [weak self] _ -> AnyPublisher<LoginResponseEntity, Never> in
+                guard let self else {
+                    return Empty<LoginResponseEntity, Never>().eraseToAnyPublisher()
                 }
 
-                let appleLoginPublisher: AnyPublisher<(String, String), Error> = self.appleLoginUseCase.executeAppleLogin()
-
-                return appleLoginPublisher
-                    .flatMap { token, _ -> AnyPublisher<LoginResponseEntity, Error> in
-                        self.socialLoginUseCase.login(with: token)
-                    }
+                return self.socialLoginUseCase.execute()
                     .handleEvents(receiveOutput: { [weak self] result in
                         if result.isProfileCompleted {
                             self?.homeSubject.send()
@@ -64,13 +59,13 @@ public final class LoginViewModel: BaseViewModel {
                             self?.onboardingSubject.send()
                         }
                     })
-                    .map { _ in () } // LoginResponseEntity → Void
-                    .catch { [weak self] error -> AnyPublisher<Void, Never> in
+                    .catch { [weak self] error in
                         self?.errorSubject.send(error)
-                        return Empty<Void, Never>().eraseToAnyPublisher()
+                        return Empty<LoginResponseEntity, Never>().eraseToAnyPublisher()
                     }
                     .eraseToAnyPublisher()
             }
+            .map { _ in () }
             .eraseToAnyPublisher()
 
         loginFlow

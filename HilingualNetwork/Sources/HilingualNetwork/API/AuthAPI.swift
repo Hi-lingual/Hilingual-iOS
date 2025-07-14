@@ -14,7 +14,7 @@ public enum AuthAPI {
 extension AuthAPI: NoAuthorizeTargetType {
 
     public var path: String {
-        return "/api/auth/social-login"
+        return "/auth/login"
     }
 
     public var method: Moya.Method {
