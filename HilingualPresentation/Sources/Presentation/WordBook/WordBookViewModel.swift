@@ -97,34 +97,34 @@ public final class WordBookViewModel: BaseViewModel {
     }
 
     private func fetchWordDetail(id: Int) {
-    //    fetchWordListUseCase.getWordDetail(id: id)
-    //        .map { entity in
-    //            PhraseData(
-    //                phraseId: entity.phraseId,
-    //                phraseType: entity.phraseType,
-    //                phrase: entity.phrase,
-    //                explanation: entity.explanation,
-    //                example: entity.example,
-    //                isMarked: entity.isMarked,
-    //                created_at: entity.createdAt
-    //            )
-    //        }
-    //        .sink(receiveCompletion: { _ in },
-    //              receiveValue: { [weak self] phrase in
-    //                  self?.wordDetailSubject.send(phrase)
-    //              })
-    //        .store(in: &cancellables)
-        let dummy = PhraseData(
-            phraseId: id,
-            phraseType: ["동사", "숙어"],
-            phrase: "end up ~ing",
-            explanation: "결국 ~하게 되다",
-            example: "He ended up quitting his job.",
-            isMarked: true,
-            created_at: "25.06.12"
-        )
-
-        wordDetailSubject.send(dummy)
+        fetchWordListUseCase.getWordDetail(id: id)
+            .map { entity in
+                PhraseData(
+                    phraseId: entity.phraseId,
+                    phraseType: entity.phraseType,
+                    phrase: entity.phrase,
+                    explanation: entity.explanation,
+                    example: entity.example,
+                    isMarked: entity.isMarked,
+                    created_at: entity.createdAt
+                )
+            }
+            .sink(receiveCompletion: { _ in },
+                  receiveValue: { [weak self] phrase in
+                      self?.wordDetailSubject.send(phrase)
+                  })
+            .store(in: &cancellables)
+//        let dummy = PhraseData(
+//            phraseId: id,
+//            phraseType: ["동사", "숙어"],
+//            phrase: "end up ~ing",
+//            explanation: "결국 ~하게 되다",
+//            example: "He ended up quitting his job.",
+//            isMarked: true,
+//            created_at: "25.06.12"
+//        )
+//
+//        wordDetailSubject.send(dummy)
     }
 
 }
