@@ -15,17 +15,22 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
     // MARK: - Properties
     
     private let diaryWritingView = DiaryWritingView()
+    private let dialog = Dialog()
     private let textCountSubject = PassthroughSubject<Int, Never>()
     
     // MARK: - Setup Methods
     
     public override func setUI() {
-        view.addSubviews(diaryWritingView)
+        view.addSubviews(diaryWritingView, dialog)
     }
     
     public override func setLayout() {
-        diaryWritingView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+        diaryWritingView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
+        
+        dialog.snp.makeConstraints {
+            $0.edges.equalToSuperview()
         }
     }
     
@@ -39,10 +44,34 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
         presentImagePicker()
     }
     
+    private func showDialog() {
+        dialog.configure(
+            title: "일기 작성을 취소하시겠어요?",
+            content: "지금 나가면 작성한 내용이 모두 사라져요!",
+            leftButtonTitle: "아니요",
+            rightButtonTitle: "네, 취소할게요"
+        )
+        dialog.showAnimation()
+        
+        dialog.leftButton.removeTarget(nil, action: nil, for: .allEvents)
+        dialog.leftButton.addAction(UIAction { [weak self] _ in
+            self?.dialog.dismiss()
+        }, for: .touchUpInside)
+        
+        dialog.rightButton.removeTarget(nil, action: nil, for: .allEvents)
+        dialog.rightButton.addAction(UIAction { [weak self] _ in
+            self?.navigationController?.popViewController(animated: true)
+        }, for: .touchUpInside)
+    }
+    
     // MARK: - Navigation
     
     public override func navigationType() -> NavigationType? {
         return .backTitle("일기 작성하기")
+    }
+    
+    @objc public override func backButtonTapped() {
+        showDialog()
     }
     
     // MARK: - Bind
