@@ -17,7 +17,7 @@ public final class VocaViewController: BaseUIViewController<VocaViewModel> {
     
     public override func viewDidLoad() {
         super.viewDidLoad()
-        configureDummyCards()
+        configure()
     }
     
     // MARK: Custom Method
@@ -34,7 +34,8 @@ public final class VocaViewController: BaseUIViewController<VocaViewModel> {
     
     // MARK: - Configure
 
-    private func configureDummyCards() {
-        vocaView.configure(with: dummyCards)
-    }
+    private func configure() {
+            let dataList = dummyPhraseData.data.phraseList
+            vocaView.configure(data: dataList)
+        }
 }
