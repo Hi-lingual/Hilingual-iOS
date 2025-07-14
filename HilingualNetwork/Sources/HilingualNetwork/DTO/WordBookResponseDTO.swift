@@ -43,5 +43,5 @@ public struct WordDetailResponseDTO: Decodable {
     public let phraseType: [String]
     public let explanation: String
     public let createdAt: String
-    public let isMarked: Bool
+    public let isBookmarked: Bool
 }

@@ -141,7 +141,6 @@ public final class WordBookViewModel: BaseViewModel {
             .store(in: &cancellables)
     }
 
-
     private func updateBookmarkState(phraseId: Int, isBookmarked: Bool) {
         let updated = wordListSubject.value.map { (date, items) -> (String, [PhraseData]) in
             let updatedItems = items.map { item in

@@ -50,7 +50,7 @@ public final class DefaultWordRepository: WordBookRepository {
                     phrase: dto.phrase,
                     explanation: dto.explanation,
                     example: nil,
-                    isMarked: dto.isMarked,
+                    isMarked: dto.isBookmarked,
                     createdAt: dto.createdAt
                 )
             }
