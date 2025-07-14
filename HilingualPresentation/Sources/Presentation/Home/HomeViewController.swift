@@ -48,7 +48,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         }
     }
 
-    // MARK: - Dummy Data Setter
+    // MARK: - Dummy Data
 
     private func applyDummyData(for date: Date) {
         let calendar = Calendar.current
@@ -57,7 +57,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         let tomorrow = calendar.date(byAdding: .day, value: 1, to: today)!
         
         if calendar.isDate(date, inSameDayAs: today) {
-            // 오늘 → 작성 가능
+            // 오늘: 작성 가능
             homeView.selectedInfo.updateView(
                 for: date,
                 isWritten: false,
@@ -68,23 +68,24 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                 )
             )
         } else if calendar.isDate(date, inSameDayAs: yesterday) {
-            // 어제 → 작성된 일기 프리뷰
+            // 어제: 작성된 일기 프리뷰
             homeView.selectedInfo.updateView(
                     for: date,
                     isWritten: true,
                     remainingTime: 0,
                     createdAt: "2025-07-08T20:15:00",
                     diaryData: "Today was the most stressful day in 2025 for me. It was the team building day at SOPT. I dreaded this day because I didn't know what to expect. The process was complicated and the group(?) was 공개 in that day, so setting the team in advance was impossible. However, after the long team building I was able to be with the people I wanted which was such a relief. I know it's just the start, but I am already excited.",
+                    imageURL: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRkp6rJALpEwmvjDRzTmLZvkIvnItXqRu34BQ&s"
                 )
         } else if calendar.isDate(date, inSameDayAs: tomorrow) {
-            // 내일 → 작성 불가
+            // 내일: 작성 불가
             homeView.selectedInfo.updateView(
                 for: date,
                 isWritten: false,
                 remainingTime: 0
             )
         } else {
-            // 그 외 → 일기 없음 + 작성 불가
+            // 그 외: 일기 없음 + 작성 불가
             homeView.selectedInfo.updateView(
                 for: date,
                 isWritten: false,
