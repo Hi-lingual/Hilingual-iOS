@@ -69,9 +69,8 @@ final class HighlightingFeedback: UIView {
     
     // MARK: - Lifecycle
     
-    init(original: String, rewrite: String, explanation: String) {
-        super.init(frame: .zero)
-        
+    override init(frame: CGRect) {
+        super.init(frame: frame)
         setStyle()
         setUI()
         setLayout()
@@ -128,35 +127,5 @@ final class HighlightingFeedback: UIView {
         originalLabel.text = original
         rewriteLabel.text = rewrite
         explainLabel.text = explanation
-    }
-}
-
-// MARK: - Preview
-
-@available(iOS 17.0, *)
-#Preview {
-    HighlightingFeedbackPreview()
-}
-
-final class HighlightingFeedbackPreview: UIView {
-    private let feedbackView = HighlightingFeedback(original: "", rewrite: "", explanation: "")
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        
-        addSubview(feedbackView)
-        feedbackView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
-        }
-        
-        feedbackView.configure(
-            original: "I was planning to arrive it here around 13:30",
-            rewrite: "I was planning to arrive here around 1:30 p.m",
-            explanation: "arrive는 자동사이기 때문에 직접 목적어 ‘it’을 쓸 수 없어요. ‘arrive at the station’, ‘arrive here’처럼 써야 맞는 표현이에요!"
-        )
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
     }
 }

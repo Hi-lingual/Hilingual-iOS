@@ -37,6 +37,18 @@ final class AppDIContainer: ViewControllerFactory {
     public func makeLoginViewController() -> LoginViewController {
         return LoginViewController(viewModel: makeLoginViewModel(), diContainer: self)
     }
+    
+    public func makeDiaryDetailViewController() -> DiaryDetailViewController {
+        return DiaryDetailViewController(viewModel: makeDiaryDetailViewModel(), diContainer: self)
+    }
+    
+    public func makeFeedbackViewController() -> FeedbackViewController {
+        return FeedbackViewController(viewModel: makeFeedbackViewModel(), diContainer: self)
+    }
+    
+    public func makeVocaViewController() -> VocaViewController {
+        return VocaViewController(viewModel: makeVocaViewModel(), diContainer: self)
+    }
 
     func makeOnboardingViewController() -> HilingualPresentation.OnBoardingViewController {
         return OnBoardingViewController(viewModel: makeOnBoardingViewModel(), diContainer: self)
@@ -58,6 +70,18 @@ extension AppDIContainer {
 
     private func makeAppleLoginService() -> AppleLoginService {
         DefaultAppleLoginService()
+    }
+    
+    private func makeDiaryDetailViewModel() -> DiaryDetailViewModel {
+        return DiaryDetailViewModel()
+    }
+    
+    private func makeFeedbackViewModel() -> FeedbackViewModel {
+        return FeedbackViewModel()
+    }
+    
+    private func makeVocaViewModel() -> VocaViewModel {
+        return VocaViewModel()
     }
 
     private func makeAppleLoginRepository() -> AppleLoginRepository {

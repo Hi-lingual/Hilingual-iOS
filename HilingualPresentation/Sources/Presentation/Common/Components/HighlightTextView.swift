@@ -53,6 +53,12 @@ final class HighlightTextView: BaseUIView {
     
     override func setUI() {
         addSubviews(diaryImageView, textView, textCountLabel)
+        textView.isUserInteractionEnabled = false
+        self.backgroundColor = .white
+        self.layer.cornerRadius = 12
+        diaryImageView.isUserInteractionEnabled = true
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTapGesture))
+        diaryImageView.addGestureRecognizer(tapGesture)
     }
     
     override func setLayout() {
@@ -69,6 +75,7 @@ final class HighlightTextView: BaseUIView {
         textCountLabel.snp.makeConstraints {
             $0.top.equalTo(textView.snp.bottom).offset(12)
             $0.trailing.equalToSuperview().inset(12)
+            $0.bottom.equalToSuperview().inset(12)
         }
     }
     
@@ -94,16 +101,20 @@ final class HighlightTextView: BaseUIView {
     }
     
     func highlightCorrections(textType: String, diffRanges: [DiffRange]) {
-        let attributedString = NSMutableAttributedString(string: textType)
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.lineHeightMultiple = 1.4
+        
+        let attributedString = NSMutableAttributedString(string: textType, attributes: [
+            .font: UIFont.suit(.body_r_16),
+            .paragraphStyle: paragraphStyle,
+            .foregroundColor: UIColor.hilingualBlack
+        ])
         
         for range in diffRanges {
             let nsRange = NSRange(location: range.start, length: range.end - range.start)
-            attributedString.addAttribute(
-                .foregroundColor,
-                value: UIColor.hilingualOrange,
-                range: nsRange
-            )
+            attributedString.addAttribute(.foregroundColor, value: UIColor.hilingualOrange, range: nsRange)
         }
+        
         textView.attributedText = attributedString
     }
     
@@ -117,5 +128,16 @@ final class HighlightTextView: BaseUIView {
             textCountLabel.text = "\(originalText.count)/1000"
         }
         isHighlightingEnabled.toggle()
+    }
+    
+    @objc private func handleTapGesture() {
+        guard let image = diaryImageView.image else { return }
+
+        let detailImageView = DetailImageView(image: image)
+        
+        if let window = UIApplication.shared.windows.first(where: { $0.isKeyWindow }) {
+            detailImageView.frame = window.bounds
+            window.addSubview(detailImageView)
+        }
     }
 }

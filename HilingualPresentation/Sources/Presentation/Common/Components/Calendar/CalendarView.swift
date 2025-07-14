@@ -14,6 +14,7 @@ final class CalendarView: UIView {
     
     //CalendarHeaderView한테 알려줌
     var onMonthChanged: ((Date) -> Void)?
+    var onDateSelected: ((Date) -> Void)?
 
     private let calendar = Calendar.current
     public var currentDate = Date()
@@ -184,7 +185,7 @@ extension CalendarView: UICollectionViewDataSource, UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return days.count
     }
-
+    
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CustomCalendarCell", for: indexPath) as! CustomCalendarCell
 
@@ -208,6 +209,9 @@ extension CalendarView: UICollectionViewDataSource, UICollectionViewDelegate {
 
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         selectedDate = days[indexPath.item]
+        if let selectedDate = selectedDate {
+            onDateSelected?(selectedDate)
+        }
     }
     
     func setSelectedDate(_ date: Date) {

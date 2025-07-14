@@ -2,62 +2,112 @@
 //  HomeView.swift
 //  Hilingual
 //
-//  Created by 성현주 on 7/2/25.
+//  Created by 조영서 on 7/9/25.
 //
 
 import UIKit
 import SnapKit
 
 final class HomeView: BaseUIView {
-
-    //MARK: - UI Components
-
-    let rateLabel: UILabel = {
-        let label = UILabel()
-        label.text = "환율을 조회해보세요"
-        label.font = .systemFont(ofSize: 20, weight: .medium)
-        label.textAlignment = .center
-        return label
+    
+    // MARK: - UI Components
+    
+    internal let profileView = ProfileView()
+    internal let headerView = CalendarHeaderView()
+    internal let calendarView = CalendarView()
+    internal let selectedInfo = SelectedInfo()
+    
+    private let spacer: UIView = {
+        let view = UIView()
+        view.backgroundColor = .white
+        return view
     }()
-
-    let iconImageView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.contentMode = .scaleAspectFit
-        imageView.image = UIImage(named: "Image", in: .module, compatibleWith: nil)
-        return imageView
+    
+    private let spacer2: UIView = {
+        let view = UIView()
+        view.backgroundColor = .white
+        return view
     }()
-
-    let fetchButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setTitle("환율 조회", for: .normal)
-        button.setTitleColor(.white, for: .normal)
-        button.backgroundColor = .systemBlue
-        button.layer.cornerRadius = 8
-        return button
+    
+    private let divider: UIView = {
+        let view = UIView()
+        view.backgroundColor = .gray100
+        return view
     }()
-
-    //MARK: - Custom Method
-
+    
+    // MARK: - Custom Method
+        
     override func setUI() {
-        addSubviews(rateLabel,fetchButton,iconImageView)
+        
+        backgroundColor = .hilingualBlack
+        
+        addSubviews(
+            profileView,
+            headerView,
+            calendarView,
+            spacer,
+            divider,
+            selectedInfo,
+            spacer2
+        )
+
+        bindCalendar()
+        
     }
-
+        
     override func setLayout() {
-        rateLabel.snp.makeConstraints {
-            $0.center.equalToSuperview()
+
+        profileView.snp.makeConstraints {
+            $0.top.equalTo(safeAreaLayoutGuide).inset(8)
+            $0.horizontalEdges.equalToSuperview()
+            $0.height.equalTo(46)
+        }
+                
+        headerView.snp.makeConstraints {
+            $0.top.equalTo(profileView.snp.bottom).offset(12)
+            $0.horizontalEdges.equalToSuperview()
+        }
+        
+        calendarView.snp.makeConstraints {
+            $0.top.equalTo(headerView.snp.bottom)
+            $0.horizontalEdges.equalToSuperview()
+        }
+        
+        spacer.snp.makeConstraints {
+            $0.top.equalTo(calendarView.snp.bottom)
+            $0.horizontalEdges.equalToSuperview()
+            $0.height.equalTo(12)
+        }
+        
+        divider.snp.makeConstraints {
+            $0.top.equalTo(spacer.snp.bottom)
+            $0.horizontalEdges.equalToSuperview()
+            $0.height.equalTo(4)
+        }
+        
+        selectedInfo.snp.makeConstraints {
+            $0.top.equalTo(divider.snp.bottom)
+            $0.horizontalEdges.equalToSuperview()
+        }
+        
+        spacer2.snp.makeConstraints {
+            $0.top.equalTo(selectedInfo.snp.bottom)
+            $0.horizontalEdges.equalToSuperview()
+            $0.bottom.equalToSuperview()
+        }
+    }
+    
+    // MARK: - Binding
+
+    // 캘린더 하나로 묶기
+    private func bindCalendar() {
+        headerView.onMonthChanged = { [weak self] newDate in
+            self?.calendarView.reload(for: newDate)
         }
 
-        fetchButton.snp.makeConstraints {
-            $0.top.equalTo(rateLabel.snp.bottom).offset(20)
-            $0.centerX.equalToSuperview()
-            $0.width.equalTo(120)
-            $0.height.equalTo(44)
-        }
-
-        iconImageView.snp.makeConstraints {
-            $0.top.equalTo(fetchButton.snp.bottom).offset(20)
-            $0.centerX.equalToSuperview()
-            $0.width.height.equalTo(100)
+        //선택된 날짜 반영
+        calendarView.onDateSelected = { [weak self] date in
+            self?.selectedInfo.setSelectedDate(date)
         }
     }
 }
