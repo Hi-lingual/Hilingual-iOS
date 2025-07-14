@@ -24,7 +24,7 @@ public final class SplashViewController: BaseUIViewController<SplashViewModel> {
                 guard let self else { return }
                 print("스플래시 -> 홈")
                 let vc = self.diContainer.makeTabBarViewController()
-                changeRootVC(vc)
+                changeRootVC(vc,animated: true)
             }
             .store(in: &cancellables)
 
@@ -33,7 +33,7 @@ public final class SplashViewController: BaseUIViewController<SplashViewModel> {
                 guard let self else { return }
                 print("스플래시 -> 온보딩")
                 let vc = self.diContainer.makeOnboardingViewController()
-                changeRootVC(vc)
+                changeRootVC(vc,animated: true)
             }
             .store(in: &cancellables)
 
@@ -42,7 +42,7 @@ public final class SplashViewController: BaseUIViewController<SplashViewModel> {
                 guard let self else { return }
                 print("스플래시 -> 로그인")
                 let vc = self.diContainer.makeLoginViewController()
-                changeRootVC(vc)
+                changeRootVC(vc,animated: true)
             }
             .store(in: &cancellables)
     }

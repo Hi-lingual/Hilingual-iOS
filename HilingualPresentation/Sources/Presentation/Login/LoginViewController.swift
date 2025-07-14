@@ -63,7 +63,7 @@ public final class LoginViewController: BaseUIViewController<LoginViewModel> {
                 guard let self else { return }
                 print("로그인 -> 홈")
                 let homeVC = self.diContainer.makeTabBarViewController()
-                changeRootVC(homeVC)
+                changeRootVC(homeVC,animated: true)
             }
             .store(in: &cancellables)
 
@@ -72,7 +72,7 @@ public final class LoginViewController: BaseUIViewController<LoginViewModel> {
                 guard let self else { return }
                 print("로그인 -> 온보딩")
                 let onboardingVC = self.diContainer.makeOnboardingViewController()
-                changeRootVC(onboardingVC)
+                changeRootVC(onboardingVC,animated: true)
             }
             .store(in: &cancellables)
 

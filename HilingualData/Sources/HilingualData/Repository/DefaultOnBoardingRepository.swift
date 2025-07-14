@@ -21,5 +21,9 @@ public final class DefaultOnBoardingRepository: OnBoardingRepository {
     public func isNicknameAvailable(_ nickname: String) -> AnyPublisher<Bool, any Error> {
         service.checkNicknameDuplication(nickname: nickname)
     }
+
+    public func registerProfile(profile: ProfileEntity) -> AnyPublisher<Void, Error> {
+          return service.registerProfile(nickname: profile.nickname, profileImg: profile.profileImg)
+      }
 }
 
