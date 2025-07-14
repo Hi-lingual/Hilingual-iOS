@@ -11,15 +11,28 @@ import HilingualDomain
 import HilingualNetwork
 
 public final class DefaultAuthRepository: AuthRepository {
-    private let service: AuthService
+    private let authService: AuthService
+    private let tokenStore: TokenStoreUseCase
 
-    public init(service: AuthService) {
-        self.service = service
+    public init(
+        authService: AuthService,
+        tokenStore: TokenStoreUseCase
+    ) {
+        self.authService = authService
+        self.tokenStore = tokenStore
     }
 
     public func loginWithApple(token: String) -> AnyPublisher<LoginResponseEntity, Error> {
-        return service.loginWithApple(token: token)
-            .map { $0.toEntity() }
+        return authService.loginWithApple(token: token)
+            .map { dto in
+                let entity = dto.toEntity()
+                self.tokenStore.save(
+                    accessToken: entity.accessToken,
+                    refreshToken: entity.refreshToken
+                )
+                return entity
+            }
             .eraseToAnyPublisher()
     }
 }
+

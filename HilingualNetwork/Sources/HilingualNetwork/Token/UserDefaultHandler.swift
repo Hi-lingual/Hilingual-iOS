@@ -7,10 +7,10 @@
 
 import Foundation
 
-struct UserDefaultHandler {
+public struct UserDefaultHandler {
     @UserDefault(key: "accessToken", defaultValue: "")
-    static var accessToken: String
+    public static var accessToken: String
 
     @UserDefault(key: "refreshToken", defaultValue: "")
-    static var refreshToken: String
+    public static var refreshToken: String
 }

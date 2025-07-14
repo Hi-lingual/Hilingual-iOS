@@ -89,8 +89,31 @@ extension AppDIContainer {
         DefaultAppleLoginUseCase(repository: makeAppleLoginRepository())
     }
 
+    private func makeTokenStoreUseCase() -> TokenStoreUseCase {
+        DefaultTokenStore()
+    }
+
+    private func makeAuthRepository() -> AuthRepository {
+        DefaultAuthRepository(
+            authService: makeAuthService(),
+            tokenStore: makeTokenStoreUseCase()
+        )
+    }
+
+    private func makeAuthService() -> AuthService {
+         DefaultAuthService()
+     }
+
+
+    private func makeSocialLoginUseCase() -> SocialLoginUseCase {
+        DefaultSocialLoginUseCase(appleLoginUseCase: makeAppleLoginUseCase(), authRepository: makeAuthRepository())
+    }
+
     private func makeLoginViewModel() -> LoginViewModel {
-        LoginViewModel(useCase: makeAppleLoginUseCase())
+        return LoginViewModel(
+            appleLoginUseCase: makeAppleLoginUseCase(),
+            socialLoginUseCase: makeSocialLoginUseCase()
+        )
     }
 }
 
