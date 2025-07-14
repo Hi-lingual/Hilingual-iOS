@@ -39,7 +39,6 @@ final class HighlightTextView: BaseUIView {
         textView.font = .suit(.body_r_16)
         textView.isScrollEnabled = false
         textView.textColor = .hilingualBlack
-//        textView.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
         return textView
     }()
     
@@ -57,6 +56,9 @@ final class HighlightTextView: BaseUIView {
         textView.isUserInteractionEnabled = false
         self.backgroundColor = .white
         self.layer.cornerRadius = 12
+        diaryImageView.isUserInteractionEnabled = true
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTapGesture))
+        diaryImageView.addGestureRecognizer(tapGesture)
     }
     
     override func setLayout() {
@@ -126,5 +128,16 @@ final class HighlightTextView: BaseUIView {
             textCountLabel.text = "\(originalText.count)/1000"
         }
         isHighlightingEnabled.toggle()
+    }
+    
+    @objc private func handleTapGesture() {
+        guard let image = diaryImageView.image else { return }
+
+        let detailImageView = DetailImageView(image: image)
+        
+        if let window = UIApplication.shared.windows.first(where: { $0.isKeyWindow }) {
+            detailImageView.frame = window.bounds
+            window.addSubview(detailImageView)
+        }
     }
 }
