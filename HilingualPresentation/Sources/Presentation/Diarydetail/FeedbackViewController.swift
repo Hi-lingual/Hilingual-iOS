@@ -6,7 +6,8 @@
 //
 
 import Foundation
-import UIKit
+
+// MARK: - Model
 
 struct DiaryViewData {
     let imageURL: String?
@@ -30,7 +31,11 @@ struct FeedbackItem {
 
 public final class FeedbackViewController: BaseUIViewController<FeedbackViewModel> {
     
+    // MARK: - Properties
+    
     private let feedbackView = FeedbackView()
+    
+    // MARK: - LifeCycle
     
     public override func viewDidLoad() {
         super.viewDidLoad()
@@ -60,6 +65,8 @@ public final class FeedbackViewController: BaseUIViewController<FeedbackViewMode
 
         feedbackView.configureDiary(data: diaryData)
     }
+    
+    // MARK: - Custom Method
     
     public override func setUI() {
         view.addSubview(feedbackView)

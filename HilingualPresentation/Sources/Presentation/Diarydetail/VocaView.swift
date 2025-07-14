@@ -15,6 +15,8 @@ final class VocaView: BaseUIView {
     private let scrollView = UIScrollView()
     private let contentView = UIStackView()
     
+    // MARK: - Custom Method
+    
     override func setUI() {
         self.backgroundColor = .systemGray6
         contentView.axis = .vertical
@@ -30,6 +32,8 @@ final class VocaView: BaseUIView {
             $0.width.equalToSuperview().offset(-40)
         }
     }
+    
+    // MARK: - Configure
 
     func configure(with cards: [(PhraseData, WordCardType)]) {
         contentView.arrangedSubviews.forEach { $0.removeFromSuperview() } 

@@ -10,5 +10,4 @@ import SnapKit
 
 final class DiaryDetailView: BaseUIView {
     
-    
 }
