@@ -22,6 +22,7 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
     private let sortSubject = PassthroughSubject<SortOption, Never>()
     private let selectedWordIdSubject = PassthroughSubject<Int, Never>()
     private let bookmarkToggledSubject = PassthroughSubject<(Int, Bool), Never>()
+    private let refreshSubject = PassthroughSubject<Void, Never>()
 
     // MARK: - UI Components
 
@@ -42,6 +43,9 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
 
     public override func viewDidLoad() {
         super.viewDidLoad()
+
+        wordBookView.refreshControl.addTarget(self, action: #selector(didPullToRefresh), for: .valueChanged)
+
 
         if let tabView = tabBarController?.view {
             modal.isHidden = true
@@ -65,7 +69,8 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
             viewDidLoad: Just(()).eraseToAnyPublisher(),
             sortChanged: sortSubject.eraseToAnyPublisher(),
             selectedWordId: selectedWordIdSubject.eraseToAnyPublisher(),
-            bookmarkToggled: bookmarkToggledSubject.eraseToAnyPublisher()
+            bookmarkToggled: bookmarkToggledSubject.eraseToAnyPublisher(),
+            refreshTriggered: refreshSubject.eraseToAnyPublisher()
         )
 
         let output = viewModel.transform(input: input)
@@ -120,6 +125,15 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
         modal.isHidden = false
         modal.showAnimation()
     }
+
+    @objc
+    private func didPullToRefresh() {
+        refreshSubject.send(())
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { [weak self] in
+            self?.wordBookView.refreshControl.endRefreshing()
+        }
+    }
+
 
     @objc
     private func didTapEmptyAdd() {

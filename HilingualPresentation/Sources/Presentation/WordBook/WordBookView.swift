@@ -14,6 +14,8 @@ final class WordBookView: BaseUIView {
 
     private let navigationContainer = UIView()
 
+    let refreshControl = UIRefreshControl()
+
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.text = "나의 단어장"
@@ -141,6 +143,7 @@ final class WordBookView: BaseUIView {
         )
 
         tableView.tableHeaderView = statusHeaderView
+        tableView.refreshControl = refreshControl
     }
 
     override func setLayout() {

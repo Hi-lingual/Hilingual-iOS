@@ -19,6 +19,7 @@ public final class WordBookViewModel: BaseViewModel {
         let sortChanged: AnyPublisher<SortOption, Never>
         let selectedWordId: AnyPublisher<Int, Never>
         let bookmarkToggled: AnyPublisher<(Int, Bool), Never>
+        let refreshTriggered: AnyPublisher<Void, Never>
     }
 
     public struct Output {
@@ -74,6 +75,12 @@ public final class WordBookViewModel: BaseViewModel {
                 self?.toggleBookmark(phraseId: phraseId, isBookmarked: isBookmarked)
             }
             .store(in: &cancellables)
+
+        input.refreshTriggered
+               .sink { [weak self] in
+                   self?.fetchWords(sort: self?.currentSortOption ?? .latest)
+               }
+               .store(in: &cancellables)
 
 
         return Output(
