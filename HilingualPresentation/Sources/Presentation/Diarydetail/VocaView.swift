@@ -34,17 +34,17 @@ final class VocaView: BaseUIView {
     }
     
     // MARK: - Configure
-
-    func configure(with cards: [(PhraseData, WordCardType)]) {
-        contentView.arrangedSubviews.forEach { $0.removeFromSuperview() } 
+    
+    func configure(data: [PhraseData.PhraseList]){
+        let dataList = data
         
-        cards.forEach { data, type in
-            let card = WordCard()
-            card.configure(type: type, data: data)
-            card.onBookmarkToggled = { isBookmarked in
-                print(" \(data.phrase) 북마크 상태: \(isBookmarked)")
+        dataList.forEach { phrase in
+            let wordCard = WordCard()
+            wordCard.configure(type: .withExample, data: phrase)
+            wordCard.onBookmarkToggled = { isBookmarked in
+                print(" \(phrase) 북마크 상태: \(isBookmarked)")
             }
-            contentView.addArrangedSubview(card)
+            contentView.addArrangedSubview(wordCard)
         }
     }
 }
