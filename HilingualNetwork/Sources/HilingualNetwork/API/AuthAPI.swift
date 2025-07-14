@@ -18,7 +18,7 @@ extension AuthAPI: NoAuthorizeTargetType {
         case .socialLogin:
             return "/auth/login"
         case .refreshToken:
-            return "/auth/refresh"
+            return "/auth/reissue"
         }
     }
 

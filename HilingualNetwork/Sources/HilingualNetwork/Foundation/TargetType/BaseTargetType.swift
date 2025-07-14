@@ -17,13 +17,10 @@ extension BaseTargetType{
         return NetworkEnvironment.shared.baseURL
     }
     
-    public var headers: [String : String]? {
-        let header = [
-            "Content-Type": "application/json",
-            //TODO: - 토큰 변경
-            "Authorization": "Bearer \(NetworkEnvironment.shared.token)"
+    public var headers: [String: String]? {
+        return [
+            "Content-Type": "application/json"
         ]
-        return header
     }
 
     public var sampleData: Data {
