@@ -122,7 +122,7 @@ final class CardPreview: UIView {
             if let urlString = imageUrl, let url = URL(string: urlString) {
                 previewImage.kf.setImage(with: url)
             } else {
-                previewImage.image = UIImage(named: "img_profile_normal_ios", in: .module, compatibleWith: nil)
+                previewImage.image = UIImage(named: "img_load_fail_small_ios", in: .module, compatibleWith: nil)
             }
         }
     }
