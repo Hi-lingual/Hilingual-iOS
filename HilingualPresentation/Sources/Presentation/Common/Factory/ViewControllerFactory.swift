@@ -10,4 +10,5 @@ public protocol ViewControllerFactory {
     func makeLoginViewController() -> LoginViewController
     func makeOnboardingViewController() -> OnBoardingViewController
     func makeHomeViewController() -> HomeViewController
+    func makeLoadingViewController() -> LoadingViewController
 }
