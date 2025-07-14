@@ -63,8 +63,7 @@ final class CardPreview: UIView {
     // MARK: - Setup Methods
 
     private func setupUI() {
-        backgroundColor = .white
-
+        
         cardStack.addArrangedSubviews(
             previewLine,
             originalText
@@ -74,24 +73,21 @@ final class CardPreview: UIView {
     }
 
     private func setupLayout() {
-        
+
         previewLine.snp.makeConstraints {
             $0.size.equalTo(CGSize(width: 3, height: 74))
         }
 
         cardStack.snp.makeConstraints {
             $0.leading.equalToSuperview().inset(16)
-            $0.centerY.equalToSuperview()
-            $0.height.equalTo(74)
         }
         
         originalText.snp.makeConstraints {
-            $0.trailing.lessThanOrEqualTo(previewImage.snp.leading).offset(-8)
+            $0.trailing.equalTo(previewImage.snp.leading).offset(-8)
         }
         
         previewImage.snp.makeConstraints {
             $0.trailing.equalToSuperview().inset(16)
-            $0.centerY.equalToSuperview()
             $0.size.equalTo(74)
         }
     }
@@ -109,6 +105,10 @@ final class CardPreview: UIView {
             originalText.text = text ?? "일기를 불러오지 못했습니다."
             previewImage.isHidden = true
             
+            originalText.snp.remakeConstraints {
+                $0.trailing.equalTo(previewImage.snp.leading).offset(-16)
+            }
+            
             previewImage.snp.remakeConstraints {
                 $0.trailing.equalToSuperview()
                 $0.centerY.equalToSuperview()
@@ -122,7 +122,7 @@ final class CardPreview: UIView {
             if let urlString = imageUrl, let url = URL(string: urlString) {
                 previewImage.kf.setImage(with: url)
             } else {
-                previewImage.image = UIImage(named: "img_profile_normal_ios", in: .module, compatibleWith: nil)
+                previewImage.image = UIImage(named: "img_load_fail_small_ios", in: .module, compatibleWith: nil)
             }
         }
     }

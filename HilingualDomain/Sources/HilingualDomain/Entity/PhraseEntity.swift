@@ -10,11 +10,11 @@ public struct PhraseEntity {
     let data: PhraseData
     let message: String
     
-    struct PhraseData {
+    public struct PhraseData {
         let phraseList: PhraseList
     }
-    
-    struct PhraseList {
+ 
+    public struct PhraseList {
         let phraseId: Int64
         let phraseType: [String]
         let phrase: String
@@ -23,3 +23,4 @@ public struct PhraseEntity {
         let isMarked: Bool
     }
 }
+

@@ -131,7 +131,9 @@ final class SelectedInfo: UIView {
         cardPreview.isHidden = true
         emptyDiaryView.isHidden = true
         diaryLockView.isHidden = true
-
+        
+        iconView.isHidden = true
+        timeLeftStack.isHidden = true
     }
 
     private func setupLayout() {
@@ -147,7 +149,7 @@ final class SelectedInfo: UIView {
      
         [cardTopicView, cardPreview, emptyDiaryView, diaryLockView].forEach {
             $0.snp.makeConstraints {
-                $0.top.equalTo(headerStack.snp.bottom)
+                $0.top.equalTo(headerStack.snp.bottom).offset(12)
                 $0.horizontalEdges.bottom.equalToSuperview()
             }
         }
@@ -161,14 +163,14 @@ final class SelectedInfo: UIView {
         remainingTime: Int,
         createdAt: String? = nil,
         topicData: (kor: String, en: String)? = nil,
-        diaryData: String? = nil
+        diaryData: String? = nil,
+        imageURL: String? = nil
     ) {
-        
         // 초기화
         [cardTopicView, cardPreview, emptyDiaryView, diaryLockView].forEach {
             $0.isHidden = true
         }
-        
+
         setSelectedDate(date)
 
         let today = Calendar.current.startOfDay(for: Date())
@@ -183,24 +185,28 @@ final class SelectedInfo: UIView {
             return
         }
 
-        // 2. 작성완료, 미작성일 경우
+        // 2. 작성완료 or 미작성일 경우
         notWrittenLabel.text = isWritten ? "작성완료" : "미작성"
         notWrittenLabel.textColor = isWritten ? .hilingualBlue : .gray300
         timeLeftLabel.textColor = isWritten ? .gray300 : .black
         iconView.isHidden = isWritten
         timeLeftStack.isHidden = !isWritten && remainingTime == 0
 
-        // 시간 표시
         if let createdAt = createdAt, isWritten {
             timeLeftLabel.text = formatCreatedAt(createdAt)
         } else {
             timeLeftLabel.attributedText = formatRemainingTime(remainingTime)
         }
 
-        // 상태별 View 처리
         if isWritten {
             cardPreview.isHidden = false
-            cardPreview.configure(type: .textWithImage(text: diaryData ?? "", imageUrl: "https://..."))
+
+            if let imageURL = imageURL, !imageURL.isEmpty {
+                cardPreview.configure(type: .textWithImage(text: diaryData ?? "", imageUrl: imageURL))
+            } else {
+                cardPreview.configure(type: .textOnly(text: diaryData ?? ""))
+            }
+
         } else if remainingTime > 0 {
             cardTopicView.isHidden = false
             if let topic = topicData {

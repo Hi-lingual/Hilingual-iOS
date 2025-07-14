@@ -20,7 +20,7 @@ final class EmptyDiaryView: UIView {
         return label
     }()
 
-    private let emptyDiaryImageView: UIImageView = {
+    private let emptyDiaryView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFit
         imageView.image = UIImage(named: "img_diary_empty_ios", in: .module, compatibleWith: nil)
@@ -32,7 +32,6 @@ final class EmptyDiaryView: UIView {
         stack.axis = .vertical
         stack.spacing = 8
         stack.alignment = .center
-        stack.backgroundColor = .white
         return stack
     }()
 
@@ -47,17 +46,15 @@ final class EmptyDiaryView: UIView {
     }
 
     private func setupUI() {
-        backgroundColor = .white
         addSubview(emptyDiaryStack)
         emptyDiaryStack.addArrangedSubviews(
-            emptyDiaryImageView,
+            emptyDiaryView,
             emptyDiaryLabel
         )
     }
 
     private func setupLayout() {
         emptyDiaryStack.snp.makeConstraints {
-            $0.top.equalTo(12)
             $0.edges.equalToSuperview()
         }
     }
