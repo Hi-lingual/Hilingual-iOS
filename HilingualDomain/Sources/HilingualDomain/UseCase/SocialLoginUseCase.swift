@@ -9,8 +9,8 @@ import Combine
 
 public protocol SocialLoginUseCase {
     func execute() -> AnyPublisher<LoginResponseEntity, Error>
+    func executeAuto(with token: String) -> AnyPublisher<LoginResponseEntity, Error>
 }
-
 public final class DefaultSocialLoginUseCase: SocialLoginUseCase {
     private let appleLoginUseCase: AppleLoginUseCase
     private let authRepository: AuthRepository
@@ -29,5 +29,9 @@ public final class DefaultSocialLoginUseCase: SocialLoginUseCase {
                 self.authRepository.loginWithApple(token: token)
             }
             .eraseToAnyPublisher()
+    }
+
+    public func executeAuto(with token: String) -> AnyPublisher<LoginResponseEntity, Error> {
+        return authRepository.loginWithApple(token: token)
     }
 }

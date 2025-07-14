@@ -59,7 +59,24 @@ final class AppDIContainer: ViewControllerFactory {
     }
 
 }
+// MARK: - SplashDIContainer
 
+extension AppDIContainer {
+
+    func makeSplashViewModel() -> SplashViewModel {
+        return SplashViewModel(
+            tokenStore: makeTokenStoreUseCase(),
+            socialLoginUseCase: makeSocialLoginUseCase()
+        )
+    }
+
+    func makeSplashViewController() -> SplashViewController {
+        return SplashViewController(
+            viewModel: makeSplashViewModel(),
+            diContainer: self
+        )
+    }
+}
 
 // MARK: - LoginDIContainer
 
@@ -111,7 +128,6 @@ extension AppDIContainer {
 
     private func makeLoginViewModel() -> LoginViewModel {
         return LoginViewModel(
-            appleLoginUseCase: makeAppleLoginUseCase(),
             socialLoginUseCase: makeSocialLoginUseCase()
         )
     }

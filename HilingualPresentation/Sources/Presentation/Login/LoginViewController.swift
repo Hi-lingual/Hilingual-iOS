@@ -61,19 +61,21 @@ public final class LoginViewController: BaseUIViewController<LoginViewModel> {
             .receive(on: RunLoop.main)
             .sink { [weak self] in
                 guard let self else { return }
+                print("로그인 -> 홈")
                 let homeVC = self.diContainer.makeTabBarViewController()
-                self.navigationController?.pushViewController(homeVC, animated: true)
+                changeRootVC(homeVC)
             }
             .store(in: &cancellables)
 
         output.navigateToOnboarding
-            .receive(on: RunLoop.main)
             .sink { [weak self] in
                 guard let self else { return }
+                print("로그인 -> 온보딩")
                 let onboardingVC = self.diContainer.makeOnboardingViewController()
-                self.navigationController?.pushViewController(onboardingVC, animated: true)
+                changeRootVC(onboardingVC)
             }
             .store(in: &cancellables)
+
 
         output.error
             .receive(on: RunLoop.main)

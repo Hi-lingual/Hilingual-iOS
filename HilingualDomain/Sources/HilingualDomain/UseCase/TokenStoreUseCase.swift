@@ -8,4 +8,5 @@
 public protocol TokenStoreUseCase {
     func save(accessToken: String, refreshToken: String)
     func clear()
+    func loadAccessToken() -> String
 }

@@ -20,4 +20,8 @@ public final class DefaultTokenStore: TokenStoreUseCase {
         UserDefaultHandler.accessToken = ""
         UserDefaultHandler.refreshToken = ""
     }
+
+    public func loadAccessToken() -> String {
+        return UserDefaultHandler.accessToken
+    }
 }

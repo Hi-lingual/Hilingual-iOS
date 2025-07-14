@@ -11,8 +11,6 @@ import HilingualDomain
 
 public final class LoginViewModel: BaseViewModel {
 
-    // MARK: - Input / Output
-
     public struct Input {
         let loginTapped: AnyPublisher<Void, Never>
     }
@@ -23,52 +21,46 @@ public final class LoginViewModel: BaseViewModel {
         let error: AnyPublisher<Error, Never>
     }
 
-    // MARK: - Dependencies
-
-    private let appleLoginUseCase: AppleLoginUseCase
     private let socialLoginUseCase: SocialLoginUseCase
 
     private let homeSubject = PassthroughSubject<Void, Never>()
     private let onboardingSubject = PassthroughSubject<Void, Never>()
     private let errorSubject = PassthroughSubject<Error, Never>()
 
-    // MARK: - Init
-
     public init(
-        appleLoginUseCase: AppleLoginUseCase,
         socialLoginUseCase: SocialLoginUseCase
     ) {
-        self.appleLoginUseCase = appleLoginUseCase
         self.socialLoginUseCase = socialLoginUseCase
     }
 
-    // MARK: - Transform
-
     public func transform(input: Input) -> Output {
-        let loginFlow: AnyPublisher<Void, Never> = input.loginTapped
+        input.loginTapped
             .flatMap { [weak self] _ -> AnyPublisher<LoginResponseEntity, Never> in
                 guard let self else {
                     return Empty<LoginResponseEntity, Never>().eraseToAnyPublisher()
                 }
 
                 return self.socialLoginUseCase.execute()
-                    .handleEvents(receiveOutput: { [weak self] result in
-                        if result.isProfileCompleted {
-                            self?.homeSubject.send()
-                        } else {
-                            self?.onboardingSubject.send()
+                    .handleEvents(
+                        receiveOutput: { [weak self] (result: LoginResponseEntity) in
+                            print("🟢 로그인 성공 - isProfileCompleted: \(result.isProfileCompleted)")
+                            if result.isProfileCompleted {
+                                self?.homeSubject.send()
+                            } else {
+                                self?.onboardingSubject.send()
+                            }
+                        },
+                        receiveCompletion: { (completion: Subscribers.Completion<Error>) in
+                            print("✅ 로그인 흐름 완료: \(completion)")
                         }
-                    })
-                    .catch { [weak self] error in
+                    )
+                    .catch { [weak self] error -> AnyPublisher<LoginResponseEntity, Never> in
+                        print("❌ 로그인 실패: \(error)")
                         self?.errorSubject.send(error)
-                        return Empty<LoginResponseEntity, Never>().eraseToAnyPublisher()
+                        return Empty().eraseToAnyPublisher()
                     }
                     .eraseToAnyPublisher()
             }
-            .map { _ in () }
-            .eraseToAnyPublisher()
-
-        loginFlow
             .sink { _ in }
             .store(in: &cancellables)
 
@@ -78,5 +70,4 @@ public final class LoginViewModel: BaseViewModel {
             error: errorSubject.eraseToAnyPublisher()
         )
     }
-
 }
