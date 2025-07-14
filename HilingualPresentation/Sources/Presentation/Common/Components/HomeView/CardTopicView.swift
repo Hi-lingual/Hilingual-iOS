@@ -69,9 +69,7 @@ final class CardTopicView: UIView {
         stack.layer.cornerRadius = 8
         return stack
     }()
-    
-    private let bottomSpacer = UIView()
-    
+        
     private let diaryAddButton = CTAButton(style: .IconTextButton(iconName: "ic_plus_16_ios", text: "일기 작성하기"))
 
     // MARK: - Initialization
@@ -106,11 +104,13 @@ final class CardTopicView: UIView {
         cardStack.addArrangedSubviews(
             topicStack,
             topicEnLabel,
-            topicKorLabel,
-            bottomSpacer
+            topicKorLabel
         )
 
         topicKorLabel.isHidden = true
+        
+        cardStack.isLayoutMarginsRelativeArrangement = true
+        cardStack.layoutMargins = UIEdgeInsets(top: 12, left: 12, bottom: 12, right: 12)
 
         addSubviews(cardStack, diaryAddButton)
     }
@@ -120,26 +120,13 @@ final class CardTopicView: UIView {
         iconButton.snp.makeConstraints {
             $0.width.height.equalTo(20)
         }
-        
-        bottomSpacer.snp.makeConstraints {
-            $0.height.equalTo(12)
-        }
 
         topicStack.snp.makeConstraints {
-            $0.top.equalTo(12)
             $0.horizontalEdges.equalToSuperview().inset(12)
-        }
-
-        topicEnLabel.snp.makeConstraints {
-            $0.horizontalEdges.equalToSuperview().inset(12)
-        }
-
-        topicKorLabel.snp.makeConstraints {
-            $0.horizontalEdges.equalToSuperview().inset(12)
+            $0.height.equalTo(28)
         }
 
         cardStack.snp.makeConstraints {
-            $0.top.equalTo(12)
             $0.horizontalEdges.equalToSuperview().inset(16)
         }
         

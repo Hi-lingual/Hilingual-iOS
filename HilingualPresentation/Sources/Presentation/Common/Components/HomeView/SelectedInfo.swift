@@ -149,7 +149,7 @@ final class SelectedInfo: UIView {
      
         [cardTopicView, cardPreview, emptyDiaryView, diaryLockView].forEach {
             $0.snp.makeConstraints {
-                $0.top.equalTo(headerStack.snp.bottom)
+                $0.top.equalTo(headerStack.snp.bottom).offset(12)
                 $0.horizontalEdges.bottom.equalToSuperview()
             }
         }

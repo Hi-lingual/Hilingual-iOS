@@ -80,7 +80,6 @@ final class CardPreview: UIView {
         }
 
         cardStack.snp.makeConstraints {
-            $0.top.equalTo(12)
             $0.leading.equalToSuperview().inset(16)
             $0.centerY.equalToSuperview()
             $0.height.equalTo(74)
@@ -91,7 +90,6 @@ final class CardPreview: UIView {
         }
         
         previewImage.snp.makeConstraints {
-            $0.top.equalTo(12)
             $0.trailing.equalToSuperview().inset(16)
             $0.centerY.equalToSuperview()
             $0.size.equalTo(74)
@@ -116,7 +114,6 @@ final class CardPreview: UIView {
             }
             
             previewImage.snp.remakeConstraints {
-                $0.top.equalTo(12)
                 $0.trailing.equalToSuperview()
                 $0.centerY.equalToSuperview()
                 $0.size.equalTo(0)
