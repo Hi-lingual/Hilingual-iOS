@@ -36,6 +36,7 @@ final class WordCard: UIView {
         super.init(frame: frame)
         setUI()
         setLayout()
+        addTargets()
     }
 
     required init?(coder: NSCoder) {
@@ -156,7 +157,7 @@ final class WordCard: UIView {
         savedDateLabel.font = .suit(.caption_m_12)
         savedDateLabel.textColor = .gray400
 
-        bookmarkButton.addTarget(self, action: #selector(didTapBookmark), for: .touchUpInside)
+        
 
         addSubviews(chipStackView, phraseLabel, explanationLabel, savedDateLabel, reasonLabel, bookmarkButton)
     }
@@ -169,6 +170,11 @@ final class WordCard: UIView {
         bookmarkButton.snp.makeConstraints {
             $0.top.trailing.equalToSuperview().inset(12)
         }
+    }
+    
+    // MARK: - AddTargets
+    private func addTargets() {
+        bookmarkButton.addTarget(self, action: #selector(didTapBookmark), for: .touchUpInside)
     }
 
     // MARK: - Helpers
