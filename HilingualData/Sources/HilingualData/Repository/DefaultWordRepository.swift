@@ -42,15 +42,16 @@ public final class DefaultWordRepository: WordBookRepository {
 
     public func fetchWordDetail(id: Int) -> AnyPublisher<WordEntity, Error> {
         return service.fetchWordDetail(id: id)
+            .map { $0.data }
             .map { dto in
                 WordEntity(
                     phraseId: dto.phraseId,
                     phraseType: dto.phraseType,
                     phrase: dto.phrase,
-                    explanation: dto.explaination,
+                    explanation: dto.explanation,
                     example: nil,
-                    isMarked: false,
-                    createdAt: dto.created_at
+                    isMarked: dto.isMarked,
+                    createdAt: dto.createdAt
                 )
             }
             .eraseToAnyPublisher()

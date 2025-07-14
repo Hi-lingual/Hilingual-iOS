@@ -29,14 +29,19 @@ public struct WordDTO: Decodable {
     public let phraseType: [String]
 }
 
+//MARK: - WordDetail
+
+public struct WordDetailResponseWrapperDTO: Decodable {
+    public let code: Int
+    public let data: WordDetailResponseDTO
+    public let message: String
+}
+
 public struct WordDetailResponseDTO: Decodable {
     public let phraseId: Int
     public let phrase: String
     public let phraseType: [String]
-    public let explaination: String
-    public let created_at: String?
-
-    enum CodingKeys: String, CodingKey {
-        case phraseId, phrase, phraseType, explaination, created_at
-    }
+    public let explanation: String
+    public let createdAt: String
+    public let isMarked: Bool
 }

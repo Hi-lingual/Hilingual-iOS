@@ -11,15 +11,15 @@ import Moya
 
 public protocol WordBookService {
     func fetchWordList(sort: Int) -> AnyPublisher<WordBookResponseWrapperDTO, Error>
-    func fetchWordDetail(id: Int) -> AnyPublisher<WordDetailResponseDTO, Error>
+    func fetchWordDetail(id: Int) -> AnyPublisher<WordDetailResponseWrapperDTO, Error>
     func toggleBookmark(phraseId: Int, isBookmarked: Bool) -> AnyPublisher<Void, Error>
 
 }
 
 public final class DefaultWordBookService: BaseService<WordBookAPI>, WordBookService {
-    public func fetchWordDetail(id: Int) -> AnyPublisher<WordDetailResponseDTO, Error> {
-        return request(.fetchWordDetail(id: id), as: WordDetailResponseDTO.self)
-            .mapError { $0 as Error } 
+    public func fetchWordDetail(id: Int) -> AnyPublisher<WordDetailResponseWrapperDTO, Error> {
+        return request(.fetchWordDetail(id: id), as: WordDetailResponseWrapperDTO.self)
+            .mapError { $0 as Error }
             .eraseToAnyPublisher()
     }
 
