@@ -14,9 +14,8 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
     
     private let diaryDetailView = DiaryDetailView()
     private var isHighlightingEnabled: Bool = true
-    private let toggleButton = UIButton(type: .system)
     private lazy var dialog = Dialog()
-    private let detailImage = DetailImageView(image: UIImage(resource: .imgLoadingIos))
+    private let detailImage = DetailImageView(image: UIImage(resource: .imgLoadingIos)) // 
     let modal: Modal = {
         let modal = Modal()
         modal.isHidden = true
@@ -50,7 +49,7 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
     // MARK: - Custom Method
     
     public override func setUI() {
-        view.addSubviews(diaryDetailView, toggleButton, modal, dialog)
+        view.addSubviews(diaryDetailView, modal, dialog)
         view.bringSubviewToFront(modal)
     }
     
