@@ -10,8 +10,11 @@ import SnapKit
 
 final class FeedbackView: BaseUIView {
     
+    // MARK: - UI Components
+    
     private let scrollView = UIScrollView()
     private let contentView = UIStackView()
+    private let detailImageView = DetailImageView(image: UIImage(resource: .imgLoadingIos))
     
     private var isHighlightingEnabled: Bool = true
     private let toggleButton = UIButton(type: .system)
@@ -97,6 +100,7 @@ final class FeedbackView: BaseUIView {
         view.addSubview(stack)
         view.layer.cornerRadius = 8
         view.layer.masksToBounds = true
+        
         view.snp.makeConstraints {
             $0.height.equalTo(199)
         }
@@ -114,9 +118,11 @@ final class FeedbackView: BaseUIView {
         label.snp.makeConstraints {
             $0.centerX.equalToSuperview()
         }
+        
         return view
     }()
     
+    // MARK: - Custom Method
     
     override func setUI() {
         self.addSubview(scrollView)
@@ -163,19 +169,7 @@ final class FeedbackView: BaseUIView {
         }
     }
     
-    @objc private func toggleButtonTapped() {
-        let mappedDiffRanges = dummyCorrectionData.data.diffRanges.map {
-            HighlightTextView.DiffRange(start: $0.start, end: $0.end)
-        }
-        diaryTextView.configure(
-            image: UIImage(named: "img_loading_ios", in: .module, compatibleWith: nil),
-            originalText: dummyCorrectionData.data.originalText,
-            highlightText: dummyCorrectionData.data.rewriteText,
-            diffRanges: mappedDiffRanges,
-            isHighlightingEnabled: self.isHighlightingEnabled
-        )
-        isHighlightingEnabled.toggle()
-    }
+    // MARK: - Configure
     
     func configureDiary(data: DiaryViewData) {
         diaryTextView.configure(
@@ -216,6 +210,22 @@ final class FeedbackView: BaseUIView {
             )
             feedbackStackView.addArrangedSubview(feedbackView)
         }
+    }
+    
+    // MARK: - Actions
+    
+    @objc private func toggleButtonTapped() {
+        let mappedDiffRanges = dummyCorrectionData.data.diffRanges.map {
+            HighlightTextView.DiffRange(start: $0.start, end: $0.end)
+        }
+        diaryTextView.configure(
+            image: UIImage(named: "img_loading_ios", in: .module, compatibleWith: nil),
+            originalText: dummyCorrectionData.data.originalText,
+            highlightText: dummyCorrectionData.data.rewriteText,
+            diffRanges: mappedDiffRanges,
+            isHighlightingEnabled: self.isHighlightingEnabled
+        )
+        isHighlightingEnabled.toggle()
     }
     
 }
