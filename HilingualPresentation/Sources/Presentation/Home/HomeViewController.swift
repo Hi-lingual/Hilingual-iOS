@@ -47,6 +47,12 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
             make.edges.equalToSuperview()
         }
     }
+    
+    public override func addTarget() {
+        homeView.selectedInfo.cardTopicView.onTapWriteDiary = { [weak self] in
+            self?.goToDiaryWritingView()
+        }
+    }
 
     // MARK: - Dummy Data
 
@@ -93,5 +99,11 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
             )
         }
     }
-    // MARK: - Bind
+    
+    // MARK: - Navigation
+    
+    private func goToDiaryWritingView() {
+        let diaryWritingVC = DiaryWritingViewController(viewModel: DiaryWritingViewModel(), diContainer: self.diContainer)
+        navigationController?.pushViewController(diaryWritingVC, animated: true)
+    }
 }

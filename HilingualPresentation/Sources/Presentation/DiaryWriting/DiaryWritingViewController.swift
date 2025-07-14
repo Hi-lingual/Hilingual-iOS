@@ -18,6 +18,13 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
     private let dialog = Dialog()
     private let textCountSubject = PassthroughSubject<Int, Never>()
     
+    // MARK: - LifeCycle
+    
+    public override func viewDidAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(false, animated: false)
+    }
+    
     // MARK: - Setup Methods
     
     public override func setUI() {

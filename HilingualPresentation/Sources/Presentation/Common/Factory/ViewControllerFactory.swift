@@ -13,4 +13,5 @@ public protocol ViewControllerFactory {
     func makeDiaryDetailViewController() -> DiaryDetailViewController
     func makeFeedbackViewController() -> FeedbackViewController
     func makeVocaViewController() -> VocaViewController
+    func makeDiaryWritingViewController() -> DiaryWritingViewController
 }
