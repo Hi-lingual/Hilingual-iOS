@@ -187,6 +187,9 @@ final class FeedbackView: BaseUIView {
         if data.isEmpty {
             feedbackLabel.text = "일기에서 발견된 피드백이 없어요!"
             feedbackStackView.addArrangedSubview(emptyFeedbackView)
+            emptyFeedbackView.snp.makeConstraints {
+                $0.horizontalEdges.equalToSuperview()
+            }
             return
         }
         
@@ -209,6 +212,9 @@ final class FeedbackView: BaseUIView {
                 explanation: $0.explanation
             )
             feedbackStackView.addArrangedSubview(feedbackView)
+            feedbackView.snp.makeConstraints {
+                $0.horizontalEdges.equalToSuperview()
+            }
         }
     }
     
