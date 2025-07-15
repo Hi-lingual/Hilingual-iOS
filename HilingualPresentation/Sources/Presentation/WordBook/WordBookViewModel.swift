@@ -92,59 +92,6 @@ public final class WordBookViewModel: BaseViewModel {
     // MARK: - Private Methods
 
     private func fetchWords(sort: SortOption) {
-    #if DEBUG
-        // 👉 더미 데이터 (개발용)
-        let dummyData: [PhraseData] = [
-            PhraseData(
-                phraseId: 101,
-                phraseType: ["동사", "명사"],
-                phrase: "resonate with",
-                explanation: "~와 깊이 공감되다, 마음에 와닿다",
-                reason: "",
-                createdAt: "25.07.14",
-                isMarked: true
-            ),
-            PhraseData(
-                phraseId: 102,
-                phraseType: ["형용사"],
-                phrase: "compelling",
-                explanation: "매력적인, 눈을 뗄 수 없는",
-                reason: "",
-                createdAt: "25.07.14",
-                isMarked: false
-            ),
-            PhraseData(
-                phraseId: 103,
-                phraseType: ["부사"],
-                phrase: "ultimately",
-                explanation: "결국, 궁극적으로",
-                reason: "",
-                createdAt: "25.07.14",
-                isMarked: true
-            ),
-            PhraseData(
-                phraseId: 104,
-                phraseType: ["전치사"],
-                phrase: "beyond",
-                explanation: "~을 넘어서",
-                reason: "",
-                createdAt: "25.07.14",
-                isMarked: false
-            ),
-            PhraseData(
-                phraseId: 105,
-                phraseType: ["숙어"],
-                phrase: "call it a day",
-                explanation: "오늘은 여기까지 하다",
-                reason: "",
-                createdAt: "25.07.14",
-                isMarked: false
-            )
-        ]
-
-        let dummyGrouped = [("2025-07-14", dummyData)]
-        self.wordListSubject.send(dummyGrouped)
-    #else
         fetchWordListUseCase.execute(sort: sort)
             .map { wordList in
                 wordList.map { (date, items) in
@@ -167,7 +114,6 @@ public final class WordBookViewModel: BaseViewModel {
                 self?.wordListSubject.send(result)
             }
             .store(in: &cancellables)
-    #endif
     }
 
 

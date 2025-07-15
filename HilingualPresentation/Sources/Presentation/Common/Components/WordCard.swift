@@ -73,16 +73,29 @@ final class WordCard: UIView {
         switch type {
         case .basic:
             phraseLabel.font = .suit(.head_m_18)
+
             explanationLabel.isHidden = true
             reasonLabel.isHidden = true
             savedDateLabel.isHidden = true
-            
+
+            // ✅ 높이 0으로 고정하여 완전히 제거
+            explanationLabel.snp.remakeConstraints {
+                $0.height.equalTo(0)
+            }
+            reasonLabel.snp.remakeConstraints {
+                $0.height.equalTo(0)
+            }
+            savedDateLabel.snp.remakeConstraints {
+                $0.height.equalTo(0)
+            }
+
+            // ✅ phraseLabel은 하단에 닿도록 구성
             phraseLabel.snp.remakeConstraints {
                 $0.top.equalTo(chipStackView.snp.bottom).offset(4)
                 $0.leading.trailing.equalToSuperview().inset(12)
                 $0.bottom.equalToSuperview().inset(12)
             }
-            
+
         case .withExample:
             phraseLabel.font = .suit(.body_sb_16)
             explanationLabel.font = .suit(.body_b_14)

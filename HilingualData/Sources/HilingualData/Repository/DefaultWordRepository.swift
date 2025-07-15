@@ -52,7 +52,7 @@ public final class DefaultWordRepository: WordBookRepository {
                     explanation: dto.explanation,
                     example: nil,
                     isMarked: dto.isBookmarked,
-                    createdAt: dto.createdAt
+                    createdAt: dto.writtenDate
                 )
             }
             .eraseToAnyPublisher()

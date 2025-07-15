@@ -179,7 +179,7 @@ extension WordBookViewController: UITableViewDataSource, UITableViewDelegate {
         }
 
         let item = filteredWordList[indexPath.section].1[indexPath.row]
-        cell.configure(with: item, type: .withDate)
+        cell.configure(with: item, type: .basic)
 
         cell.onBookmarkToggled = { [weak self] isMarked in
             self?.bookmarkToggledSubject.send((Int(item.phraseId), isMarked))
