@@ -91,6 +91,9 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
             .receive(on: RunLoop.main)
             .sink { [weak self] detail in
                 self?.wordDetailDialog.configure(data: detail)
+                self?.wordDetailDialog.onBookmarkToggled = { [weak self] phraseId, isMarked in
+                    self?.bookmarkToggledSubject.send((phraseId, isMarked))
+                }
                 self?.wordDetailDialog.showAnimation()
             }
             .store(in: &cancellables)

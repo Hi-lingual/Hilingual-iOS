@@ -8,8 +8,8 @@
 import Foundation
 
 public enum SortOption: Int {
-    case alphabetical = 1  // 가나다순 (기본)
-    case latest = 2        // 최신순
+    case alphabetical = 2  // 알파벳순
+    case latest = 1        // 최신순
 }
 
 public struct WordEntity: Equatable, Hashable {

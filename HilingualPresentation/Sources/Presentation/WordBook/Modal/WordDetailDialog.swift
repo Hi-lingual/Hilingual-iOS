@@ -10,6 +10,10 @@ import SnapKit
 
 final class WordDetailDialog: UIView {
 
+    // MARK: - Callback
+
+    var onBookmarkToggled: ((Int, Bool) -> Void)?
+
     // MARK: - UI Components
 
     private let dialogContainerView: UIView = {
@@ -66,6 +70,10 @@ final class WordDetailDialog: UIView {
 
     func configure(data: PhraseData) {
         wordCard.configure(type: .withDate, data: data)
+
+        wordCard.onBookmarkToggled = { [weak self] isMarked in
+            self?.onBookmarkToggled?(Int(data.phraseId), isMarked)
+        }
     }
 
     func showAnimation() {
