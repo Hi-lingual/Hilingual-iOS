@@ -5,21 +5,34 @@
 //  Created by 성현주 on 7/15/25.
 //
 
-import UIKit
 import Combine
 
 public final class SplashViewController: BaseUIViewController<SplashViewModel> {
 
-    public override func viewDidLoad() {
-        super.viewDidLoad()
+    // MARK: - UI
 
-        view.backgroundColor = .red
-        
-        let output = viewModel?.transform(input: .init(
+    private let splashView = SplashView()
+
+    // MARK: - Custom Method
+
+    public override func setUI() {
+        view.addSubviews(splashView)
+    }
+
+    public override func setLayout() {
+        splashView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+    }
+
+    // MARK: - Bind
+
+    public override func bind(viewModel: SplashViewModel) {
+        let output = viewModel.transform(input: .init(
             viewDidLoad: Just(()).eraseToAnyPublisher()
         ))
 
-        output?.navigateToHome
+        output.navigateToHome
             .sink { [weak self] in
                 guard let self else { return }
                 print("스플래시 -> 홈")
@@ -28,7 +41,7 @@ public final class SplashViewController: BaseUIViewController<SplashViewModel> {
             }
             .store(in: &cancellables)
 
-        output?.navigateToOnboarding
+        output.navigateToOnboarding
             .sink { [weak self] in
                 guard let self else { return }
                 print("스플래시 -> 온보딩")
@@ -37,7 +50,7 @@ public final class SplashViewController: BaseUIViewController<SplashViewModel> {
             }
             .store(in: &cancellables)
 
-        output?.navigateToLogin
+        output.navigateToLogin
             .sink { [weak self] in
                 guard let self else { return }
                 print("스플래시 -> 로그인")
