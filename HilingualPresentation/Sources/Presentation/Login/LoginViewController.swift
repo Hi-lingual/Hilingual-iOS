@@ -57,25 +57,31 @@ public final class LoginViewController: BaseUIViewController<LoginViewModel> {
     }
 
     private func bindOutput(_ output: LoginViewModel.Output) {
-        output.loginResult
+        output.navigateToHome
             .receive(on: RunLoop.main)
-            .sink { completion in
-                switch completion {
-                case .finished:
-                    break
-                case .failure(let error):
-                    print("로그인 실패: \(error)")
-                    // TODO: 에러 토스트 또는 Alert
-                }
-            } receiveValue: { identityToken, userId in
-                print("Apple 로그인 성공")
-                print("identityToken: \(identityToken)")
-                print("userId: \(userId)")
+            .sink { [weak self] in
+                guard let self else { return }
+                print("로그인 -> 홈")
+                let homeVC = self.diContainer.makeTabBarViewController()
+                changeRootVC(homeVC,animated: true)
+            }
+            .store(in: &cancellables)
 
-                // TODO: 서버 API 호출 또는 화면 전환 + 분기 처리 -> 임시
-                /// 기존 유저라면, 텝바 신규 유저면 로그인
-                let onBoardingVC = self.diContainer.makeOnboardingViewController()
-                self.navigationController?.pushViewController(onBoardingVC, animated: true)
+        output.navigateToOnboarding
+            .sink { [weak self] in
+                guard let self else { return }
+                print("로그인 -> 온보딩")
+                let onboardingVC = self.diContainer.makeOnboardingViewController()
+                changeRootVC(onboardingVC,animated: true)
+            }
+            .store(in: &cancellables)
+
+
+        output.error
+            .receive(on: RunLoop.main)
+            .sink { error in
+                print("로그인 중 에러 발생: \(error)")
+                // TODO: Alert 또는 Toast 처리
             }
             .store(in: &cancellables)
     }

@@ -11,6 +11,7 @@ import Combine
 public protocol OnBoardingUseCase {
     func validate(_ nickname: String) -> NicknameValidationResult
     func checkDuplicate(_ nickname: String) -> AnyPublisher<Bool, Error>
+    func registerProfile(nickname: String, profileImg: String) -> AnyPublisher<Void, Error>
 }
 
 public final class DefaultOnBoardingUseCase: OnBoardingUseCase {
@@ -36,6 +37,12 @@ public final class DefaultOnBoardingUseCase: OnBoardingUseCase {
     public func checkDuplicate(_ nickname: String) -> AnyPublisher<Bool, Error> {
         return onBoardingRepository.isNicknameAvailable(nickname)
     }
+
+    public func registerProfile(nickname: String, profileImg: String) -> AnyPublisher<Void, Error> {
+           let entity = ProfileEntity(nickname: nickname, profileImg: profileImg)
+           return onBoardingRepository.registerProfile(profile: entity)
+       }
+
 }
 
 //MARK: - Extension

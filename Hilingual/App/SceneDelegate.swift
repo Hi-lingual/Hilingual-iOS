@@ -28,8 +28,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) {
             let appDI = AppDIContainer.shared
-            let loginVC = appDI.makeTabBarViewController()
-            let navigation = UINavigationController(rootViewController: loginVC)
+
+            let splashVC = appDI.makeSplashViewController()
+            let navigation = UINavigationController(rootViewController: splashVC)
             navigation.setNavigationBarHidden(true, animated: false)
             navigation.view.layoutIfNeeded()
 
@@ -41,7 +42,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             }, completion: nil)
         }
     }
-
 
     func sceneDidBecomeActive(_ scene: UIScene) {
         // Called when the scene has moved from an inactive state to an active state.

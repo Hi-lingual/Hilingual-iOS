@@ -7,6 +7,8 @@
 
 import Foundation
 
+//MARK: - OnBoarding
+
 public struct OnBoardingResponseDTO: Decodable {
     public let code: Int
     public let message: String
@@ -15,4 +17,11 @@ public struct OnBoardingResponseDTO: Decodable {
 
 public struct NicknameAvailabilityDTO: Decodable {
     public let isAvailable: Bool
+}
+
+// MARK: - RegisterProfile
+
+public struct RegisterProfileRequestDTO: Encodable {
+    public let nickname: String
+    public let profileImg: String
 }
