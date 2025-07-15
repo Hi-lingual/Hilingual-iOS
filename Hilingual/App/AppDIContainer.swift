@@ -58,6 +58,9 @@ final class AppDIContainer: ViewControllerFactory {
         return DiaryWritingViewController(viewModel: makeDiaryWritingViewModel(), diContainer: self)
     }
 
+    func makeLoadingViewController() -> HilingualPresentation.LoadingViewController {
+        return LoadingViewController(viewModel: makeLoadingViewModel(), diContainer: self)
+    }
 }
 // MARK: - SplashDIContainer
 
@@ -180,5 +183,13 @@ extension AppDIContainer {
 
     private func makeHomeViewModel() -> HomeViewModel {
         return HomeViewModel(useCase: makeHomeUseCase())
+    }
+}
+
+// MARK: - LoadingDIContainer
+
+extension AppDIContainer {
+    private func makeLoadingViewModel() -> LoadingViewModel {
+        return LoadingViewModel()
     }
 }
