@@ -22,7 +22,8 @@ final class TextView: UIView {
     weak var delegate: TextViewDelegate?
     
     var text: String {
-        return textView.text
+        get { textView.text }
+        set { configure(text: newValue) }
     }
     
     // MARK: - UI Components
@@ -115,9 +116,15 @@ final class TextView: UIView {
         delegate?.textView(self, didChangeTextCount: count)
     }
     
+    func scrollToTop(animated: Bool = false) {
+        textView.setContentOffset(.zero, animated: animated)
+    }
+    
     func configure(text: String) {
-        textView.text = text
+        let limitedText = String(text.prefix(maxCharacterCount))
+        textView.text = limitedText
         updateUI()
+        scrollToTop()
     }
 }
 

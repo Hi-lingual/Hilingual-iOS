@@ -8,7 +8,18 @@
 import UIKit
 import SnapKit
 
+@MainActor
+protocol DiaryWritingViewDelegate: AnyObject {
+    func didTapCamera()
+    func didTapGallery()
+    func didTapOCRGallery()
+}
+
 final class DiaryWritingView: BaseUIView {
+    
+    //MARK: - Properties
+    
+    weak var delegate: DiaryWritingViewDelegate?
     
     //MARK: - UI Components
     
@@ -17,7 +28,7 @@ final class DiaryWritingView: BaseUIView {
     
     let dateLabel: UILabel = {
         let label = UILabel()
-        label.text = "6월 20일 금요일"
+        label.text = ""
         label.font = .suit(.body_sb_16)
         label.textAlignment = .center
         label.textColor = .gray850
@@ -99,17 +110,17 @@ final class DiaryWritingView: BaseUIView {
     
     let dropdown = Dropdown()
     
-    let modal: Modal = {
+    lazy var modal: Modal = {
         let modal = Modal()
         modal.isHidden = true
         modal.configure(
             title: "이미지 선택하기",
             items: [
-                ("카메라로 사진 찍기", UIImage(resource: .icCamera24Ios), {
-                    print("카메라 선택")
+                ("카메라로 사진 찍기", UIImage(resource: .icCamera24Ios), { [weak self] in
+                    self?.delegate?.didTapCamera()
                 }),
-                ("갤러리에서 선택하기", UIImage(resource: .icGallary24Ios), {
-                    print("갤러리 선택")
+                ("갤러리에서 선택하기", UIImage(resource: .icGallary24Ios), { [weak self] in
+                    self?.delegate?.didTapOCRGallery()
                 })
             ]
         )
@@ -215,6 +226,7 @@ final class DiaryWritingView: BaseUIView {
     private func addTarget() {
         deleteImageButton.addTarget(self, action: #selector(deleteImage), for: .touchUpInside)
         textScanButton.addTarget(self, action: #selector(showModal), for: .touchUpInside)
+        cameraButton.addTarget(self, action: #selector(cameraButtonTapped), for: .touchUpInside)
     }
     
     // MARK: - Private Methods
@@ -242,7 +254,30 @@ final class DiaryWritingView: BaseUIView {
         modal.isHidden = false
         modal.showAnimation()
     }
-
+    
+    @objc private func cameraButtonTapped() {
+        delegate?.didTapGallery()
+    }
+    
+    func setText(_ text: String) {
+        textView.configure(text: text)
+    }
+    
+    func updateView(
+        for date: Date
+    ) {
+        setSelectedDate(date)
+    }
+    
+    // MARK: - Binding
+    
+    func setSelectedDate(_ date: Date) {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "ko_KR")
+        formatter.dateFormat = "M월 d일 EEEE"
+        dateLabel.text = formatter.string(from: date)
+    }
+    
     // MARK: - Keyboard Handling
     
     override func didMoveToWindow() {

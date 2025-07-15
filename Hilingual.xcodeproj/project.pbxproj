@@ -11,7 +11,6 @@
 		3AE57A282E20F98D0047097A /* Config.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 3AE57A272E20F98D0047097A /* Config.xcconfig */; };
 		E51DB2052E1D9E8B000C2BEA /* AppConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = E51DB2042E1D9E8B000C2BEA /* AppConfig.swift */; };
 		E51DB2242E1E4407000C2BEA /* AppBaseURLProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E51DB2232E1E4407000C2BEA /* AppBaseURLProvider.swift */; };
-		E51DB2382E2033D9000C2BEA /* Config.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = E51DB2372E2033D9000C2BEA /* Config.xcconfig */; };
 		E5C2F3952E170A01003DF6C4 /* HilingualNetwork in Frameworks */ = {isa = PBXBuildFile; productRef = E5C2F3942E170A01003DF6C4 /* HilingualNetwork */; };
 		E5C2F3992E171575003DF6C4 /* HilingualDomain in Frameworks */ = {isa = PBXBuildFile; productRef = E5C2F3982E171575003DF6C4 /* HilingualDomain */; };
 		E5C79B322E15282100E461C3 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E5C79B2A2E15282100E461C3 /* LaunchScreen.storyboard */; };
@@ -40,7 +39,6 @@
 		E51DB2002E1CF7AD000C2BEA /* Hilingual.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Hilingual.entitlements; sourceTree = "<group>"; };
 		E51DB2042E1D9E8B000C2BEA /* AppConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfig.swift; sourceTree = "<group>"; };
 		E51DB2232E1E4407000C2BEA /* AppBaseURLProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppBaseURLProvider.swift; sourceTree = "<group>"; };
-		E51DB2372E2033D9000C2BEA /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 		E5C2F3932E1709DC003DF6C4 /* HilingualNetwork */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = HilingualNetwork; sourceTree = "<group>"; };
 		E5C2F3972E171509003DF6C4 /* HilingualDomain */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = HilingualDomain; sourceTree = "<group>"; };
 		E5C79B0E2E15281900E461C3 /* Hilingual.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Hilingual.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -246,6 +244,8 @@
 				DEVELOPMENT_TEAM = C9XX799UJH;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Hilingual/Info.plist;
+				INFOPLIST_KEY_NSCameraUsageDescription = "카메라 사용을 위해 권한이 필요합니다.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "기기에서 사진을 선택하기 위해 사진 접근 권한이 필요합니다.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -277,6 +277,8 @@
 				DEVELOPMENT_TEAM = C9XX799UJH;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Hilingual/Info.plist;
+				INFOPLIST_KEY_NSCameraUsageDescription = "카메라 사용을 위해 권한이 필요합니다.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "기기에서 사진을 선택하기 위해 사진 접근 권한이 필요합니다.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
