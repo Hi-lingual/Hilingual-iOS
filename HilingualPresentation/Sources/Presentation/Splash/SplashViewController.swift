@@ -6,6 +6,7 @@
 //
 
 import Combine
+import UIKit
 
 public final class SplashViewController: BaseUIViewController<SplashViewModel> {
 
@@ -13,7 +14,11 @@ public final class SplashViewController: BaseUIViewController<SplashViewModel> {
 
     private let splashView = SplashView()
 
-    // MARK: - Custom Method
+    // MARK: - Combine
+
+    private let viewDidAppearSubject = PassthroughSubject<Void, Never>()
+
+    // MARK: - Lifecycle
 
     public override func setUI() {
         view.addSubviews(splashView)
@@ -25,11 +30,16 @@ public final class SplashViewController: BaseUIViewController<SplashViewModel> {
         }
     }
 
+    public override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        viewDidAppearSubject.send(())
+    }
+
     // MARK: - Bind
 
     public override func bind(viewModel: SplashViewModel) {
         let output = viewModel.transform(input: .init(
-            viewDidLoad: Just(()).eraseToAnyPublisher()
+            viewDidLoad: viewDidAppearSubject.eraseToAnyPublisher()
         ))
 
         output.navigateToHome
@@ -37,7 +47,7 @@ public final class SplashViewController: BaseUIViewController<SplashViewModel> {
                 guard let self else { return }
                 print("스플래시 -> 홈")
                 let vc = self.diContainer.makeTabBarViewController()
-                changeRootVC(vc,animated: true)
+                changeRootVC(vc, animated: true)
             }
             .store(in: &cancellables)
 
@@ -46,7 +56,7 @@ public final class SplashViewController: BaseUIViewController<SplashViewModel> {
                 guard let self else { return }
                 print("스플래시 -> 온보딩")
                 let vc = self.diContainer.makeOnboardingViewController()
-                changeRootVC(vc,animated: true)
+                changeRootVC(vc, animated: true)
             }
             .store(in: &cancellables)
 
@@ -55,7 +65,7 @@ public final class SplashViewController: BaseUIViewController<SplashViewModel> {
                 guard let self else { return }
                 print("스플래시 -> 로그인")
                 let vc = self.diContainer.makeLoginViewController()
-                changeRootVC(vc,animated: true)
+                changeRootVC(vc, animated: true)
             }
             .store(in: &cancellables)
     }

@@ -48,6 +48,7 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
     @objc private func feedbackButtonTapped() {
         let loadingVC = self.diContainer.makeLoadingViewController()
         navigationController?.pushViewController(loadingVC, animated: true)
+    }
       
     private func showDialog() {
         dialog.configure(
