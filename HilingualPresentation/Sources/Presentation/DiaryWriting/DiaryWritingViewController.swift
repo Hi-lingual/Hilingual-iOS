@@ -15,10 +15,17 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
     // MARK: - Properties
     
     private let diaryWritingView = DiaryWritingView()
-//    private let visionKitManager = VisionKitManager()
+    private let visionKitManager = VisionKitManager()
     private let dialog = Dialog()
     private let textCountSubject = PassthroughSubject<Int, Never>()
     let selectedDate = Date()
+    
+    // MARK: - LifeCyccle
+    
+    public override func viewDidLoad() {
+        super.viewDidLoad()
+        visionKitManager.delegate = self
+    }
     
     // MARK: - Setup Methods
     
@@ -121,19 +128,28 @@ extension DiaryWritingViewController: PHPickerViewControllerDelegate {
     
     public func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
         picker.dismiss(animated: true)
-
+        
         guard let itemProvider = results.first?.itemProvider,
-              itemProvider.canLoadObject(ofClass: UIImage.self) else { return }
-
+              itemProvider.canLoadObject(ofClass: UIImage.self) else {
+            print("❌ 이미지 선택 실패 or 불러오기 불가")
+            return
+        }
+        
         itemProvider.loadObject(ofClass: UIImage.self) { [weak self] image, error in
-            guard let self = self, let image = image as? UIImage else { return }
-
+            if let error = error {
+                print("❌ 이미지 로드 에러: \(error.localizedDescription)")
+                return
+            }
+            guard let self = self, let image = image as? UIImage else {
+                print("❌ 이미지 변환 실패")
+                return
+            }
+            
             DispatchQueue.main.async {
+                print("✅ 이미지 선택 완료 - OCR용?: \(picker.view.tag == 999)")
                 if picker.view.tag == 999 {
-                    // OCR용 이미지 → VisionKitManager 등으로 OCR 처리
-//                    self.visionKitManager.handleOCRImage(image)
+                    self.visionKitManager.handleOCRImage(image)
                 } else {
-                    // 일반 이미지 → 다이어리 뷰에 이미지 삽입
                     self.diaryWritingView.setImage(image)
                 }
             }
@@ -168,7 +184,7 @@ extension DiaryWritingViewController: UIImagePickerControllerDelegate, UINavigat
         picker.dismiss(animated: true)
 
         if let image = info[.originalImage] as? UIImage {
-            diaryWritingView.setImage(image)
+            visionKitManager.handleOCRImage(image)
         }
     }
 
@@ -183,13 +199,23 @@ extension DiaryWritingViewController: UIImagePickerControllerDelegate, UINavigat
 extension DiaryWritingViewController: DiaryWritingViewDelegate {
     func didTapCamera() {
         presentCamera()
+        self.diaryWritingView.modal.isHidden = true
     }
 
     func didTapGallery() {
         presentImagePicker(isForOCR: false) // 일반 이미지 선택기
+        self.diaryWritingView.modal.isHidden = true
     }
 
     func didTapOCRGallery() {
         presentImagePicker(isForOCR: true)  // OCR용 이미지 선택기
+        self.diaryWritingView.modal.isHidden = true
+    }
+}
+
+extension DiaryWritingViewController: VisionKitManagerDelegate {
+    func didRecognizeText(_ text: String) {
+        let limitedText = String(text.prefix(diaryWritingView.textView.maxCharacterCount))
+        diaryWritingView.setText(limitedText)
     }
 }

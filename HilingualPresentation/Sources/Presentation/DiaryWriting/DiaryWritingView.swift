@@ -110,7 +110,7 @@ final class DiaryWritingView: BaseUIView {
     
     let dropdown = Dropdown()
     
-    private lazy var modal: Modal = {
+    lazy var modal: Modal = {
         let modal = Modal()
         modal.isHidden = true
         modal.configure(
@@ -257,6 +257,10 @@ final class DiaryWritingView: BaseUIView {
     
     @objc private func cameraButtonTapped() {
         delegate?.didTapGallery()
+    }
+    
+    func setText(_ text: String) {
+        textView.configure(text: text)
     }
     
     func updateView(
