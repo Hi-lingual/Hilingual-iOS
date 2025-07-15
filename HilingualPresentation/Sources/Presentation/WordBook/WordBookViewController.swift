@@ -182,7 +182,7 @@ extension WordBookViewController: UITableViewDataSource, UITableViewDelegate {
         cell.configure(with: item, type: .withDate)
 
         cell.onBookmarkToggled = { [weak self] isMarked in
-            self?.bookmarkToggledSubject.send((item.phraseId, isMarked))
+            self?.bookmarkToggledSubject.send((Int(item.phraseId), isMarked))
         }
 
         return cell
@@ -201,7 +201,7 @@ extension WordBookViewController: UITableViewDataSource, UITableViewDelegate {
 
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let item = filteredWordList[indexPath.section].1[indexPath.row]
-        selectedWordIdSubject.send(item.phraseId)
+        selectedWordIdSubject.send(Int(item.phraseId))
     }
 }
 
