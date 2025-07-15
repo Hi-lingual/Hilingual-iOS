@@ -35,7 +35,9 @@ public final class VocaViewController: BaseUIViewController<VocaViewModel> {
     // MARK: - Configure
 
     private func configure() {
-            let dataList = dummyPhraseData.data.phraseList
-            vocaView.configure(data: dataList)
+        let dataList = dummyPhraseData
+        dataList.forEach { phrase in
+            vocaView.configure(data: phrase)
         }
+    }
 }

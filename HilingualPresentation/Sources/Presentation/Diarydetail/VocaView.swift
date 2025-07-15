@@ -35,16 +35,12 @@ final class VocaView: BaseUIView {
     
     // MARK: - Configure
     
-    func configure(data: [PhraseData.PhraseList]){
-        let dataList = data
-        
-        dataList.forEach { phrase in
-            let wordCard = WordCard()
-            wordCard.configure(type: .withExample, data: phrase)
-            wordCard.onBookmarkToggled = { isBookmarked in
-                print(" \(phrase) 북마크 상태: \(isBookmarked)")
-            }
-            contentView.addArrangedSubview(wordCard)
+    func configure(data: PhraseData) {
+        let wordCard = WordCard()
+        wordCard.configure(type: .withExample, data: data)
+        wordCard.onBookmarkToggled = { isBookmarked in
+            print(" \(data) 북마크 상태: \(isBookmarked)")
         }
+        contentView.addArrangedSubview(wordCard)
     }
 }

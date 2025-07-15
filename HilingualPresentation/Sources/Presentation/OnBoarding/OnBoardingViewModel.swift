@@ -13,12 +13,12 @@ public final class OnBoardingViewModel: BaseViewModel {
 
     // MARK: - Input / Output
 
-    struct Input {
+    public struct Input {
         let nicknameChanged: AnyPublisher<String, Never>
         let startTapped: AnyPublisher<Void, Never>
     }
 
-    struct Output {
+    public struct Output {
         let nicknameState: AnyPublisher<TextField.State, Never>
         let startButtonEnabled: AnyPublisher<Bool, Never>
         let signUpResult: AnyPublisher<Void, Never>
@@ -28,6 +28,7 @@ public final class OnBoardingViewModel: BaseViewModel {
 
     private let useCase: OnBoardingUseCase
     private let navigateToHomeSubject = PassthroughSubject<Void, Never>()
+    private var latestValidNickname: String = ""
 
     // MARK: - Init
 
@@ -37,10 +38,13 @@ public final class OnBoardingViewModel: BaseViewModel {
 
     // MARK: - Transform
 
-    func transform(input: Input) -> Output {
+    public func transform(input: Input) -> Output {
         let nicknameChanged = input.nicknameChanged
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
             .removeDuplicates()
+            .handleEvents(receiveOutput: { [weak self] nickname in
+                self?.latestValidNickname = nickname
+            })
             .share()
 
         let nicknameValidatoinState = nicknameChanged
@@ -66,8 +70,8 @@ public final class OnBoardingViewModel: BaseViewModel {
                 self.useCase.checkDuplicate(nickname)
                     .map { isAvailable in
                         (nickname, isAvailable
-                            ? TextField.State.success("사용 가능한 닉네임이에요")
-                            : .error("이미 사용 중인 닉네임이에요."))
+                         ? TextField.State.success("사용 가능한 닉네임이에요")
+                         : .error("이미 사용 중인 닉네임이에요."))
                     }
                     .catch { _ in
                         Just((nickname, .error("중복 확인 중 오류가 발생했어요.")))
@@ -94,9 +98,19 @@ public final class OnBoardingViewModel: BaseViewModel {
             }
 
         input.startTapped
-            .sink { [weak self] _ in
-                self?.navigateToHomeSubject.send()
+            .flatMap { [weak self] _ -> AnyPublisher<Void, Never> in
+                guard let self else { return Empty().eraseToAnyPublisher() }
+                return self.useCase.registerProfile(nickname: self.latestValidNickname,
+                                                    profileImg: "https://default.image.url/profile.png")
+                .handleEvents(receiveOutput: { [weak self] in
+                    UserDefaults.standard.set(true, forKey: "isProfileCompleted")
+                    print("[OnBoardingVM] ✅ 프로필 등록 완료 → isProfileCompleted = true 저장")
+                    self?.navigateToHomeSubject.send()
+                })
+                .catch { _ in Empty() }
+                .eraseToAnyPublisher()
             }
+            .sink { _ in }
             .store(in: &cancellables)
 
         return Output(

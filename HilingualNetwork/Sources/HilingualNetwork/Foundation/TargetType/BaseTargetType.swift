@@ -6,24 +6,27 @@
 //
 
 import Foundation
-
 import Moya
 
 public protocol BaseTargetType: TargetType {}
 
-extension BaseTargetType{
+extension BaseTargetType {
 
     public var baseURL: URL {
         return NetworkEnvironment.shared.baseURL
     }
-    
-    public var headers: [String : String]? {
-        let header = [
-            "Content-Type": "application/json",
-            //TODO: - 토큰 변경
-            "Authorization": "Bearer \(NetworkEnvironment.shared.token)"
+
+    public var headers: [String: String]? {
+        var baseHeaders: [String: String] = [
+            "Content-Type": "application/json"
         ]
-        return header
+
+        let accessToken = UserDefaultHandler.accessToken
+        if !accessToken.isEmpty {
+            baseHeaders["Authorization"] = "Bearer \(accessToken)"
+        }
+
+        return baseHeaders
     }
 
     public var sampleData: Data {

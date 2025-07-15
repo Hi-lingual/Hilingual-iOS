@@ -58,8 +58,28 @@ final class AppDIContainer: ViewControllerFactory {
         return DiaryWritingViewController(viewModel: makeDiaryWritingViewModel(), diContainer: self)
     }
 
+    func makeLoadingViewController() -> HilingualPresentation.LoadingViewController {
+        return LoadingViewController(viewModel: makeLoadingViewModel(), diContainer: self)
+    }
 }
+// MARK: - SplashDIContainer
 
+extension AppDIContainer {
+
+    func makeSplashViewModel() -> SplashViewModel {
+        return SplashViewModel(
+            tokenStore: makeTokenStoreUseCase(),
+            socialLoginUseCase: makeSocialLoginUseCase()
+        )
+    }
+
+    func makeSplashViewController() -> SplashViewController {
+        return SplashViewController(
+            viewModel: makeSplashViewModel(),
+            diContainer: self
+        )
+    }
+}
 
 // MARK: - LoginDIContainer
 
@@ -89,8 +109,30 @@ extension AppDIContainer {
         DefaultAppleLoginUseCase(repository: makeAppleLoginRepository())
     }
 
+    private func makeTokenStoreUseCase() -> TokenStoreUseCase {
+        DefaultTokenStore()
+    }
+
+    private func makeAuthRepository() -> AuthRepository {
+        DefaultAuthRepository(
+            authService: makeAuthService(),
+            tokenStore: makeTokenStoreUseCase()
+        )
+    }
+
+    private func makeAuthService() -> AuthService {
+         DefaultAuthService()
+     }
+
+
+    private func makeSocialLoginUseCase() -> SocialLoginUseCase {
+        DefaultSocialLoginUseCase(appleLoginUseCase: makeAppleLoginUseCase(), authRepository: makeAuthRepository())
+    }
+
     private func makeLoginViewModel() -> LoginViewModel {
-        LoginViewModel(useCase: makeAppleLoginUseCase())
+        return LoginViewModel(
+            socialLoginUseCase: makeSocialLoginUseCase(), tokenStore: makeTokenStoreUseCase()
+        )
     }
 }
 
@@ -141,5 +183,13 @@ extension AppDIContainer {
 
     private func makeHomeViewModel() -> HomeViewModel {
         return HomeViewModel(useCase: makeHomeUseCase())
+    }
+}
+
+// MARK: - LoadingDIContainer
+
+extension AppDIContainer {
+    private func makeLoadingViewModel() -> LoadingViewModel {
+        return LoadingViewModel()
     }
 }

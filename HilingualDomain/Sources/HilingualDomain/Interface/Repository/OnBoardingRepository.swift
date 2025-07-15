@@ -10,7 +10,6 @@ import Combine
 
 public protocol OnBoardingRepository {
     func isNicknameAvailable(_ nickname: String) -> AnyPublisher<Bool, Error>
-    //func checkDuplicate(_ nickname: String) -> AnyPublisher<Bool, Error>
+    func registerProfile(profile: ProfileEntity) -> AnyPublisher<Void, Error>
 }
 
-//TODO: - Service 연결

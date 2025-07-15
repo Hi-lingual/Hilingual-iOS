@@ -75,7 +75,7 @@ public final class OnBoardingViewController: BaseUIViewController<OnBoardingView
             .sink { [weak self] in
                 guard let self else { return }
                 let homeVC = diContainer.makeTabBarViewController()
-                changeRootVC(homeVC, animated: false)
+                changeRootVC(homeVC, animated: true)
             }
             .store(in: &cancellables)
     }
