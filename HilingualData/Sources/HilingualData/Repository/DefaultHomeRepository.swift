@@ -22,15 +22,21 @@ public final class DefaultHomeRepository: HomeRepository {
         self.service = service
     }
 
-    /// 현재 환율 정보를 가져오는 함수
     /// - 반환: 도메인 모델(HomeEntity)을 Publisher로 반환
-    public func fetchCurrentRate() -> AnyPublisher<HomeEntity, Error> {
-        return service.fetchExchangeRate() //네트워크 모듈로 부터 환율 정보를 가지고옴요
-            .map { DTO in
-                // DTO → Entity 변환 (Data Layer에서 수행하는게 맞습니다)
-                HomeEntity(exchangeRate: DTO.data)
+    public func fetchUserInfo() -> AnyPublisher<UserInfoEntity, Error> {
+        return service.fetchUserInfo()
+            .tryMap { dto in
+                guard let data = dto.data else {
+                    throw NetworkError.decoding
+                }
+
+                return UserInfoEntity(
+                    nickname: data.nickname,
+                    profileImg: data.profileImg,
+                    totalDiaries: data.totalDiaries,
+                    streak: data.streak
+                )
             }
             .eraseToAnyPublisher()
     }
 }
-

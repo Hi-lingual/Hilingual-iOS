@@ -9,18 +9,17 @@ import Combine
 
 //인터페이스 외부에서는 이친구를 의존합니다
 public protocol HomeUseCase {
-    func fetchCurrentRate() -> AnyPublisher<HomeEntity, Error>
+    func fetchUserInfo() -> AnyPublisher<UserInfoEntity, Error>
 }
 
-//실제 구현부 
 public final class DefaultHomeUseCase: HomeUseCase {
-    private let repository: HomeRepository //추상화된 레포지토리 의존
+    private let repository: HomeRepository
 
     public init(repository: HomeRepository) {
         self.repository = repository
     }
 
-    public func fetchCurrentRate() -> AnyPublisher<HomeEntity, Error> {
-        return repository.fetchCurrentRate() //레포지토리에 요청 조회좀 해주셈 ㅋㅋ
+    public func fetchUserInfo() -> AnyPublisher<UserInfoEntity, Error> {
+        return repository.fetchUserInfo()
     }
 }

@@ -10,19 +10,47 @@ import Foundation
 import Moya
 
 public enum HomeAPI {
-    case getRate
+    case getUserInfo
 }
 
-extension HomeAPI: BaseTargetType {
+extension HomeAPI: TargetType {
+    
+    public var baseURL: URL {
+        return NetworkEnvironment.shared.baseURL
+    }
+
     public var path: String {
-        return "/money"
+        switch self {
+        case .getUserInfo:
+            return "/users/info"
+        }
     }
 
     public var method: Moya.Method {
-        return .get
+        switch self {
+        case .getUserInfo:
+            return .get
+        }
     }
 
     public var task: Task {
-        return .requestPlain
+        switch self {
+        case .getUserInfo:
+            return .requestPlain
+        }
+    }
+
+    public var headers: [String: String]? {
+        switch self {
+        case .getUserInfo:
+            return [
+                "Content-Type": "application/json",
+                "Authorization": "Bearer \(UserDefaultHandler.accessToken)"
+            ]
+        }
+    }
+
+    public var sampleData: Data {
+        return Data()
     }
 }
