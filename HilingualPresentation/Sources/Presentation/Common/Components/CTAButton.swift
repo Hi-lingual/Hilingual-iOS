@@ -21,8 +21,6 @@ final class CTAButton: UIButton {
     
     // MARK: - UI Components
     
-    private let stackView = UIStackView()
-    private let iconView = UIImageView()
     private let textLabel = UILabel()
     
     // MARK: - Lifecycle
@@ -41,7 +39,7 @@ final class CTAButton: UIButton {
         setupStyle()
         setupLayout()
         configure(with: style)
-        
+                
         self.isEnabled = autoBackground ? false : true
         
         if autoBackground {
@@ -64,50 +62,37 @@ final class CTAButton: UIButton {
     }
     
     private func setupStyle() {
-        layer.cornerRadius = 8
-        clipsToBounds = true
+            layer.cornerRadius = 8
+            clipsToBounds = true
+
+            titleLabel?.font = .suit(.body_sb_16)
+            setTitleColor(.white, for: .normal)
+            imageView?.contentMode = .scaleAspectFit
+
+            contentHorizontalAlignment = .center
+            semanticContentAttribute = .forceLeftToRight
         
-        textLabel.textColor = .white
-        textLabel.font = .suit(.body_sb_16)
-        
-        stackView.axis = .horizontal
-        stackView.spacing = 8
-        stackView.alignment = .center
-    }
-    
-    private func configure(with style: CTAButtonStyle) {
-        switch style {
-        case .TextButton(let text):
-            setupTextLabel(text)
-            
-        case .IconTextButton(let iconName, let text):
-            setupStackView(iconName: iconName, text: text)
-        }
-    }
-
-    private func setupTextLabel(_ text: String) {
-        textLabel.text = text
-        addSubview(textLabel)
-        textLabel.snp.makeConstraints {
-            $0.center.equalToSuperview()
-        }
-    }
-
-    private func setupStackView(iconName: String, text: String) {
-        iconView.image = UIImage(named: iconName, in: .module, compatibleWith: nil)
-        iconView.contentMode = .scaleAspectFit
-        iconView.snp.makeConstraints {
-            $0.width.height.equalTo(16)
+            imageEdgeInsets = UIEdgeInsets(top: 0, left: -4, bottom: 0, right: 4)
         }
 
-        textLabel.text = text
-        stackView.addArrangedSubview(iconView)
-        stackView.addArrangedSubview(textLabel)
-        addSubview(stackView)
-        stackView.snp.makeConstraints {
-            $0.center.equalToSuperview()
+        private func configure(with style: CTAButtonStyle) {
+            switch style {
+            case .TextButton(let text):
+                setTitle(text, for: .normal)
+                setImage(nil, for: .normal)
+
+            case .IconTextButton(let iconName, let text):
+                setTitle(text, for: .normal)
+
+                //아이콘 터치 이벤트 무효화 위해서
+                guard let image = UIImage(named: iconName, in: .module, compatibleWith: nil) else { return }
+
+                setImage(image, for: .normal)
+                setImage(image, for: .highlighted)
+                setImage(image, for: .selected)
+                setImage(image, for: .disabled)
+            }
         }
-    }
     
     // MARK: - Private Methods
     
