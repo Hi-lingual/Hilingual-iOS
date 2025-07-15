@@ -7,15 +7,12 @@
 
 import Moya
 
-import Moya
-import Alamofire
-
 public struct NetworkProvider {
     public static func make<T: TargetType>() -> MoyaProvider<T> {
         let logger = MoyaLoggerPlugin()
-
-        let session = Session(interceptor: AuthInterceptor()) 
-        return MoyaProvider<T>(session: session, plugins: [logger])
+        return MoyaProvider<T>(
+            plugins: [logger]
+        )
     }
 }
 

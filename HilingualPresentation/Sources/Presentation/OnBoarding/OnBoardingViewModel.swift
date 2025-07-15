@@ -70,8 +70,8 @@ public final class OnBoardingViewModel: BaseViewModel {
                 self.useCase.checkDuplicate(nickname)
                     .map { isAvailable in
                         (nickname, isAvailable
-                            ? TextField.State.success("사용 가능한 닉네임이에요")
-                            : .error("이미 사용 중인 닉네임이에요."))
+                         ? TextField.State.success("사용 가능한 닉네임이에요")
+                         : .error("이미 사용 중인 닉네임이에요."))
                     }
                     .catch { _ in
                         Just((nickname, .error("중복 확인 중 오류가 발생했어요.")))
@@ -102,11 +102,13 @@ public final class OnBoardingViewModel: BaseViewModel {
                 guard let self else { return Empty().eraseToAnyPublisher() }
                 return self.useCase.registerProfile(nickname: self.latestValidNickname,
                                                     profileImg: "https://default.image.url/profile.png")
-                    .catch { _ in Empty() }
-                    .handleEvents(receiveOutput: { [weak self] in
-                        self?.navigateToHomeSubject.send()
-                    })
-                    .eraseToAnyPublisher()
+                .handleEvents(receiveOutput: { [weak self] in
+                    UserDefaults.standard.set(true, forKey: "isProfileCompleted")
+                    print("[OnBoardingVM] ✅ 프로필 등록 완료 → isProfileCompleted = true 저장")
+                    self?.navigateToHomeSubject.send()
+                })
+                .catch { _ in Empty() }
+                .eraseToAnyPublisher()
             }
             .sink { _ in }
             .store(in: &cancellables)

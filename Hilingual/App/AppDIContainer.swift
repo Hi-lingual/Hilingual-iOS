@@ -128,7 +128,7 @@ extension AppDIContainer {
 
     private func makeLoginViewModel() -> LoginViewModel {
         return LoginViewModel(
-            socialLoginUseCase: makeSocialLoginUseCase()
+            socialLoginUseCase: makeSocialLoginUseCase(), tokenStore: makeTokenStoreUseCase()
         )
     }
 }

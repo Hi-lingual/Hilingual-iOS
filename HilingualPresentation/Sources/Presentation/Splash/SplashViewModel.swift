@@ -63,25 +63,46 @@ public final class SplashViewModel: BaseViewModel {
     // MARK: - Logic
 
     private func handleAutoLogin() {
-        let token = tokenStore.loadAccessToken()
-        
-        if token.isEmpty {
+        let accessToken = tokenStore.loadAccessToken()
+        let refreshToken = tokenStore.loadRefreshToken()
+
+        print("[SplashVM] 🔍 accessToken: \(accessToken.isEmpty ? "없음" : "있음")")
+        print("[SplashVM] 🔍 refreshToken: \(refreshToken.isEmpty ? "없음" : "있음")")
+
+        guard !accessToken.isEmpty, !refreshToken.isEmpty else {
+            print("[SplashVM] ❌ 토큰 없음 → 로그인 화면으로 이동")
             loginSubject.send()
             return
         }
-        
-        socialLoginUseCase.executeAuto(with: token)
+
+        print("[SplashVM] 🔁 토큰 재발급 시도")
+
+        socialLoginUseCase.executeRefresh(with: refreshToken)
             .sink(
-                receiveCompletion: { (completion: Subscribers.Completion<Error>) in
-                    if case .failure = completion {
-                        self.loginSubject.send()
+                receiveCompletion: { [weak self] completion in
+                    if case .failure(let error) = completion {
+                        print("[SplashVM] ⚠️ 토큰 재발급 실패 → 로그인 이동 (\(error))")
+                        self?.loginSubject.send()
                     }
                 },
-                receiveValue: { (result: LoginResponseEntity) in
-                    if result.isProfileCompleted {
-                        self.homeSubject.send()
+                receiveValue: { [weak self] response in
+                    print("[SplashVM] ✅ 토큰 재발급 성공")
+
+                    self?.tokenStore.save(
+                        accessToken: response.accessToken,
+                        refreshToken: response.refreshToken
+                    )
+
+                    // ✅ 프로필 완료 여부는 로컬에서 확인
+                    let isProfileCompleted = UserDefaults.standard.bool(forKey: "isProfileCompleted")
+                    print("[SplashVM] 📦 로컬 프로필 완료 여부: \(isProfileCompleted)")
+
+                    if isProfileCompleted {
+                        print("[SplashVM] 🏠 홈 화면 이동")
+                        self?.homeSubject.send()
                     } else {
-                        self.onboardingSubject.send()
+                        print("[SplashVM] 🚀 온보딩 화면 이동")
+                        self?.onboardingSubject.send()
                     }
                 }
             )

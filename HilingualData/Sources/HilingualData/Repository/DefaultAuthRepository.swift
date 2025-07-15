@@ -34,5 +34,18 @@ public final class DefaultAuthRepository: AuthRepository {
             }
             .eraseToAnyPublisher()
     }
+
+    public func refreshToken(token: String) -> AnyPublisher<LoginResponseEntity, Error> {
+        return authService.refreshToken(token: token)
+            .map { dto in
+                let entity = dto.toEntity()
+                self.tokenStore.save(
+                    accessToken: entity.accessToken,
+                    refreshToken: entity.refreshToken
+                )
+                return entity
+            }
+            .eraseToAnyPublisher()
+    }
 }
 
