@@ -73,6 +73,7 @@ final class CustomCalendarCell: UICollectionViewCell {
 
         if isSelected {
             bubbleView.image = UIImage(named: "img_bubble_unfilled_ios", in: .module, compatibleWith: nil)
+            dayLabel.textColor = .hilingualBlue
         } else if isFilled {
             bubbleView.image = UIImage(named: "img_bubble_filled_ios", in: .module, compatibleWith: nil)
             dayLabel.textColor = .white
