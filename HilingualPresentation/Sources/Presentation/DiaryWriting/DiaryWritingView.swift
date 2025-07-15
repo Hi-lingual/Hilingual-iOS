@@ -8,7 +8,18 @@
 import UIKit
 import SnapKit
 
+@MainActor
+protocol DiaryWritingViewDelegate: AnyObject {
+    func didTapCamera()
+    func didTapGallery()
+    func didTapOCRGallery()
+}
+
 final class DiaryWritingView: BaseUIView {
+    
+    //MARK: - Properties
+    
+    weak var delegate: DiaryWritingViewDelegate?
     
     //MARK: - UI Components
     
@@ -99,17 +110,17 @@ final class DiaryWritingView: BaseUIView {
     
     let dropdown = Dropdown()
     
-    let modal: Modal = {
+    private lazy var modal: Modal = {
         let modal = Modal()
         modal.isHidden = true
         modal.configure(
             title: "이미지 선택하기",
             items: [
-                ("카메라로 사진 찍기", UIImage(resource: .icCamera24Ios), {
-                    print("카메라 선택")
+                ("카메라로 사진 찍기", UIImage(resource: .icCamera24Ios), { [weak self] in
+                    self?.delegate?.didTapCamera()
                 }),
-                ("갤러리에서 선택하기", UIImage(resource: .icGallary24Ios), {
-                    print("갤러리 선택")
+                ("갤러리에서 선택하기", UIImage(resource: .icGallary24Ios), { [weak self] in
+                    self?.delegate?.didTapOCRGallery()
                 })
             ]
         )
@@ -215,6 +226,7 @@ final class DiaryWritingView: BaseUIView {
     private func addTarget() {
         deleteImageButton.addTarget(self, action: #selector(deleteImage), for: .touchUpInside)
         textScanButton.addTarget(self, action: #selector(showModal), for: .touchUpInside)
+        cameraButton.addTarget(self, action: #selector(cameraButtonTapped), for: .touchUpInside)
     }
     
     // MARK: - Private Methods
@@ -241,6 +253,10 @@ final class DiaryWritingView: BaseUIView {
     @objc private func showModal() {
         modal.isHidden = false
         modal.showAnimation()
+    }
+    
+    @objc private func cameraButtonTapped() {
+        delegate?.didTapGallery()
     }
     
     func updateView(

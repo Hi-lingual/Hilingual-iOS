@@ -15,16 +15,10 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
     // MARK: - Properties
     
     private let diaryWritingView = DiaryWritingView()
+//    private let visionKitManager = VisionKitManager()
     private let dialog = Dialog()
     private let textCountSubject = PassthroughSubject<Int, Never>()
     let selectedDate = Date()
-    
-    // MARK: - LifeCycle
-    
-    public override func viewDidAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        navigationController?.setNavigationBarHidden(false, animated: false)
-    }
     
     // MARK: - Setup Methods
     
@@ -42,16 +36,8 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
             $0.edges.equalToSuperview()
         }
     }
-    
-    public override func addTarget() {
-        diaryWritingView.cameraButton.addTarget(self, action: #selector(cameraButtonTapped), for: .touchUpInside)
-    }
-    
+
     // MARK: - Private Methods
-    
-    @objc private func cameraButtonTapped() {
-        presentImagePicker()
-    }
     
     private func showDialog() {
         dialog.configure(
@@ -88,6 +74,7 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
     public override func bind(viewModel: DiaryWritingViewModel) {
         super.bind(viewModel: viewModel)
         
+        diaryWritingView.delegate = self
         diaryWritingView.textView.delegate = self
         
         let input = DiaryWritingViewModel.Input(textCount: textCountSubject.eraseToAnyPublisher())
@@ -112,26 +99,97 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
     }
 }
 
+// MARK: - PHPickerViewControllerDelegate + 이미지 선택기
+
 extension DiaryWritingViewController: PHPickerViewControllerDelegate {
-    func presentImagePicker() {
+    
+    /// 이미지 선택기 띄우기 (OCR용 / 일반용 구분)
+    func presentImagePicker(isForOCR: Bool = false) {
         var config = PHPickerConfiguration()
         config.selectionLimit = 1
         config.filter = .images
         
         let picker = PHPickerViewController(configuration: config)
         picker.delegate = self
+        
+        if isForOCR {
+            picker.view.tag = 999 // OCR 식별 태그
+        }
+        
         present(picker, animated: true)
     }
     
     public func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
         picker.dismiss(animated: true)
-        guard let itemProvider = results.first?.itemProvider, itemProvider.canLoadObject(ofClass: UIImage.self) else { return }
+
+        guard let itemProvider = results.first?.itemProvider,
+              itemProvider.canLoadObject(ofClass: UIImage.self) else { return }
 
         itemProvider.loadObject(ofClass: UIImage.self) { [weak self] image, error in
-            guard let image = image as? UIImage else { return }
+            guard let self = self, let image = image as? UIImage else { return }
+
             DispatchQueue.main.async {
-                self?.diaryWritingView.setImage(image)
+                if picker.view.tag == 999 {
+                    // OCR용 이미지 → VisionKitManager 등으로 OCR 처리
+//                    self.visionKitManager.handleOCRImage(image)
+                } else {
+                    // 일반 이미지 → 다이어리 뷰에 이미지 삽입
+                    self.diaryWritingView.setImage(image)
+                }
             }
         }
+    }
+}
+
+// MARK: - UIImagePickerControllerDelegate + 카메라 촬영기
+
+extension DiaryWritingViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    
+    func presentCamera() {
+        guard UIImagePickerController.isSourceTypeAvailable(.camera) else {
+            let alert = UIAlertController(
+                title: "카메라 사용 불가",
+                message: "카메라를 사용할 수 없습니다. 설정에서 권한을 확인해주세요.",
+                preferredStyle: .alert
+            )
+            alert.addAction(UIAlertAction(title: "확인", style: .default))
+            present(alert, animated: true)
+            return
+        }
+
+        let picker = UIImagePickerController()
+        picker.sourceType = .camera
+        picker.delegate = self
+        picker.allowsEditing = false
+        present(picker, animated: true)
+    }
+
+    public func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
+        picker.dismiss(animated: true)
+
+        if let image = info[.originalImage] as? UIImage {
+            diaryWritingView.setImage(image)
+        }
+    }
+
+    public func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        picker.dismiss(animated: true)
+    }
+}
+
+// MARK: - DiaryWritingViewDelegate (카메라/갤러리 버튼 터치 이벤트)
+
+@MainActor
+extension DiaryWritingViewController: DiaryWritingViewDelegate {
+    func didTapCamera() {
+        presentCamera()
+    }
+
+    func didTapGallery() {
+        presentImagePicker(isForOCR: false) // 일반 이미지 선택기
+    }
+
+    func didTapOCRGallery() {
+        presentImagePicker(isForOCR: true)  // OCR용 이미지 선택기
     }
 }
