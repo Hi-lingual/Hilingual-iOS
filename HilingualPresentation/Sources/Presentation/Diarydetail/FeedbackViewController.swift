@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Combine
 
 // MARK: - Model
 
@@ -22,11 +23,6 @@ struct FeedbackItem {
     let original: String
     let rewrite: String
     let explanation: String
-    init(original: String, rewrite: String, explanation: String) {
-            self.original = original
-            self.rewrite = rewrite
-            self.explanation = explanation
-        }
 }
 
 public final class FeedbackViewController: BaseUIViewController<FeedbackViewModel> {
@@ -40,20 +36,11 @@ public final class FeedbackViewController: BaseUIViewController<FeedbackViewMode
     public override func viewDidLoad() {
         super.viewDidLoad()
         
-        let feedbackItems: [FeedbackItem] = dummyFeedbackData.data.map {
-            FeedbackItem(
-                original: $0.originalText,
-                rewrite: $0.rewriteText,
-                explanation: $0.explanation
-            )
-        }
-        feedbackView.configureFeedbacks(data: feedbackItems)
-
         let diaryContent = dummyCorrectionData.data
         let diffRanges = diaryContent.diffRanges.map {
             HighlightTextView.DiffRange(start: $0.start, end: $0.end)
         }
-
+        
         let diaryData = DiaryViewData(
             imageURL: diaryContent.image,
             date: diaryContent.date,
@@ -62,7 +49,7 @@ public final class FeedbackViewController: BaseUIViewController<FeedbackViewMode
             diffRanges: diffRanges,
             isHighlightingEnabled: true
         )
-
+        
         feedbackView.configureDiary(data: diaryData)
     }
     
@@ -76,5 +63,31 @@ public final class FeedbackViewController: BaseUIViewController<FeedbackViewMode
         feedbackView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
+    }
+    
+    public override func bind(viewModel: FeedbackViewModel) {
+        super.bind(viewModel: viewModel)
+        
+        let input = makeInput()
+        let output = viewModel.transform(input: input)
+        
+        bindOutput(output)
+    }
+    
+    private func makeInput() -> FeedbackViewModel.Input {
+        return FeedbackViewModel.Input(
+            viewDidLoad: Just(()).eraseToAnyPublisher()
+        )
+    }
+    
+    private func bindOutput(_ output: FeedbackViewModel.Output) {
+        output.fetchDiaryResult
+            .receive(on: RunLoop.main)
+            .sink { [weak self] feedbackList in
+                let feedbackItems: [FeedbackItem] = feedbackList.map {
+                    FeedbackItem(original: $0.original, rewrite: $0.rewrite, explanation: $0.explain)
+                }
+                self?.feedbackView.configureFeedbacks(data: feedbackItems)            }
+            .store(in: &cancellables)
     }
 }

@@ -92,18 +92,6 @@ extension AppDIContainer {
     private func makeAppleLoginService() -> AppleLoginService {
         DefaultAppleLoginService()
     }
-    
-    private func makeDiaryDetailViewModel() -> DiaryDetailViewModel {
-        return DiaryDetailViewModel()
-    }
-    
-    private func makeFeedbackViewModel() -> FeedbackViewModel {
-        return FeedbackViewModel()
-    }
-    
-    private func makeVocaViewModel() -> VocaViewModel {
-        return VocaViewModel()
-    }
 
     private func makeAppleLoginRepository() -> AppleLoginRepository {
         DefaultAppleLoginRepository(service: makeAppleLoginService())
@@ -166,6 +154,34 @@ extension AppDIContainer {
 extension AppDIContainer {
     private func makeDiaryWritingViewModel() -> DiaryWritingViewModel {
         return DiaryWritingViewModel()
+    }
+}
+
+// MARK: - DiaryDetailDIContainer
+
+extension AppDIContainer {
+    private func makeDiaryDetailViewModel() -> DiaryDetailViewModel {
+        return DiaryDetailViewModel()
+    }
+    
+    private func makeFeedbackViewModel() -> FeedbackViewModel {
+        return FeedbackViewModel(useCase: makeFeedbackUseCase())
+    }
+    
+    private func makeFeedbackUseCase() -> FeedbackUseCase {
+        return DefaultFeedbackUseCase(repository: makeFeedbackRepository())
+    }
+    
+    private func makeFeedbackRepository() -> FeedbackRepository {
+        return DefaultFeedbackRepository(service: makeFeedbackService())
+    }
+    
+    private func makeFeedbackService() -> FeedbackService {
+        return DefaultFeedbackService()
+    }
+    
+    private func makeVocaViewModel() -> VocaViewModel {
+        return VocaViewModel()
     }
 }
 

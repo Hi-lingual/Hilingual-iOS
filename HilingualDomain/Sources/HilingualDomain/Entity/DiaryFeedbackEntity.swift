@@ -8,7 +8,14 @@
 import Foundation
 
 public struct DiaryFeedbackEntity {
-    let original: String
-    let rewrite: String
-    let explanation: String
+    public let original: String
+    public let rewrite: String
+    public let explain: String
+    
+    public init(original: String, rewrite: String, explain: String) {
+        self.original = original
+        self.rewrite = rewrite
+        self.explain = explain
+    }
 }
+
