@@ -66,8 +66,8 @@ public final class SplashViewModel: BaseViewModel {
         let accessToken = tokenStore.loadAccessToken()
         let refreshToken = tokenStore.loadRefreshToken()
 
-        print("[SplashVM] 🔍 accessToken: \(accessToken.isEmpty ? "없음" : "있음")")
-        print("[SplashVM] 🔍 refreshToken: \(refreshToken.isEmpty ? "없음" : "있음")")
+        print("[SplashVM] 엑세스 토큰: \(accessToken.isEmpty ? "없음" : "있음")")
+        print("[SplashVM] 리프래시 토큰: \(refreshToken.isEmpty ? "없음" : "있음")")
 
         guard !accessToken.isEmpty, !refreshToken.isEmpty else {
             print("[SplashVM] ❌ 토큰 없음 → 로그인 화면으로 이동")
@@ -81,7 +81,7 @@ public final class SplashViewModel: BaseViewModel {
             .sink(
                 receiveCompletion: { [weak self] completion in
                     if case .failure(let error) = completion {
-                        print("[SplashVM] ⚠️ 토큰 재발급 실패 → 로그인 이동 (\(error))")
+                        print("[SplashVM] ❌ 토큰 재발급 실패 → 로그인 이동 (\(error))")
                         self?.loginSubject.send()
                     }
                 },
@@ -93,15 +93,14 @@ public final class SplashViewModel: BaseViewModel {
                         refreshToken: response.refreshToken
                     )
 
-                    // ✅ 프로필 완료 여부는 로컬에서 확인
                     let isProfileCompleted = UserDefaults.standard.bool(forKey: "isProfileCompleted")
-                    print("[SplashVM] 📦 로컬 프로필 완료 여부: \(isProfileCompleted)")
+                    print("[SplashVM] 로컬 프로필 완료 여부: \(isProfileCompleted)")
 
                     if isProfileCompleted {
-                        print("[SplashVM] 🏠 홈 화면 이동")
+                        print("[SplashVM] 홈 화면 이동")
                         self?.homeSubject.send()
                     } else {
-                        print("[SplashVM] 🚀 온보딩 화면 이동")
+                        print("[SplashVM] 온보딩 화면 이동")
                         self?.onboardingSubject.send()
                     }
                 }
