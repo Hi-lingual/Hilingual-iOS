@@ -12,6 +12,10 @@ import SnapKit
 
 final class SelectedInfo: UIView {
     
+    var topicData: (String, String)? {
+        return cardTopicView.topicData
+    }
+    
     // MARK: - UI Components
     
     internal let cardTopicView = CardTopicView()

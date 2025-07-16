@@ -37,7 +37,12 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
 
     public override func addTarget() {
         homeView.selectedInfo.cardTopicView.onTapWriteDiary = { [weak self] in
-            self?.goToDiaryWritingView()
+            guard let self else { return }
+            
+            let selectedDate = self.homeView.calendarView.selectedDate
+            let topic = self.homeView.selectedInfo.topicData
+            
+            self.goToDiaryWritingView(topicData: topic, selectedDate: selectedDate)
         }
     }
 
@@ -146,11 +151,14 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
 
     // MARK: - Navigation Method
 
-    private func goToDiaryWritingView() {
+    private func goToDiaryWritingView(topicData: (String, String)? = nil, selectedDate: Date? = nil) {
         navigationController?.setNavigationBarHidden(false, animated: false)
-        
-        let diaryWritingVC = diContainer.makeDiaryWritingViewController()
-        
+
+        let diaryWritingVC = diContainer.makeDiaryWritingViewController(
+            topicData: topicData,
+            selectedDate: selectedDate ?? Date()
+        )
+
         navigationController?.pushViewController(diaryWritingVC, animated: true)
     }
 }

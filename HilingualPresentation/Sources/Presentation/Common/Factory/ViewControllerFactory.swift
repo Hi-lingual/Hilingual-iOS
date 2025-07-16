@@ -5,6 +5,8 @@
 //  Created by 성현주 on 7/5/25.
 //
 
+import Foundation
+
 public protocol ViewControllerFactory {
     func makeTabBarViewController() -> TabBarViewController
     func makeLoginViewController() -> LoginViewController
@@ -15,5 +17,8 @@ public protocol ViewControllerFactory {
     func makeDiaryDetailViewController() -> DiaryDetailViewController
     func makeFeedbackViewController() -> FeedbackViewController
     func makeVocaViewController() -> VocaViewController
-    func makeDiaryWritingViewController() -> DiaryWritingViewController
+    func makeDiaryWritingViewController(
+        topicData: (String, String)?,
+        selectedDate: Date
+    ) -> DiaryWritingViewController
 }

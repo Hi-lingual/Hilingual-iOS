@@ -54,8 +54,16 @@ final class AppDIContainer: ViewControllerFactory {
         return OnBoardingViewController(viewModel: makeOnBoardingViewModel(), diContainer: self)
     }
     
-    func makeDiaryWritingViewController() -> HilingualPresentation.DiaryWritingViewController {
-        return DiaryWritingViewController(viewModel: makeDiaryWritingViewModel(), diContainer: self)
+    func makeDiaryWritingViewController(
+        topicData: (String, String)?,
+        selectedDate: Date
+    ) -> DiaryWritingViewController {
+        return DiaryWritingViewController(
+            viewModel: makeDiaryWritingViewModel(),
+            diContainer: self,
+            topicData: topicData,
+            selectedDate: selectedDate
+        )
     }
 
     func makeLoadingViewController() -> HilingualPresentation.LoadingViewController {

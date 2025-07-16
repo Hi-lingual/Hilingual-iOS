@@ -169,6 +169,13 @@ final class Dropdown: UIView {
     private func updateLabel() {
         topicEnLabel.text = isKorean ? (topicKor ?? "What surprised you today?") : (topicEn ?? "What surprised you today?")
     }
+    
+    func configure(kor: String?, en: String?) {
+        self.topicKor = kor
+        self.topicEn = en
+        updateLabel()
+    }
+    
 }
 
 // MARK: - Preview
