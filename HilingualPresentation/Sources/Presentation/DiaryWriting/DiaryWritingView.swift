@@ -133,7 +133,6 @@ final class DiaryWritingView: BaseUIView {
         super.init(frame: frame)
         setUI()
         setLayout()
-        setTopic()
         addTarget()
     }
     
@@ -231,10 +230,10 @@ final class DiaryWritingView: BaseUIView {
     
     // MARK: - Private Methods
     
-    private func setTopic() {
-        dropdown.topicEn = "What surprised you today?"
-        dropdown.topicKor = "오늘 당신을 놀라게 한 일이 있었나요?"
+    func setTopic(kor: String, en: String) {
+        dropdown.configure(kor: kor, en: en)
     }
+    
     
     func setImage(_ image: UIImage) {
         selectedImageView.image = image

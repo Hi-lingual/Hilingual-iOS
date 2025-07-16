@@ -47,6 +47,10 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
     public override func setUI() {
         view.addSubviews(diaryWritingView, dialog)
         diaryWritingView.updateView(for: selectedDate)
+        
+        if let topic = topicData {
+            diaryWritingView.setTopic(kor: topic.0, en: topic.1)
+        }
     }
     
     public override func setLayout() {
