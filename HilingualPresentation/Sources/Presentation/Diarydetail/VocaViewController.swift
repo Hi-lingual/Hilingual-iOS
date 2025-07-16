@@ -37,12 +37,20 @@ public final class VocaViewController: BaseUIViewController<VocaViewModel> {
     
     // MARK: - Binding
     
+    private let bookmarkToggleSubject = PassthroughSubject<(Int, Bool), Never>()
+
     public override func bind(viewModel: VocaViewModel) {
+        vocaView.onBookmarkToggle = { [weak self] phraseId, isBookmarked in
+            self?.bookmarkToggleSubject.send((Int(phraseId), isBookmarked))
+        }
+
         let input = VocaViewModel.Input(
-            viewDidLoad: Just(()).eraseToAnyPublisher()
+            viewDidLoad: Just(()).eraseToAnyPublisher(),
+            bookmarkToggled: bookmarkToggleSubject.eraseToAnyPublisher()
         )
+
         let output = viewModel.transform(input: input)
-        
+
         output.fetchVoca
             .map { phraseList in
                 phraseList.map {
@@ -53,7 +61,7 @@ public final class VocaViewController: BaseUIViewController<VocaViewModel> {
                         explanation: $0.explanation,
                         reason: $0.reason,
                         isMarked: $0.isBookmarked,
-                        createdAt: "" // 없으면 공백 또는 기본값 처리
+                        createdAt: ""
                     )
                 }
             }
@@ -62,6 +70,6 @@ public final class VocaViewController: BaseUIViewController<VocaViewModel> {
                 self?.vocaView.configure(dataList: viewDataList)
             }
             .store(in: &cancellables)
-        
     }
+
 }

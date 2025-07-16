@@ -20,6 +20,9 @@ struct PhraseViewData {
 
 final class VocaView: BaseUIView {
     
+    var onBookmarkToggle: ((Int64, Bool) -> Void)?
+
+    
     // MARK: - UI Properties
     
     private let scrollView = UIScrollView()
@@ -67,7 +70,7 @@ final class VocaView: BaseUIView {
             )
 
             wordCard.onBookmarkToggled = { isBookmarked in
-                print("\(phrase.phrase) 북마크 상태: \(isBookmarked)")
+                self.onBookmarkToggle?(phrase.phraseId, isBookmarked)
             }
 
             contentView.addArrangedSubview(wordCard)

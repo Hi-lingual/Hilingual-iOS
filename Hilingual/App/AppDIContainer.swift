@@ -181,7 +181,7 @@ extension AppDIContainer {
     }
     
     private func makeVocaViewModel() -> VocaViewModel {
-        return VocaViewModel(recommendedVocaUseCase: makeVocaUseCase())
+        return VocaViewModel(recommendedVocaUseCase: makeVocaUseCase(), toggleBookmarkUseCase: makeToggleBookmarkUseCase())
     }
     
     private func makeDiaryDetailUseCase() -> DiaryDetailUseCase {

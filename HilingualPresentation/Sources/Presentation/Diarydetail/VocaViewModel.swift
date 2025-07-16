@@ -14,6 +14,7 @@ public final class VocaViewModel: BaseViewModel {
     
     public struct Input {
         let viewDidLoad: AnyPublisher<Void, Never>
+        let bookmarkToggled: AnyPublisher<(Int, Bool), Never>
     }
 
     // MARK: - Output
@@ -26,12 +27,16 @@ public final class VocaViewModel: BaseViewModel {
     // MARK: - Properties
 
     private let recommendedVocaUseCase: RecommendedUseCase
+    private let toggleBookmarkUseCase: ToggleBookmarkUseCase
 
     private let recommendecVocaSubject = PassthroughSubject<[RecommendedVocaEntity.Phrase], Never>()
+    private let bookmarkToggledSubject = PassthroughSubject<(Int, Bool), Never>()
+    
     private let errorSubject = PassthroughSubject<String, Never>()
 
-    public init(recommendedVocaUseCase: RecommendedUseCase) {
+    public init(recommendedVocaUseCase: RecommendedUseCase, toggleBookmarkUseCase: ToggleBookmarkUseCase) {
         self.recommendedVocaUseCase = recommendedVocaUseCase
+        self.toggleBookmarkUseCase = toggleBookmarkUseCase
     }
 
     public func transform(input: Input) -> Output {
@@ -53,10 +58,49 @@ public final class VocaViewModel: BaseViewModel {
                     .store(in: &self.cancellables)
             }
             .store(in: &cancellables)
+        input .bookmarkToggled
+            .sink { [weak self] (phraseId, isBookmarked) in
+                self?.toggleBookmark(phraseId: phraseId, isBookmarked: isBookmarked)
+            }
+            .store(in: &cancellables)
 
         return Output(
             fetchVoca: recommendecVocaSubject.eraseToAnyPublisher(),
             errorMessage: errorSubject.eraseToAnyPublisher()
         )
+    }
+    
+    private func toggleBookmark(phraseId: Int, isBookmarked: Bool) {
+        toggleBookmarkUseCase.execute(phraseId: phraseId, isBookmarked: isBookmarked)
+            .sink(receiveCompletion: { [weak self] completion in
+                switch completion {
+                case .finished:
+                    self?.updateBookmarkState(phraseId: phraseId, isBookmarked: isBookmarked)
+                case .failure(let error):
+                    print("북마크 토글 실패: \(error.localizedDescription)")
+                }
+            }, receiveValue: { _ in
+            })
+            .store(in: &cancellables)
+    }
+    
+    private func updateBookmarkState(phraseId: Int, isBookmarked: Bool) {
+        let updated = recommendecVocaSubject.map { items -> [RecommendedVocaEntity.Phrase] in
+            items.map { item in
+                if item.phraseId == phraseId {
+                    return RecommendedVocaEntity.Phrase(
+                        phraseId: item.phraseId,
+                        phraseType: item.phraseType,
+                        phrase: item.phrase,
+                        explanation: item.explanation,
+                        reason: item.reason,
+                        isBookmarked: isBookmarked
+                    )
+                } else {
+                    return item
+                }
+            }
+        }
+
     }
 }
