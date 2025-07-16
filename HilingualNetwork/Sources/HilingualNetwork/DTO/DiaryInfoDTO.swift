@@ -10,7 +10,7 @@ public struct DiaryInfoDTO: Decodable {
 
     public struct DiaryDataDTO: Decodable {
         public let diaryId: Int
-        public let imageUrl: String
+        public let imageUrl: String?
         public let originalText: String
     }
 }

@@ -168,7 +168,7 @@ final class SelectedInfo: UIView {
         [cardPreview, cardTopicView, emptyDiaryView, diaryLockView].forEach {
             $0.isHidden = true
         }
-
+        
         setSelectedDate(date)
 
         let today = Calendar.current.startOfDay(for: Date())
@@ -249,7 +249,6 @@ final class SelectedInfo: UIView {
         )
         return attributed
     }
-
 
     func setSelectedDate(_ date: Date) {
         let formatter = DateFormatter()
