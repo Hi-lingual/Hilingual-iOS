@@ -10,7 +10,7 @@ import HilingualDomain
 
 public final class VocaViewModel: BaseViewModel {
     
-    private let diaryId: Int
+    let diaryId: Int
     
     // MARK: - Input
     

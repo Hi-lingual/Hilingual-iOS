@@ -12,6 +12,7 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
     
     // MARK: - Properties
     
+    private let diaryId: Int
     private let diaryDetailView = DiaryDetailView()
     private var isHighlightingEnabled: Bool = true
     private lazy var dialog = Dialog()
@@ -22,12 +23,17 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
         return modal
     }()
     
-    private lazy var vc1 = diContainer.makeFeedbackViewController()
-    private lazy var vc2 = diContainer.makeVocaViewController()
+    private lazy var vc1 = diContainer.makeFeedbackViewController(diaryId: diaryId)
+    private lazy var vc2 = diContainer.makeVocaViewController(diaryId: diaryId)
     
     private var segmentedControl : SegmentedControl!
     
     // MARK: - LifeCycle
+    
+    public init(viewModel: DiaryDetailViewModel, diContainer: ViewControllerFactory, diaryId: Int) {
+        self.diaryId = diaryId
+        super.init(viewModel: viewModel, diContainer: diContainer)
+    }
     
     public override func viewDidLoad() {
         super.viewDidLoad()

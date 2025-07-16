@@ -14,6 +14,7 @@ public final class LoadingViewModel: BaseViewModel {
     // MARK: - Dependencies
 
     private let diaryWritingUseCase: DiaryWritingUseCase
+    @Published public var diaryId: Int? = nil
 
     // MARK: - Init
 
@@ -68,22 +69,7 @@ public final class LoadingViewModel: BaseViewModel {
         input.retryTapped
             .sink { [weak self] in self?.retryFeedback() }
             .store(in: &cancellables)
-
-        feedbackCompletedSubject
-            .sink { [weak self] result in
-                guard let self = self else { return }
-                Task { @MainActor in
-                    self.startLoadingState()
-                    switch result {
-                    case .success:
-                        await self.handleFeedbackCompleted(success: true)
-                    case .failure:
-                        await self.handleFeedbackCompleted(success: false)
-                    }
-                }
-            }
-            .store(in: &cancellables)
-
+        
         return Output(
             state: statePublisher,
             goToHome: input.closeTapped
@@ -129,8 +115,9 @@ public final class LoadingViewModel: BaseViewModel {
                         await self.handleFeedbackCompleted(success: false)
                     }
                 }
-            } receiveValue: { [weak self] _ in
+            } receiveValue: { [weak self] responseEntity in
                 guard let self = self else { return }
+                self.diaryId = responseEntity.diaryId
                 Task { @MainActor in
                     await self.handleFeedbackCompleted(success: true)
                 }

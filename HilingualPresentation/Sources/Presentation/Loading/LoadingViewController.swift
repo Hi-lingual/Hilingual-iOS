@@ -58,7 +58,11 @@ public final class LoadingViewController: BaseUIViewController<LoadingViewModel>
         case .loading:
             break
         case .success:
-            goToNextView()
+            if let diaryId = viewModel?.diaryId {
+                self.goToNextView(with: diaryId)
+            } else {
+                print("❌ diaryId가 nil이라서 화면 전환 안 됨")
+            }
         case .error:
             retryButtonTapped()
         }
@@ -91,8 +95,9 @@ public final class LoadingViewController: BaseUIViewController<LoadingViewModel>
             .store(in: &cancellables)
 
         output.state
+            .combineLatest(viewModel.$diaryId)
             .receive(on: RunLoop.main)
-            .sink { [weak self] state in
+            .sink { [weak self] state, diaryId in
                 guard let self = self else { return }
 
                 let viewState: LoadingView.State
@@ -102,6 +107,10 @@ public final class LoadingViewController: BaseUIViewController<LoadingViewModel>
                     viewState = .loading
                 case .success:
                     print("✅ 상태: 성공")
+                    guard let diaryId = diaryId else {
+                        print("❌ diaryId가 nil인데 success 상태? 로직 확인 필요")
+                        return
+                    }
                     viewState = .success
                 case .error:
                     print("❌ 상태: 에러")
@@ -115,12 +124,12 @@ public final class LoadingViewController: BaseUIViewController<LoadingViewModel>
 
     // MARK: - Navigation
 
-    private func goToNextView() {
-        let dairyDetailVC = self.diContainer.makeDiaryDetailViewController()
-        navigationController?.pushViewController(dairyDetailVC, animated: true)
+    private func goToNextView(with diaryId: Int) {
+        let diaryDetailVC = self.diContainer.makeDiaryDetailViewController(diaryId: diaryId)
+        navigationController?.pushViewController(diaryDetailVC, animated: true)
     }
-
+    
     private func goToHomeView() {
-        navigationController?.popViewController(animated: true)
+        navigationController?.popToRootViewController(animated: true)
     }
 }
