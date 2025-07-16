@@ -67,7 +67,7 @@ final class Dropdown: UIView {
     private let dropdownContentStack: UIStackView = {
         let stack = UIStackView()
         stack.axis = .horizontal
-        stack.distribution = .equalSpacing
+        stack.distribution = .fill
         stack.alignment = .center
         stack.backgroundColor = .white
         stack.layer.cornerRadius = 8
@@ -82,6 +82,7 @@ final class Dropdown: UIView {
         label.text = "What surprised you today?"
         label.font = .suit(.body_sb_16)
         label.textColor = .gray700
+        label.numberOfLines = 2
         return label
     }()
     
@@ -146,6 +147,9 @@ final class Dropdown: UIView {
         changeButton.snp.makeConstraints {
             $0.size.equalTo(20)
         }
+        
+        dropdownContentStack.setCustomSpacing(12, after: topicEnLabel)
+
     }
     
     // MARK: - Actions
