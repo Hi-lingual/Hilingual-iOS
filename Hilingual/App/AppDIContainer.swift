@@ -39,19 +39,19 @@ final class AppDIContainer: ViewControllerFactory {
     }
     
     public func makeDiaryDetailViewController(diaryId: Int) -> DiaryDetailViewController {
-        print("📝 makeDiaryDetailViewController 호출됨, diaryId: \(diaryId)")
-        let viewModel = makeDiaryDetailViewModel(diaryId: diaryId)
-        return DiaryDetailViewController(viewModel: viewModel, diContainer: self, diaryId: diaryId)
+        return DiaryDetailViewController(
+            viewModel: makeDiaryDetailViewModel(diaryId: diaryId),
+            diContainer: self,
+            diaryId: diaryId
+        )
     }
     
     public func makeFeedbackViewController(diaryId: Int) -> FeedbackViewController {
-        let viewModel = makeFeedbackViewModel(diaryId: diaryId)
-        return FeedbackViewController(viewModel: viewModel, diContainer: self)
+        return FeedbackViewController(viewModel: makeFeedbackViewModel(diaryId: diaryId), diContainer: self)
     }
-
+    
     public func makeVocaViewController(diaryId: Int) -> VocaViewController {
-        let viewModel = makeVocaViewModel(diaryId: diaryId)
-        return VocaViewController(viewModel: viewModel, diContainer: self)
+        return VocaViewController(viewModel: makeVocaViewModel(diaryId: diaryId), diContainer: self)
     }
 
     func makeOnboardingViewController() -> HilingualPresentation.OnBoardingViewController {
@@ -191,12 +191,8 @@ extension AppDIContainer {
     
     // MARK: - diaryId 수정
     
-    func makeFeedbackViewModel(diaryId: Int) -> FeedbackViewModel {
-        return FeedbackViewModel(
-            diaryId: diaryId,
-            diaryDetailUseCase: makeDiaryDetailUseCase(),
-            feedbackUseCase: makeFeedbackUseCase()
-        )
+    private func makeFeedbackViewModel(diaryId: Int) -> FeedbackViewModel {
+        return FeedbackViewModel(diaryId: diaryId, diaryDetailUseCase: makeDiaryDetailUseCase(), feedbackUseCase: makeFeedbackUseCase())
     }
     
     private func makeFeedbackUseCase() -> FeedbackUseCase {
@@ -213,12 +209,8 @@ extension AppDIContainer {
     
     // MARK: - diaryId 수정
     
-    func makeVocaViewModel(diaryId: Int) -> VocaViewModel {
-        return VocaViewModel(
-            diaryId: diaryId,
-            recommendedVocaUseCase: makeVocaUseCase(),
-            toggleBookmarkUseCase: makeToggleBookmarkUseCase()
-        )
+    private func makeVocaViewModel(diaryId: Int) -> VocaViewModel {
+        return VocaViewModel(diaryId: diaryId, recommendedVocaUseCase: makeVocaUseCase(), toggleBookmarkUseCase: makeToggleBookmarkUseCase())
     }
     
     private func makeDiaryDetailUseCase() -> DiaryDetailUseCase {

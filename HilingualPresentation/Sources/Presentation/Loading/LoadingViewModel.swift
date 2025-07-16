@@ -45,6 +45,8 @@ public final class LoadingViewModel: BaseViewModel {
 
     public let feedbackCompletedSubject = PassthroughSubject<Result<Void, Error>, Never>()
 
+    public private(set) var diaryId: Int? 
+
     // MARK: - Input / Output
 
     public struct Input {
@@ -115,9 +117,11 @@ public final class LoadingViewModel: BaseViewModel {
                         await self.handleFeedbackCompleted(success: false)
                     }
                 }
-            } receiveValue: { [weak self] responseEntity in
+            } receiveValue: { [weak self] response in
                 guard let self = self else { return }
-                self.diaryId = responseEntity.diaryId
+
+                self.diaryId = response.diaryId
+
                 Task { @MainActor in
                     await self.handleFeedbackCompleted(success: true)
                 }

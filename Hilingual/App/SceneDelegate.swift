@@ -22,53 +22,31 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window.backgroundColor = .white
         self.window = window
 
-        let appDI = AppDIContainer.shared
-        let loginVC = appDI.makeWordBookViewController()
-        let navigation = UINavigationController(rootViewController: loginVC)
-
-        window.rootViewController = navigation
+        // Step 1: Launch 화면 표시
         let launchScreenVC = LaunchScreen()
         window.rootViewController = launchScreenVC
         window.makeKeyAndVisible()
 
+        // Step 2: 0.7초 후 SplashViewController로 전환
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) {
             let appDI = AppDIContainer.shared
-
-            let splashVC = appDI.makeTabBarViewController()
+            let splashVC = appDI.makeSplashViewController()
             let navigation = UINavigationController(rootViewController: splashVC)
             navigation.setNavigationBarHidden(true, animated: false)
-            navigation.view.layoutIfNeeded()
 
             UIView.transition(with: window,
                               duration: 0.5,
                               options: [.transitionCrossDissolve],
                               animations: {
                 window.rootViewController = navigation
-            }, completion: nil)
+            })
         }
     }
 
-    func sceneDidBecomeActive(_ scene: UIScene) {
-        // Called when the scene has moved from an inactive state to an active state.
-        // Use this method to restart any tasks that were paused (or not yet started) when the scene was inactive.
-    }
+    // MARK: - Scene Lifecycle (기본 제공 메서드)
 
-    func sceneWillResignActive(_ scene: UIScene) {
-        // Called when the scene will move from an active state to an inactive state.
-        // This may occur due to temporary interruptions (ex. an incoming phone call).
-    }
-
-    func sceneWillEnterForeground(_ scene: UIScene) {
-        // Called as the scene transitions from the background to the foreground.
-        // Use this method to undo the changes made on entering the background.
-    }
-
-    func sceneDidEnterBackground(_ scene: UIScene) {
-        // Called as the scene transitions from the foreground to the background.
-        // Use this method to save data, release shared resources, and store enough scene-specific state information
-        // to restore the scene back to its current state.
-    }
-
-
+    func sceneDidBecomeActive(_ scene: UIScene) { }
+    func sceneWillResignActive(_ scene: UIScene) { }
+    func sceneWillEnterForeground(_ scene: UIScene) { }
+    func sceneDidEnterBackground(_ scene: UIScene) { }
 }
-
