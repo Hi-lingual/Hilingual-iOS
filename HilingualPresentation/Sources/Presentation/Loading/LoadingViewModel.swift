@@ -7,119 +7,151 @@
 
 import Foundation
 import Combine
-
 import HilingualDomain
 
 public final class LoadingViewModel: BaseViewModel {
-    
+
+    // MARK: - Dependencies
+
     private let diaryWritingUseCase: DiaryWritingUseCase
-    
+
+    // MARK: - Init
+
     public init(diaryWritingUseCase: DiaryWritingUseCase) {
         self.diaryWritingUseCase = diaryWritingUseCase
         super.init()
     }
-    
+
+    // MARK: - State Enum
+
     public enum State {
         case loading
         case success
         case error
     }
-    
+
     // MARK: - Properties
-    
-    @Published private(set) var state: State = .loading
+
+    private let stateSubject = CurrentValueSubject<State, Never>(.loading)
+    public var statePublisher: AnyPublisher<State, Never> {
+        stateSubject.eraseToAnyPublisher()
+    }
+
     private var startTime: Date?
-    
     private var errorCount = 0
-    let maxErrorCount = 2
-    
-    public let feedbackCompletedSubject = PassthroughSubject<Void, Never>()
-    
+    private let maxErrorCount = 2
+    private var diaryEntity: DiaryWritingEntity?
+
+    public let feedbackCompletedSubject = PassthroughSubject<Result<Void, Error>, Never>()
+
     // MARK: - Input / Output
-    
+
     public struct Input {
         let startLoading: AnyPublisher<Void, Never>
         let retryTapped: AnyPublisher<Void, Never>
         let closeTapped: AnyPublisher<Void, Never>
     }
-    
+
     public struct Output {
         let state: AnyPublisher<State, Never>
         let goToHome: AnyPublisher<Void, Never>
     }
-    
+
     // MARK: - Transform
+
     @MainActor
     public func transform(input: Input) -> Output {
         input.startLoading
-            .sink { [weak self] in
-                guard let self = self else { return }
-                Task { @MainActor in
-                    await self.startLoading()
-                }
-            }
+            .sink { [weak self] in self?.startLoadingState() }
             .store(in: &cancellables)
-        
+
         input.retryTapped
-            .sink { [weak self] in
+            .sink { [weak self] in self?.retryFeedback() }
+            .store(in: &cancellables)
+
+        feedbackCompletedSubject
+            .sink { [weak self] result in
                 guard let self = self else { return }
                 Task { @MainActor in
-                    await self.startLoading()
+                    self.startLoadingState()
+                    switch result {
+                    case .success:
+                        await self.handleFeedbackCompleted(success: true)
+                    case .failure:
+                        await self.handleFeedbackCompleted(success: false)
+                    }
                 }
             }
             .store(in: &cancellables)
-        
-        let goToHome = input.closeTapped
-            .eraseToAnyPublisher()
-        
-        feedbackCompletedSubject
-            .sink { [weak self] in
+
+        return Output(
+            state: statePublisher,
+            goToHome: input.closeTapped
+        )
+    }
+
+    // MARK: - External API
+
+    @MainActor
+    public func requestFeedback(with entity: DiaryWritingEntity) {
+        self.diaryEntity = entity
+        postDiary(entity: entity)
+    }
+
+    // MARK: - Internal
+
+    @MainActor
+    private func retryFeedback() {
+        guard let entity = diaryEntity else {
+            print("❌ diaryEntity가 nil입니다. API 호출 불가")
+            return
+        }
+        print("📡 다시 요청 - API 호출 시작")
+        postDiary(entity: entity)
+    }
+
+    @MainActor
+    private func startLoadingState() {
+        print("🔄 Loading 상태 진입")
+        stateSubject.send(.loading)
+        startTime = Date()
+    }
+
+    @MainActor
+    private func postDiary(entity: DiaryWritingEntity) {
+        startLoadingState()
+
+        diaryWritingUseCase.postDiaryWriting(entity)
+            .sink { [weak self] completion in
+                guard let self = self else { return }
+                if case .failure = completion {
+                    Task { @MainActor in
+                        await self.handleFeedbackCompleted(success: false)
+                    }
+                }
+            } receiveValue: { [weak self] _ in
                 guard let self = self else { return }
                 Task { @MainActor in
                     await self.handleFeedbackCompleted(success: true)
                 }
             }
             .store(in: &cancellables)
-        
-        return Output(
-            state: $state.eraseToAnyPublisher(),
-            goToHome: goToHome
-        )
     }
-    
-    // MARK: - Private methods
-    
-    @MainActor
-    private func startLoading() async {
-        state = .loading
-        startTime = Date()
-        
-        // 실제 API 콜이 들어갈 자리
-        // 테스트용: 1초 대기 후 결과 시뮬레이션
-        try? await Task.sleep(nanoseconds: 1_000_000_000)
-        
-        let success = Bool.random()
-        await handleFeedbackCompleted(success: success)
-    }
-    
+
     @MainActor
     private func handleFeedbackCompleted(success: Bool) async {
         guard let startTime = startTime else { return }
+
         let elapsed = Date().timeIntervalSince(startTime)
         let delay = max(3 - elapsed, 0)
-        
         try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
-        
+
         if success {
             errorCount = 0
-            state = .success
+            stateSubject.send(.success)
         } else {
             errorCount += 1
-            if errorCount >= maxErrorCount {
-                state = .error
-            } else {
-                await startLoading()
-            }
+            stateSubject.send(.error)
         }
     }
 }

@@ -9,6 +9,7 @@ import Foundation
 import Combine
 
 import PhotosUI
+import HilingualDomain
 
 public final class DiaryWritingViewController: BaseUIViewController<DiaryWritingViewModel>, TextViewDelegate {
     
@@ -57,22 +58,24 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
     
     @objc private func feedbackButtonTapped() {
         let text = diaryWritingView.textView.text ?? ""
-        
+
         let imageData: Data?
         if let image = diaryWritingView.selectedImageView.image {
             imageData = image.jpegData(compressionQuality: 0.8)
         } else {
             imageData = nil
         }
-        
+
         let dateString = selectedDate.toString(format: "yyyy-MM-dd")
-        
         print("📤 postDiary 호출")
-        viewModel?.postDiary(originalText: text, date: dateString, imageFile: imageData)
-        
+
+        let entity = DiaryWritingEntity(originalText: text, date: dateString, imageFile: imageData)
+
         let loadingVC = self.diContainer.makeLoadingViewController()
+        loadingVC.viewModel?.requestFeedback(with: entity)
         navigationController?.pushViewController(loadingVC, animated: true)
     }
+
     
     private func showDialog() {
         dialog.configure(
@@ -127,6 +130,27 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
                 self.diaryWritingView.tooltip.isHidden = isActive
             }
             .store(in: &cancellables)
+
+        viewModel?.$successDiaryId
+            .compactMap { $0 }
+            .sink { [weak self] _ in
+                self?.notifyLoadingVC(.success(()))
+            }
+            .store(in: &cancellables)
+
+        viewModel?.$error
+            .compactMap { $0 }
+            .sink { [weak self] error in
+                self?.notifyLoadingVC(.failure(error))
+            }
+            .store(in: &cancellables)
+    }
+
+    private func notifyLoadingVC(_ result: Result<Void, Error>) {
+        guard let loadingVC = navigationController?.viewControllers.last(where: { $0 is LoadingViewController }) as? LoadingViewController else {
+            return
+        }
+        loadingVC.viewModel?.feedbackCompletedSubject.send(result)
     }
     
     func textView(_ textView: TextView, didChangeTextCount count: Int) {

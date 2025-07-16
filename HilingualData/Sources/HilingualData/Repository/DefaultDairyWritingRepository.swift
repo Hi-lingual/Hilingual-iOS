@@ -28,7 +28,7 @@ public final class DefaultDiaryWritingRepository: DiaryWritingRepository {
         
         return service.postDiaryWriting(requestDTO: requestDTO)
             .map { responseDTO in
-                DiaryWritingResponseEntity(diaryId: responseDTO.data.diaryId)
+                DiaryWritingResponseEntity(diaryId: responseDTO.data.id)
             }
             .eraseToAnyPublisher()
     }
