@@ -37,16 +37,29 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
         self.view = wordBookView
     }
 
+    public override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(true, animated: animated)
+    }
+
+    public override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        navigationController?.setNavigationBarHidden(false, animated: animated)
+    }
+
     public override func viewDidLoad() {
         super.viewDidLoad()
 
-        if let tabView = tabBarController?.view {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self,
+                  let window = self.view.window ?? UIApplication.shared.windows.first else { return }
+
             modal.isHidden = true
-            tabView.addSubview(modal)
+            window.addSubview(modal)
             modal.snp.makeConstraints { $0.edges.equalToSuperview() }
 
             wordDetailDialog.isHidden = true
-            tabView.addSubview(wordDetailDialog)
+            window.addSubview(wordDetailDialog)
             wordDetailDialog.snp.makeConstraints { $0.edges.equalToSuperview() }
         }
     }

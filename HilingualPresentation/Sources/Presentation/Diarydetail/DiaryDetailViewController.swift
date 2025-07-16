@@ -12,6 +12,8 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
     
     // MARK: - Properties
     
+    let diaryId: Int
+    
     private let diaryDetailView = DiaryDetailView()
     private var isHighlightingEnabled: Bool = true
     private lazy var dialog = Dialog()
@@ -22,10 +24,19 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
         return modal
     }()
     
-    private lazy var vc1 = diContainer.makeFeedbackViewController()
-    private lazy var vc2 = diContainer.makeVocaViewController()
+    private lazy var vc1 = diContainer.makeFeedbackViewController(diaryId: diaryId)
+    private lazy var vc2 = diContainer.makeVocaViewController(diaryId: diaryId)
     
     private var segmentedControl : SegmentedControl!
+    
+    public init(viewModel: DiaryDetailViewModel, diContainer: ViewControllerFactory, diaryId: Int) {
+        self.diaryId = diaryId
+        super.init(viewModel: viewModel, diContainer: diContainer)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     // MARK: - LifeCycle
     
@@ -69,6 +80,10 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
     
     public override func navigationType() -> NavigationType? {
         return .backTitleMenu("일기장")
+    }
+    
+    @objc public override func backButtonTapped() {
+        navigationController?.popToRootViewController(animated: true)
     }
     
     // MARK: - Actions
