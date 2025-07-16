@@ -51,7 +51,7 @@ public final class TabBarViewController: UITabBarController {
         )
 
         let communityVC = makeTabItem(
-            viewController: factory.makeDiaryDetailViewController(),
+            viewController: factory.makeHomeViewController(),
             title: "커뮤니티",
             selectedImageName: "ic_community_black_24_ios",
             unselectedImageName: "ic_community_gray_24_ios"

@@ -78,7 +78,6 @@ final class WordCard: UIView {
             reasonLabel.isHidden = true
             savedDateLabel.isHidden = true
 
-            // ✅ 높이 0으로 고정하여 완전히 제거
             explanationLabel.snp.remakeConstraints {
                 $0.height.equalTo(0)
             }
@@ -89,7 +88,6 @@ final class WordCard: UIView {
                 $0.height.equalTo(0)
             }
 
-            // ✅ phraseLabel은 하단에 닿도록 구성
             phraseLabel.snp.remakeConstraints {
                 $0.top.equalTo(chipStackView.snp.bottom).offset(4)
                 $0.leading.trailing.equalToSuperview().inset(12)
