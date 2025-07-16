@@ -82,7 +82,7 @@ final class DiaryWritingView: BaseUIView {
         return button
     }()
     
-    private let selectedImageView: UIImageView = {
+    let selectedImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true

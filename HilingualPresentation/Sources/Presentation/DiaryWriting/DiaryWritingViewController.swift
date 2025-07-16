@@ -56,10 +56,24 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
     }
     
     @objc private func feedbackButtonTapped() {
+        let text = diaryWritingView.textView.text ?? ""
+        
+        let imageData: Data?
+        if let image = diaryWritingView.selectedImageView.image {
+            imageData = image.jpegData(compressionQuality: 0.8)
+        } else {
+            imageData = nil
+        }
+        
+        let dateString = selectedDate.toString(format: "yyyy-MM-dd")
+        
+        print("📤 postDiary 호출")
+        viewModel?.postDiary(originalText: text, date: dateString, imageFile: imageData)
+        
         let loadingVC = self.diContainer.makeLoadingViewController()
         navigationController?.pushViewController(loadingVC, animated: true)
     }
-      
+    
     private func showDialog() {
         dialog.configure(
             title: "일기 작성을 취소하시겠어요?",
@@ -231,5 +245,14 @@ extension DiaryWritingViewController: VisionKitManagerDelegate {
     func didRecognizeText(_ text: String) {
         let limitedText = String(text.prefix(diaryWritingView.textView.maxCharacterCount))
         diaryWritingView.setText(limitedText)
+    }
+}
+
+extension Date {
+    func toString(format: String) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = format
+        formatter.locale = Locale(identifier: "ko_KR")
+        return formatter.string(from: self)
     }
 }

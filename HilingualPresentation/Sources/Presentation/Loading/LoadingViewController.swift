@@ -21,7 +21,6 @@ public final class LoadingViewController: BaseUIViewController<LoadingViewModel>
     
     public override func viewDidLoad() {
         super.viewDidLoad()
-        bind(viewModel: LoadingViewModel())
         
         addTarget()
         setStyle()
@@ -99,9 +98,8 @@ public final class LoadingViewController: BaseUIViewController<LoadingViewModel>
     }
     
     private func goToNextView() {
-        // TODO: - 소은이 뷰 붙이기
-//        let dairyDetailVC = DairyDetailViewController()
-//        navigationController?.pushViewController(dairyDetailVC, animated: true)
+        let dairyDetailVC = self.diContainer.makeDiaryDetailViewController()
+        navigationController?.pushViewController(dairyDetailVC, animated: true)
     }
     
     private func goToHomeView() {

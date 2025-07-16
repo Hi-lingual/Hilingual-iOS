@@ -152,8 +152,21 @@ extension AppDIContainer {
 // MARK: - DiaryDIContainer
 
 extension AppDIContainer {
+    
+    private func makeDiaryWritingService() -> DiaryWritingService {
+        return DefaultDiaryWritingService()
+    }
+
+    private func makeDiaryWritingRepository() -> DiaryWritingRepository {
+        return DefaultDiaryWritingRepository(service: makeDiaryWritingService())
+    }
+
+    private func makeDiaryWritingUseCase() -> DiaryWritingUseCase {
+        return DefaultDiaryWritingUseCase(repository: makeDiaryWritingRepository())
+    }
+
     private func makeDiaryWritingViewModel() -> DiaryWritingViewModel {
-        return DiaryWritingViewModel()
+        return DiaryWritingViewModel(diaryWritingUseCase: makeDiaryWritingUseCase())
     }
 }
 
@@ -238,7 +251,7 @@ extension AppDIContainer {
 
 extension AppDIContainer {
     private func makeLoadingViewModel() -> LoadingViewModel {
-        return LoadingViewModel()
+        return LoadingViewModel(diaryWritingUseCase: makeDiaryWritingUseCase())
     }
 }
 

@@ -51,6 +51,14 @@ final class LoadingView: BaseUIView {
         return view
     }()
     
+    private let errorImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFit
+        imageView.image = UIImage(resource: .imgErrorIos)
+        imageView.isHidden = true
+        return imageView
+    }()
+    
     private let errorIcon: UIImageView = {
         let icon = UIImageView()
         icon.contentMode = .scaleAspectFit
@@ -103,7 +111,7 @@ final class LoadingView: BaseUIView {
     override func setUI() {
         addSubviews(titleLabel, subtitleLabel,
                     animationView, errorIcon, footerLabel,
-                    closeIcon, feedbackButton)
+                    closeIcon, feedbackButton, errorImageView)
     }
     
     override func setLayout() {
@@ -138,6 +146,13 @@ final class LoadingView: BaseUIView {
             $0.bottom.equalToSuperview().inset(50)
             $0.centerX.equalToSuperview()
             $0.horizontalEdges.equalToSuperview().inset(16)
+        }
+        
+        errorImageView.snp.makeConstraints {
+            $0.top.equalTo(titleLabel.snp.bottom).offset(20)
+            $0.centerX.equalToSuperview()
+            $0.width.equalTo(200)
+            $0.height.equalTo(175)
         }
     }
     
@@ -186,9 +201,8 @@ final class LoadingView: BaseUIView {
         case .error:
             titleLabel.text = "앗! 일시적인 오류가 발생했어요."
             subtitleLabel.isHidden = true
-            // TODO: - 영서가 추가한 에셋 추가 예정
-            animationView.animation = LottieAnimation.named("feedback_error", bundle: .module)
-            animationView.play()
+            
+            errorImageView.isHidden = false
             
             errorIcon.isHidden = true
             footerLabel.isHidden = true

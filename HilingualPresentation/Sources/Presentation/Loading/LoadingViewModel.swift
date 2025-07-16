@@ -10,8 +10,14 @@ import Combine
 
 import HilingualDomain
 
-@MainActor
 public final class LoadingViewModel: BaseViewModel {
+    
+    private let diaryWritingUseCase: DiaryWritingUseCase
+    
+    public init(diaryWritingUseCase: DiaryWritingUseCase) {
+        self.diaryWritingUseCase = diaryWritingUseCase
+        super.init()
+    }
     
     public enum State {
         case loading
@@ -43,7 +49,7 @@ public final class LoadingViewModel: BaseViewModel {
     }
     
     // MARK: - Transform
-    
+    @MainActor
     public func transform(input: Input) -> Output {
         input.startLoading
             .sink { [weak self] in
