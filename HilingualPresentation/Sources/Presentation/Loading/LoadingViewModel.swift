@@ -45,8 +45,6 @@ public final class LoadingViewModel: BaseViewModel {
 
     public let feedbackCompletedSubject = PassthroughSubject<Result<Void, Error>, Never>()
 
-    public private(set) var diaryId: Int? 
-
     // MARK: - Input / Output
 
     public struct Input {

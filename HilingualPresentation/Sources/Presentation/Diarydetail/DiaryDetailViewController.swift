@@ -40,11 +40,6 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
     
     // MARK: - LifeCycle
     
-    public init(viewModel: DiaryDetailViewModel, diContainer: ViewControllerFactory, diaryId: Int) {
-        self.diaryId = diaryId
-        super.init(viewModel: viewModel, diContainer: diContainer)
-    }
-    
     public override func viewDidLoad() {
         super.viewDidLoad()
         
