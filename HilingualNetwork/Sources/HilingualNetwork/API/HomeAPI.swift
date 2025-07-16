@@ -10,19 +10,29 @@ import Foundation
 import Moya
 
 public enum HomeAPI {
-    case getRate
+    case getUserInfo
 }
 
 extension HomeAPI: BaseTargetType {
+
     public var path: String {
-        return "/money"
+        switch self {
+        case .getUserInfo:
+            return "/users/info"
+        }
     }
 
     public var method: Moya.Method {
-        return .get
+        switch self {
+        case .getUserInfo:
+            return .get
+        }
     }
 
     public var task: Task {
-        return .requestPlain
+        switch self {
+        case .getUserInfo:
+            return .requestPlain
+        }
     }
 }
