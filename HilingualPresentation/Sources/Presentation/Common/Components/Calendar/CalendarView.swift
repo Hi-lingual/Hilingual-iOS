@@ -176,6 +176,11 @@ final class CalendarView: UIView {
         collectionView.reloadData()
         invalidateIntrinsicContentSize()
     }
+    
+    public func reloadData() {
+        collectionView.reloadData()
+        invalidateIntrinsicContentSize()
+    }
 }
 
 // MARK: - Extensions

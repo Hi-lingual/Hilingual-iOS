@@ -10,6 +10,8 @@ import SnapKit
 
 final class HomeView: BaseUIView {
     
+    var onMonthChanged: ((Int, Int) -> Void)?
+    
     // MARK: - UI Components
     
     internal let profileView = ProfileView()
@@ -36,7 +38,7 @@ final class HomeView: BaseUIView {
     }()
     
     // MARK: - Custom Method
-        
+    
     override func setUI() {
         
         backgroundColor = .hilingualBlack
@@ -50,19 +52,19 @@ final class HomeView: BaseUIView {
             selectedInfo,
             spacer2
         )
-
+        
         bindCalendar()
         
     }
-        
+    
     override func setLayout() {
-
+        
         profileView.snp.makeConstraints {
             $0.top.equalTo(safeAreaLayoutGuide).inset(8)
             $0.horizontalEdges.equalToSuperview()
             $0.height.equalTo(46)
         }
-                
+        
         headerView.snp.makeConstraints {
             $0.top.equalTo(profileView.snp.bottom).offset(12)
             $0.horizontalEdges.equalToSuperview()
@@ -98,14 +100,19 @@ final class HomeView: BaseUIView {
     }
     
     // MARK: - Binding
-
+    
     // 캘린더 하나로 묶기
     private func bindCalendar() {
         headerView.onMonthChanged = { [weak self] newDate in
             self?.calendarView.reload(for: newDate)
+            
+            let calendar = Calendar.current
+            let year = calendar.component(.year, from: newDate)
+            let month = calendar.component(.month, from: newDate)
+            
+            self?.onMonthChanged?(year, month)
         }
-
-        //선택된 날짜 반영
+        
         calendarView.onDateSelected = { [weak self] date in
             self?.selectedInfo.setSelectedDate(date)
         }

@@ -6,6 +6,7 @@
 //
 
 import Combine
+import Foundation
 import HilingualDomain
 
 public final class HomeViewModel: BaseViewModel {
@@ -13,13 +14,14 @@ public final class HomeViewModel: BaseViewModel {
     // MARK: - Input
 
     public struct Input {
-        // 필요한 Input이 있다면 여기에 나중에 추가
+        let monthChange = PassthroughSubject<(Int, Int), Never>()
     }
 
     // MARK: - Output
 
     public struct Output {
         let userInfo: AnyPublisher<UserInfoEntity, Error>
+        let filledDates: AnyPublisher<[Date], Never>
     }
 
     // MARK: - Properties
@@ -38,7 +40,29 @@ public final class HomeViewModel: BaseViewModel {
         let userInfoPublisher = useCase.fetchUserInfo()
             .eraseToAnyPublisher()
 
-        return Output(userInfo: userInfoPublisher)
+        let filledDatesPublisher = input.monthChange
+            .flatMap { year, month in
+                self.useCase.fetchMonthInfo(year: year, month: month)
+                    .map { $0.dates }
+                    .catch { _ in Just([]) }
+            }
+            .eraseToAnyPublisher()
+
+        return Output(
+            userInfo: userInfoPublisher,
+            filledDates: filledDatesPublisher
+        )
+    }
+
+    // MARK: - Additional Fetch Methods
+
+    public func fetchDiary(for date: Date) -> AnyPublisher<DiaryInfoEntity?, Error> {
+        let dateString = date.toFormattedString("yyyy-MM-dd")
+        return useCase.fetchDiaryInfo(for: dateString)
+    }
+
+    public func fetchTopic(for date: Date) -> AnyPublisher<TopicEntity?, Error> {
+        let dateString = date.toFormattedString("yyyy-MM-dd")
+        return useCase.fetchTopic(for: dateString)
     }
 }
-
