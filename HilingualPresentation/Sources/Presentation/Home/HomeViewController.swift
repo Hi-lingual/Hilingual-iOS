@@ -108,7 +108,6 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
             }
 
             if isDiaryDate {
-                // 일기 조회만
                 self.viewModel?.fetchDiary(for: date)
                     .receive(on: RunLoop.main)
                     .sink(receiveCompletion: { completion in
@@ -116,20 +115,21 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                             print("일기 조회 실패: \(error.localizedDescription)")
                         }
                     }, receiveValue: { [weak self] diary in
-                        guard let self else { return }
+                        guard let self, let diary else { return }
 
                         self.homeView.selectedInfo.updateView(
                             for: date,
-                            diaryId: diary?.diaryId,
+                            diaryId: diary.diaryId,
                             remainingTime: 0,
                             topicData: nil,
-                            diaryData: diary?.originalText,
-                            imageURL: diary?.imageUrl
+                            diaryData: diary.originalText,
+                            imageURL: diary.imageUrl
                         )
+
+                        self.goToDiaryDetailView(diaryId: diary.diaryId)
                     })
                     .store(in: &self.viewModel!.cancellables)
             } else {
-                // 주제 조회만
                 self.viewModel?.fetchTopic(for: date)
                     .receive(on: RunLoop.main)
                     .sink(receiveCompletion: { completion in
@@ -151,6 +151,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                     .store(in: &self.viewModel!.cancellables)
             }
         }
+
         homeView.calendarView.onDateSelected?(today)
     }
 
@@ -165,5 +166,12 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         )
         diaryWritingVC.hidesBottomBarWhenPushed = true
         navigationController?.pushViewController(diaryWritingVC, animated: true)
+    }
+
+    private func goToDiaryDetailView(diaryId: Int) {
+        navigationController?.setNavigationBarHidden(false, animated: false)
+        let detailVC = diContainer.makeDiaryDetailViewController(diaryId: diaryId)
+        detailVC.hidesBottomBarWhenPushed = true
+        navigationController?.pushViewController(detailVC, animated: true)
     }
 }
