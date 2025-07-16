@@ -35,18 +35,10 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
 
     public override func loadView() {
         self.view = wordBookView
-
-        wordBookView.sortButton.addTarget(self, action: #selector(didTapSort), for: .touchUpInside)
-
-        if let emptyButton = wordBookView.emptyView.viewWithTag(999) as? UIButton {
-            emptyButton.addTarget(self, action: #selector(didTapEmptyAdd), for: .touchUpInside)
-        }
     }
 
     public override func viewDidLoad() {
         super.viewDidLoad()
-
-        wordBookView.refreshControl.addTarget(self, action: #selector(didPullToRefresh), for: .valueChanged)
 
         if let tabView = tabBarController?.view {
             modal.isHidden = true
@@ -59,10 +51,18 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
         }
     }
 
+    // MARK: - Custom Method
+
     public override func setDelegate() {
         wordBookView.tableView.dataSource = self
         wordBookView.tableView.delegate = self
         wordBookView.searchBar.delegate = self
+    }
+
+    public override func addTarget() {
+        wordBookView.refreshControl.addTarget(self, action: #selector(didPullToRefresh), for: .valueChanged)
+        wordBookView.sortButton.addTarget(self, action: #selector(didTapSort), for: .touchUpInside)
+        wordBookView.emptyView.emptyButton.addTarget(self, action: #selector(didTapEmptyAdd), for: .touchUpInside)
     }
 
     public override func bind(viewModel: WordBookViewModel) {
@@ -103,21 +103,12 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
             .store(in: &cancellables)
     }
 
-    // MARK: - Private Helpers
+    // MARK: - Private Methods
 
     private func updateViewState() {
         let isEmpty = fullWordList.allSatisfy { $0.1.isEmpty }
         wordBookView.tableView.isHidden = isEmpty
         wordBookView.emptyView.isHidden = !isEmpty
-    }
-
-    @objc
-    private func didTapSort() {
-        modal.configure(selectedIndex: selectedSortIndex) { [weak self] selected in
-            self?.updateSort(by: selected)
-        }
-        modal.isHidden = false
-        modal.showAnimation()
     }
 
     private func updateSort(by index: Int) {
@@ -138,19 +129,6 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
         modal.isHidden = true
     }
 
-    @objc
-    private func didPullToRefresh() {
-        refreshSubject.send(())
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { [weak self] in
-            self?.wordBookView.refreshControl.endRefreshing()
-        }
-    }
-
-    @objc
-    private func didTapEmptyAdd() {
-        print("일기 쓰러 이동")
-    }
-
     private func filterWords(for keyword: String) {
         guard !keyword.isEmpty else {
             filteredWordList = fullWordList
@@ -166,6 +144,31 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
         }
 
         wordBookView.tableView.reloadData()
+    }
+
+    //MARK: - Action Method
+
+    @objc
+    private func didPullToRefresh() {
+        refreshSubject.send(())
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { [weak self] in
+            self?.wordBookView.refreshControl.endRefreshing()
+        }
+    }
+
+    @objc
+    private func didTapEmptyAdd() {
+        print("일기 쓰러 이동")
+        tabBarController?.selectedIndex = 0
+    }
+
+    @objc
+    private func didTapSort() {
+        modal.configure(selectedIndex: selectedSortIndex) { [weak self] selected in
+            self?.updateSort(by: selected)
+        }
+        modal.isHidden = false
+        modal.showAnimation()
     }
 }
 

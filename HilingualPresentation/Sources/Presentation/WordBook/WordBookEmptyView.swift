@@ -28,7 +28,7 @@ final class WordBookEmptyView: UIView {
         return label
     }()
 
-    let emptyButton: UIButton = {
+    public let emptyButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("일기 쓰고 단어 추가하기", for: .normal)
         button.setTitleColor(.white, for: .normal)
@@ -36,7 +36,6 @@ final class WordBookEmptyView: UIView {
         button.backgroundColor = .hilingualBlack
         button.layer.cornerRadius = 12
         button.clipsToBounds = true
-        button.tag = 999
         return button
     }()
 

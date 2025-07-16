@@ -157,8 +157,7 @@ final class WordBookView: BaseUIView {
 
         emptyView.snp.makeConstraints {
             $0.top.equalTo(navigationContainer.snp.bottom).offset(120)
-            $0.leading.trailing.equalToSuperview().inset(20)
-            $0.centerX.equalToSuperview().priority(.low)
+            $0.leading.trailing.bottom.equalToSuperview()
         }
     }
 
