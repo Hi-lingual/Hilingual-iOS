@@ -19,6 +19,7 @@ final class SelectedInfo: UIView {
     private let emptyDiaryView = EmptyDiaryView()
     private let diaryLockView = DiaryLockView()
     
+    private let diaryContainerView = UIView()
     
     private let selectedDayLabel: UILabel = {
         let label = UILabel()
@@ -99,12 +100,16 @@ final class SelectedInfo: UIView {
         
         backgroundColor = .white
         
-        addSubviews(
-            headerStack,
+        diaryContainerView.addSubviews(
             cardTopicView,
             cardPreview,
             emptyDiaryView,
             diaryLockView
+        )
+
+        addSubviews(
+            headerStack,
+            diaryContainerView
         )
         
         selectedDayStack.addArrangedSubviews(
@@ -146,11 +151,15 @@ final class SelectedInfo: UIView {
             $0.top.equalToSuperview().inset(12)
             $0.horizontalEdges.equalToSuperview().inset(16)
         }
-        
+
+        diaryContainerView.snp.makeConstraints {
+            $0.top.equalTo(headerStack.snp.bottom).offset(12)
+            $0.horizontalEdges.bottom.equalToSuperview()
+        }
+
         [cardTopicView, cardPreview, emptyDiaryView, diaryLockView].forEach {
             $0.snp.makeConstraints {
-                $0.top.equalTo(headerStack.snp.bottom).offset(12)
-                $0.horizontalEdges.bottom.equalToSuperview()
+                $0.edges.equalToSuperview()
             }
         }
     }
@@ -229,16 +238,28 @@ final class SelectedInfo: UIView {
     }
 
     private func formatRemainingTime(_ remainingTime: Int) -> NSAttributedString {
-        let hours = remainingTime / 60
-        let fullText = "\(hours)시간 남았어요"
+        let fullText: String
+        let highlightText: String
+
+        if remainingTime >= 60 {
+            let hours = remainingTime / 60
+            highlightText = "\(hours)"
+            fullText = "\(highlightText)시간 남았어요"
+        } else {
+            let minutes = max(1, remainingTime)
+            highlightText = "\(minutes)"
+            fullText = "\(highlightText)분 남았어요"
+        }
+
         let attributed = NSMutableAttributedString(string: fullText)
         attributed.addAttribute(
             .foregroundColor,
             value: UIColor.hilingualOrange,
-            range: NSRange(location: 0, length: "\(hours)".count)
+            range: (fullText as NSString).range(of: highlightText)
         )
         return attributed
     }
+
 
     func setSelectedDate(_ date: Date) {
         let formatter = DateFormatter()
