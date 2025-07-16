@@ -13,11 +13,7 @@ public enum HomeAPI {
     case getUserInfo
 }
 
-extension HomeAPI: TargetType {
-    
-    public var baseURL: URL {
-        return NetworkEnvironment.shared.baseURL
-    }
+extension HomeAPI: BaseTargetType {
 
     public var path: String {
         switch self {
@@ -38,19 +34,5 @@ extension HomeAPI: TargetType {
         case .getUserInfo:
             return .requestPlain
         }
-    }
-
-    public var headers: [String: String]? {
-        switch self {
-        case .getUserInfo:
-            return [
-                "Content-Type": "application/json",
-                "Authorization": "Bearer \(UserDefaultHandler.accessToken)"
-            ]
-        }
-    }
-
-    public var sampleData: Data {
-        return Data()
     }
 }
