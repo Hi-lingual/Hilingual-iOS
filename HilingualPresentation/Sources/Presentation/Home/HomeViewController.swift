@@ -87,14 +87,20 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
             )
             .store(in: &viewModel.cancellables)
 
-        // 채워진 날짜 바인딩
         output.filledDates
             .receive(on: RunLoop.main)
             .sink { [weak self] dates in
                 guard let self else { return }
                 self.homeView.calendarView.filledDates = dates
+                
+                if !self.didSendInitialMonth {
+                    self.didSendInitialMonth = true
+                    let selectedDate = self.homeView.calendarView.selectedDate ?? Date()
+                    self.homeView.calendarView.onDateSelected?(selectedDate)
+                }
             }
             .store(in: &viewModel.cancellables)
+
 
         // 날짜 선택 이벤트 처리
         homeView.calendarView.onDateSelected = { [weak self] date in
