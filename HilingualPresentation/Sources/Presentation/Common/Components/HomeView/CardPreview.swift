@@ -126,4 +126,12 @@ final class CardPreview: UIView {
             }
         }
     }
+    
+    func configure(text: String?, imageUrl: String?) {
+        if let url = imageUrl, !url.isEmpty {
+            configure(type: .textWithImage(text: text, imageUrl: url))
+        } else {
+            configure(type: .textOnly(text: text))
+        }
+    }
 }
