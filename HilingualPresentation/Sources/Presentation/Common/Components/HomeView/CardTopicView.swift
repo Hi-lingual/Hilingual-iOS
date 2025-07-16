@@ -125,6 +125,7 @@ final class CardTopicView: UIView {
         }
 
         cardStack.snp.makeConstraints {
+            $0.top.equalToSuperview().offset(0)
             $0.horizontalEdges.equalToSuperview().inset(16)
         }
         
