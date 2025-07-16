@@ -10,6 +10,8 @@ import HilingualDomain
 
 public final class VocaViewModel: BaseViewModel {
     
+    private let diaryId: Int
+    
     // MARK: - Input
     
     public struct Input {
@@ -34,7 +36,8 @@ public final class VocaViewModel: BaseViewModel {
     
     private let errorSubject = PassthroughSubject<String, Never>()
 
-    public init(recommendedVocaUseCase: RecommendedUseCase, toggleBookmarkUseCase: ToggleBookmarkUseCase) {
+    public init(diaryId: Int, recommendedVocaUseCase: RecommendedUseCase, toggleBookmarkUseCase: ToggleBookmarkUseCase) {
+        self.diaryId = diaryId
         self.recommendedVocaUseCase = recommendedVocaUseCase
         self.toggleBookmarkUseCase = toggleBookmarkUseCase
     }
@@ -44,7 +47,7 @@ public final class VocaViewModel: BaseViewModel {
             .sink { [weak self] in
                 guard let self = self else { return }
 
-                self.recommendedVocaUseCase.fetchRecommendedVoca(diaryId: 29)
+                self.recommendedVocaUseCase.fetchRecommendedVoca(diaryId: diaryId)
                     .sink(receiveCompletion: { [weak self] completion in
                         switch completion {
                         case .failure(let error):

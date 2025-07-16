@@ -164,8 +164,10 @@ extension AppDIContainer {
         return DiaryDetailViewModel()
     }
     
+    // MARK: - diaryId 수정
+    
     private func makeFeedbackViewModel() -> FeedbackViewModel {
-        return FeedbackViewModel(diaryDetailUseCase: makeDiaryDetailUseCase(), feedbackUseCase: makeFeedbackUseCase())
+        return FeedbackViewModel(diaryId: 28, diaryDetailUseCase: makeDiaryDetailUseCase(), feedbackUseCase: makeFeedbackUseCase())
     }
     
     private func makeFeedbackUseCase() -> FeedbackUseCase {
@@ -180,8 +182,10 @@ extension AppDIContainer {
         return DefaultFeedbackService()
     }
     
+    // MARK: - diaryId 수정
+    
     private func makeVocaViewModel() -> VocaViewModel {
-        return VocaViewModel(recommendedVocaUseCase: makeVocaUseCase(), toggleBookmarkUseCase: makeToggleBookmarkUseCase())
+        return VocaViewModel(diaryId: 28, recommendedVocaUseCase: makeVocaUseCase(), toggleBookmarkUseCase: makeToggleBookmarkUseCase())
     }
     
     private func makeDiaryDetailUseCase() -> DiaryDetailUseCase {

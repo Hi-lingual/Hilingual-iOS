@@ -11,6 +11,8 @@ import HilingualDomain
 
 public final class FeedbackViewModel: BaseViewModel{
     
+    private let diaryId: Int
+    
     // MARK: - Input
     
     struct Input {
@@ -34,8 +36,9 @@ public final class FeedbackViewModel: BaseViewModel{
     private let feedbackSubject = PassthroughSubject<[DiaryFeedbackEntity], Never>()
     private let errorSubject = PassthroughSubject<String, Never>()
     
-    public init(diaryDetailUseCase: DiaryDetailUseCase,
+    public init(diaryId: Int, diaryDetailUseCase: DiaryDetailUseCase,
                 feedbackUseCase: FeedbackUseCase) {
+        self.diaryId = diaryId
         self.diaryDetailUseCase = diaryDetailUseCase
         self.feedbackUseCase = feedbackUseCase
     }
@@ -44,7 +47,7 @@ public final class FeedbackViewModel: BaseViewModel{
         input.viewDidLoad
             .sink { [weak self] in
                 guard let self = self else { return }
-                self.feedbackUseCase.fetchFeedback(diaryId: 37)
+                self.feedbackUseCase.fetchFeedback(diaryId: diaryId)
                     .sink(receiveCompletion: { [weak self] completion in
                         switch completion {
                         case .failure(let error):
@@ -59,7 +62,7 @@ public final class FeedbackViewModel: BaseViewModel{
                     })
                     .store(in: &self.cancellables)
                 
-                self.diaryDetailUseCase.fetchDiaryDetail(diaryId: 37)
+                self.diaryDetailUseCase.fetchDiaryDetail(diaryId: diaryId)
                                 .sink(receiveCompletion: { [weak self] completion in
                                     if case let .failure(error) = completion {
                                         self?.errorSubject.send("일기 상세 조회 실패: \(error.localizedDescription)")
