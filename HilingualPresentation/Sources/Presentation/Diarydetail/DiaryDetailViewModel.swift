@@ -9,5 +9,9 @@ import Foundation
 import Combine
 
 public final class DiaryDetailViewModel: BaseViewModel {
+    private let diaryId: Int
 
+    public init(diaryId: Int) {
+        self.diaryId = diaryId
+    }
 }

@@ -40,6 +40,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         input.monthChange.send((year, month))
     }
 
+
     public override func addTarget() {
         homeView.selectedInfo.cardTopicView.onTapWriteDiary = { [weak self] in
             guard let self else { return }
@@ -49,81 +50,74 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
             
             self.goToDiaryWritingView(topicData: topic, selectedDate: selectedDate)
         }
+
+        homeView.selectedInfo.onDiaryPreviewTapped = { [weak self] in
+            guard let self,
+                  let date = self.homeView.calendarView.selectedDate else { return }
+
+            self.viewModel?.fetchDiary(for: date)
+                .receive(on: RunLoop.main)
+                .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] diary in
+                    guard let self, let diary else { return }
+                    self.goToDiaryDetailView(diaryId: diary.diaryId)
+                })
+                .store(in: &self.viewModel!.cancellables)
+        }
     }
 
-    // MARK: - Bind Method
-
     public override func bind(viewModel: HomeViewModel) {
-        // 초기 날짜 세팅
         let today = Date()
         homeView.calendarView.selectedDate = today
         homeView.calendarView.reload(for: today)
         homeView.selectedInfo.setSelectedDate(today)
 
-        // 헤더에서 달 변경 시 ViewModel에 전달
         homeView.onMonthChanged = { [weak self] year, month in
             self?.input.monthChange.send((year, month))
         }
 
         let output = viewModel.transform(input: input)
 
-        // 유저 정보 바인딩
         output.userInfo
             .receive(on: RunLoop.main)
-            .sink(
-                receiveCompletion: { completion in
-                    if case .failure(let error) = completion {
-                        print("유저 정보 조회 실패: \(error.localizedDescription)")
-                    }
-                },
-                receiveValue: { [weak self] entity in
-                    self?.homeView.profileView.updateView(
-                        nickname: entity.nickname,
-                        profileImageURL: entity.profileImg,
-                        totalDiaries: entity.totalDiaries,
-                        streak: entity.streak
-                    )
-                }
-            )
+            .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] entity in
+                self?.homeView.profileView.updateView(
+                    nickname: entity.nickname,
+                    profileImageURL: entity.profileImg,
+                    totalDiaries: entity.totalDiaries,
+                    streak: entity.streak
+                )
+            })
             .store(in: &viewModel.cancellables)
 
         output.filledDates
-            .receive(on: RunLoop.main)
-            .sink { [weak self] dates in
-                guard let self else { return }
-                self.homeView.calendarView.filledDates = dates
-                
-                if !self.didSendInitialMonth {
-                    self.didSendInitialMonth = true
-                    let selectedDate = self.homeView.calendarView.selectedDate ?? Date()
-                    self.homeView.calendarView.onDateSelected?(selectedDate)
-                }
-            }
-            .store(in: &viewModel.cancellables)
+    .receive(on: RunLoop.main)
+    .sink { [weak self] dates in
+        guard let self else { return }
+        self.homeView.calendarView.filledDates = dates
 
+        // 중복 호출 방지
+        if !self.didSendInitialMonth {
+            self.didSendInitialMonth = true
+            let selectedDate = self.homeView.calendarView.selectedDate ?? Date()
+            self.homeView.calendarView.onDateSelected?(selectedDate)
+        }
+    }
+    .store(in: &viewModel.cancellables)
 
-        // 날짜 선택 이벤트 처리
         homeView.calendarView.onDateSelected = { [weak self] date in
             guard let self else { return }
 
             self.homeView.selectedInfo.setSelectedDate(date)
 
-            // 일기 있는 날짜인지 판단
             let isDiaryDate = self.homeView.calendarView.filledDates.contains {
                 Calendar.current.isDate($0, inSameDayAs: date)
             }
 
             if isDiaryDate {
-                // 일기 조회만
                 self.viewModel?.fetchDiary(for: date)
                     .receive(on: RunLoop.main)
-                    .sink(receiveCompletion: { completion in
-                        if case .failure(let error) = completion {
-                            print("일기 조회 실패: \(error.localizedDescription)")
-                        }
-                    }, receiveValue: { [weak self] diary in
+                    .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] diary in
                         guard let self else { return }
-
                         self.homeView.selectedInfo.updateView(
                             for: date,
                             diaryId: diary?.diaryId,
@@ -135,16 +129,10 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                     })
                     .store(in: &self.viewModel!.cancellables)
             } else {
-                // 주제 조회만
                 self.viewModel?.fetchTopic(for: date)
                     .receive(on: RunLoop.main)
-                    .sink(receiveCompletion: { completion in
-                        if case .failure(let error) = completion {
-                            print("주제 조회 실패: \(error.localizedDescription)")
-                        }
-                    }, receiveValue: { [weak self] topic in
+                    .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] topic in
                         guard let self else { return }
-
                         self.homeView.selectedInfo.updateView(
                             for: date,
                             diaryId: nil,
@@ -157,10 +145,9 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                     .store(in: &self.viewModel!.cancellables)
             }
         }
+
         homeView.calendarView.onDateSelected?(today)
     }
-
-    // MARK: - Navigation Method
 
     private func goToDiaryWritingView(topicData: (String, String)? = nil, selectedDate: Date? = nil) {
         navigationController?.setNavigationBarHidden(false, animated: false)
@@ -171,5 +158,12 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         )
         diaryWritingVC.hidesBottomBarWhenPushed = true
         navigationController?.pushViewController(diaryWritingVC, animated: true)
+    }
+
+    private func goToDiaryDetailView(diaryId: Int) {
+        navigationController?.setNavigationBarHidden(false, animated: false)
+        let detailVC = diContainer.makeDiaryDetailViewController(diaryId: diaryId)
+        detailVC.hidesBottomBarWhenPushed = true
+        navigationController?.pushViewController(detailVC, animated: true)
     }
 }

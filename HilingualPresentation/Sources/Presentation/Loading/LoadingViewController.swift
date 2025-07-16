@@ -126,8 +126,14 @@ public final class LoadingViewController: BaseUIViewController<LoadingViewModel>
     // MARK: - Navigation
 
     private func goToNextView() {
-        let dairyDetailVC = self.diContainer.makeDiaryDetailViewController()
-        navigationController?.pushViewController(dairyDetailVC, animated: true)
+        guard let diaryId = viewModel?.diaryId else {
+            assertionFailure("❌ diaryId가 nil입니다. DiaryDetail로 이동 불가")
+            return
+        }
+
+        let detailVC = diContainer.makeDiaryDetailViewController(diaryId: diaryId)
+        detailVC.hidesBottomBarWhenPushed = true
+        navigationController?.pushViewController(detailVC, animated: true)
     }
 
     private func goToHomeView() {
