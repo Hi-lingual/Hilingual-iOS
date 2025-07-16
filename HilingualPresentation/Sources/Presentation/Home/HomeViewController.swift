@@ -148,10 +148,9 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
 
     private func goToDiaryWritingView() {
         navigationController?.setNavigationBarHidden(false, animated: false)
-        let diaryWritingVC = DiaryWritingViewController(
-            viewModel: DiaryWritingViewModel(),
-            diContainer: self.diContainer
-        )
+        
+        let diaryWritingVC = diContainer.makeDiaryWritingViewController()
+        
         navigationController?.pushViewController(diaryWritingVC, animated: true)
     }
 }

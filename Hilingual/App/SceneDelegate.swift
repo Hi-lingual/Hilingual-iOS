@@ -34,7 +34,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) {
             let appDI = AppDIContainer.shared
 
-            let splashVC = appDI.makeSplashViewController()
+            let splashVC = appDI.makeTabBarViewController()
             let navigation = UINavigationController(rootViewController: splashVC)
             navigation.setNavigationBarHidden(true, animated: false)
             navigation.view.layoutIfNeeded()
