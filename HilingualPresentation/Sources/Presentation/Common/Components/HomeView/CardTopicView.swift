@@ -10,6 +10,8 @@ import SnapKit
 
 final class CardTopicView: UIView {
     
+    private(set) var topicData: (String, String)?
+    
     // MARK: - Callback
 
     var onTapWriteDiary: (() -> Void)?
@@ -167,6 +169,12 @@ final class CardTopicView: UIView {
     func configure(kor: String? = nil, en: String? = nil) {
         topicKorLabel.text = kor ?? "한글 주제 아직 없지롱"
         topicEnLabel.text = en ?? "Bringing up the English topic"
+        
+        if let kor = kor, let en = en {
+            topicData = (kor, en)
+        } else {
+            topicData = nil
+        }
     }
 }
 

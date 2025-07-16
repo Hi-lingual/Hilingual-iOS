@@ -19,13 +19,27 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
     private let visionKitManager = VisionKitManager()
     private let dialog = Dialog()
     private let textCountSubject = PassthroughSubject<Int, Never>()
-    let selectedDate = Date()
+    private let topicData: (String, String)?
+    private let selectedDate: Date
     
     // MARK: - LifeCyccle
     
     public override func viewDidLoad() {
         super.viewDidLoad()
         visionKitManager.delegate = self
+    }
+    
+    // MARK: - Init
+
+    public init(
+        viewModel: DiaryWritingViewModel,
+        diContainer: any ViewControllerFactory,
+        topicData: (String, String)?,
+        selectedDate: Date
+    ) {
+        self.topicData = topicData
+        self.selectedDate = selectedDate
+        super.init(viewModel: viewModel, diContainer: diContainer)
     }
     
     // MARK: - Setup Methods
