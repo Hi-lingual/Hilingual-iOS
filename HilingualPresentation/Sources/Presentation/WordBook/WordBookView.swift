@@ -54,24 +54,20 @@ final class WordBookView: BaseUIView {
 
     let sortButton: UIButton = {
         let button = UIButton(type: .system)
-
         let image = UIImage(named: "ic_list_24_ios", in: .module, compatibleWith: nil)?
             .withRenderingMode(.alwaysTemplate)
 
         button.setImage(image, for: .normal)
         button.setTitle("최신순", for: .normal)
-
         button.tintColor = .gray500
         button.setTitleColor(.gray500, for: .normal)
         button.titleLabel?.font = .suit(.body_m_14)
         button.contentHorizontalAlignment = .right
-
         button.semanticContentAttribute = .forceLeftToRight
         button.imageEdgeInsets = UIEdgeInsets(top: 0, left: -2, bottom: 0, right: 2)
         button.titleEdgeInsets = UIEdgeInsets(top: 0, left: 2, bottom: 0, right: -2)
         return button
     }()
-
 
     private lazy var statusHeaderView: UIView = {
         let container = UIView()
@@ -102,64 +98,27 @@ final class WordBookView: BaseUIView {
         return table
     }()
 
-    let emptyView: UIView = {
-        let view = UIView()
-        view.isHidden = true
-
-        let emptyImageView = UIImageView()
-        emptyImageView.image = UIImage(named: "img_word_ios", in: .module, compatibleWith: nil)
-        emptyImageView.contentMode = .scaleAspectFit
-
-        let emptyLabel = UILabel()
-        emptyLabel.text = "아직 단어가 추가되지 않았어요."
-        emptyLabel.font = .suit(.head_m_18)
-        emptyLabel.textColor = .gray500
-        emptyLabel.textAlignment = .center
-
-        let emptyButton = CTAButton(style: .TextButton("일기 쓰고 단어 추가하기"), autoBackground: false)
-        emptyButton.tag = 999
-
-        view.addSubviews(emptyImageView, emptyLabel, emptyButton)
-
-        emptyImageView.snp.makeConstraints {
-            $0.top.equalToSuperview()
-            $0.centerX.equalToSuperview()
-        }
-
-        emptyLabel.snp.makeConstraints {
-            $0.top.equalTo(emptyImageView.snp.bottom).offset(8)
-            $0.centerX.equalToSuperview()
-        }
-
-        emptyButton.snp.makeConstraints {
-            $0.top.equalTo(emptyLabel.snp.bottom).offset(16)
-            $0.horizontalEdges.equalToSuperview()
-            $0.centerX.equalToSuperview()
-        }
-
-        return view
-    }()
+    let emptyView = WordBookEmptyView()
 
     // MARK: - Private Properties
 
     private let sortOptions = ["최신순", "A-Z순"]
 
-    // MARK: - Public Method
-
-    func updateHeaderView(totalCount: Int, sortIndex: Int) {
-        totalCountLabel.text = "총 \(totalCount)개"
-
-        if sortOptions.indices.contains(sortIndex) {
-            sortButton.setTitle(sortOptions[sortIndex], for: .normal)
-        } else {
-            sortButton.setTitle(nil, for: .normal)
-        }
-    }
-
     // MARK: - Lifecycle
 
+    override func layoutSubviews() {
+        super.layoutSubviews()
+
+        let headerSize = statusHeaderView.systemLayoutSizeFitting(CGSize(
+            width: bounds.width,
+            height: UIView.layoutFittingCompressedSize.height
+        ))
+        statusHeaderView.frame = CGRect(origin: .zero, size: headerSize)
+        tableView.tableHeaderView = statusHeaderView
+    }
+
     override func setUI() {
-        navigationContainer.backgroundColor = .black
+        navigationContainer.backgroundColor = .hilingualBlack
 
         addSubviews(
             navigationContainer,
@@ -172,7 +131,6 @@ final class WordBookView: BaseUIView {
             searchBar
         )
 
-        tableView.tableHeaderView = statusHeaderView
         tableView.refreshControl = refreshControl
     }
 
@@ -198,14 +156,20 @@ final class WordBookView: BaseUIView {
         }
 
         emptyView.snp.makeConstraints {
-            $0.centerX.equalToSuperview()
-            $0.top.equalTo(tableView.snp.top).offset(80)
-            $0.horizontalEdges.equalToSuperview().inset(100)
+            $0.top.equalTo(navigationContainer.snp.bottom).offset(120)
+            $0.leading.trailing.equalToSuperview().inset(20)
+            $0.centerX.equalToSuperview().priority(.low)
         }
+    }
 
-        layoutIfNeeded()
-        let headerSize = statusHeaderView.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize)
-        statusHeaderView.frame = CGRect(origin: .zero, size: headerSize)
-        tableView.tableHeaderView = statusHeaderView
+    // MARK: - Public Method
+
+    func updateHeaderView(totalCount: Int, sortIndex: Int) {
+        totalCountLabel.text = "총 \(totalCount)개"
+        if sortOptions.indices.contains(sortIndex) {
+            sortButton.setTitle(sortOptions[sortIndex], for: .normal)
+        } else {
+            sortButton.setTitle(nil, for: .normal)
+        }
     }
 }
