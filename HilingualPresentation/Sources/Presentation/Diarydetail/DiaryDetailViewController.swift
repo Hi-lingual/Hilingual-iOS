@@ -126,7 +126,8 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
         
         dialog.rightButton.removeTarget(nil, action: nil, for: .allEvents)
         dialog.rightButton.addAction(UIAction { [weak self] _ in
-            self?.navigationController?.popViewController(animated: true)
+            let webVC = ReportWebViewController()
+            self?.navigationController?.pushViewController(webVC, animated: true)
         }, for: .touchUpInside)
     }
 }
