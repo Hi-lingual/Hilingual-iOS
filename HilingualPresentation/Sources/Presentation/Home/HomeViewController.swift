@@ -1,10 +1,3 @@
-//
-//  HomeViewController.swift
-//  HilingualPresentation
-//
-//  Created by 조영서 on 7/8/25.
-//
-
 import Foundation
 import UIKit
 
@@ -99,37 +92,56 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
 
             self.homeView.selectedInfo.setSelectedDate(date)
 
-            self.viewModel?.fetchDiary(for: date)
-                .receive(on: RunLoop.main)
-                .sink(receiveCompletion: { completion in
-                    if case .failure(let error) = completion {
-                        print("일기 조회 실패: \(error.localizedDescription)")
-                    }
-                }, receiveValue: { [weak self] diary in
-                    guard let self else { return }
+            // ✅ 일기 있는 날짜인지 판단
+            let isDiaryDate = self.homeView.calendarView.filledDates.contains {
+                Calendar.current.isDate($0, inSameDayAs: date)
+            }
 
-                    self.viewModel?.fetchTopic(for: date)
-                        .receive(on: RunLoop.main)
-                        .sink(receiveCompletion: { completion in
-                            if case .failure(let error) = completion {
-                                print("주제 조회 실패: \(error.localizedDescription)")
-                            }
-                        }, receiveValue: { [weak self] topic in
-                            guard let self else { return }
+            if isDiaryDate {
+                // 📘 일기 조회만
+                self.viewModel?.fetchDiary(for: date)
+                    .receive(on: RunLoop.main)
+                    .sink(receiveCompletion: { completion in
+                        if case .failure(let error) = completion {
+                            print("일기 조회 실패: \(error.localizedDescription)")
+                        }
+                    }, receiveValue: { [weak self] diary in
+                        guard let self else { return }
 
-                            self.homeView.selectedInfo.updateView(
-                                for: date,
-                                diaryId: diary?.diaryId,
-                                remainingTime: topic?.remainingTime ?? 0,
-                                topicData: topic.map { ($0.topicKor, $0.topicEn) },
-                                diaryData: diary?.originalText,
-                                imageURL: diary?.imageUrl
-                            )
-                        })
-                        .store(in: &self.viewModel!.cancellables)
-                })
-                .store(in: &self.viewModel!.cancellables)
+                        self.homeView.selectedInfo.updateView(
+                            for: date,
+                            diaryId: diary?.diaryId,
+                            remainingTime: 0,
+                            topicData: nil,
+                            diaryData: diary?.originalText,
+                            imageURL: diary?.imageUrl
+                        )
+                    })
+                    .store(in: &self.viewModel!.cancellables)
+            } else {
+                // 📝 주제 조회만
+                self.viewModel?.fetchTopic(for: date)
+                    .receive(on: RunLoop.main)
+                    .sink(receiveCompletion: { completion in
+                        if case .failure(let error) = completion {
+                            print("주제 조회 실패: \(error.localizedDescription)")
+                        }
+                    }, receiveValue: { [weak self] topic in
+                        guard let self else { return }
+
+                        self.homeView.selectedInfo.updateView(
+                            for: date,
+                            diaryId: nil,
+                            remainingTime: topic?.remainingTime ?? 0,
+                            topicData: topic.map { ($0.topicKor, $0.topicEn) },
+                            diaryData: nil,
+                            imageURL: nil
+                        )
+                    })
+                    .store(in: &self.viewModel!.cancellables)
+            }
         }
+        homeView.calendarView.onDateSelected?(today)
     }
 
     // MARK: - Navigation Method
