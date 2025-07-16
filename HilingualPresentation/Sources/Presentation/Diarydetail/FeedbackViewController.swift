@@ -35,22 +35,6 @@ public final class FeedbackViewController: BaseUIViewController<FeedbackViewMode
     
     public override func viewDidLoad() {
         super.viewDidLoad()
-        
-        let diaryContent = dummyCorrectionData.data
-        let diffRanges = diaryContent.diffRanges.map {
-            HighlightTextView.DiffRange(start: $0.start, end: $0.end)
-        }
-        
-        let diaryData = DiaryViewData(
-            imageURL: diaryContent.image,
-            date: diaryContent.date,
-            originalText: diaryContent.originalText,
-            rewriteText: diaryContent.rewriteText,
-            diffRanges: diffRanges,
-            isHighlightingEnabled: true
-        )
-        
-        feedbackView.configureDiary(data: diaryData)
     }
     
     // MARK: - Custom Method
@@ -81,7 +65,7 @@ public final class FeedbackViewController: BaseUIViewController<FeedbackViewMode
     }
     
     private func bindOutput(_ output: FeedbackViewModel.Output) {
-        output.fetchDiaryResult
+        output.fetchFeedbackResult
             .receive(on: RunLoop.main)
             .sink { [weak self] feedbackList in
                 let feedbackItems: [FeedbackItem] = feedbackList.map {
@@ -89,5 +73,29 @@ public final class FeedbackViewController: BaseUIViewController<FeedbackViewMode
                 }
                 self?.feedbackView.configureFeedbacks(data: feedbackItems)            }
             .store(in: &cancellables)
+        
+        output.fetchDiaryResult
+            .receive(on: RunLoop.main)
+            .sink { [weak self] entity in
+                let diffRanges = entity.diffRanges.map {
+                    HighlightTextView.DiffRange(
+                        start: $0.start,
+                        end: $0.end,
+                    )
+                }
+                
+                let diaryViewData = DiaryViewData(
+                    imageURL: entity.image,
+                    date: entity.date,
+                    originalText: entity.originalText,
+                    rewriteText: entity.rewriteText,
+                    diffRanges: diffRanges,
+                    isHighlightingEnabled: true
+                )
+                
+                self?.feedbackView.configureDiary(data: diaryViewData)
+            }
+            .store(in: &cancellables)
+        
     }
 }
