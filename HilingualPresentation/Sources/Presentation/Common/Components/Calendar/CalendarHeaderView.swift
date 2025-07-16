@@ -151,11 +151,13 @@ final class CalendarHeaderView: UIView {
     @objc private func previousButtonTapped() {
         guard let newDate = Calendar.current.date(byAdding: .month, value: -1, to: currentDate) else { return }
         currentDate = newDate
+        onMonthChanged?(currentDate)
     }
 
     @objc private func nextButtonTapped() {
         guard let newDate = Calendar.current.date(byAdding: .month, value: 1, to: currentDate) else { return }
         currentDate = newDate
+        onMonthChanged?(currentDate)
     }
 
     // MARK: - Helper

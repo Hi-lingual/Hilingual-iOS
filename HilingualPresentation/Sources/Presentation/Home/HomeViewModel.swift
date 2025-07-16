@@ -39,19 +39,30 @@ public final class HomeViewModel: BaseViewModel {
     public func transform(input: Input) -> Output {
         let userInfoPublisher = useCase.fetchUserInfo()
             .eraseToAnyPublisher()
-        
+
         let filledDatesPublisher = input.monthChange
-            .flatMap { _ in
-                self.useCase.fetchMonthInfo()
+            .flatMap { year, month in
+                self.useCase.fetchMonthInfo(year: year, month: month)
                     .map { $0.dates }
                     .catch { _ in Just([]) }
             }
             .eraseToAnyPublisher()
-        
+
         return Output(
             userInfo: userInfoPublisher,
             filledDates: filledDatesPublisher
         )
     }
-}
 
+    // MARK: - Additional Fetch Methods
+
+    public func fetchDiary(for date: Date) -> AnyPublisher<DiaryInfoEntity?, Error> {
+        let dateString = date.toFormattedString("yyyy-MM-dd")
+        return useCase.fetchDiaryInfo(for: dateString)
+    }
+
+    public func fetchTopic(for date: Date) -> AnyPublisher<TopicEntity?, Error> {
+        let dateString = date.toFormattedString("yyyy-MM-dd")
+        return useCase.fetchTopic(for: dateString)
+    }
+}

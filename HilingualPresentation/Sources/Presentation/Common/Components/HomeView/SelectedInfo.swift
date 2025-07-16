@@ -11,14 +11,14 @@ import SnapKit
 // MARK: - SelectedInfo
 
 final class SelectedInfo: UIView {
-
+    
     // MARK: - UI Components
-
+    
     internal let cardTopicView = CardTopicView()
     internal let cardPreview = CardPreview()
     private let emptyDiaryView = EmptyDiaryView()
     private let diaryLockView = DiaryLockView()
-
+    
     
     private let selectedDayLabel: UILabel = {
         let label = UILabel()
@@ -49,21 +49,21 @@ final class SelectedInfo: UIView {
         stack.alignment = .center
         return stack
     }()
-
+    
     private let iconView: UIImageView = {
         let imageView = UIImageView()
         imageView.image = UIImage(named: "ic_time_16_ios", in: .module, compatibleWith: nil)
         imageView.contentMode = .scaleAspectFit
         return imageView
     }()
-
+    
     private let timeLeftLabel: UILabel = {
         let label = UILabel()
         label.font = .suit(.body_sb_14)
         label.textColor = .black
         return label
     }()
-
+    
     private let timeLeftStack: UIStackView = {
         let stack = UIStackView()
         stack.axis = .horizontal
@@ -80,21 +80,21 @@ final class SelectedInfo: UIView {
         stack.alignment = .center
         return stack
     }()
-
+    
     // MARK: - Lifecycle
-
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
         setupLayout()
     }
-
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
+    
     // MARK: - Setup Methods
-
+    
     private func setupUI() {
         
         backgroundColor = .white
@@ -126,7 +126,7 @@ final class SelectedInfo: UIView {
         
         spacer.setContentHuggingPriority(.defaultLow, for: .horizontal)
         spacer.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
-
+        
         cardTopicView.isHidden = true
         cardPreview.isHidden = true
         emptyDiaryView.isHidden = true
@@ -135,7 +135,7 @@ final class SelectedInfo: UIView {
         iconView.isHidden = true
         timeLeftStack.isHidden = true
     }
-
+    
     private func setupLayout() {
         
         dot.snp.makeConstraints {
@@ -146,7 +146,7 @@ final class SelectedInfo: UIView {
             $0.top.equalToSuperview().inset(12)
             $0.horizontalEdges.equalToSuperview().inset(16)
         }
-     
+        
         [cardTopicView, cardPreview, emptyDiaryView, diaryLockView].forEach {
             $0.snp.makeConstraints {
                 $0.top.equalTo(headerStack.snp.bottom).offset(12)
@@ -154,20 +154,18 @@ final class SelectedInfo: UIView {
             }
         }
     }
-
+    
     // MARK: - Public Methods
-
+    
     func updateView(
         for date: Date,
-        isWritten: Bool,
+        diaryId: Int?,
         remainingTime: Int,
-        createdAt: String? = nil,
         topicData: (kor: String, en: String)? = nil,
         diaryData: String? = nil,
         imageURL: String? = nil
     ) {
-        // 초기화
-        [cardTopicView, cardPreview, emptyDiaryView, diaryLockView].forEach {
+        [cardPreview, cardTopicView, emptyDiaryView, diaryLockView].forEach {
             $0.isHidden = true
         }
 
@@ -176,46 +174,46 @@ final class SelectedInfo: UIView {
         let today = Calendar.current.startOfDay(for: Date())
         let selectedDay = Calendar.current.startOfDay(for: date)
 
-        // 1. 미래 날짜일 경우
+        iconView.isHidden = true
+        timeLeftStack.isHidden = true
+
         if selectedDay > today {
             notWrittenLabel.text = "작성불가"
             notWrittenLabel.textColor = .gray300
-            timeLeftStack.isHidden = true
             diaryLockView.isHidden = false
             return
         }
 
-        // 2. 작성완료 or 미작성일 경우
-        notWrittenLabel.text = isWritten ? "작성완료" : "미작성"
-        notWrittenLabel.textColor = isWritten ? .hilingualBlue : .gray300
-        timeLeftLabel.textColor = isWritten ? .gray300 : .black
-        iconView.isHidden = isWritten
-        timeLeftStack.isHidden = !isWritten && remainingTime == 0
+        if let _ = diaryId {
+            notWrittenLabel.text = "작성완료"
+            notWrittenLabel.textColor = .hilingualBlue
 
-        if let createdAt = createdAt, isWritten {
-            timeLeftLabel.text = formatCreatedAt(createdAt)
-        } else {
-            timeLeftLabel.attributedText = formatRemainingTime(remainingTime)
-        }
-
-        if isWritten {
             cardPreview.isHidden = false
-
-            if let imageURL = imageURL, !imageURL.isEmpty {
+            if let imageURL, !imageURL.isEmpty {
                 cardPreview.configure(type: .textWithImage(text: diaryData ?? "", imageUrl: imageURL))
             } else {
                 cardPreview.configure(type: .textOnly(text: diaryData ?? ""))
             }
-
-        } else if remainingTime > 0 {
-            cardTopicView.isHidden = false
-            if let topic = topicData {
-                cardTopicView.configure(kor: topic.kor, en: topic.en)
-            }
-        } else {
-            emptyDiaryView.isHidden = false
+            return
         }
+
+        if remainingTime > 0, let topic = topicData {
+            notWrittenLabel.text = "미작성"
+            notWrittenLabel.textColor = .gray300
+
+            cardTopicView.isHidden = false
+            cardTopicView.configure(kor: topic.kor, en: topic.en)
+            timeLeftLabel.attributedText = formatRemainingTime(remainingTime)
+            iconView.isHidden = false
+            timeLeftStack.isHidden = false
+            return
+        }
+
+        notWrittenLabel.text = "미작성"
+        notWrittenLabel.textColor = .gray300
+        emptyDiaryView.isHidden = false
     }
+
 
     // MARK: - Helpers
     
