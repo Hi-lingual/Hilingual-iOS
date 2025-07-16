@@ -8,43 +8,44 @@
 import UIKit
 import SnapKit
 
-// MARK: - SelectedInfo
-
 final class SelectedInfo: UIView {
     
     var topicData: (String, String)? {
         return cardTopicView.topicData
     }
     
+
+    // MARK: - Callback
+    var onDiaryPreviewTapped: (() -> Void)?
+
     // MARK: - UI Components
-    
+
     internal let cardTopicView = CardTopicView()
     internal let cardPreview = CardPreview()
     private let emptyDiaryView = EmptyDiaryView()
     private let diaryLockView = DiaryLockView()
-        
+
     private let selectedDayLabel: UILabel = {
         let label = UILabel()
-        label.text = ""
         label.font = .suit(.head_b_16)
         label.textColor = .black
         return label
     }()
-    
+
     private let dot: UIView = {
         let view = UIView()
         view.backgroundColor = .gray300
         view.layer.cornerRadius = 1
         return view
     }()
-    
+
     private let notWrittenLabel: UILabel = {
         let label = UILabel()
         label.font = .suit(.caption_m_12)
         label.textColor = .gray300
         return label
     }()
-    
+
     private let selectedDayStack: UIStackView = {
         let stack = UIStackView()
         stack.axis = .horizontal
@@ -52,21 +53,21 @@ final class SelectedInfo: UIView {
         stack.alignment = .center
         return stack
     }()
-    
+
     private let iconView: UIImageView = {
         let imageView = UIImageView()
         imageView.image = UIImage(named: "ic_time_16_ios", in: .module, compatibleWith: nil)
         imageView.contentMode = .scaleAspectFit
         return imageView
     }()
-    
+
     private let timeLeftLabel: UILabel = {
         let label = UILabel()
         label.font = .suit(.body_sb_14)
         label.textColor = .black
         return label
     }()
-    
+
     private let timeLeftStack: UIStackView = {
         let stack = UIStackView()
         stack.axis = .horizontal
@@ -74,34 +75,33 @@ final class SelectedInfo: UIView {
         stack.alignment = .center
         return stack
     }()
-    
+
     private let spacer = UIView()
-    
+
     private let headerStack: UIStackView = {
         let stack = UIStackView()
         stack.axis = .horizontal
         stack.alignment = .center
         return stack
     }()
-    
-    // MARK: - Lifecycle
-    
+
+    // MARK: - Init
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
         setupLayout()
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
-    // MARK: - Setup Methods
-    
+
+    // MARK: - Setup
+
     private func setupUI() {
-        
         backgroundColor = .white
-        
+
         addSubviews(
             headerStack,
             cardTopicView,
@@ -109,42 +109,26 @@ final class SelectedInfo: UIView {
             emptyDiaryView,
             diaryLockView
         )
-        
-        selectedDayStack.addArrangedSubviews(
-            selectedDayLabel,
-            dot,
-            notWrittenLabel
-        )
-        
-        timeLeftStack.addArrangedSubviews(
-            iconView,
-            timeLeftLabel
-        )
-        
-        headerStack.addArrangedSubviews(
-            selectedDayStack,
-            spacer,
-            timeLeftStack
-        )
-        
+
+        selectedDayStack.addArrangedSubviews(selectedDayLabel, dot, notWrittenLabel)
+        timeLeftStack.addArrangedSubviews(iconView, timeLeftLabel)
+        headerStack.addArrangedSubviews(selectedDayStack, spacer, timeLeftStack)
+
         spacer.setContentHuggingPriority(.defaultLow, for: .horizontal)
         spacer.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
-        
-        cardTopicView.isHidden = true
-        cardPreview.isHidden = true
-        emptyDiaryView.isHidden = true
-        diaryLockView.isHidden = true
-        
+
+        [cardTopicView, cardPreview, emptyDiaryView, diaryLockView].forEach { $0.isHidden = true }
         iconView.isHidden = true
         timeLeftStack.isHidden = true
+
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(cardPreviewTapped))
+        cardPreview.addGestureRecognizer(tapGesture)
+        cardPreview.isUserInteractionEnabled = true
     }
-    
+
     private func setupLayout() {
-        
-        dot.snp.makeConstraints {
-            $0.size.equalTo(2)
-        }
-        
+        dot.snp.makeConstraints { $0.size.equalTo(2) }
+
         headerStack.snp.makeConstraints {
             $0.top.equalToSuperview().inset(12)
             $0.horizontalEdges.equalToSuperview().inset(16)
@@ -158,9 +142,9 @@ final class SelectedInfo: UIView {
             }
         }
     }
-    
-    // MARK: - Public Methods
-    
+
+    // MARK: - Public
+
     func updateView(
         for date: Date,
         diaryId: Int?,
@@ -204,7 +188,6 @@ final class SelectedInfo: UIView {
         if remainingTime > 0, let topic = topicData {
             notWrittenLabel.text = "미작성"
             notWrittenLabel.textColor = .gray300
-
             cardTopicView.isHidden = false
             cardTopicView.configure(kor: topic.kor, en: topic.en)
             timeLeftLabel.attributedText = formatRemainingTime(remainingTime)
@@ -218,18 +201,14 @@ final class SelectedInfo: UIView {
         emptyDiaryView.isHidden = false
     }
 
-    // MARK: - Helpers
-    
-    private func formatCreatedAt(_ createdAt: String) -> String? {
+    func setSelectedDate(_ date: Date) {
         let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
         formatter.locale = Locale(identifier: "ko_KR")
-        guard let date = formatter.date(from: createdAt) else { return nil }
-
-        let displayFormatter = DateFormatter()
-        displayFormatter.dateFormat = "HH:mm"
-        return displayFormatter.string(from: date)
+        formatter.dateFormat = "M월 d일 EEEE"
+        selectedDayLabel.text = formatter.string(from: date)
     }
+
+    // MARK: - Private
 
     private func formatRemainingTime(_ remainingTime: Int) -> NSAttributedString {
         let fullText: String
@@ -259,5 +238,7 @@ final class SelectedInfo: UIView {
         formatter.locale = Locale(identifier: "ko_KR")
         formatter.dateFormat = "M월 d일 EEEE"
         selectedDayLabel.text = formatter.string(from: date)
+    @objc private func cardPreviewTapped() {
+        onDiaryPreviewTapped?()
     }
 }
