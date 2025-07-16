@@ -10,7 +10,7 @@ import SnapKit
 
 final class WordBookView: BaseUIView {
 
-    //MARK: - UI Components
+    // MARK: - UI Components
 
     private let navigationContainer = UIView()
 
@@ -53,12 +53,25 @@ final class WordBookView: BaseUIView {
     }()
 
     let sortButton: UIButton = {
-        let button = UIButton()
-        button.setTitle("↑ 최신순", for: .normal)
+        let button = UIButton(type: .system)
+
+        let image = UIImage(named: "ic_list_24_ios", in: .module, compatibleWith: nil)?
+            .withRenderingMode(.alwaysTemplate)
+
+        button.setImage(image, for: .normal)
+        button.setTitle("최신순", for: .normal)
+
+        button.tintColor = .gray500
         button.setTitleColor(.gray500, for: .normal)
         button.titleLabel?.font = .suit(.body_m_14)
+        button.contentHorizontalAlignment = .right
+
+        button.semanticContentAttribute = .forceLeftToRight
+        button.imageEdgeInsets = UIEdgeInsets(top: 0, left: -2, bottom: 0, right: 2)
+        button.titleEdgeInsets = UIEdgeInsets(top: 0, left: 2, bottom: 0, right: -2)
         return button
     }()
+
 
     private lazy var statusHeaderView: UIView = {
         let container = UIView()
@@ -104,6 +117,7 @@ final class WordBookView: BaseUIView {
         emptyLabel.textAlignment = .center
 
         let emptyButton = CTAButton(style: .TextButton("일기 쓰고 단어 추가하기"), autoBackground: false)
+        emptyButton.tag = 999
 
         view.addSubviews(emptyImageView, emptyLabel, emptyButton)
 
@@ -126,7 +140,23 @@ final class WordBookView: BaseUIView {
         return view
     }()
 
-    // MARK: - Custom Method
+    // MARK: - Private Properties
+
+    private let sortOptions = ["최신순", "A-Z순"]
+
+    // MARK: - Public Method
+
+    func updateHeaderView(totalCount: Int, sortIndex: Int) {
+        totalCountLabel.text = "총 \(totalCount)개"
+
+        if sortOptions.indices.contains(sortIndex) {
+            sortButton.setTitle(sortOptions[sortIndex], for: .normal)
+        } else {
+            sortButton.setTitle(nil, for: .normal)
+        }
+    }
+
+    // MARK: - Lifecycle
 
     override func setUI() {
         navigationContainer.backgroundColor = .black
@@ -177,6 +207,5 @@ final class WordBookView: BaseUIView {
         let headerSize = statusHeaderView.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize)
         statusHeaderView.frame = CGRect(origin: .zero, size: headerSize)
         tableView.tableHeaderView = statusHeaderView
-
     }
 }

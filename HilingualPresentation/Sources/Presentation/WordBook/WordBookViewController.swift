@@ -28,7 +28,7 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
 
     // MARK: - UI Components
 
-    private let modal = SortOptionModal() 
+    private let modal = SortOptionModal()
     private let wordDetailDialog = WordDetailDialog()
 
     // MARK: - Lifecycle
@@ -79,11 +79,15 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
         output.wordList
             .receive(on: RunLoop.main)
             .sink { [weak self] wordList in
-                self?.fullWordList = wordList
-                self?.filteredWordList = wordList
-                self?.updateViewState()
-                self?.wordBookView.totalCountLabel.text = "총 \(wordList.reduce(0) { $0 + $1.1.count })개"
-                self?.wordBookView.tableView.reloadData()
+                guard let self = self else { return }
+                self.fullWordList = wordList
+                self.filteredWordList = wordList
+                self.updateViewState()
+
+                let totalCount = wordList.reduce(0) { $0 + $1.1.count }
+                self.wordBookView.updateHeaderView(totalCount: totalCount, sortIndex: self.selectedSortIndex)
+
+                self.wordBookView.tableView.reloadData()
             }
             .store(in: &cancellables)
 
@@ -109,24 +113,29 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
 
     @objc
     private func didTapSort() {
-        let options: [(String, UIImage?, () -> Void)] = [
-            ("최신순", UIImage(named: "ic_arrow_down_16_ios", in: .module, compatibleWith: nil), { [weak self] in
-                self?.sortSubject.send(.latest)
-                self?.wordBookView.sortButton.setTitle("↑ 최신순", for: .normal)
-                self?.selectedSortIndex = 0
-                self?.modal.isHidden = true
-            }),
-            ("가나다순", UIImage(named: "ic_arrow_down_16_ios", in: .module, compatibleWith: nil), { [weak self] in
-                self?.sortSubject.send(.alphabetical)
-                self?.wordBookView.sortButton.setTitle("ㄱ 가나다순", for: .normal)
-                self?.selectedSortIndex = 1
-                self?.modal.isHidden = true
-            })
-        ]
-
-        modal.configure(title: "단어 정렬", items: options, selectedIndex: selectedSortIndex)
+        modal.configure(selectedIndex: selectedSortIndex) { [weak self] selected in
+            self?.updateSort(by: selected)
+        }
         modal.isHidden = false
         modal.showAnimation()
+    }
+
+    private func updateSort(by index: Int) {
+        selectedSortIndex = index
+
+        switch index {
+        case 0:
+            sortSubject.send(.latest)
+        case 1:
+            sortSubject.send(.alphabetical)
+        default:
+            break
+        }
+
+        let totalCount = fullWordList.reduce(0) { $0 + $1.1.count }
+        wordBookView.updateHeaderView(totalCount: totalCount, sortIndex: index)
+
+        modal.isHidden = true
     }
 
     @objc

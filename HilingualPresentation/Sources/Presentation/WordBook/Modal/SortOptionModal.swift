@@ -8,8 +8,6 @@
 import UIKit
 import SnapKit
 
-// MARK: - SortOptionModal
-
 final class SortOptionModal: UIView {
 
     // MARK: - UI Components
@@ -42,8 +40,14 @@ final class SortOptionModal: UIView {
     // MARK: - State
 
     private var selectedIndex: Int?
+    private var onSelect: ((Int) -> Void)?
 
-    // MARK: - LifeCycle
+    private let sortOptions: [(title: String, selectedIconName: String, unselectedIconName: String)] = [
+        ("최신순", "ic_listdown_black_24_ios", "ic_listdown_gray_24_ios"),
+        ("A-Z순", "ic_az_black_24_ios", "ic_az_gray_24_ios")
+    ]
+
+    // MARK: - Init
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -88,18 +92,26 @@ final class SortOptionModal: UIView {
 
     // MARK: - Public
 
-    public func configure(title: String, items: [(String, UIImage?, () -> Void)], selectedIndex: Int?) {
-        modalLabel.text = title
-        stackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
+    public func configure(selectedIndex: Int, onSelect: @escaping (Int) -> Void) {
         self.selectedIndex = selectedIndex
+        self.onSelect = onSelect
+        stackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
 
-        for (index, (title, image, action)) in items.enumerated() {
+        for (index, option) in sortOptions.enumerated() {
             let isSelected = index == selectedIndex
-            let itemView = SortOptionItemView(title: title, icon: image, isSelected: isSelected) { [weak self] in
+            let iconName = isSelected ? option.selectedIconName : option.unselectedIconName
+            let icon = UIImage(named: iconName, in: .module, compatibleWith: nil)
+
+            let itemView = SortOptionItemView(
+                title: option.title,
+                icon: icon,
+                isSelected: isSelected
+            ) { [weak self] in
                 self?.selectedIndex = index
-                action()
-                self?.configure(title: title, items: items, selectedIndex: index)
+                self?.onSelect?(index)
+                self?.dismissModal()
             }
+
             stackView.addArrangedSubview(itemView)
         }
     }
@@ -109,7 +121,7 @@ final class SortOptionModal: UIView {
     public func showAnimation() {
         modalSheetView.transform = CGAffineTransform(translationX: 0, y: modalSheetView.frame.height)
         self.backgroundColor = .clear
-        UIView.animate(withDuration: 0.3, delay: 0, options: [.curveEaseOut]) {
+        UIView.animate(withDuration: 0.3) {
             self.modalSheetView.transform = .identity
             self.backgroundColor = UIColor.black.withAlphaComponent(0.3)
         }
@@ -118,7 +130,7 @@ final class SortOptionModal: UIView {
     @objc private func dismissModal() {
         UIView.animate(withDuration: 0.2, animations: {
             self.modalSheetView.transform = CGAffineTransform(translationX: 0, y: self.modalSheetView.frame.height)
-            self.backgroundColor = UIColor.clear
+            self.backgroundColor = .clear
         }, completion: { _ in
             self.isHidden = true
         })

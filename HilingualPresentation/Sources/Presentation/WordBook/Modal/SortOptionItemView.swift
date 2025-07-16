@@ -1,12 +1,12 @@
 //
-//  File.swift
+//  SortOptionItemView.swift
 //  HilingualPresentation
 //
 //  Created by 성현주 on 7/16/25.
 //
 
-import Foundation
 import UIKit
+import SnapKit
 
 final class SortOptionItemView: UIView {
 
@@ -30,26 +30,29 @@ final class SortOptionItemView: UIView {
         iconImageView.image = icon
         iconImageView.tintColor = isSelected ? .black : .lightGray
         iconImageView.contentMode = .scaleAspectFit
-        iconImageView.snp.makeConstraints { $0.width.height.equalTo(20) }
 
         titleLabel.text = title
-        titleLabel.font = .systemFont(ofSize: 14, weight: .medium)
+        titleLabel.font = .suit(.body_sb_14)
         titleLabel.textColor = isSelected ? .black : .lightGray
 
-        checkmarkImageView.image = UIImage(systemName: "checkmark")
-        checkmarkImageView.tintColor = .black
+        checkmarkImageView.image = isSelected
+            ? UIImage(named: "ic_check_24_ios", in: .module, compatibleWith: nil)
+            : nil
+        checkmarkImageView.contentMode = .scaleAspectFit
         checkmarkImageView.isHidden = !isSelected
-        checkmarkImageView.snp.makeConstraints { $0.width.height.equalTo(18) }
 
-        let hStack = UIStackView(arrangedSubviews: [iconImageView, titleLabel, UIView(), checkmarkImageView])
+        let hStack = UIStackView(arrangedSubviews: [
+            iconImageView,
+            titleLabel,
+            UIView(),
+            checkmarkImageView
+        ])
         hStack.axis = .horizontal
         hStack.alignment = .center
         hStack.spacing = 8
 
         addSubview(hStack)
         hStack.snp.makeConstraints { $0.edges.equalToSuperview().inset(12) }
-
-        self.layer.cornerRadius = 8
     }
 
     private func setupTapGesture() {
