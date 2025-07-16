@@ -115,7 +115,13 @@ final class HighlightTextView: BaseUIView {
         
         for range in diffRanges {
             let nsRange = NSRange(location: range.start, length: range.end - range.start)
-            attributedString.addAttribute(.foregroundColor, value: UIColor.hilingualOrange, range: nsRange)
+            attributedString.addAttributes(
+                [
+                    .foregroundColor: UIColor.hilingualOrange,
+                    .font: UIFont.suit(.body_m_16)
+                ],
+                range: nsRange
+            )
         }
         
         textView.attributedText = attributedString
