@@ -8,43 +8,21 @@
 import Foundation
 
 public struct DiaryDetailDTO: Decodable {
-    struct Diary: Decodable {
-        let code: Int
-        let data: CorrectionData?
-        let message: String
-        
-        struct CorrectionData: Decodable {
-            let date: String
-            let image: String
-            let originalFullText: String
-            let rewritedFullText: String
-            let diffRanges: DiffRange
-        }
-        
-        struct DiffRange: Decodable {
-            let start: Int
-            let end: Int
-            let originalText: String
-            let correctedText: String
-        }
+    public let code: Int
+    public let data: CorrectionData?
+    public let message: String
+    
+    public struct CorrectionData: Decodable {
+        public let date: String
+        public let originalText: String
+        public let rewriteText: String
+        public let diffRanges: [DiffRange]
+        public let imageUrl: String?
     }
     
-    struct PhraseDTO: Decodable {
-        let code: Int
-        let data: PhraseData
-        let message: String
-        
-        struct PhraseData: Decodable {
-            let phraseList: PhraseList
-        }
-        
-        struct PhraseList: Decodable {
-            let phraseId: Int64
-            let phraseType: [String]
-            let phrase: String
-            let explanation: String
-            let reason: String
-            let isMarked: Bool
-        }
+    public struct DiffRange: Decodable {
+        public let start: Int
+        public let end: Int
+        public let correctedText: String
     }
 }
