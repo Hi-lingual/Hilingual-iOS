@@ -47,16 +47,25 @@ public final class LoadingViewController: BaseUIViewController<LoadingViewModel>
     }
 
     public override func addTarget() {
-        loadingView.feedbackButton.addTarget(self, action: #selector(retryButtonTapped), for: .touchUpInside)
+        loadingView.feedbackButton.addTarget(self, action: #selector(feedbackButtonTapped), for: .touchUpInside)
         loadingView.closeIcon.addTarget(self, action: #selector(closeButtonTapped), for: .touchUpInside)
     }
 
     // MARK: - Action
+    
+    @objc private func feedbackButtonTapped() {
+        switch loadingView.currentState {
+        case .loading:
+            break
+        case .success:
+            goToNextView()
+        case .error:
+            retryButtonTapped()
+        }
+    }
 
     @objc private func retryButtonTapped() {
-        print("🔁 다시 요청하기 버튼 탭됨")
         retryTappedSubject.send()
-        onRetryTapped?()
     }
 
     @objc private func closeButtonTapped() {
@@ -94,7 +103,6 @@ public final class LoadingViewController: BaseUIViewController<LoadingViewModel>
                 case .success:
                     print("✅ 상태: 성공")
                     viewState = .success
-                    self.goToNextView()
                 case .error:
                     print("❌ 상태: 에러")
                     viewState = .error

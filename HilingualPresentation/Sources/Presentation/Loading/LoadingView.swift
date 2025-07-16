@@ -23,7 +23,7 @@ final class LoadingView: BaseUIView {
     var onCloseTapped: (() -> Void)?
     
     private var startTime: Date?
-    private var currentState: State = .loading
+    var currentState: State = .loading
     
     //MARK: - UI Components
     
@@ -201,6 +201,7 @@ final class LoadingView: BaseUIView {
         case .error:
             titleLabel.text = "앗! 일시적인 오류가 발생했어요."
             subtitleLabel.isHidden = true
+            animationView.isHidden = true
             
             errorImageView.isHidden = false
             
