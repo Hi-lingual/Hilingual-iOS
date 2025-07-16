@@ -165,7 +165,7 @@ extension AppDIContainer {
     }
     
     private func makeFeedbackViewModel() -> FeedbackViewModel {
-        return FeedbackViewModel(useCase: makeFeedbackUseCase())
+        return FeedbackViewModel(diaryDetailUseCase: makeDiaryDetailUseCase(), feedbackUseCase: makeFeedbackUseCase())
     }
     
     private func makeFeedbackUseCase() -> FeedbackUseCase {
@@ -181,7 +181,31 @@ extension AppDIContainer {
     }
     
     private func makeVocaViewModel() -> VocaViewModel {
-        return VocaViewModel()
+        return VocaViewModel(recommendedVocaUseCase: makeVocaUseCase())
+    }
+    
+    private func makeDiaryDetailUseCase() -> DiaryDetailUseCase {
+        return DefaultDiaryDetailUseCase(repository: makeDiaryDetailRepository())
+    }
+    
+    private func makeDiaryDetailRepository() -> DiaryDetailRepository {
+        return DefaultDiaryDetailRepository(service: makeDiaryDetailService())
+    }
+    
+    private func makeDiaryDetailService() -> DiaryDetailService {
+        return DefaultDiaryDetailService()
+    }
+    
+    private func makeVocaUseCase() -> RecommendedUseCase {
+        return DefaultRecommendedUseCase(repository: makeRecommendedRepository())
+    }
+    
+    private func makeRecommendedRepository() -> RecommendedVocaRepository {
+        return DefaultRecommendedVocaRepository(service: makeRecommendedService())
+    }
+    
+    private func makeRecommendedService() -> RecommendedVocaService {
+        return DefaultRecommendedVocaService()
     }
 }
 

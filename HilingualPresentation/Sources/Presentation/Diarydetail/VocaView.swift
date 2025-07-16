@@ -8,6 +8,16 @@
 import UIKit
 import SnapKit
 
+struct PhraseViewData {
+    let phraseId: Int64
+    let phraseType: [String]
+    let phrase: String
+    let explanation: String
+    let reason: String
+    let isMarked: Bool
+    let createdAt: String // 빈값 허용
+}
+
 final class VocaView: BaseUIView {
     
     // MARK: - UI Properties
@@ -35,12 +45,32 @@ final class VocaView: BaseUIView {
     
     // MARK: - Configure
     
-    func configure(data: PhraseData) {
-        let wordCard = WordCard()
-        wordCard.configure(type: .withExample, data: data)
-        wordCard.onBookmarkToggled = { isBookmarked in
-            print(" \(data) 북마크 상태: \(isBookmarked)")
+    func configure(dataList: [PhraseViewData]) {
+        // 기존 뷰 제거
+        contentView.arrangedSubviews.forEach { $0.removeFromSuperview() }
+
+        // 새 데이터로 구성
+        dataList.forEach { phrase in
+            let wordCard = WordCard()
+
+            wordCard.configure(
+                type: .withExample,
+                data: PhraseData(
+                    phraseId: phrase.phraseId,
+                    phraseType: phrase.phraseType,
+                    phrase: phrase.phrase,
+                    explanation: phrase.explanation,
+                    reason: phrase.reason,
+                    createdAt: phrase.createdAt,
+                    isMarked: phrase.isMarked
+                )
+            )
+
+            wordCard.onBookmarkToggled = { isBookmarked in
+                print("\(phrase.phrase) 북마크 상태: \(isBookmarked)")
+            }
+
+            contentView.addArrangedSubview(wordCard)
         }
-        contentView.addArrangedSubview(wordCard)
     }
 }
