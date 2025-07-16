@@ -22,7 +22,7 @@ public final class DefaultDiaryDetailRepository: DiaryDetailRepository {
         return service.fetchDiaryDetail(diaryId: diaryId)
             .tryMap { dto -> DiaryDetailEntity in
                 guard let data = dto.data else {
-                    throw NetworkError.decoding // 또는 .unknown, 상황에 맞게
+                    throw NetworkError.decoding
                 }
                 let diffRanges: [DiaryDetailEntity.DiffRange] = data.diffRanges.map {
                     DiaryDetailEntity.DiffRange(

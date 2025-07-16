@@ -13,11 +13,9 @@ public enum FeedbackAPI {
 }
 
 extension FeedbackAPI: BaseTargetType {
-    
     public var path: String {
         switch self {
         case .fetchFeedback(let diaryId):
-            print(diaryId)
             return "/diaries/\(diaryId)/feedbacks"
         }
     }

@@ -15,7 +15,7 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
     private let diaryDetailView = DiaryDetailView()
     private var isHighlightingEnabled: Bool = true
     private lazy var dialog = Dialog()
-    private let detailImage = DetailImageView(image: UIImage(resource: .imgLoadingIos)) // 
+    private let detailImage = DetailImageView(image: UIImage(resource: .imgLoadFailLargeIos))
     let modal: Modal = {
         let modal = Modal()
         modal.isHidden = true
