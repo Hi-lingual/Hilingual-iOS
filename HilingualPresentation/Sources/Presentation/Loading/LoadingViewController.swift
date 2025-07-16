@@ -13,7 +13,7 @@ public final class LoadingViewController: BaseUIViewController<LoadingViewModel>
     // MARK: - Properties
 
     private let loadingView = LoadingView()
-    public var onRetryTapped: (() -> Void)? // 재요청 트리거
+    public var onRetryTapped: (() -> Void)? 
 
     private let retryTappedSubject = PassthroughSubject<Void, Never>()
     private let closeTappedSubject = PassthroughSubject<Void, Never>()
@@ -24,6 +24,16 @@ public final class LoadingViewController: BaseUIViewController<LoadingViewModel>
         super.viewDidLoad()
         addTarget()
         setStyle()
+    }
+
+    public override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(true, animated: animated)
+    }
+
+    public override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        navigationController?.setNavigationBarHidden(false, animated: animated)
     }
 
     // MARK: - Setup
@@ -52,7 +62,7 @@ public final class LoadingViewController: BaseUIViewController<LoadingViewModel>
     }
 
     // MARK: - Action
-    
+
     @objc private func feedbackButtonTapped() {
         switch loadingView.currentState {
         case .loading:

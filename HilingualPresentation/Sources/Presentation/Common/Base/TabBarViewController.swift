@@ -94,13 +94,14 @@ public final class TabBarViewController: UITabBarController {
         selectedImageName: String,
         unselectedImageName: String
     ) -> UIViewController {
-        viewController.tabBarItem = UITabBarItem(
+        let nav = UINavigationController(rootViewController: viewController)
+        nav.tabBarItem = UITabBarItem(
             title: title,
             image: UIImage(named: unselectedImageName, in: .module, compatibleWith: nil)?
                 .withRenderingMode(.alwaysOriginal),
             selectedImage: UIImage(named: selectedImageName, in: .module, compatibleWith: nil)?
                 .withRenderingMode(.alwaysOriginal)
         )
-        return viewController
+        return nav
     }
 }
