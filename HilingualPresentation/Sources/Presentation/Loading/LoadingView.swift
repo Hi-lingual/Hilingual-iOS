@@ -170,7 +170,7 @@ final class LoadingView: BaseUIView {
             $0.isHidden = false
         }
         
-        [closeIcon, feedbackButton].forEach {
+        [closeIcon, feedbackButton, errorImageView].forEach {
             $0.isHidden = true
         }
         
