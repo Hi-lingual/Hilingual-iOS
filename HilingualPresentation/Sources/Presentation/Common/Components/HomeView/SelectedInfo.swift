@@ -18,9 +18,7 @@ final class SelectedInfo: UIView {
     internal let cardPreview = CardPreview()
     private let emptyDiaryView = EmptyDiaryView()
     private let diaryLockView = DiaryLockView()
-    
-    private let diaryContainerView = UIView()
-    
+        
     private let selectedDayLabel: UILabel = {
         let label = UILabel()
         label.text = ""
@@ -100,16 +98,12 @@ final class SelectedInfo: UIView {
         
         backgroundColor = .white
         
-        diaryContainerView.addSubviews(
+        addSubviews(
+            headerStack,
             cardTopicView,
             cardPreview,
             emptyDiaryView,
             diaryLockView
-        )
-
-        addSubviews(
-            headerStack,
-            diaryContainerView
         )
         
         selectedDayStack.addArrangedSubviews(
@@ -152,14 +146,11 @@ final class SelectedInfo: UIView {
             $0.horizontalEdges.equalToSuperview().inset(16)
         }
 
-        diaryContainerView.snp.makeConstraints {
-            $0.top.equalTo(headerStack.snp.bottom).offset(12)
-            $0.horizontalEdges.bottom.equalToSuperview()
-        }
-
         [cardTopicView, cardPreview, emptyDiaryView, diaryLockView].forEach {
             $0.snp.makeConstraints {
-                $0.edges.equalToSuperview()
+                $0.top.equalTo(headerStack.snp.bottom).offset(12)
+                $0.horizontalEdges.equalToSuperview()
+                $0.bottom.equalToSuperview()
             }
         }
     }
@@ -222,7 +213,6 @@ final class SelectedInfo: UIView {
         notWrittenLabel.textColor = .gray300
         emptyDiaryView.isHidden = false
     }
-
 
     // MARK: - Helpers
     

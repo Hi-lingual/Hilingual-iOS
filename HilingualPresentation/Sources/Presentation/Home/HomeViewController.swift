@@ -92,13 +92,13 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
 
             self.homeView.selectedInfo.setSelectedDate(date)
 
-            // ✅ 일기 있는 날짜인지 판단
+            // 일기 있는 날짜인지 판단
             let isDiaryDate = self.homeView.calendarView.filledDates.contains {
                 Calendar.current.isDate($0, inSameDayAs: date)
             }
 
             if isDiaryDate {
-                // 📘 일기 조회만
+                // 일기 조회만
                 self.viewModel?.fetchDiary(for: date)
                     .receive(on: RunLoop.main)
                     .sink(receiveCompletion: { completion in
@@ -119,7 +119,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                     })
                     .store(in: &self.viewModel!.cancellables)
             } else {
-                // 📝 주제 조회만
+                // 주제 조회만
                 self.viewModel?.fetchTopic(for: date)
                     .receive(on: RunLoop.main)
                     .sink(receiveCompletion: { completion in
