@@ -92,18 +92,6 @@ extension AppDIContainer {
     private func makeAppleLoginService() -> AppleLoginService {
         DefaultAppleLoginService()
     }
-    
-    private func makeDiaryDetailViewModel() -> DiaryDetailViewModel {
-        return DiaryDetailViewModel()
-    }
-    
-    private func makeFeedbackViewModel() -> FeedbackViewModel {
-        return FeedbackViewModel()
-    }
-    
-    private func makeVocaViewModel() -> VocaViewModel {
-        return VocaViewModel()
-    }
 
     private func makeAppleLoginRepository() -> AppleLoginRepository {
         DefaultAppleLoginRepository(service: makeAppleLoginService())
@@ -166,6 +154,62 @@ extension AppDIContainer {
 extension AppDIContainer {
     private func makeDiaryWritingViewModel() -> DiaryWritingViewModel {
         return DiaryWritingViewModel()
+    }
+}
+
+// MARK: - DiaryDetailDIContainer
+
+extension AppDIContainer {
+    private func makeDiaryDetailViewModel() -> DiaryDetailViewModel {
+        return DiaryDetailViewModel()
+    }
+    
+    // MARK: - diaryId 수정
+    
+    private func makeFeedbackViewModel() -> FeedbackViewModel {
+        return FeedbackViewModel(diaryId: 28, diaryDetailUseCase: makeDiaryDetailUseCase(), feedbackUseCase: makeFeedbackUseCase())
+    }
+    
+    private func makeFeedbackUseCase() -> FeedbackUseCase {
+        return DefaultFeedbackUseCase(repository: makeFeedbackRepository())
+    }
+    
+    private func makeFeedbackRepository() -> FeedbackRepository {
+        return DefaultFeedbackRepository(service: makeFeedbackService())
+    }
+    
+    private func makeFeedbackService() -> FeedbackService {
+        return DefaultFeedbackService()
+    }
+    
+    // MARK: - diaryId 수정
+    
+    private func makeVocaViewModel() -> VocaViewModel {
+        return VocaViewModel(diaryId: 28, recommendedVocaUseCase: makeVocaUseCase(), toggleBookmarkUseCase: makeToggleBookmarkUseCase())
+    }
+    
+    private func makeDiaryDetailUseCase() -> DiaryDetailUseCase {
+        return DefaultDiaryDetailUseCase(repository: makeDiaryDetailRepository())
+    }
+    
+    private func makeDiaryDetailRepository() -> DiaryDetailRepository {
+        return DefaultDiaryDetailRepository(service: makeDiaryDetailService())
+    }
+    
+    private func makeDiaryDetailService() -> DiaryDetailService {
+        return DefaultDiaryDetailService()
+    }
+    
+    private func makeVocaUseCase() -> RecommendedUseCase {
+        return DefaultRecommendedUseCase(repository: makeRecommendedRepository())
+    }
+    
+    private func makeRecommendedRepository() -> RecommendedVocaRepository {
+        return DefaultRecommendedVocaRepository(service: makeRecommendedService())
+    }
+    
+    private func makeRecommendedService() -> RecommendedVocaService {
+        return DefaultRecommendedVocaService()
     }
 }
 

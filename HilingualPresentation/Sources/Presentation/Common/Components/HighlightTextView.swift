@@ -6,6 +6,8 @@
 //
 
 import UIKit
+
+import Kingfisher
 import SnapKit
 
 final class HighlightTextView: BaseUIView {
@@ -17,6 +19,7 @@ final class HighlightTextView: BaseUIView {
         let end: Int
     }
     
+    private var date: String = ""
     private var originalText: String = ""
     private var highlightText: String = ""
     private var diffRanges: [DiffRange] = []
@@ -79,9 +82,9 @@ final class HighlightTextView: BaseUIView {
         }
     }
     
-    func configure(image:UIImage? = nil, originalText: String, highlightText: String, diffRanges: [DiffRange], isHighlightingEnabled: Bool) {
-        if let image = image {
-            diaryImageView.image = image
+    func configure(image: String?, originalText: String, highlightText: String, diffRanges: [DiffRange], isHighlightingEnabled: Bool) {
+        if let image = image, !image.isEmpty, let url = URL(string: image) {
+            diaryImageView.kf.setImage(with: url)
             diaryImageView.isHidden = false
         } else {
             diaryImageView.isHidden = true

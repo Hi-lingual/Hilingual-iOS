@@ -7,6 +7,8 @@
 
 import Foundation
 
+import Combine
+
 public final class VocaViewController: BaseUIViewController<VocaViewModel> {
     
     // MARK: - Properties
@@ -17,7 +19,8 @@ public final class VocaViewController: BaseUIViewController<VocaViewModel> {
     
     public override func viewDidLoad() {
         super.viewDidLoad()
-        configure()
+        guard let viewModel = self.viewModel else { return }
+            bind(viewModel: viewModel)
     }
     
     // MARK: Custom Method
@@ -32,12 +35,41 @@ public final class VocaViewController: BaseUIViewController<VocaViewModel> {
         }
     }
     
-    // MARK: - Configure
+    // MARK: - Binding
+    
+    private let bookmarkToggleSubject = PassthroughSubject<(Int, Bool), Never>()
 
-    private func configure() {
-        let dataList = dummyPhraseData
-        dataList.forEach { phrase in
-            vocaView.configure(data: phrase)
+    public override func bind(viewModel: VocaViewModel) {
+        vocaView.onBookmarkToggle = { [weak self] phraseId, isBookmarked in
+            self?.bookmarkToggleSubject.send((Int(phraseId), isBookmarked))
         }
+
+        let input = VocaViewModel.Input(
+            viewDidLoad: Just(()).eraseToAnyPublisher(),
+            bookmarkToggled: bookmarkToggleSubject.eraseToAnyPublisher()
+        )
+
+        let output = viewModel.transform(input: input)
+
+        output.fetchVoca
+            .map { phraseList in
+                phraseList.map {
+                    PhraseViewData(
+                        phraseId: Int64($0.phraseId),
+                        phraseType: $0.phraseType,
+                        phrase: $0.phrase,
+                        explanation: $0.explanation,
+                        reason: $0.reason,
+                        isMarked: $0.isBookmarked,
+                        createdAt: ""
+                    )
+                }
+            }
+            .receive(on: RunLoop.main)
+            .sink { [weak self] viewDataList in
+                self?.vocaView.configure(dataList: viewDataList)
+            }
+            .store(in: &cancellables)
     }
+
 }

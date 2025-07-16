@@ -8,5 +8,5 @@
 import Combine
 
 public protocol DiaryDetailRepository {
-    func fetchDiaryDetail(diaryId: Int64) -> AnyPublisher<DiaryDetailEntity, Error>
+    func fetchDiaryDetail(diaryId: Int) -> AnyPublisher<DiaryDetailEntity, Error>
 }

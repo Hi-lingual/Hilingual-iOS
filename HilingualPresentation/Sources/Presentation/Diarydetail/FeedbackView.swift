@@ -14,16 +14,16 @@ final class FeedbackView: BaseUIView {
     
     private let scrollView = UIScrollView()
     private let contentView = UIStackView()
-    private let detailImageView = DetailImageView(image: UIImage(resource: .imgLoadingIos))
+    private let detailImageView = DetailImageView(image: UIImage(resource: .imgLoadFailLargeIos))
     
+    private var currentDiaryData: DiaryViewData?
     private var isHighlightingEnabled: Bool = true
     private let toggleButton = UIButton(type: .system)
     
-    let dateLabel: UILabel = {
+    var dateLabel: UILabel = {
         let label = UILabel()
         label.font = .suit(.body_sb_14)
         label.textColor = .gray700
-        label.text = "7월 11일 금요일"
         return label
     }()
     
@@ -172,8 +172,10 @@ final class FeedbackView: BaseUIView {
     // MARK: - Configure
     
     func configureDiary(data: DiaryViewData) {
+        currentDiaryData = data
+        self.dateLabel.text = data.date
         diaryTextView.configure(
-            image: UIImage(named: "img_loading_ios", in: .module, compatibleWith: nil),
+            image: data.imageURL,
             originalText: data.originalText,
             highlightText: data.rewriteText,
             diffRanges: data.diffRanges,
@@ -221,17 +223,18 @@ final class FeedbackView: BaseUIView {
     // MARK: - Actions
     
     @objc private func toggleButtonTapped() {
-        let mappedDiffRanges = dummyCorrectionData.data.diffRanges.map {
-            HighlightTextView.DiffRange(start: $0.start, end: $0.end)
-        }
-        diaryTextView.configure(
-            image: UIImage(named: "img_loading_ios", in: .module, compatibleWith: nil),
-            originalText: dummyCorrectionData.data.originalText,
-            highlightText: dummyCorrectionData.data.rewriteText,
-            diffRanges: mappedDiffRanges,
-            isHighlightingEnabled: self.isHighlightingEnabled
+        guard var data = currentDiaryData else { return }
+        
+        data = DiaryViewData(
+            imageURL: data.imageURL,
+            date: data.date,
+            originalText: data.originalText,
+            rewriteText: data.rewriteText,
+            diffRanges: data.diffRanges,
+            isHighlightingEnabled: !data.isHighlightingEnabled
         )
-        isHighlightingEnabled.toggle()
+        
+        configureDiary(data: data)
+        currentDiaryData = data
     }
-    
 }

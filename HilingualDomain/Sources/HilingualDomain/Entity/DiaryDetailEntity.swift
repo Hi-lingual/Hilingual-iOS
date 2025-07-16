@@ -8,22 +8,31 @@
 import Foundation
 
 public struct DiaryDetailEntity {
-    let code: Int
-    let data: CorrectionData?
-    let message: String
-    
-    public struct CorrectionData {
-        let date: String
-        let image: String
-        let originalFullText: String
-        let rewritedFullText: String
-        let diffRanges: DiffRange
-    }
+    public let date: String
+    public let image: String?
+    public let originalText: String
+    public let rewriteText: String
+    public let diffRanges: [DiffRange]
     
     public struct DiffRange {
-        let start: Int
-        let end: Int
-        let originalText: String
-        let correctedText: String
+        public let start: Int
+        public let end: Int
+        public let correctedText: String
+        
+        public init(start: Int, end: Int, correctedText: String) {
+            self.start = start
+            self.end = end
+            self.correctedText = correctedText
+        }
     }
+    
+    public init(date: String, image: String, originalText: String, rewriteText: String, diffRanges: [DiffRange]) {
+        self.date = date
+        self.image = image
+        self.originalText = originalText
+        self.rewriteText = rewriteText
+        self.diffRanges = diffRanges
+    }
+    
+    
 }
