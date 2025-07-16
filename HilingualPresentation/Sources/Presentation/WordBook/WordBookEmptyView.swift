@@ -8,20 +8,23 @@
 import UIKit
 import SnapKit
 
+enum WordBookEmptyState {
+    case noWords
+    case noSearchResult
+}
+
 final class WordBookEmptyView: UIView {
 
     // MARK: - UI Components
 
     private let emptyImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = UIImage(named: "img_word_ios", in: .module, compatibleWith: nil)
         imageView.contentMode = .scaleAspectFit
         return imageView
     }()
 
     private let emptyLabel: UILabel = {
         let label = UILabel()
-        label.text = "아직 단어가 추가되지 않았어요."
         label.font = .suit(.head_m_18)
         label.textColor = .gray500
         label.textAlignment = .center
@@ -30,7 +33,6 @@ final class WordBookEmptyView: UIView {
 
     public let emptyButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("일기 쓰고 단어 추가하기", for: .normal)
         button.setTitleColor(.white, for: .normal)
         button.titleLabel?.font = .suit(.body_m_16)
         button.backgroundColor = .hilingualBlack
@@ -43,7 +45,7 @@ final class WordBookEmptyView: UIView {
         let stack = UIStackView(arrangedSubviews: [emptyImageView, emptyLabel, emptyButton])
         stack.axis = .vertical
         stack.alignment = .center
-        stack.spacing = 0 
+        stack.spacing = 0
         return stack
     }()
 
@@ -76,6 +78,25 @@ final class WordBookEmptyView: UIView {
         emptyButton.snp.makeConstraints {
             $0.height.equalTo(46)
             $0.width.equalTo(175)
+        }
+    }
+
+    // MARK: - Configuration
+
+    func configure(state: WordBookEmptyState) {
+        switch state {
+        case .noWords:
+            emptyImageView.image = UIImage(named: "img_word_ios", in: .module, compatibleWith: nil)
+            emptyImageView.isHidden = false
+            emptyLabel.text = "아직 단어가 추가되지 않았어요."
+            emptyButton.setTitle("일기 쓰고 단어 추가하기", for: .normal)
+            emptyButton.isHidden = false
+
+        case .noSearchResult:
+            emptyImageView.image = UIImage(named: "img_search_ios", in: .module, compatibleWith: nil)
+            emptyImageView.isHidden = false
+            emptyLabel.text = "검색 결과가 없습니다."
+            emptyButton.isHidden = true
         }
     }
 }

@@ -106,9 +106,16 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
     // MARK: - Private Methods
 
     private func updateViewState() {
-        let isEmpty = fullWordList.allSatisfy { $0.1.isEmpty }
-        wordBookView.tableView.isHidden = isEmpty
-        wordBookView.emptyView.isHidden = !isEmpty
+        let isAllEmpty = fullWordList.allSatisfy { $0.1.isEmpty }
+        let isFilteredEmpty = filteredWordList.allSatisfy { $0.1.isEmpty }
+
+        wordBookView.tableView.isHidden = isFilteredEmpty
+        wordBookView.emptyView.isHidden = !isFilteredEmpty
+
+        if isFilteredEmpty {
+            let state: WordBookEmptyState = isAllEmpty ? .noWords : .noSearchResult
+            wordBookView.emptyView.configure(state: state)
+        }
     }
 
     private func updateSort(by index: Int) {
@@ -133,6 +140,7 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
         guard !keyword.isEmpty else {
             filteredWordList = fullWordList
             wordBookView.tableView.reloadData()
+            updateViewState()
             return
         }
 
@@ -144,6 +152,7 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
         }
 
         wordBookView.tableView.reloadData()
+        updateViewState()
     }
 
     //MARK: - Action Method
