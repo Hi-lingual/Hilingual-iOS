@@ -18,8 +18,8 @@ public final class DefaultFeedbackRepository: FeedbackRepository {
         self.service = service
     }
     
-    public func fetchFeedback() -> AnyPublisher<[DiaryFeedbackEntity], any Error> {
-        return service.fetchFeedback()
+    public func fetchFeedback(diaryId: Int) -> AnyPublisher<[DiaryFeedbackEntity], any Error> {
+        return service.fetchFeedback(diaryId: diaryId)
             .map { dto in
                 dto.data.feedbackList.map {
                     DiaryFeedbackEntity(

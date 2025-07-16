@@ -11,12 +11,12 @@ import Moya
 import Combine
 
 public protocol FeedbackService {
-    func fetchFeedback() -> AnyPublisher<FeedbackResponseDTO, Error>
+    func fetchFeedback(diaryId: Int) -> AnyPublisher<FeedbackResponseDTO, Error>
 }
 
 public final class DefaultFeedbackService: BaseService<FeedbackAPI>, FeedbackService {
-    public func fetchFeedback() -> AnyPublisher<FeedbackResponseDTO, Error> {
-        return request(.fetchFeedback(diaryId: 9), as: FeedbackResponseDTO.self)
+    public func fetchFeedback(diaryId: Int) -> AnyPublisher<FeedbackResponseDTO, Error> {
+        return request(.fetchFeedback(diaryId: diaryId), as: FeedbackResponseDTO.self)
             .mapError { $0 as Error }
             .eraseToAnyPublisher()
     }

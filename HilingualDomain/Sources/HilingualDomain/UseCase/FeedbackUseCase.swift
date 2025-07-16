@@ -8,7 +8,7 @@
 import Combine
 
 public protocol FeedbackUseCase {
-    func fetchFeedback() -> AnyPublisher<[DiaryFeedbackEntity], Error>
+    func fetchFeedback(diaryId: Int) -> AnyPublisher<[DiaryFeedbackEntity], Error>
 }
 
 public final class DefaultFeedbackUseCase: FeedbackUseCase {
@@ -18,7 +18,7 @@ public final class DefaultFeedbackUseCase: FeedbackUseCase {
         self.repository = repository
     }
     
-    public func fetchFeedback() -> AnyPublisher<[DiaryFeedbackEntity], Error> {
-        return repository.fetchFeedback()
+    public func fetchFeedback(diaryId: Int) -> AnyPublisher<[DiaryFeedbackEntity], Error> {
+        return repository.fetchFeedback(diaryId: diaryId)
     }
 }

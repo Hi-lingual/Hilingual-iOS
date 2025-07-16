@@ -8,5 +8,5 @@
 import Combine
 
 public protocol FeedbackRepository {
-    func fetchFeedback() -> AnyPublisher<[DiaryFeedbackEntity], Error>
+    func fetchFeedback(diaryId: Int) -> AnyPublisher<[DiaryFeedbackEntity], Error>
 }

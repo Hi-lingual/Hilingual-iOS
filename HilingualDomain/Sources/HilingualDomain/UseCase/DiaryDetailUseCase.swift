@@ -19,6 +19,6 @@ public final class DefaultDiaryDetailUseCase: DiaryDetailUseCase {
     }
 
     public func fetchDiaryDetail(diaryId: Int) -> AnyPublisher<DiaryDetailEntity, Error> {
-        return repository.fetchDiaryDetail(diaryId: 28)
+        return repository.fetchDiaryDetail(diaryId: diaryId)
     }
 }
