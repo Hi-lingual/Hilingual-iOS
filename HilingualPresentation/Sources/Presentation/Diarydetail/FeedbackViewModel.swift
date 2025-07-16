@@ -20,27 +20,31 @@ public final class FeedbackViewModel: BaseViewModel{
     // MARK: - Output
     
     struct Output {
-        let fetchDiaryResult: AnyPublisher<[DiaryFeedbackEntity], Never>
+        let fetchDiaryResult: AnyPublisher<DiaryDetailEntity, Never>
+        let fetchFeedbackResult: AnyPublisher<[DiaryFeedbackEntity], Never>
         let errorMessage: AnyPublisher<String, Never>
     }
     
     // MARK: - Properties
     
-    private let useCase: FeedbackUseCase
+    private let diaryDetailUseCase: DiaryDetailUseCase
+    private let feedbackUseCase: FeedbackUseCase
     
+    private let diaryDetailSubject = PassthroughSubject<DiaryDetailEntity, Never>()
     private let feedbackSubject = PassthroughSubject<[DiaryFeedbackEntity], Never>()
     private let errorSubject = PassthroughSubject<String, Never>()
     
-    public init(useCase: FeedbackUseCase) {
-        self.useCase = useCase
+    public init(diaryDetailUseCase: DiaryDetailUseCase,
+                feedbackUseCase: FeedbackUseCase) {
+        self.diaryDetailUseCase = diaryDetailUseCase
+        self.feedbackUseCase = feedbackUseCase
     }
     
     func transform(input: Input) -> Output {
         input.viewDidLoad
             .sink { [weak self] in
                 guard let self = self else { return }
-                
-                self.useCase.fetchFeedback()
+                self.feedbackUseCase.fetchFeedback(diaryId: 37)
                     .sink(receiveCompletion: { [weak self] completion in
                         switch completion {
                         case .failure(let error):
@@ -54,10 +58,21 @@ public final class FeedbackViewModel: BaseViewModel{
                         print("feedbackData: \(feedbackData)")
                     })
                     .store(in: &self.cancellables)
+                
+                self.diaryDetailUseCase.fetchDiaryDetail(diaryId: 37)
+                                .sink(receiveCompletion: { [weak self] completion in
+                                    if case let .failure(error) = completion {
+                                        self?.errorSubject.send("일기 상세 조회 실패: \(error.localizedDescription)")
+                                    }
+                                }, receiveValue: { [weak self] detail in
+                                    self?.diaryDetailSubject.send(detail)
+                                })
+                                .store(in: &self.cancellables)
             }
             .store(in: &cancellables)
         return Output(
-            fetchDiaryResult: feedbackSubject.eraseToAnyPublisher(),
+            fetchDiaryResult: diaryDetailSubject.eraseToAnyPublisher(),
+            fetchFeedbackResult: feedbackSubject.eraseToAnyPublisher(),
             errorMessage: errorSubject.eraseToAnyPublisher()
         )
     }
