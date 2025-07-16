@@ -82,6 +82,10 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
         return .backTitleMenu("일기장")
     }
     
+    @objc public override func backButtonTapped() {
+        navigationController?.popToRootViewController(animated: true)
+    }
+    
     // MARK: - Actions
     
     public override func menuButtonTapped() {
