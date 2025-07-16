@@ -22,6 +22,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window.backgroundColor = .white
         self.window = window
 
+        let appDI = AppDIContainer.shared
+        let loginVC = appDI.makeWordBookViewController()
+        let navigation = UINavigationController(rootViewController: loginVC)
+
+        window.rootViewController = navigation
         let launchScreenVC = LaunchScreen()
         window.rootViewController = launchScreenVC
         window.makeKeyAndVisible()

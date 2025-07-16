@@ -52,7 +52,7 @@ final class WordCard: UIView {
         data.phraseType.compactMap { chipType(from: $0) }
             .map { Chip(type: $0) }
             .forEach { chipStackView.addArrangedSubview($0) }
-        
+
         phraseLabel.text = data.phrase
         explanationLabel.text = data.explanation
         savedDateLabel.text = "\(data.createdAt) 일기에서 저장됨"
@@ -73,16 +73,27 @@ final class WordCard: UIView {
         switch type {
         case .basic:
             phraseLabel.font = .suit(.head_m_18)
+
             explanationLabel.isHidden = true
             reasonLabel.isHidden = true
             savedDateLabel.isHidden = true
-            
+
+            explanationLabel.snp.remakeConstraints {
+                $0.height.equalTo(0)
+            }
+            reasonLabel.snp.remakeConstraints {
+                $0.height.equalTo(0)
+            }
+            savedDateLabel.snp.remakeConstraints {
+                $0.height.equalTo(0)
+            }
+
             phraseLabel.snp.remakeConstraints {
                 $0.top.equalTo(chipStackView.snp.bottom).offset(4)
                 $0.leading.trailing.equalToSuperview().inset(12)
                 $0.bottom.equalToSuperview().inset(12)
             }
-            
+
         case .withExample:
             phraseLabel.font = .suit(.body_sb_16)
             explanationLabel.font = .suit(.body_b_14)
@@ -105,7 +116,7 @@ final class WordCard: UIView {
                 $0.leading.trailing.equalToSuperview().inset(12)
                 $0.bottom.equalToSuperview().inset(12)
             }
-            
+
         case .withDate:
             phraseLabel.font = .suit(.body_m_20)
             explanationLabel.font = .suit(.body_m_14)
@@ -134,7 +145,7 @@ final class WordCard: UIView {
             savedDateLabel.snp.remakeConstraints {
                 $0.top.equalTo(explanationLabel.snp.bottom).offset(80)
                 $0.trailing.equalToSuperview().inset(24)
-                $0.bottom.equalToSuperview().inset(40)
+                $0.bottom.equalToSuperview().inset(12)
             }
         }
     }

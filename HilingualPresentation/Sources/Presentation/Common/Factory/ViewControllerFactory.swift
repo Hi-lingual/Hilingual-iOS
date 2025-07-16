@@ -11,6 +11,7 @@ public protocol ViewControllerFactory {
     func makeOnboardingViewController() -> OnBoardingViewController
     func makeHomeViewController() -> HomeViewController
     func makeLoadingViewController() -> LoadingViewController
+    func makeWordBookViewController() -> WordBookViewController
     func makeDiaryDetailViewController() -> DiaryDetailViewController
     func makeFeedbackViewController() -> FeedbackViewController
     func makeVocaViewController() -> VocaViewController

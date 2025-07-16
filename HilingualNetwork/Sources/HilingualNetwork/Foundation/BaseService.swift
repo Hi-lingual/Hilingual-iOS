@@ -74,4 +74,41 @@ public class BaseService<API: TargetType> {
         })
         .eraseToAnyPublisher()
     }
+
+    ///삭제처럼 리스폰스 디코딩이  없는것들은 이함수로 호출하세요!! 
+    public func requestPlain(_ target: API) -> AnyPublisher<Void, NetworkError> {
+        return Future<Void, NetworkError> { [weak self] promise in
+            self?.provider.request(target) { result in
+                switch result {
+                case .success(let response):
+                    switch response.statusCode {
+                    case 200..<300:
+                        promise(.success(()))
+                    case 401:
+                        promise(.failure(.unauthorized))
+                    case 403:
+                        promise(.failure(.forbidden))
+                    case 404:
+                        promise(.failure(.notFound))
+                    default:
+                        if let serverError = try? JSONDecoder().decode(ServerError.self, from: response.data) {
+                            promise(.failure(.serverError(serverError)))
+                        } else {
+                            promise(.failure(.unknown))
+                        }
+                    }
+
+                case .failure:
+                    promise(.failure(.networkFail))
+                }
+            }
+        }
+        .handleEvents(receiveCompletion: { completion in
+            if case .failure(let error) = completion {
+                print("❌ [Plain 에러] \(API.self) - \(target.path): \(error)")
+            }
+        })
+        .eraseToAnyPublisher()
+    }
+
 }
