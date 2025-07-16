@@ -163,7 +163,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
             topicData: topicData,
             selectedDate: selectedDate ?? Date()
         )
-
+        diaryWritingVC.hidesBottomBarWhenPushed = true
         navigationController?.pushViewController(diaryWritingVC, animated: true)
     }
 }
