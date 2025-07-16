@@ -232,12 +232,6 @@ final class SelectedInfo: UIView {
         )
         return attributed
     }
-
-    func setSelectedDate(_ date: Date) {
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "ko_KR")
-        formatter.dateFormat = "M월 d일 EEEE"
-        selectedDayLabel.text = formatter.string(from: date)
     @objc private func cardPreviewTapped() {
         onDiaryPreviewTapped?()
     }
