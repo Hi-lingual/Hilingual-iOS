@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct DiaryDetailDTO: Decodable {
+public struct DiaryDetailResponseDTO: Decodable {
     public let code: Int
     public let data: CorrectionData?
     public let message: String

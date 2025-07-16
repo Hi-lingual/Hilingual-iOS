@@ -11,12 +11,12 @@ import Moya
 import Combine
 
 public protocol DiaryDetailService {
-    func fetchDiaryDetail(diaryId: Int) -> AnyPublisher<DiaryDetailDTO, Error>
+    func fetchDiaryDetail(diaryId: Int) -> AnyPublisher<DiaryDetailResponseDTO, Error>
 }
 
 public final class DefaultDiaryDetailService: BaseService<DiaryDetailAPI>, DiaryDetailService {
-    public func fetchDiaryDetail(diaryId: Int) -> AnyPublisher<DiaryDetailDTO, Error> {
-        return request(.fetchDiaryDetail(diaryId: diaryId), as: DiaryDetailDTO.self)
+    public func fetchDiaryDetail(diaryId: Int) -> AnyPublisher<DiaryDetailResponseDTO, Error> {
+        return request(.fetchDiaryDetail(diaryId: diaryId), as: DiaryDetailResponseDTO.self)
             .mapError { $0 as Error }
             .eraseToAnyPublisher()
     }
