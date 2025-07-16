@@ -7,9 +7,9 @@
 
 import Combine
 
-//인터페이스 외부에서는 이친구를 의존합니다
 public protocol HomeUseCase {
     func fetchUserInfo() -> AnyPublisher<UserInfoEntity, Error>
+    func fetchMonthInfo() -> AnyPublisher<MonthInfoEntity, Error>
 }
 
 public final class DefaultHomeUseCase: HomeUseCase {
@@ -21,5 +21,8 @@ public final class DefaultHomeUseCase: HomeUseCase {
 
     public func fetchUserInfo() -> AnyPublisher<UserInfoEntity, Error> {
         return repository.fetchUserInfo()
+    }
+    public func fetchMonthInfo() -> AnyPublisher<MonthInfoEntity, Error> {
+        return repository.fetchMonthInfo()
     }
 }

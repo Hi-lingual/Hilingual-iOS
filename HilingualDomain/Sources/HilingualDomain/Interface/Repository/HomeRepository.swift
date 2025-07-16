@@ -6,8 +6,10 @@
 //
 
 import Combine
+import Foundation
 
 //추상화된 레포지토리 실 구현은 data 레이어에 있어요
 public protocol HomeRepository {
     func fetchUserInfo() -> AnyPublisher<UserInfoEntity, Error>
+    func fetchMonthInfo() -> AnyPublisher<MonthInfoEntity, Error>
 }

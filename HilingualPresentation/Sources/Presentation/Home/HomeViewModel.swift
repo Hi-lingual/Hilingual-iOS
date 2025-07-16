@@ -6,6 +6,7 @@
 //
 
 import Combine
+import Foundation
 import HilingualDomain
 
 public final class HomeViewModel: BaseViewModel {
@@ -13,13 +14,14 @@ public final class HomeViewModel: BaseViewModel {
     // MARK: - Input
 
     public struct Input {
-        // 필요한 Input이 있다면 여기에 나중에 추가
+        let monthChange = PassthroughSubject<(Int, Int), Never>()
     }
 
     // MARK: - Output
 
     public struct Output {
         let userInfo: AnyPublisher<UserInfoEntity, Error>
+        let filledDates: AnyPublisher<[Date], Never>
     }
 
     // MARK: - Properties
@@ -37,8 +39,19 @@ public final class HomeViewModel: BaseViewModel {
     public func transform(input: Input) -> Output {
         let userInfoPublisher = useCase.fetchUserInfo()
             .eraseToAnyPublisher()
-
-        return Output(userInfo: userInfoPublisher)
+        
+        let filledDatesPublisher = input.monthChange
+            .flatMap { _ in
+                self.useCase.fetchMonthInfo()
+                    .map { $0.dates }
+                    .catch { _ in Just([]) }
+            }
+            .eraseToAnyPublisher()
+        
+        return Output(
+            userInfo: userInfoPublisher,
+            filledDates: filledDatesPublisher
+        )
     }
 }
 

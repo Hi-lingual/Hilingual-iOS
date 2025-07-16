@@ -18,16 +18,6 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     public override func setUI() {
         super.setUI()
         view.addSubview(homeView)
-        
-        // 초기 날짜 설정
-        let today = Date()
-        homeView.calendarView.selectedDate = today
-        homeView.selectedInfo.setSelectedDate(today)
-
-        // 날짜 선택 시마다 상태 업데이트
-        homeView.calendarView.onDateSelected = { [weak self] date in
-            self?.homeView.selectedInfo.setSelectedDate(date)
-        }
     }
 
     public override func setLayout() {
@@ -42,19 +32,37 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         }
     }
     
-    //MARK: - Bind Method
+    // MARK: - Bind Method
     
     public override func bind(viewModel: HomeViewModel) {
-        let output = viewModel.transform(input: .init())
-
+        let input = HomeViewModel.Input()
+        
+        let today = Date()
+        homeView.calendarView.selectedDate = today
+        homeView.calendarView.reload(for: today)
+        homeView.selectedInfo.setSelectedDate(today)
+        
+        let selectedDate = homeView.calendarView.selectedDate ?? Date()
+        let calendar = Calendar.current
+        let year = calendar.component(.year, from: selectedDate)
+        let month = calendar.component(.month, from: selectedDate)
+        input.monthChange.send((year, month))
+        
+        homeView.onMonthChanged = { year, month in
+            input.monthChange.send((year, month))
+        }
+        
+        homeView.calendarView.onDateSelected = { [weak self] date in
+            self?.homeView.selectedInfo.setSelectedDate(date)
+        }
+        
+        let output = viewModel.transform(input: input)
+        
         output.userInfo
             .receive(on: RunLoop.main)
             .sink(
                 receiveCompletion: { completion in
-                    switch completion {
-                    case .finished:
-                        break
-                    case .failure(let error):
+                    if case .failure(let error) = completion {
                         print("유저 정보 조회 실패: \(error.localizedDescription)")
                     }
                 },
@@ -68,14 +76,27 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                 }
             )
             .store(in: &viewModel.cancellables)
-    }
+        
+        output.filledDates
+            .receive(on: RunLoop.main)
+            .sink { [weak self] (dates: [Date]) in
+                guard let self else { return }
+                self.homeView.calendarView.filledDates = dates
+                let selectedDate = self.homeView.calendarView.selectedDate ?? Date()
+                self.homeView.calendarView.reload(for: selectedDate)
+            }
+            .store(in: &viewModel.cancellables)
 
+    }
 
     // MARK: - Navigation Method
     
     private func goToDiaryWritingView() {
         navigationController?.setNavigationBarHidden(false, animated: false)
-        let diaryWritingVC = DiaryWritingViewController(viewModel: DiaryWritingViewModel(), diContainer: self.diContainer)
+        let diaryWritingVC = DiaryWritingViewController(
+            viewModel: DiaryWritingViewModel(),
+            diContainer: self.diContainer
+        )
         navigationController?.pushViewController(diaryWritingVC, animated: true)
     }
 }

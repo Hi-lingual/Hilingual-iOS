@@ -9,6 +9,7 @@ import Combine
 
 import HilingualDomain
 import HilingualNetwork
+import Foundation
 
 /// HomeRepository 프로토콜을 구현한 클래스
 /// - 역할: Network로부터 받은 DTO를 도메인 모델(Entity)로 변환하여 전달하는 녀석입니다!
@@ -36,6 +37,17 @@ public final class DefaultHomeRepository: HomeRepository {
                     totalDiaries: data.totalDiaries,
                     streak: data.streak
                 )
+            }
+            .eraseToAnyPublisher()
+    }
+    
+    public func fetchMonthInfo() -> AnyPublisher<MonthInfoEntity, Error> {
+        return service.fetchMonthInfo()
+            .tryMap { dto in
+                guard let data = dto.data else {
+                    throw NetworkError.decoding
+                }
+                return data.toEntity()
             }
             .eraseToAnyPublisher()
     }
