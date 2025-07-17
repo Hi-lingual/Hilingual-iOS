@@ -25,7 +25,7 @@ final class OnBoardingView: BaseUIView {
     }()
 
     let startButton: CTAButton = {
-        CTAButton(style: .TextButton("적용하기"), autoBackground: true)
+        CTAButton(style: .TextButton("시작하기"), autoBackground: true)
     }()
 
     let nickNameLabel: UILabel = {
