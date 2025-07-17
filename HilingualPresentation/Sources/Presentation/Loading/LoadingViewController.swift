@@ -137,6 +137,6 @@ public final class LoadingViewController: BaseUIViewController<LoadingViewModel>
     }
 
     private func goToHomeView() {
-        navigationController?.popViewController(animated: true)
+        navigationController?.popToRootViewController(animated: true)
     }
 }
