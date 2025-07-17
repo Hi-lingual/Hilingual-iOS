@@ -8,18 +8,13 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     private let homeView = HomeView()
     private let input = HomeViewModel.Input()
     private var didSendInitialMonth = false
-
+    
     // MARK: - Life Cycle
-
-    public override func setUI() {
-        super.setUI()
-        view.addSubview(homeView)
-    }
-
-    public override func setLayout() {
-        homeView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
-        }
+    
+    public override func viewDidLoad() {
+        super.viewDidLoad()
+        guard let viewModel = self.viewModel else { return }
+            bind(viewModel: viewModel)
     }
 
     public override func viewWillAppear(_ animated: Bool) {
@@ -39,7 +34,19 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         let month = calendar.component(.month, from: selectedDate)
         input.monthChange.send((year, month))
     }
+    
+    // MARK: Custom Method
+    
+    public override func setUI() {
+        super.setUI()
+        view.addSubview(homeView)
+    }
 
+    public override func setLayout() {
+        homeView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+    }
 
     public override func addTarget() {
         homeView.selectedInfo.cardTopicView.onTapWriteDiary = { [weak self] in
@@ -64,6 +71,8 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                 .store(in: &self.viewModel!.cancellables)
         }
     }
+    
+    // MARK: - Binding
 
     public override func bind(viewModel: HomeViewModel) {
         let today = Date()
