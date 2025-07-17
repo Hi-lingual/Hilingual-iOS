@@ -90,7 +90,6 @@ final class WordCard: UIView {
             savedDateLabel.snp.remakeConstraints {
                 $0.height.equalTo(0)
             }
-
             phraseLabel.snp.remakeConstraints {
                 $0.top.equalTo(chipStackView.snp.bottom).offset(4)
                 $0.leading.trailing.equalToSuperview().inset(12)
@@ -109,10 +108,6 @@ final class WordCard: UIView {
                 $0.leading.trailing.equalToSuperview().inset(12)
             }
             
-            bookmarkButton.snp.makeConstraints {
-                $0.top.trailing.equalToSuperview().inset(12)
-                $0.width.equalTo(28)
-            }
             
             explanationLabel.snp.makeConstraints {
                 $0.top.equalTo(phraseLabel.snp.bottom).offset(4)
@@ -137,10 +132,6 @@ final class WordCard: UIView {
                 $0.top.leading.equalToSuperview().inset(24)
             }
             
-            bookmarkButton.snp.updateConstraints {
-                $0.top.trailing.equalToSuperview().inset(24)
-            }
-            
             phraseLabel.snp.remakeConstraints {
                 $0.top.equalTo(chipStackView.snp.bottom).offset(4)
                 $0.leading.trailing.equalToSuperview().inset(24)
@@ -156,6 +147,12 @@ final class WordCard: UIView {
                 $0.trailing.equalToSuperview().inset(24)
                 $0.bottom.equalToSuperview().inset(40)
             }
+        }
+        
+        bookmarkButton.snp.remakeConstraints {
+            let inset: CGFloat = (type == .withDate) ? 24 : 12
+            $0.top.trailing.equalToSuperview().inset(inset)
+            $0.width.height.equalTo(28)
         }
     }
 
@@ -184,10 +181,6 @@ final class WordCard: UIView {
     private func setLayout() {
         chipStackView.snp.makeConstraints {
             $0.top.leading.equalToSuperview().inset(12)
-        }
-
-        bookmarkButton.snp.makeConstraints {
-            $0.top.trailing.equalToSuperview().inset(12)
         }
     }
 
