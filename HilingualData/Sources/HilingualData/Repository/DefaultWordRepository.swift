@@ -34,11 +34,13 @@ public final class DefaultWordRepository: WordBookRepository {
                             createdAt: nil
                         )
                     }
-                    return (group.group, items)
+                    let localizedGroup = (group.group == "today") ? "오늘" : group.group
+                    return (localizedGroup, items)
                 }
             }
             .eraseToAnyPublisher()
     }
+
 
 
     public func fetchWordDetail(id: Int) -> AnyPublisher<WordEntity, Error> {
