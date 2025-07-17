@@ -33,6 +33,8 @@ public final class OnBoardingViewController: BaseUIViewController<OnBoardingView
         return .titleOnly("프로필 작성")
     }
 
+    //TODO: - 테스트후 수정하기
+
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(false, animated: animated)

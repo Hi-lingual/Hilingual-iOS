@@ -31,6 +31,8 @@ final class WordBookView: BaseUIView {
         searchBar.searchTextField.backgroundColor = .white
         searchBar.searchTextField.layer.cornerRadius = 8
         searchBar.searchTextField.clipsToBounds = true
+        searchBar.setImage(UIImage(named: "ic_search_20_ios", in: .module, compatibleWith: nil), for: UISearchBar.Icon.search, state: .normal)
+        searchBar.setImage(UIImage(named: "ic_close_20_ios", in: .module, compatibleWith: nil), for: UISearchBar.Icon.clear, state: .normal)
         searchBar.searchTextField.font = .suit(.body_m_16)
         searchBar.updateHeight(height: 46)
         let attributes: [NSAttributedString.Key: Any] = [
