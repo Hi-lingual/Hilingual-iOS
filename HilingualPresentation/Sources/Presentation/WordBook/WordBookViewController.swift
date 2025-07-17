@@ -40,6 +40,7 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: animated)
+        refreshSubject.send(())
     }
 
     public override func viewWillDisappear(_ animated: Bool) {
@@ -145,8 +146,7 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
 
         let totalCount = fullWordList.reduce(0) { $0 + $1.1.count }
         wordBookView.updateHeaderView(totalCount: totalCount, sortIndex: index)
-
-        modal.isHidden = true
+        modal.dismiss()
     }
 
     private func filterWords(for keyword: String) {

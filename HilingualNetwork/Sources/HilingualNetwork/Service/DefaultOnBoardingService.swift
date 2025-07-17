@@ -19,9 +19,8 @@ public final class DefaultOnBoardingService: BaseService<OnBoardingAPI>,OnBoardi
 
     //TODO: - null 리스폰스 변경
     public func registerProfile(nickname: String, profileImg: String) -> AnyPublisher<Void, Error> {
-        return request(
-            .setProfile(nickname: nickname, profileImg: profileImg),
-            as: BaseAPIResponse<EmptyData>.self
+        return requestPlain(
+            .setProfile(nickname: nickname, profileImg: profileImg)
         )
         .map { _ in () }
         .mapError { $0 as Error }
