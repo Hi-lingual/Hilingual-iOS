@@ -83,7 +83,7 @@ final class UnderlineSegmentedControl: UIView {
 
         let selectedButton = buttons[selectedIndex]
         let underlineHeight: CGFloat = 3
-        let underlineInset: CGFloat = 8
+        let underlineInset: CGFloat = 16
 
         let targetFrame = CGRect(
             x: selectedButton.frame.origin.x + underlineInset,
