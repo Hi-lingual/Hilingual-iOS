@@ -277,7 +277,17 @@ extension WordBookViewController: UITextFieldDelegate {
     }
 
     public func textFieldShouldClear(_ textField: UITextField) -> Bool {
+        DispatchQueue.main.async {
+            textField.resignFirstResponder()
+            self.wordBookView.searchBar.resignFirstResponder()
+        }
+        return true
+    }
+
+    public func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        print("Search button tapped on keyboard")
         textField.resignFirstResponder()
         return true
     }
+
 }
