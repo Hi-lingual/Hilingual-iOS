@@ -35,7 +35,7 @@ enum HilingualColor: String {
     case white = "White"
     case dim = "dim"
     
-    case alertRed = "AlertRed"
+    case alertRed = "AlertREd"
     case infoBlue = "InfoBlue"
 }
 
