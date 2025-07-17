@@ -72,7 +72,7 @@ final class CTAButton: UIButton {
             contentHorizontalAlignment = .center
             semanticContentAttribute = .forceLeftToRight
         
-            imageEdgeInsets = UIEdgeInsets(top: 0, left: -4, bottom: 0, right: 4)
+            titleEdgeInsets = UIEdgeInsets(top: 0, left: 8, bottom: 0, right: -8)
         }
 
         private func configure(with style: CTAButtonStyle) {

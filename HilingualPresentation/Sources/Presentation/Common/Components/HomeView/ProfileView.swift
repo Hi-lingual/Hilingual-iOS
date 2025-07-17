@@ -133,10 +133,10 @@ final class ProfileView: UIView {
         totalLabel.text = "총 \(totalDiaries)편"
         streakLabel.text = "\(streak)일 연속 작성 중"
         
-        if let urlString = profileImageURL, let url = URL(string: urlString) {
-            profileImageView.kf.setImage(with: url)
-        } else {
-            profileImageView.image = UIImage(named: "img_profile_normal_ios", in: .module, compatibleWith: nil)
-        }
+//        if let urlString = profileImageURL, let url = URL(string: urlString) {
+//            profileImageView.kf.setImage(with: url)
+//        } else {
+//            profileImageView.image = UIImage(named: "img_profile_normal_ios", in: .module, compatibleWith: nil)
+//        }
     }
 }

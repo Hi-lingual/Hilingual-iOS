@@ -14,6 +14,8 @@ final class CalendarView: UIView {
     
     //CalendarHeaderView한테 알려줌
     var onMonthChanged: ((Date) -> Void)?
+    
+    //HomeView한테 알려줌
     var onDateSelected: ((Date) -> Void)?
 
     private let calendar = Calendar.current
@@ -80,7 +82,7 @@ final class CalendarView: UIView {
         updateItemSize()
     }
     
-    //높이 계산 로직!
+    //높이 계산 로직
     override var intrinsicContentSize: CGSize {
         let rowHeight: CGFloat = 34
         let lineSpacing: CGFloat = 14
@@ -124,6 +126,26 @@ final class CalendarView: UIView {
             $0.top.equalTo(weekStackView.snp.bottom).offset(8)
             $0.leading.trailing.bottom.equalToSuperview()
         }
+    }
+    
+    // MARK: - Public Methods
+    
+    public func select(date: Date) {
+        self.selectedDate = date
+        self.reload(for: date)
+        self.onDateSelected?(date)
+    }
+    
+    func reload(for date: Date) {
+        currentDate = date
+        generateDays()
+        collectionView.reloadData()
+        invalidateIntrinsicContentSize()
+    }
+    
+    public func reloadData() {
+        collectionView.reloadData()
+        invalidateIntrinsicContentSize()
     }
 
     // MARK: - Private Methods
@@ -169,18 +191,6 @@ final class CalendarView: UIView {
         let width = containerView.bounds.width / 7
         flowLayout.itemSize = CGSize(width: width, height: 34)
     }
-    
-    func reload(for date: Date) {
-        currentDate = date
-        generateDays()
-        collectionView.reloadData()
-        invalidateIntrinsicContentSize()
-    }
-    
-    public func reloadData() {
-        collectionView.reloadData()
-        invalidateIntrinsicContentSize()
-    }
 }
 
 // MARK: - Extensions
@@ -222,8 +232,4 @@ extension CalendarView: UICollectionViewDataSource, UICollectionViewDelegate {
     func setSelectedDate(_ date: Date) {
         selectedDate = date
     }
-}
-
-#Preview {
-CalendarView()
 }
