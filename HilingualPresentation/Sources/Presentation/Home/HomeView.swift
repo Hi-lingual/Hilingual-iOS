@@ -52,7 +52,6 @@ final class HomeView: BaseUIView {
             selectedInfo,
             spacer2
         )
-        
         bindCalendar()
         
     }

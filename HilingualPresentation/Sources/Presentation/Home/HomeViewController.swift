@@ -8,8 +8,8 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     private let homeView = HomeView()
     private let input = HomeViewModel.Input()
     private var didSendInitialMonth = false
-
-    // MARK: - Life Cycle
+    
+    // MARK: - Custom Method
 
     public override func setUI() {
         super.setUI()
@@ -20,6 +20,10 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         homeView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
+    }
+    
+    public override func viewDidLoad() {
+        super.viewDidLoad()
     }
 
     public override func viewWillAppear(_ animated: Bool) {
