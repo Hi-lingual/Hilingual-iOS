@@ -71,8 +71,6 @@ final class CTAButton: UIButton {
 
             contentHorizontalAlignment = .center
             semanticContentAttribute = .forceLeftToRight
-        
-            titleEdgeInsets = UIEdgeInsets(top: 0, left: 8, bottom: 0, right: -8)
         }
 
         private func configure(with style: CTAButtonStyle) {
@@ -83,6 +81,7 @@ final class CTAButton: UIButton {
 
             case .IconTextButton(let iconName, let text):
                 setTitle(text, for: .normal)
+                titleEdgeInsets = UIEdgeInsets(top: 0, left: 8, bottom: 0, right: -8)
 
                 //아이콘 터치 이벤트 무효화 위해서
                 guard let image = UIImage(named: iconName, in: .module, compatibleWith: nil) else { return }

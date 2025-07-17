@@ -177,9 +177,3 @@ final class CardTopicView: UIView {
         }
     }
 }
-
-#Preview {
-    let view = CardTopicView()
-    view.configure(kor: nil, en: nil)
-    return view
-}
