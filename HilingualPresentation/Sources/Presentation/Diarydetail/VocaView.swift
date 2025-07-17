@@ -31,7 +31,7 @@ final class VocaView: BaseUIView {
     // MARK: - Custom Method
     
     override func setUI() {
-        self.backgroundColor = .systemGray6
+        self.backgroundColor = .gray100
         contentView.axis = .vertical
         contentView.spacing = 20
         self.addSubview(scrollView)
