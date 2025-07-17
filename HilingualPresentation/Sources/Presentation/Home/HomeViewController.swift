@@ -21,7 +21,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
             make.edges.equalToSuperview()
         }
     }
-
+    
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: false)
@@ -32,8 +32,21 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         let year = calendar.component(.year, from: selectedDate)
         let month = calendar.component(.month, from: selectedDate)
         input.monthChange.send((year, month))
+
+        // 사용자 정보도 다시 요청
+        viewModel?.fetchUserInfo()
+            .receive(on: RunLoop.main)
+            .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] entity in
+                self?.homeView.profileView.updateView(
+                    nickname: entity.nickname,
+                    profileImageURL: entity.profileImg,
+                    totalDiaries: entity.totalDiaries,
+                    streak: entity.streak
+                )
+            })
+            .store(in: &viewModel!.cancellables)
     }
-    
+
     // MARK: - Bind
 
     public override func bind(viewModel: HomeViewModel) {
