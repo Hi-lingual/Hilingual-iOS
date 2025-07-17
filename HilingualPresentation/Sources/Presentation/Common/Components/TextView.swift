@@ -36,7 +36,6 @@ final class TextView: UIView {
         textView.isScrollEnabled = true
         textView.autocorrectionType = .no
         textView.spellCheckingType = .no
-        textView.returnKeyType = .done
         textView.layer.borderWidth = 0
         textView.layer.borderColor = UIColor.hilingualBlack.cgColor
         return textView
@@ -144,11 +143,6 @@ extension TextView: UITextViewDelegate {
     }
     
     func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
-        if text == "\n" {
-            textView.resignFirstResponder()
-            return false
-        }
-        
         if text.contains(where: { $0.isEmoji }) {
             return false
         }
