@@ -49,6 +49,10 @@ final class WordCard: UIView {
         self.cardType = type
         isMarked = data.isMarked
         
+        updateBookmarkImage()
+        bookmarkButton.setNeedsLayout()
+        layoutIfNeeded()
+        
         // Chip 초기화 및 추가
         chipStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
         data.phraseType.compactMap { chipType(from: $0) }
@@ -60,8 +64,6 @@ final class WordCard: UIView {
         savedDateLabel.text = "\(data.createdAt) 일기에서 저장됨"
         reasonLabel.isHidden = data.reason.isEmpty
         reasonLabel.text = "\(data.reason)"
-        
-        updateBookmarkImage()
         
         explanationLabel.isHidden = false
         reasonLabel.isHidden = false
@@ -151,8 +153,9 @@ final class WordCard: UIView {
         
         bookmarkButton.snp.remakeConstraints {
             let inset: CGFloat = (type == .withDate) ? 24 : 12
+            let size: CGFloat = (type == .withDate) ? 36 : 28 
             $0.top.trailing.equalToSuperview().inset(inset)
-            $0.width.height.equalTo(28)
+            $0.width.height.equalTo(size)
         }
     }
 
@@ -200,8 +203,12 @@ final class WordCard: UIView {
         default:
             imageName = isMarked ? "ic_save_default_28_ios" : "ic_save_variant_28_ios"
         }
-        bookmarkButton.setImage(UIImage(named: imageName, in: .module, compatibleWith: nil), for: .normal)
+
+        let image = UIImage(named: imageName, in: .module, compatibleWith: nil)
+        print("✅ 북마크 상태: \(isMarked), imageName: \(imageName), image 존재 여부: \(image != nil)")
+        bookmarkButton.setImage(image, for: .normal)
     }
+
 
 
     private func chipType(from korTitle: String) -> ChipType? {

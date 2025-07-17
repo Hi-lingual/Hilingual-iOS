@@ -220,7 +220,7 @@ final class FeedbackView: BaseUIView {
         let bottomSpacingView = UIView()
         feedbackStackView.addArrangedSubview(bottomSpacingView)
         bottomSpacingView.snp.makeConstraints {
-            $0.height.equalTo(40)
+            $0.height.equalTo(30)
         }
     }
     
