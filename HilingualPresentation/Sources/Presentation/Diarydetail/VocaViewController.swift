@@ -9,11 +9,12 @@ import Foundation
 
 import Combine
 
-public final class VocaViewController: BaseUIViewController<VocaViewModel> {
+public final class VocaViewController: BaseUIViewController<VocaViewModel>, ScrollControllable {
     
     // MARK: - Properties
     
     private let vocaView = VocaView()
+    private var pendingDate: String?
     
     // MARK: - LifeCycle
     
@@ -27,6 +28,10 @@ public final class VocaViewController: BaseUIViewController<VocaViewModel> {
     
     public override func setUI() {
         view.addSubview(vocaView)
+        view.backgroundColor = .gray100
+        if let date = pendingDate {
+                vocaView.setDate(date)
+            }
     }
     
     public override func setLayout() {
@@ -70,6 +75,15 @@ public final class VocaViewController: BaseUIViewController<VocaViewModel> {
                 self?.vocaView.configure(dataList: viewDataList)
             }
             .store(in: &cancellables)
+    }
+    
+    func scrollToTop() {
+        vocaView.scrollToTop()
+    }
+    
+    func setDate(_ date: String) {
+        pendingDate = date
+        vocaView.setDate(date)
     }
 
 }

@@ -14,11 +14,15 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
     // MARK: - Properties
     
     let diaryId: Int
+    var date: String = ""
     
     private let diaryDetailView = DiaryDetailView()
     private var isHighlightingEnabled: Bool = true
     private lazy var dialog = Dialog()
     private let detailImage = DetailImageView(image: UIImage(resource: .imgLoadFailLargeIos))
+    
+    private let bottomSafeAreaBackgroundView = UIView()
+    
     let modal: Modal = {
         let modal = Modal()
         modal.isHidden = true
@@ -28,7 +32,9 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
     private lazy var vc1 = diContainer.makeFeedbackViewController(diaryId: diaryId)
     private lazy var vc2 = diContainer.makeVocaViewController(diaryId: diaryId)
     
-    private var segmentedControl : SegmentedControl!
+    private var segmentedControl: SegmentedControl!
+    
+    // MARK: - Init
     
     public init(viewModel: DiaryDetailViewModel, diContainer: ViewControllerFactory, diaryId: Int) {
         self.diaryId = diaryId
@@ -56,13 +62,18 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
             $0.leading.trailing.equalToSuperview()
             $0.bottom.equalToSuperview()
         }
+        
+        vc1.onDateLoaded = { [weak self] date in
+            self?.vc2.setDate(date)
+        }
     }
     
     // MARK: - Custom Method
     
     public override func setUI() {
-        view.addSubviews(diaryDetailView, modal, dialog)
+        view.addSubviews(diaryDetailView, modal, dialog, bottomSafeAreaBackgroundView)
         view.bringSubviewToFront(modal)
+        bottomSafeAreaBackgroundView.backgroundColor = .gray100
     }
     
     public override func setLayout() {
@@ -76,6 +87,12 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
         
         dialog.snp.makeConstraints {
             $0.edges.equalToSuperview()
+        }
+        
+        let bottomInset = UIApplication.shared.windows.first?.safeAreaInsets.bottom ?? 34
+        bottomSafeAreaBackgroundView.snp.makeConstraints {
+            $0.leading.trailing.bottom.equalToSuperview()
+            $0.height.equalTo(bottomInset)
         }
     }
     
@@ -115,7 +132,7 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
             title: "AI 피드백을 신고하시겠어요?",
             content: "신고된 AI 피드백은 확인 후\n서비스의 운영원칙에 따라 처리됩니다.",
             leftButtonTitle: "취소",
-            rightButtonTitle: "확인"
+            rightButtonTitle: "네, 신고할게요"
         )
         
         dialog.showAnimation()

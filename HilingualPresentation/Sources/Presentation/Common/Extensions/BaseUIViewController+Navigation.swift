@@ -33,7 +33,7 @@ public extension BaseUIViewController {
         case .backTitle(let title):
             navigationItem.titleView = makeTitleLabel(title)
             navigationItem.leftBarButtonItem = makeBarButton(
-                imageName: "ic_arrow_left_black_24_ios",
+                imageName: "ic_arrow_left_b_24_ios",
                 action: #selector(backButtonTapped)
             )
             navigationItem.rightBarButtonItem = nil
@@ -41,7 +41,7 @@ public extension BaseUIViewController {
         case .backTitleMenu(let title):
             navigationItem.titleView = makeTitleLabel(title)
             navigationItem.leftBarButtonItem = makeBarButton(
-                imageName: "ic_arrow_left_black_24_ios",
+                imageName: "ic_arrow_left_b_24_ios",
                 action: #selector(backButtonTapped)
             )
             navigationItem.rightBarButtonItem = makeBarButton(
@@ -64,7 +64,7 @@ public extension BaseUIViewController {
     private func makeTitleLabel(_ title: String) -> UILabel {
         let label = UILabel()
         label.text = title
-        label.font = UIFont.systemFont(ofSize: 18, weight: .semibold)
+        label.font = .suit(.head_b_18)
         label.textColor = .black
         label.textAlignment = .center
         label.sizeToFit()

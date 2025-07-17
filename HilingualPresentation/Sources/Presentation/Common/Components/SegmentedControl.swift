@@ -8,6 +8,11 @@
 import UIKit
 import SnapKit
 
+@MainActor
+protocol ScrollControllable: AnyObject {
+    func scrollToTop()
+}
+
 final class SegmentedControl: UIView {
 
     private let segmentedControl: UnderlineSegmentedControl
@@ -23,6 +28,10 @@ final class SegmentedControl: UIView {
                 direction: direction,
                 animated: true
             )
+
+            if let scrollableVC = viewControllers[currentPage] as? ScrollControllable {
+                scrollableVC.scrollToTop()
+            }
         }
     }
 

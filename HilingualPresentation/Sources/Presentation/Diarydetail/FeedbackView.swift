@@ -35,11 +35,11 @@ final class FeedbackView: BaseUIView {
         return label
     }()
     
-    lazy var controlSwitch: UISwitch = {
-        let toggle: UISwitch = UISwitch()
+    lazy var controlSwitch: CompactSwitch = {
+        let toggle = CompactSwitch()
         toggle.onTintColor = .hilingualOrange
         toggle.isOn = true
-        toggle.addTarget(self, action: #selector(toggleButtonTapped), for: .touchUpInside)
+        toggle.addTarget(self, action: #selector(toggleButtonTapped), for: .valueChanged)
         toggle.transform = CGAffineTransform(scaleX: 0.7, y: 0.7)
         return toggle
     }()
@@ -47,20 +47,15 @@ final class FeedbackView: BaseUIView {
     let headerStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .horizontal
-        stackView.alignment = .fill
         stackView.alignment = .center
         return stackView
     }()
     
-    private let diaryTextView: HighlightTextView = {
-        let textView = HighlightTextView()
-        return textView
-    }()
+    private let diaryTextView: HighlightTextView = HighlightTextView()
     
     private let feedbackStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
-        stackView.alignment = .fill
         stackView.alignment = .center
         stackView.spacing = 12
         return stackView
@@ -75,7 +70,6 @@ final class FeedbackView: BaseUIView {
     
     private let emptyFeedbackView: UIView = {
         let view = UIView()
-        
         view.backgroundColor = .white
         
         let imageView = UIImageView(image: UIImage(named: "img_feedback_wow_ios", in: .module, with: nil))
@@ -91,8 +85,7 @@ final class FeedbackView: BaseUIView {
         label.textAlignment = .center
         label.numberOfLines = 0
         
-        let stack = UIStackView()
-        stack.addArrangedSubviews(imageView, separator, label)
+        let stack = UIStackView(arrangedSubviews: [imageView, separator, label])
         stack.axis = .vertical
         stack.spacing = 16
         stack.alignment = .center
@@ -125,14 +118,14 @@ final class FeedbackView: BaseUIView {
     // MARK: - Custom Method
     
     override func setUI() {
-        self.addSubview(scrollView)
+        addSubview(scrollView)
         scrollView.addSubview(contentView)
         contentView.axis = .vertical
         contentView.addArrangedSubviews(headerStackView, diaryTextView, feedbackStackView)
         headerStackView.addArrangedSubviews(dateLabel, AILabel, controlSwitch)
-        feedbackStackView.addArrangedSubviews(feedbackLabel)
+        feedbackStackView.addArrangedSubview(feedbackLabel)
         
-        self.backgroundColor = .gray100
+        backgroundColor = .gray100
         isHighlightingEnabled.toggle()
     }
     
@@ -143,18 +136,19 @@ final class FeedbackView: BaseUIView {
             $0.width.equalToSuperview()
         }
         
+        contentView.setCustomSpacing(6, after: headerStackView)
+        
         controlSwitch.snp.makeConstraints {
             $0.trailing.equalToSuperview()
             $0.width.equalTo(60)
         }
         
         headerStackView.snp.makeConstraints {
-            $0.top.equalToSuperview().inset(24)
+            $0.top.equalToSuperview().inset(18)
             $0.leading.trailing.equalToSuperview().inset(16)
         }
         
         diaryTextView.snp.makeConstraints {
-            $0.top.equalTo(headerStackView.snp.bottom).offset(12)
             $0.leading.trailing.equalToSuperview().inset(16)
         }
         
@@ -169,11 +163,15 @@ final class FeedbackView: BaseUIView {
         }
     }
     
+    func scrollToTop() {
+        scrollView.setContentOffset(.zero, animated: true)
+    }
+    
     // MARK: - Configure
     
     func configureDiary(data: DiaryViewData) {
         currentDiaryData = data
-        self.dateLabel.text = data.date
+        dateLabel.text = data.date
         diaryTextView.configure(
             image: data.imageURL,
             originalText: data.originalText,
@@ -242,5 +240,12 @@ final class FeedbackView: BaseUIView {
         
         configureDiary(data: data)
         currentDiaryData = data
+    }
+}
+
+final class CompactSwitch: UISwitch {
+    override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
+        let bounds = self.bounds.insetBy(dx: 10, dy: 10)
+        return bounds.contains(point)
     }
 }

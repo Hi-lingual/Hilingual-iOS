@@ -28,6 +28,7 @@ final class WordCard: UIView {
     // MARK: - State
 
     private var isMarked: Bool = false
+    private var cardType: WordCardType = .basic
     var onBookmarkToggled: ((Bool) -> Void)?
 
     // MARK: - Init
@@ -45,6 +46,7 @@ final class WordCard: UIView {
     // MARK: - Configure
 
     func configure(type: WordCardType, data: PhraseData) {
+        self.cardType = type
         isMarked = data.isMarked
         
         // Chip 초기화 및 추가
@@ -83,11 +85,11 @@ final class WordCard: UIView {
             }
             reasonLabel.snp.remakeConstraints {
                 $0.height.equalTo(0)
+                $0.trailing.equalTo(bookmarkButton.snp.leading).offset(-17)
             }
             savedDateLabel.snp.remakeConstraints {
                 $0.height.equalTo(0)
             }
-
             phraseLabel.snp.remakeConstraints {
                 $0.top.equalTo(chipStackView.snp.bottom).offset(4)
                 $0.leading.trailing.equalToSuperview().inset(12)
@@ -106,6 +108,7 @@ final class WordCard: UIView {
                 $0.leading.trailing.equalToSuperview().inset(12)
             }
             
+            
             explanationLabel.snp.makeConstraints {
                 $0.top.equalTo(phraseLabel.snp.bottom).offset(4)
                 $0.leading.trailing.equalToSuperview().inset(12)
@@ -113,7 +116,8 @@ final class WordCard: UIView {
             
             reasonLabel.snp.makeConstraints {
                 $0.top.equalTo(explanationLabel.snp.bottom).offset(8)
-                $0.leading.trailing.equalToSuperview().inset(12)
+                $0.leading.equalToSuperview().inset(12)
+                $0.trailing.equalTo(bookmarkButton.snp.leading).offset(-17)
                 $0.bottom.equalToSuperview().inset(12)
             }
 
@@ -126,10 +130,6 @@ final class WordCard: UIView {
             
             chipStackView.snp.updateConstraints {
                 $0.top.leading.equalToSuperview().inset(24)
-            }
-            
-            bookmarkButton.snp.updateConstraints {
-                $0.top.trailing.equalToSuperview().inset(24)
             }
             
             phraseLabel.snp.remakeConstraints {
@@ -147,6 +147,12 @@ final class WordCard: UIView {
                 $0.trailing.equalToSuperview().inset(24)
                 $0.bottom.equalToSuperview().inset(40)
             }
+        }
+        
+        bookmarkButton.snp.remakeConstraints {
+            let inset: CGFloat = (type == .withDate) ? 24 : 12
+            $0.top.trailing.equalToSuperview().inset(inset)
+            $0.width.height.equalTo(28)
         }
     }
 
@@ -176,10 +182,6 @@ final class WordCard: UIView {
         chipStackView.snp.makeConstraints {
             $0.top.leading.equalToSuperview().inset(12)
         }
-
-        bookmarkButton.snp.makeConstraints {
-            $0.top.trailing.equalToSuperview().inset(12)
-        }
     }
 
     // MARK: - Helpers
@@ -191,9 +193,16 @@ final class WordCard: UIView {
     }
 
     private func updateBookmarkImage() {
-        let imageName = isMarked ? "ic_save_default_28_ios" : "ic_save_variant_28_ios"
+        let imageName: String
+        switch cardType {
+        case .withDate:
+            imageName = isMarked ? "ic_save_default_36_ios" : "ic_save_variant_36_ios"
+        default:
+            imageName = isMarked ? "ic_save_default_28_ios" : "ic_save_variant_28_ios"
+        }
         bookmarkButton.setImage(UIImage(named: imageName, in: .module, compatibleWith: nil), for: .normal)
     }
+
 
     private func chipType(from korTitle: String) -> ChipType? {
         switch korTitle {

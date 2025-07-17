@@ -25,11 +25,14 @@ struct FeedbackItem {
     let explanation: String
 }
 
-public final class FeedbackViewController: BaseUIViewController<FeedbackViewModel> {
+public final class FeedbackViewController: BaseUIViewController<FeedbackViewModel>, ScrollControllable {
     
     // MARK: - Properties
     
+    var onDateLoaded: ((String) -> Void)?
+    
     private let feedbackView = FeedbackView()
+    private var date: String = ""
     
     // MARK: - LifeCycle
     
@@ -41,6 +44,7 @@ public final class FeedbackViewController: BaseUIViewController<FeedbackViewMode
     
     public override func setUI() {
         view.addSubview(feedbackView)
+        view.backgroundColor = .gray100
     }
     
     public override func setLayout() {
@@ -92,10 +96,17 @@ public final class FeedbackViewController: BaseUIViewController<FeedbackViewMode
                     diffRanges: diffRanges,
                     isHighlightingEnabled: true
                 )
+                self?.date = entity.date
+                self?.onDateLoaded?(entity.date)
                 
                 self?.feedbackView.configureDiary(data: diaryViewData)
+
+
             }
             .store(in: &cancellables)
-        
+    }
+    
+    func scrollToTop() {
+        feedbackView.scrollToTop()
     }
 }
