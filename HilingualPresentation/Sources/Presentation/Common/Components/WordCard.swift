@@ -83,6 +83,7 @@ final class WordCard: UIView {
             }
             reasonLabel.snp.remakeConstraints {
                 $0.height.equalTo(0)
+                $0.trailing.equalTo(bookmarkButton.snp.leading).offset(-17)
             }
             savedDateLabel.snp.remakeConstraints {
                 $0.height.equalTo(0)
@@ -106,6 +107,11 @@ final class WordCard: UIView {
                 $0.leading.trailing.equalToSuperview().inset(12)
             }
             
+            bookmarkButton.snp.makeConstraints {
+                $0.top.trailing.equalToSuperview().inset(12)
+                $0.width.equalTo(28)
+            }
+            
             explanationLabel.snp.makeConstraints {
                 $0.top.equalTo(phraseLabel.snp.bottom).offset(4)
                 $0.leading.trailing.equalToSuperview().inset(12)
@@ -113,7 +119,8 @@ final class WordCard: UIView {
             
             reasonLabel.snp.makeConstraints {
                 $0.top.equalTo(explanationLabel.snp.bottom).offset(8)
-                $0.leading.trailing.equalToSuperview().inset(12)
+                $0.leading.equalToSuperview().inset(12)
+                $0.trailing.equalTo(bookmarkButton.snp.leading).offset(-17)
                 $0.bottom.equalToSuperview().inset(12)
             }
 
