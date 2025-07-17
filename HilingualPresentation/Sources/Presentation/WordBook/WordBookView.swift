@@ -35,6 +35,9 @@ final class WordBookView: BaseUIView {
         searchBar.setImage(UIImage(named: "ic_close_20_ios", in: .module, compatibleWith: nil), for: .clear, state: .normal)
         searchBar.searchTextField.font = .suit(.body_m_16)
         searchBar.updateHeight(height: 46)
+        searchBar.searchTextField.keyboardType = .asciiCapable
+        searchBar.searchTextField.autocorrectionType = .no
+        searchBar.searchTextField.autocapitalizationType = .none
 
         let attributes: [NSAttributedString.Key: Any] = [
             .foregroundColor: UIColor.gray400,

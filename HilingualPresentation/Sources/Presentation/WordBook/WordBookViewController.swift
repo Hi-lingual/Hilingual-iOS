@@ -270,6 +270,12 @@ extension WordBookViewController: UISearchBarDelegate {
 }
 
 extension WordBookViewController: UITextFieldDelegate {
+    public func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        let allowedCharacterSet = CharacterSet(charactersIn: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ ")
+        let inputCharacterSet = CharacterSet(charactersIn: string)
+        return allowedCharacterSet.isSuperset(of: inputCharacterSet)
+    }
+
     public func textFieldShouldClear(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         return true
