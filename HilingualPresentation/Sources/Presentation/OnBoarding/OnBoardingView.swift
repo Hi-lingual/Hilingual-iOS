@@ -85,13 +85,13 @@ final class OnBoardingView: BaseUIView {
 
         nicknameStackView.snp.makeConstraints {
             $0.top.equalTo(profileImageView.snp.bottom).offset(28)
-            $0.horizontalEdges.equalToSuperview().inset(24)
+            $0.horizontalEdges.equalToSuperview().inset(16)
         }
 
         startButton.snp.makeConstraints {
             $0.centerX.equalToSuperview()
             $0.bottom.equalToSuperview().inset(50)
-            $0.horizontalEdges.equalToSuperview().inset(24)
+            $0.horizontalEdges.equalToSuperview().inset(16)
         }
     }
 }
