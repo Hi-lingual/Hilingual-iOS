@@ -28,6 +28,7 @@ final class WordCard: UIView {
     // MARK: - State
 
     private var isMarked: Bool = false
+    private var cardType: WordCardType = .basic
     var onBookmarkToggled: ((Bool) -> Void)?
 
     // MARK: - Init
@@ -45,6 +46,7 @@ final class WordCard: UIView {
     // MARK: - Configure
 
     func configure(type: WordCardType, data: PhraseData) {
+        self.cardType = type
         isMarked = data.isMarked
         
         // Chip 초기화 및 추가
@@ -198,9 +200,16 @@ final class WordCard: UIView {
     }
 
     private func updateBookmarkImage() {
-        let imageName = isMarked ? "ic_save_default_28_ios" : "ic_save_variant_28_ios"
+        let imageName: String
+        switch cardType {
+        case .withDate:
+            imageName = isMarked ? "ic_save_default_36_ios" : "ic_save_variant_36_ios"
+        default:
+            imageName = isMarked ? "ic_save_default_28_ios" : "ic_save_variant_28_ios"
+        }
         bookmarkButton.setImage(UIImage(named: imageName, in: .module, compatibleWith: nil), for: .normal)
     }
+
 
     private func chipType(from korTitle: String) -> ChipType? {
         switch korTitle {
