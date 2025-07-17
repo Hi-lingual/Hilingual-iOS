@@ -245,6 +245,12 @@ extension WordBookViewController: UITableViewDataSource, UITableViewDelegate {
 extension WordBookViewController: UISearchBarDelegate {
     public func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         filterWords(for: searchText)
+
+        if searchText.isEmpty {
+            DispatchQueue.main.async {
+                searchBar.resignFirstResponder()
+            }
+        }
     }
 
     public func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
