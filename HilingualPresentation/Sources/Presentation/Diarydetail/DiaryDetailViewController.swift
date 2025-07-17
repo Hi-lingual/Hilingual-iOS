@@ -50,6 +50,8 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
     public override func viewDidLoad() {
         super.viewDidLoad()
         
+        hideKeyboardWhenTappedAround()
+        
         segmentedControl = SegmentedControl(
             viewControllers: [vc1, vc2],
             titles: ["문법·철자", "추천표현"],
