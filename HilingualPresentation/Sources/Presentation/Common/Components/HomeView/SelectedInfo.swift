@@ -130,7 +130,7 @@ final class SelectedInfo: UIView {
         dot.snp.makeConstraints { $0.size.equalTo(2) }
 
         headerStack.snp.makeConstraints {
-            $0.top.equalToSuperview().inset(12)
+            $0.top.equalToSuperview().inset(8)
             $0.horizontalEdges.equalToSuperview().inset(16)
         }
 
