@@ -8,6 +8,8 @@
 import Foundation
 import Combine
 
+import SafariServices
+
 public final class LoginViewController: BaseUIViewController<LoginViewModel> {
 
     // MARK: - Properties
@@ -32,6 +34,19 @@ public final class LoginViewController: BaseUIViewController<LoginViewModel> {
             make.edges.equalToSuperview()
         }
     }
+
+    public override func addTarget() {
+
+        loginView.privacyPolicyButton.addTarget(self, action: #selector(policyButtonTapped), for: .touchUpInside)
+    }
+
+    @objc
+    private func policyButtonTapped() {
+        guard let url = URL(string: "https://hilingual.notion.site/230829677ebf8104b52ce74c65c27607") else { return }
+        let safariVC = SFSafariViewController(url: url)
+        self.present(safariVC, animated: true, completion: nil)
+    }
+
 
     // MARK: - Navigation
 

@@ -31,8 +31,14 @@ final class WordBookView: BaseUIView {
         searchBar.searchTextField.backgroundColor = .white
         searchBar.searchTextField.layer.cornerRadius = 8
         searchBar.searchTextField.clipsToBounds = true
+        searchBar.setImage(UIImage(named: "ic_search_20_ios", in: .module, compatibleWith: nil), for: .search, state: .normal)
+        searchBar.setImage(UIImage(named: "ic_close_20_ios", in: .module, compatibleWith: nil), for: .clear, state: .normal)
         searchBar.searchTextField.font = .suit(.body_m_16)
         searchBar.updateHeight(height: 46)
+        searchBar.searchTextField.keyboardType = .asciiCapable
+        searchBar.searchTextField.autocorrectionType = .no
+        searchBar.searchTextField.autocapitalizationType = .none
+
         let attributes: [NSAttributedString.Key: Any] = [
             .foregroundColor: UIColor.gray400,
             .font: UIFont.suit(.body_m_16)
@@ -56,7 +62,6 @@ final class WordBookView: BaseUIView {
         let button = UIButton(type: .system)
         let image = UIImage(named: "ic_list_24_ios", in: .module, compatibleWith: nil)?
             .withRenderingMode(.alwaysTemplate)
-
         button.setImage(image, for: .normal)
         button.setTitle("최신순", for: .normal)
         button.tintColor = .gray500
@@ -69,7 +74,7 @@ final class WordBookView: BaseUIView {
         return button
     }()
 
-    private lazy var statusHeaderView: UIView = {
+    lazy var statusHeaderView: UIView = {
         let container = UIView()
         container.backgroundColor = .clear
 
@@ -108,13 +113,7 @@ final class WordBookView: BaseUIView {
 
     override func layoutSubviews() {
         super.layoutSubviews()
-
-        let headerSize = statusHeaderView.systemLayoutSizeFitting(CGSize(
-            width: bounds.width,
-            height: UIView.layoutFittingCompressedSize.height
-        ))
-        statusHeaderView.frame = CGRect(origin: .zero, size: headerSize)
-        tableView.tableHeaderView = statusHeaderView
+        updateHeaderViewLayout()
     }
 
     override func setUI() {
@@ -130,7 +129,7 @@ final class WordBookView: BaseUIView {
             titleLabel,
             searchBar
         )
-
+        showHeaderView(true)
         tableView.refreshControl = refreshControl
     }
 
@@ -170,5 +169,22 @@ final class WordBookView: BaseUIView {
         } else {
             sortButton.setTitle(nil, for: .normal)
         }
+    }
+
+    func showHeaderView(_ show: Bool) {
+        if show {
+            updateHeaderViewLayout()
+            tableView.tableHeaderView = statusHeaderView
+        } else {
+            tableView.tableHeaderView = nil
+        }
+    }
+
+    private func updateHeaderViewLayout() {
+        let headerSize = statusHeaderView.systemLayoutSizeFitting(CGSize(
+            width: bounds.width,
+            height: UIView.layoutFittingCompressedSize.height
+        ))
+        statusHeaderView.frame = CGRect(origin: .zero, size: headerSize)
     }
 }

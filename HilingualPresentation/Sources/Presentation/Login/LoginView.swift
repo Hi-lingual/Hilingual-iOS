@@ -30,11 +30,21 @@ final class LoginView: BaseUIView {
 
     let privacyPolicyButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("개인정보처리방침", for: .normal)
-        button.setTitleColor(.white, for: .normal)
-        button.titleLabel?.font = .suit(.body_m_14)
+
+        let title = "개인정보처리방침"
+        let attributedTitle = NSAttributedString(
+            string: title,
+            attributes: [
+                .underlineStyle: NSUnderlineStyle.single.rawValue,
+                .foregroundColor: UIColor.white,
+                .font: UIFont.suit(.body_m_14)
+            ]
+        )
+
+        button.setAttributedTitle(attributedTitle, for: .normal)
         return button
     }()
+
 
     // MARK: - Init
 
