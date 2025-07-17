@@ -178,7 +178,7 @@ final class LoadingView: BaseUIView {
         
         switch state {
         case .loading:
-            titleLabel.text = "일기 저장중.."
+            titleLabel.text = "일기 저장중..."
             subtitleLabel.text = "피드백을 요청하고 있어요."
             animationView.animation = LottieAnimation.named("feedback1", bundle: .module)
             animationView.play()

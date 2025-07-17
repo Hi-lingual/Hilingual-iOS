@@ -153,6 +153,15 @@ extension TextView: UITextViewDelegate {
             return false
         }
         
+        let allowedPunctuation: Set<Character> = [".", ",", "!", "?", "'", "\"", "-", ":", ";", "(", ")", "[", "]", "{", "}", "…"]
+        let isAllowed = text.allSatisfy { char in
+            char.isLetter || char.isNumber || char.isWhitespace || allowedPunctuation.contains(char)
+        }
+        
+        if !isAllowed {
+            return false
+        }
+        
         guard let currentText = textView.text else { return true }
         
         if let stringRange = Range(range, in: currentText) {

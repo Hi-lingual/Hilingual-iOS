@@ -47,7 +47,7 @@ final class DiaryWritingView: BaseUIView {
         config.imagePlacement = .leading
         config.imagePadding = 4
         config.baseForegroundColor = .gray500
-        config.contentInsets = NSDirectionalEdgeInsets(top: 4, leading: 8, bottom: 4, trailing: 8)
+        config.contentInsets = NSDirectionalEdgeInsets(top: 8, leading: 8, bottom: 8, trailing: 8)
         
         button.configuration = config
         button.layer.borderWidth = 1
@@ -114,7 +114,7 @@ final class DiaryWritingView: BaseUIView {
         let modal = Modal()
         modal.isHidden = true
         modal.configure(
-            title: "이미지 선택하기",
+            title: "이미지 선택",
             items: [
                 ("카메라로 사진 찍기", UIImage(resource: .icCamera24Ios), { [weak self] in
                     self?.delegate?.didTapCamera()
@@ -165,8 +165,8 @@ final class DiaryWritingView: BaseUIView {
         }
         
         textScanButton.snp.makeConstraints {
-            $0.width.equalTo(125)
-            $0.height.equalTo(32)
+            $0.width.equalTo(129)
+            $0.height.equalTo(33)
         }
         
         headerStackView.snp.makeConstraints {
@@ -233,7 +233,6 @@ final class DiaryWritingView: BaseUIView {
     func setTopic(kor: String, en: String) {
         dropdown.configure(kor: kor, en: en)
     }
-    
     
     func setImage(_ image: UIImage) {
         selectedImageView.image = image

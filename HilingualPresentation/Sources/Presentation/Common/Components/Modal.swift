@@ -93,7 +93,13 @@ final class Modal: UIView {
         items.forEach { (title, image, action) in
             let button = UIButton(type: .system)
             var config = UIButton.Configuration.plain()
-            config.title = title
+            
+            let attributedTitle = AttributedString(title, attributes: AttributeContainer([
+                .font: UIFont.suit(.body_sb_14),
+                .foregroundColor: UIColor.gray700
+            ]))
+            
+            config.attributedTitle = attributedTitle
             config.image = image
             config.imagePadding = 8
             config.baseForegroundColor = .black

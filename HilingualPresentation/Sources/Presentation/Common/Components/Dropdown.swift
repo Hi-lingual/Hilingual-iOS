@@ -40,7 +40,6 @@ final class Dropdown: UIView {
     private let dropdownHeaderStack: UIStackView = {
         let stack = UIStackView()
         stack.axis = .horizontal
-        stack.alignment = .center
         stack.distribution = .equalSpacing
         stack.backgroundColor = .gray100
         return stack
@@ -149,7 +148,6 @@ final class Dropdown: UIView {
         }
         
         dropdownContentStack.setCustomSpacing(12, after: topicEnLabel)
-
     }
     
     // MARK: - Actions
