@@ -149,6 +149,10 @@ extension TextView: UITextViewDelegate {
             return false
         }
         
+        if text.contains(where: { $0.isEmoji }) {
+            return false
+        }
+        
         guard let currentText = textView.text else { return true }
         
         if let stringRange = Range(range, in: currentText) {
