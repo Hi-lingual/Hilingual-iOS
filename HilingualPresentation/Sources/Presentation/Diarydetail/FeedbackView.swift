@@ -136,6 +136,8 @@ final class FeedbackView: BaseUIView {
             $0.width.equalToSuperview()
         }
         
+        contentView.setCustomSpacing(12, after: headerStackView)
+        
         controlSwitch.snp.makeConstraints {
             $0.trailing.equalToSuperview()
             $0.width.equalTo(60)
@@ -147,7 +149,7 @@ final class FeedbackView: BaseUIView {
         }
         
         diaryTextView.snp.makeConstraints {
-            $0.top.equalTo(headerStackView.snp.bottom).offset(200)
+//            $0.top.equalTo(headerStackView.snp.bottom).offset(120)
             $0.leading.trailing.equalToSuperview().inset(16)
         }
         
