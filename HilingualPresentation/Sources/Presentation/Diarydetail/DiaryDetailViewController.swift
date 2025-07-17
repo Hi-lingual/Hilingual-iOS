@@ -20,6 +20,9 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
     private var isHighlightingEnabled: Bool = true
     private lazy var dialog = Dialog()
     private let detailImage = DetailImageView(image: UIImage(resource: .imgLoadFailLargeIos))
+    
+    private let bottomSafeAreaBackgroundView = UIView()
+    
     let modal: Modal = {
         let modal = Modal()
         modal.isHidden = true
@@ -29,7 +32,9 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
     private lazy var vc1 = diContainer.makeFeedbackViewController(diaryId: diaryId)
     private lazy var vc2 = diContainer.makeVocaViewController(diaryId: diaryId)
     
-    private var segmentedControl : SegmentedControl!
+    private var segmentedControl: SegmentedControl!
+    
+    // MARK: - Init
     
     public init(viewModel: DiaryDetailViewModel, diContainer: ViewControllerFactory, diaryId: Int) {
         self.diaryId = diaryId
@@ -66,8 +71,9 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
     // MARK: - Custom Method
     
     public override func setUI() {
-        view.addSubviews(diaryDetailView, modal, dialog)
+        view.addSubviews(diaryDetailView, modal, dialog, bottomSafeAreaBackgroundView)
         view.bringSubviewToFront(modal)
+        bottomSafeAreaBackgroundView.backgroundColor = .gray100
     }
     
     public override func setLayout() {
@@ -81,6 +87,12 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
         
         dialog.snp.makeConstraints {
             $0.edges.equalToSuperview()
+        }
+        
+        let bottomInset = UIApplication.shared.windows.first?.safeAreaInsets.bottom ?? 34
+        bottomSafeAreaBackgroundView.snp.makeConstraints {
+            $0.leading.trailing.bottom.equalToSuperview()
+            $0.height.equalTo(bottomInset)
         }
     }
     

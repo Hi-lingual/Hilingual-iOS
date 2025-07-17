@@ -28,6 +28,7 @@ public final class VocaViewController: BaseUIViewController<VocaViewModel>, Scro
     
     public override func setUI() {
         view.addSubview(vocaView)
+        view.backgroundColor = .gray100
         if let date = pendingDate {
                 vocaView.setDate(date)
             }

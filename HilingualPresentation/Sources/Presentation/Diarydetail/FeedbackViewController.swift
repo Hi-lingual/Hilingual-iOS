@@ -44,6 +44,7 @@ public final class FeedbackViewController: BaseUIViewController<FeedbackViewMode
     
     public override func setUI() {
         view.addSubview(feedbackView)
+        view.backgroundColor = .gray100
     }
     
     public override func setLayout() {
@@ -99,6 +100,7 @@ public final class FeedbackViewController: BaseUIViewController<FeedbackViewMode
                 self?.onDateLoaded?(entity.date)
                 
                 self?.feedbackView.configureDiary(data: diaryViewData)
+
 
             }
             .store(in: &cancellables)
