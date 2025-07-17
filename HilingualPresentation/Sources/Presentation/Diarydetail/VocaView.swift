@@ -33,7 +33,7 @@ final class VocaView: BaseUIView {
     override func setUI() {
         self.backgroundColor = .gray100
         contentView.axis = .vertical
-        contentView.spacing = 20
+        contentView.spacing = 12
         self.addSubview(scrollView)
         scrollView.addSubview(contentView)
     }
