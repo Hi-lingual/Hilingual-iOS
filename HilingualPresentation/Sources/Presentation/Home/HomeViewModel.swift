@@ -65,4 +65,8 @@ public final class HomeViewModel: BaseViewModel {
         let dateString = date.toFormattedString("yyyy-MM-dd")
         return useCase.fetchTopic(for: dateString)
     }
+    
+    public func fetchUserInfo() -> AnyPublisher<UserInfoEntity, Error> {
+        return useCase.fetchUserInfo()
+    }
 }
