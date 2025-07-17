@@ -149,7 +149,6 @@ final class FeedbackView: BaseUIView {
         }
         
         diaryTextView.snp.makeConstraints {
-//            $0.top.equalTo(headerStackView.snp.bottom).offset(120)
             $0.leading.trailing.equalToSuperview().inset(16)
         }
         
