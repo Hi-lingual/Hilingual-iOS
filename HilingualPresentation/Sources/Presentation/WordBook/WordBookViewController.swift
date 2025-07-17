@@ -40,6 +40,13 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: animated)
+        wordBookView.searchBar.text = ""
+        wordBookView.searchBar.resignFirstResponder()
+        wordBookView.showHeaderView(true)
+        selectedSortIndex = 0
+        wordBookView.tableView.contentInset.top = 0
+        sortSubject.send(.latest)
+        wordBookView.updateHeaderView(totalCount: fullWordList.reduce(0) { $0 + $1.1.count }, sortIndex: selectedSortIndex)
         refreshSubject.send(())
     }
 
