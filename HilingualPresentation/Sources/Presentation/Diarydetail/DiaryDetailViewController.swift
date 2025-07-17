@@ -132,7 +132,7 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
             title: "AI 피드백을 신고하시겠어요?",
             content: "신고된 AI 피드백은 확인 후\n서비스의 운영원칙에 따라 처리됩니다.",
             leftButtonTitle: "취소",
-            rightButtonTitle: "확인"
+            rightButtonTitle: "네, 신고할게요"
         )
         
         dialog.showAnimation()
