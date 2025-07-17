@@ -14,6 +14,7 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
     // MARK: - Properties
     
     let diaryId: Int
+    var date: String = ""
     
     private let diaryDetailView = DiaryDetailView()
     private var isHighlightingEnabled: Bool = true
@@ -55,6 +56,10 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
             $0.top.equalTo(diaryDetailView.safeAreaLayoutGuide.snp.top)
             $0.leading.trailing.equalToSuperview()
             $0.bottom.equalToSuperview()
+        }
+        
+        vc1.onDateLoaded = { [weak self] date in
+            self?.vc2.setDate(date)
         }
     }
     

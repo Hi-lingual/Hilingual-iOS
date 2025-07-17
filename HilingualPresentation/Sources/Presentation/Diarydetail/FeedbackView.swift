@@ -47,7 +47,6 @@ final class FeedbackView: BaseUIView {
     let headerStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .horizontal
-//        stackView.alignment = .fill
         stackView.alignment = .center
         return stackView
     }()

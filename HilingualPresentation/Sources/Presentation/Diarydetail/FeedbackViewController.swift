@@ -29,7 +29,10 @@ public final class FeedbackViewController: BaseUIViewController<FeedbackViewMode
     
     // MARK: - Properties
     
+    var onDateLoaded: ((String) -> Void)?
+    
     private let feedbackView = FeedbackView()
+    private var date: String = ""
     
     // MARK: - LifeCycle
     
@@ -92,11 +95,13 @@ public final class FeedbackViewController: BaseUIViewController<FeedbackViewMode
                     diffRanges: diffRanges,
                     isHighlightingEnabled: true
                 )
+                self?.date = entity.date
+                self?.onDateLoaded?(entity.date)
                 
                 self?.feedbackView.configureDiary(data: diaryViewData)
+
             }
             .store(in: &cancellables)
-        
     }
     
     func scrollToTop() {

@@ -14,6 +14,7 @@ public final class VocaViewController: BaseUIViewController<VocaViewModel>, Scro
     // MARK: - Properties
     
     private let vocaView = VocaView()
+    private var pendingDate: String?
     
     // MARK: - LifeCycle
     
@@ -27,6 +28,9 @@ public final class VocaViewController: BaseUIViewController<VocaViewModel>, Scro
     
     public override func setUI() {
         view.addSubview(vocaView)
+        if let date = pendingDate {
+                vocaView.setDate(date)
+            }
     }
     
     public override func setLayout() {
@@ -73,7 +77,12 @@ public final class VocaViewController: BaseUIViewController<VocaViewModel>, Scro
     }
     
     func scrollToTop() {
-            vocaView.scrollToTop()
-        }
+        vocaView.scrollToTop()
+    }
+    
+    func setDate(_ date: String) {
+        pendingDate = date
+        vocaView.setDate(date)
+    }
 
 }
