@@ -145,8 +145,7 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
 
         let totalCount = fullWordList.reduce(0) { $0 + $1.1.count }
         wordBookView.updateHeaderView(totalCount: totalCount, sortIndex: index)
-
-        modal.isHidden = true
+        modal.dismiss()
     }
 
     private func filterWords(for keyword: String) {

@@ -127,6 +127,22 @@ final class SortOptionModal: UIView {
         }
     }
 
+    public func dismiss(completion: (() -> Void)? = nil) {
+        layoutIfNeeded()
+        let sheetHeight = modalSheetView.bounds.height
+
+        UIView.animate(withDuration: 0.25,
+                       delay: 0,
+                       options: [.curveEaseIn],
+                       animations: {
+            self.modalSheetView.transform = CGAffineTransform(translationX: 0, y: sheetHeight)
+            self.backgroundColor = .clear
+        }, completion: { _ in
+            self.isHidden = true
+            completion?()
+        })
+    }
+
     @objc private func dismissModal() {
         UIView.animate(withDuration: 0.2, animations: {
             self.modalSheetView.transform = CGAffineTransform(translationX: 0, y: self.modalSheetView.frame.height)

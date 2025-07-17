@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		24C5DD322E243C8D009B59F6 /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = 24C5DD312E243C8D009B59F6 /* Lottie */; };
 		3AE57A282E20F98D0047097A /* Config.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 3AE57A272E20F98D0047097A /* Config.xcconfig */; };
+		E51B4C542E28DC11000B16D0 /* AppIcon.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E51B4C532E28DC11000B16D0 /* AppIcon.xcassets */; };
 		E51DB2052E1D9E8B000C2BEA /* AppConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = E51DB2042E1D9E8B000C2BEA /* AppConfig.swift */; };
 		E51DB2242E1E4407000C2BEA /* AppBaseURLProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E51DB2232E1E4407000C2BEA /* AppBaseURLProvider.swift */; };
 		E5C2F3952E170A01003DF6C4 /* HilingualNetwork in Frameworks */ = {isa = PBXBuildFile; productRef = E5C2F3942E170A01003DF6C4 /* HilingualNetwork */; };
@@ -36,6 +37,7 @@
 
 /* Begin PBXFileReference section */
 		3AE57A272E20F98D0047097A /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
+		E51B4C532E28DC11000B16D0 /* AppIcon.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = AppIcon.xcassets; sourceTree = "<group>"; };
 		E51DB2002E1CF7AD000C2BEA /* Hilingual.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Hilingual.entitlements; sourceTree = "<group>"; };
 		E51DB2042E1D9E8B000C2BEA /* AppConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfig.swift; sourceTree = "<group>"; };
 		E51DB2232E1E4407000C2BEA /* AppBaseURLProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppBaseURLProvider.swift; sourceTree = "<group>"; };
@@ -80,6 +82,7 @@
 				3AE57A272E20F98D0047097A /* Config.xcconfig */,
 				E51DB2042E1D9E8B000C2BEA /* AppConfig.swift */,
 				E51DB2232E1E4407000C2BEA /* AppBaseURLProvider.swift */,
+				E51B4C532E28DC11000B16D0 /* AppIcon.xcassets */,
 			);
 			path = Config;
 			sourceTree = "<group>";
@@ -199,6 +202,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3AE57A282E20F98D0047097A /* Config.xcconfig in Resources */,
+				E51B4C542E28DC11000B16D0 /* AppIcon.xcassets in Resources */,
 				E5C79B322E15282100E461C3 /* LaunchScreen.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
