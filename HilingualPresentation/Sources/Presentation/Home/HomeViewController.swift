@@ -93,8 +93,13 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
             .receive(on: RunLoop.main)
             .sink { [weak self] dates in
                 self?.homeView.calendarView.filledDates = dates
+
+                // ✅ filledDates 설정 이후에 선택 날짜 처리
+                let today = Date()
+                self?.homeView.calendarView.onDateSelected?(today)
             }
             .store(in: &viewModel.cancellables)
+
 
         homeView.calendarView.onDateSelected = { [weak self] date in
             guard let self else { return }
@@ -137,8 +142,6 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                     .store(in: &self.viewModel!.cancellables)
             }
         }
-
-        homeView.calendarView.onDateSelected?(today)
     }
 
     private func goToDiaryWritingView(topicData: (String, String)? = nil, selectedDate: Date? = nil) {
