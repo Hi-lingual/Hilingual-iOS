@@ -57,7 +57,7 @@ final class WordDetailDialog: UIView {
     private func setLayout() {
         dialogContainerView.snp.makeConstraints {
             $0.centerX.equalToSuperview()
-            $0.bottom.equalToSuperview().inset(40)
+            $0.bottom.equalToSuperview().inset(61)
             $0.leading.trailing.equalToSuperview().inset(16)
         }
 
