@@ -7,6 +7,7 @@
 
 import Foundation
 import UIKit
+import SafariServices
 
 public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailViewModel> {
     
@@ -126,8 +127,10 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
         
         dialog.rightButton.removeTarget(nil, action: nil, for: .allEvents)
         dialog.rightButton.addAction(UIAction { [weak self] _ in
-            let webVC = ReportWebViewController()
-            self?.navigationController?.pushViewController(webVC, animated: true)
-        }, for: .touchUpInside)
+                    guard let url = URL(string: "https://hilingual.notion.site/230829677ebf801c965be24b0ef444e9") else { return }
+                    let safariVC = SFSafariViewController(url: url)
+//                    let safariVC = ReportWebViewController
+                    self?.present(safariVC, animated: true, completion: nil)
+                }, for: .touchUpInside)
     }
 }
