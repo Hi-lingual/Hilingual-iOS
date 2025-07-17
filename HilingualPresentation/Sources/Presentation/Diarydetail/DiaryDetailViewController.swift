@@ -129,7 +129,6 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
         dialog.rightButton.addAction(UIAction { [weak self] _ in
                     guard let url = URL(string: "https://hilingual.notion.site/230829677ebf801c965be24b0ef444e9") else { return }
                     let safariVC = SFSafariViewController(url: url)
-//                    let safariVC = ReportWebViewController
                     self?.present(safariVC, animated: true, completion: nil)
                 }, for: .touchUpInside)
     }
