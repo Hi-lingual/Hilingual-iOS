@@ -57,5 +57,10 @@ final class EmptyDiaryView: UIView {
         emptyDiaryStack.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
+        
+        emptyDiaryView.snp.makeConstraints {
+            $0.width.equalTo(200)
+            $0.height.equalTo(100)
+        }
     }
 }

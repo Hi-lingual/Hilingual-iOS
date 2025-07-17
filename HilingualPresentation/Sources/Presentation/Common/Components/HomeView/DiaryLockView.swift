@@ -58,5 +58,10 @@ final class DiaryLockView: UIView {
         diaryLockStack.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
+        
+        diaryLockView.snp.makeConstraints {
+            $0.width.equalTo(200)
+            $0.height.equalTo(100)
+        }
     }
 }
