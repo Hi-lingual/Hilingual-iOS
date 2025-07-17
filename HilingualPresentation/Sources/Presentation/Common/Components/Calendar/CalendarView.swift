@@ -127,6 +127,26 @@ final class CalendarView: UIView {
             $0.leading.trailing.bottom.equalToSuperview()
         }
     }
+    
+    // MARK: - Public Methods
+    
+    public func select(date: Date) {
+        self.selectedDate = date
+        self.reload(for: date)
+        self.onDateSelected?(date)
+    }
+    
+    func reload(for date: Date) {
+        currentDate = date
+        generateDays()
+        collectionView.reloadData()
+        invalidateIntrinsicContentSize()
+    }
+    
+    public func reloadData() {
+        collectionView.reloadData()
+        invalidateIntrinsicContentSize()
+    }
 
     // MARK: - Private Methods
 
@@ -170,18 +190,6 @@ final class CalendarView: UIView {
     private func updateItemSize() {
         let width = containerView.bounds.width / 7
         flowLayout.itemSize = CGSize(width: width, height: 34)
-    }
-    
-    func reload(for date: Date) {
-        currentDate = date
-        generateDays()
-        collectionView.reloadData()
-        invalidateIntrinsicContentSize()
-    }
-    
-    public func reloadData() {
-        collectionView.reloadData()
-        invalidateIntrinsicContentSize()
     }
 }
 
