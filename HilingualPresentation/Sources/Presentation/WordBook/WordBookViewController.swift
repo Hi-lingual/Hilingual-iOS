@@ -71,6 +71,7 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
         wordBookView.tableView.dataSource = self
         wordBookView.tableView.delegate = self
         wordBookView.searchBar.delegate = self
+        wordBookView.searchBar.searchTextField.delegate = self
     }
 
     public override func addTarget() {
@@ -258,15 +259,12 @@ extension WordBookViewController: UITableViewDataSource, UITableViewDelegate {
 extension WordBookViewController: UISearchBarDelegate {
     public func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         filterWords(for: searchText)
-
-        if searchText.isEmpty {
-            DispatchQueue.main.async {
-                searchBar.resignFirstResponder()
-            }
-        }
     }
+}
 
-    public func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        searchBar.resignFirstResponder()
+extension WordBookViewController: UITextFieldDelegate {
+    public func textFieldShouldClear(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        return true
     }
 }
