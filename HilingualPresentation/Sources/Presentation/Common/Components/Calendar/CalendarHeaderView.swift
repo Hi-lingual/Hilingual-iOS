@@ -129,22 +129,17 @@ final class CalendarHeaderView: UIView {
 
     // MARK: - Actions
 
-    //상위 ViewController가 없어서 일단 직접 루트 VC를 찾아 present 중. 나중에 바꿀거에요!!!
     @objc private func monthButtonTapped() {
-        let pickerVC = MonthPickerViewController()
-        pickerVC.onDateSelected = { [weak self] selectedDate in
+        let monthPicker = MonthPickerModal()
+        monthPicker.onDateSelected = { [weak self] selectedDate in
             self?.currentDate = selectedDate
         }
 
-        if let topVC = UIApplication.shared.connectedScenes
+        if let window = UIApplication.shared.connectedScenes
             .compactMap({ $0 as? UIWindowScene })
             .first?.windows
-            .first(where: { $0.isKeyWindow })?.rootViewController {
-            pickerVC.modalPresentationStyle = .pageSheet
-            if let sheet = pickerVC.sheetPresentationController {
-                sheet.detents = [.medium()]
-            }
-            topVC.present(pickerVC, animated: true)
+            .first(where: { $0.isKeyWindow }) {
+            monthPicker.show(in: window)
         }
     }
 
@@ -167,8 +162,4 @@ final class CalendarHeaderView: UIView {
         formatter.dateFormat = "yyyy년 M월"
         return formatter.string(from: date)
     }
-}
-
-#Preview {
-    CalendarHeaderView()
 }
