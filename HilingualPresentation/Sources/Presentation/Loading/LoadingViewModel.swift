@@ -14,6 +14,7 @@ public final class LoadingViewModel: BaseViewModel {
     // MARK: - Dependencies
 
     private let diaryWritingUseCase: DiaryWritingUseCase
+    @Published public var diaryId: Int? = nil
 
     // MARK: - Init
 
@@ -44,8 +45,6 @@ public final class LoadingViewModel: BaseViewModel {
 
     public let feedbackCompletedSubject = PassthroughSubject<Result<Void, Error>, Never>()
 
-    public private(set) var diaryId: Int? 
-
     // MARK: - Input / Output
 
     public struct Input {
@@ -70,22 +69,7 @@ public final class LoadingViewModel: BaseViewModel {
         input.retryTapped
             .sink { [weak self] in self?.retryFeedback() }
             .store(in: &cancellables)
-
-        feedbackCompletedSubject
-            .sink { [weak self] result in
-                guard let self = self else { return }
-                Task { @MainActor in
-                    self.startLoadingState()
-                    switch result {
-                    case .success:
-                        await self.handleFeedbackCompleted(success: true)
-                    case .failure:
-                        await self.handleFeedbackCompleted(success: false)
-                    }
-                }
-            }
-            .store(in: &cancellables)
-
+        
         return Output(
             state: statePublisher,
             goToHome: input.closeTapped

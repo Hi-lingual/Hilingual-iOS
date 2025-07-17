@@ -11,7 +11,7 @@ import HilingualDomain
 
 public final class FeedbackViewModel: BaseViewModel{
     
-    private let diaryId: Int
+    let diaryId: Int
     
     // MARK: - Input
     

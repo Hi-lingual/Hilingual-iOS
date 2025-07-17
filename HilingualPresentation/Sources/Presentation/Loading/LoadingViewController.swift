@@ -13,7 +13,7 @@ public final class LoadingViewController: BaseUIViewController<LoadingViewModel>
     // MARK: - Properties
 
     private let loadingView = LoadingView()
-    public var onRetryTapped: (() -> Void)? 
+    public var onRetryTapped: (() -> Void)?
 
     private let retryTappedSubject = PassthroughSubject<Void, Never>()
     private let closeTappedSubject = PassthroughSubject<Void, Never>()
