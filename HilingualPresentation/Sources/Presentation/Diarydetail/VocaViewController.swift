@@ -9,7 +9,7 @@ import Foundation
 
 import Combine
 
-public final class VocaViewController: BaseUIViewController<VocaViewModel> {
+public final class VocaViewController: BaseUIViewController<VocaViewModel>, ScrollControllable {
     
     // MARK: - Properties
     
@@ -71,5 +71,9 @@ public final class VocaViewController: BaseUIViewController<VocaViewModel> {
             }
             .store(in: &cancellables)
     }
+    
+    func scrollToTop() {
+            vocaView.scrollToTop()
+        }
 
 }

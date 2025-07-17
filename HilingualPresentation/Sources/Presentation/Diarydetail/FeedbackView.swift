@@ -47,7 +47,7 @@ final class FeedbackView: BaseUIView {
     let headerStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .horizontal
-        stackView.alignment = .fill
+//        stackView.alignment = .fill
         stackView.alignment = .center
         return stackView
     }()
@@ -151,10 +151,11 @@ final class FeedbackView: BaseUIView {
         headerStackView.snp.makeConstraints {
             $0.top.equalToSuperview().inset(24)
             $0.leading.trailing.equalToSuperview().inset(16)
+//            $0.height.equalTo(22)
         }
         
         diaryTextView.snp.makeConstraints {
-            $0.top.equalTo(headerStackView.snp.bottom).offset(12)
+            $0.top.equalTo(headerStackView.snp.bottom).offset(200)
             $0.leading.trailing.equalToSuperview().inset(16)
         }
         
@@ -167,6 +168,10 @@ final class FeedbackView: BaseUIView {
             $0.top.equalTo(diaryTextView.snp.bottom).offset(40)
             $0.leading.trailing.equalToSuperview()
         }
+    }
+    
+    func scrollToTop() {
+        scrollView.setContentOffset(.zero, animated: true)
     }
     
     // MARK: - Configure

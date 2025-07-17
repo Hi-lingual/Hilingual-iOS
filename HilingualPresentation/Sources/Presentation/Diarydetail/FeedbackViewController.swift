@@ -25,7 +25,7 @@ struct FeedbackItem {
     let explanation: String
 }
 
-public final class FeedbackViewController: BaseUIViewController<FeedbackViewModel> {
+public final class FeedbackViewController: BaseUIViewController<FeedbackViewModel>, ScrollControllable {
     
     // MARK: - Properties
     
@@ -97,5 +97,9 @@ public final class FeedbackViewController: BaseUIViewController<FeedbackViewMode
             }
             .store(in: &cancellables)
         
+    }
+    
+    func scrollToTop() {
+        feedbackView.scrollToTop()
     }
 }

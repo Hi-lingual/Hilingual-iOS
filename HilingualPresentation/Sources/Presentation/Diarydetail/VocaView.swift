@@ -76,4 +76,8 @@ final class VocaView: BaseUIView {
             contentView.addArrangedSubview(wordCard)
         }
     }
+    
+    func scrollToTop() {
+        scrollView.setContentOffset(.zero, animated: true)
+    }
 }
