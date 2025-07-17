@@ -40,6 +40,7 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: animated)
+        refreshSubject.send(())
     }
 
     public override func viewWillDisappear(_ animated: Bool) {
