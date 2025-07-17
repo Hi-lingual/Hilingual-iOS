@@ -94,7 +94,6 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
             .sink { [weak self] dates in
                 self?.homeView.calendarView.filledDates = dates
 
-                // ✅ filledDates 설정 이후에 선택 날짜 처리
                 let today = Date()
                 self?.homeView.calendarView.onDateSelected?(today)
             }
