@@ -57,7 +57,7 @@ final class CTAButton: UIButton {
     
     private func setupLayout() {
         snp.makeConstraints {
-            $0.height.equalTo(58)
+            $0.height.equalTo(56)
         }
     }
     
@@ -72,7 +72,7 @@ final class CTAButton: UIButton {
             contentHorizontalAlignment = .center
             semanticContentAttribute = .forceLeftToRight
         
-            imageEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 8)
+            titleEdgeInsets = UIEdgeInsets(top: 0, left: 8, bottom: 0, right: -8)
         }
 
         private func configure(with style: CTAButtonStyle) {
