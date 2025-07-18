@@ -1,4 +1,4 @@
-<img width="1920" height="1080" alt="브랜딩 썸네일" src="https://github.com/user-attachments/assets/8fcfd49f-890c-4d23-9877-b57104107507" />
+<img width="3240" height="1350" alt="브랜딩 썸네일" src="https://github.com/user-attachments/assets/4577a38e-780c-4f35-9eba-aed3ddd28328" />
 
 <br>
 
@@ -16,6 +16,7 @@
 
 <img width="1920" alt="11" src="https://github.com/user-attachments/assets/9af559e9-f8f8-44f0-9fdf-4c06f1b744e2" />
 
+<br>
 
 <!--
 <table>
@@ -62,8 +63,6 @@
 </table>
 -->
 
-<br>
-
 ## 👩‍💻 iOS 파트
 
 | [**성현주**](https://github.com/hye0njuoo) | [**신혜연**](https://github.com/hyeyeonie) | [**조영서**](https://github.com/jjwm10625) | [**진소은**](https://github.com/rosejinse) |
@@ -107,8 +106,7 @@
 <br>
 
 ## 🔧 Project Architecture
-<!-- 여기에 사진 넣자 -->
-
+<img width="2054" height="1270" alt="아키텍쳐" src="https://github.com/user-attachments/assets/d1233b8b-49b5-4f3f-ba8e-33e2dbfde9a1" />
 
 <br>
 
@@ -233,3 +231,11 @@ feat: #1 로그인 화면 UI 구현
 add: #3 온보딩 이미지 에셋 추가  
 fix: #5 캘린더 날짜 선택 오류 수정  
 ```
+
+<br>
+
+## ☄️ Trouble Shooting
+
+문제 해결 과정은 아래 Notion 페이지에 정리되어 있습니다.  
+[🔗 Trouble Shooting 바로가기](https://hilingual.notion.site/Trouble-Shooting-230829677ebf81028a15c2970ecba082?source=copy_link)
+
