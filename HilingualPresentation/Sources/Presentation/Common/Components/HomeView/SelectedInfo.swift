@@ -13,6 +13,7 @@ final class SelectedInfo: UIView {
     var topicData: (String, String)? {
         return cardTopicView.topicData
     }
+    
 
     // MARK: - Callback
     var onDiaryPreviewTapped: (() -> Void)?
@@ -163,7 +164,7 @@ final class SelectedInfo: UIView {
 
         iconView.isHidden = true
         timeLeftStack.isHidden = true
-        
+
         if selectedDay > today {
             notWrittenLabel.text = "작성불가"
             notWrittenLabel.textColor = .gray300
@@ -185,7 +186,6 @@ final class SelectedInfo: UIView {
         }
 
         if remainingTime > 0, let topic = topicData {
-        if let topic = topicData {
             notWrittenLabel.text = "미작성"
             notWrittenLabel.textColor = .gray300
             cardTopicView.isHidden = false
