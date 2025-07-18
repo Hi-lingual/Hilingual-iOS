@@ -13,7 +13,6 @@ final class SelectedInfo: UIView {
     var topicData: (String, String)? {
         return cardTopicView.topicData
     }
-    
 
     // MARK: - Callback
     var onDiaryPreviewTapped: (() -> Void)?
