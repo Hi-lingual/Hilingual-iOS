@@ -15,6 +15,7 @@ final class SelectedInfo: UIView {
     }
 
     // MARK: - Callback
+    
     var onDiaryPreviewTapped: (() -> Void)?
 
     // MARK: - UI Components
@@ -163,13 +164,13 @@ final class SelectedInfo: UIView {
 
         iconView.isHidden = true
         timeLeftStack.isHidden = true
-        
-//        if selectedDay > today {
-//            notWrittenLabel.text = "작성불가"
-//            notWrittenLabel.textColor = .gray300
-//            diaryLockView.isHidden = false
-//            return
-//        }
+
+        if selectedDay > today {
+            notWrittenLabel.text = "작성불가"
+            notWrittenLabel.textColor = .gray300
+            diaryLockView.isHidden = false
+            return
+        }
 
         if let _ = diaryId {
             notWrittenLabel.text = "작성완료"
@@ -184,8 +185,7 @@ final class SelectedInfo: UIView {
             return
         }
 
-        //if remainingTime > 0, let topic = topicData {
-        if let topic = topicData {
+        if remainingTime > 0, let topic = topicData {
             notWrittenLabel.text = "미작성"
             notWrittenLabel.textColor = .gray300
             cardTopicView.isHidden = false
@@ -196,9 +196,9 @@ final class SelectedInfo: UIView {
             return
         }
 
-//        notWrittenLabel.text = "미작성"
-//        notWrittenLabel.textColor = .gray300
-//        emptyDiaryView.isHidden = false
+        notWrittenLabel.text = "미작성"
+        notWrittenLabel.textColor = .gray300
+        emptyDiaryView.isHidden = false
     }
 
     func setSelectedDate(_ date: Date) {
