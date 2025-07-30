@@ -13,6 +13,13 @@ import HilingualDomain
 
 public final class DiaryWritingViewController: BaseUIViewController<DiaryWritingViewModel>, TextViewDelegate {
     
+    //MARK: - PickerMode
+    
+    enum PickerMode {
+        case normal
+        case ocr
+    }
+    
     // MARK: - Properties
     
     private let diaryWritingView = DiaryWritingView()
@@ -21,6 +28,7 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
     private let textCountSubject = PassthroughSubject<Int, Never>()
     private let topicData: (String, String)?
     private let selectedDate: Date
+    private var currentPickerMode: PickerMode?
     
     // MARK: - LifeCyccle
     
@@ -70,12 +78,32 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
     
     // MARK: - Private Methods
     
+    func showErrorDialog(title: String = "이미지 에러 발생", message: String) {
+        dialog.configure(
+            title: title,
+            content: message,
+            leftButtonTitle: "확인",
+            rightButtonTitle: "닫기"
+        )
+        
+        dialog.rightButton.removeTarget(nil, action: nil, for: .allEvents)
+        dialog.rightButton.addAction(UIAction { [weak self] _ in
+            self?.dialog.dismiss()
+        }, for: .touchUpInside)
+        
+        dialog.leftButton.removeTarget(nil, action: nil, for: .allEvents)
+        dialog.leftButton.addAction(UIAction { _ in
+            self.dialog.dismiss()
+        }, for: .touchUpInside)
+        dialog.showAnimation()
+    }
+    
     @objc private func cameraButtonTapped() {
         presentImagePicker()
     }
     
     @objc private func feedbackButtonTapped() {
-        let text = diaryWritingView.textView.text ?? ""
+        let text = diaryWritingView.textView.text
 
         let imageData: Data?
         if let image = diaryWritingView.selectedImageView.image {
@@ -180,19 +208,15 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
 
 extension DiaryWritingViewController: PHPickerViewControllerDelegate {
     
-    /// 이미지 선택기 띄우기 (OCR용 / 일반용 구분)
-    func presentImagePicker(isForOCR: Bool = false) {
+    func presentImagePicker(mode: PickerMode = .normal) {
+        currentPickerMode = mode
+        
         var config = PHPickerConfiguration()
         config.selectionLimit = 1
         config.filter = .images
         
         let picker = PHPickerViewController(configuration: config)
         picker.delegate = self
-        
-        if isForOCR {
-            picker.view.tag = 999 // OCR 식별 태그
-        }
-        
         present(picker, animated: true)
     }
     
@@ -200,26 +224,39 @@ extension DiaryWritingViewController: PHPickerViewControllerDelegate {
         picker.dismiss(animated: true)
         
         guard let itemProvider = results.first?.itemProvider,
-              itemProvider.canLoadObject(ofClass: UIImage.self) else {
+              itemProvider.canLoadObject(ofClass: UIImage.self),
+              let mode = currentPickerMode else {
             print("❌ 이미지 선택 실패 or 불러오기 불가")
+            DispatchQueue.main.async {
+                self.showErrorDialog(message: "이미지 선택 실패 또는 불러올 수 없습니다.")
+            }
             return
         }
         
         itemProvider.loadObject(ofClass: UIImage.self) { [weak self] image, error in
+            guard let self = self else { return }
+            
             if let error = error {
                 print("❌ 이미지 로드 에러: \(error.localizedDescription)")
+                DispatchQueue.main.async {
+                    self.showErrorDialog(message: "이미지 로드 중 오류가 발생했습니다.")
+                }
                 return
             }
-            guard let self = self, let image = image as? UIImage else {
+            
+            guard let image = image as? UIImage else {
                 print("❌ 이미지 변환 실패")
+                DispatchQueue.main.async {
+                    self.showErrorDialog(message: "이미지를 변환할 수 없습니다.")
+                }
                 return
             }
             
             DispatchQueue.main.async {
-                print("✅ 이미지 선택 완료 - OCR용?: \(picker.view.tag == 999)")
-                if picker.view.tag == 999 {
+                switch mode {
+                case .ocr:
                     self.visionKitManager.handleOCRImage(image)
-                } else {
+                case .normal:
                     self.diaryWritingView.setImage(image)
                 }
             }
@@ -273,12 +310,12 @@ extension DiaryWritingViewController: DiaryWritingViewDelegate {
     }
 
     func didTapGallery() {
-        presentImagePicker(isForOCR: false) // 일반 이미지 선택기
+        presentImagePicker(mode: .normal) // 일반 이미지 선택기
         self.diaryWritingView.modal.isHidden = true
     }
 
     func didTapOCRGallery() {
-        presentImagePicker(isForOCR: true)  // OCR용 이미지 선택기
+        presentImagePicker(mode: .ocr)  // OCR용 이미지 선택기
         self.diaryWritingView.modal.isHidden = true
     }
 }
@@ -289,3 +326,4 @@ extension DiaryWritingViewController: VisionKitManagerDelegate {
         diaryWritingView.setText(limitedText)
     }
 }
+
