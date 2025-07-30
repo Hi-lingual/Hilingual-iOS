@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		24C5DD322E243C8D009B59F6 /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = 24C5DD312E243C8D009B59F6 /* Lottie */; };
 		3AA29BE62E2A781C002C3AC7 /* Config.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 3AA29BE52E2A781C002C3AC7 /* Config.xcconfig */; };
 		E51B4C542E28DC11000B16D0 /* AppIcon.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E51B4C532E28DC11000B16D0 /* AppIcon.xcassets */; };
 		E51DB2052E1D9E8B000C2BEA /* AppConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = E51DB2042E1D9E8B000C2BEA /* AppConfig.swift */; };
@@ -58,7 +57,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				24C5DD322E243C8D009B59F6 /* Lottie in Frameworks */,
 				E5D5D0A92E171AC300DABE8D /* HilingualData in Frameworks */,
 				E5C2F3992E171575003DF6C4 /* HilingualDomain in Frameworks */,
 				E5C2F3952E170A01003DF6C4 /* HilingualNetwork in Frameworks */,
@@ -153,7 +151,6 @@
 				E5C2F3982E171575003DF6C4 /* HilingualDomain */,
 				E5D5D0A82E171AC300DABE8D /* HilingualData */,
 				E5D5D0AB2E17289000DABE8D /* HilingualPresentation */,
-				24C5DD312E243C8D009B59F6 /* Lottie */,
 			);
 			productName = Hilingual;
 			productReference = E5C79B0E2E15281900E461C3 /* Hilingual.app */;
@@ -184,7 +181,6 @@
 			mainGroup = E5C79B052E15281900E461C3;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				24C5DD302E243C8D009B59F6 /* XCRemoteSwiftPackageReference "lottie-spm" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = E5C79B0F2E15281900E461C3 /* Products */;
@@ -444,23 +440,7 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCRemoteSwiftPackageReference section */
-		24C5DD302E243C8D009B59F6 /* XCRemoteSwiftPackageReference "lottie-spm" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/airbnb/lottie-spm";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 4.5.2;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
-
 /* Begin XCSwiftPackageProductDependency section */
-		24C5DD312E243C8D009B59F6 /* Lottie */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 24C5DD302E243C8D009B59F6 /* XCRemoteSwiftPackageReference "lottie-spm" */;
-			productName = Lottie;
-		};
 		E5C2F3942E170A01003DF6C4 /* HilingualNetwork */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = HilingualNetwork;
