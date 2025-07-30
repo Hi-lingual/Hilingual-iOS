@@ -48,7 +48,7 @@ final class VisionKitManager: NSObject {
             
             print("✅ 인식된 텍스트:\n\(recognizedText)")
             
-            Task { @MainActor in
+            Task {
                 self.delegate?.didRecognizeText(recognizedText)
             }
         } catch {
