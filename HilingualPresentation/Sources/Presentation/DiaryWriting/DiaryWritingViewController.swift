@@ -84,7 +84,7 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
             imageData = nil
         }
 
-        let dateString = selectedDate.toString(format: "yyyy-MM-dd")
+        let dateString = selectedDate.toFormattedString("yyyy-MM-dd")
         print("📤 postDiary 호출")
 
         let entity = DiaryWritingEntity(originalText: text, date: dateString, imageFile: imageData)
@@ -287,14 +287,5 @@ extension DiaryWritingViewController: VisionKitManagerDelegate {
     func didRecognizeText(_ text: String) {
         let limitedText = String(text.prefix(diaryWritingView.textView.maxCharacterCount))
         diaryWritingView.setText(limitedText)
-    }
-}
-
-extension Date {
-    func toString(format: String) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = format
-        formatter.locale = Locale(identifier: "ko_KR")
-        return formatter.string(from: self)
     }
 }
