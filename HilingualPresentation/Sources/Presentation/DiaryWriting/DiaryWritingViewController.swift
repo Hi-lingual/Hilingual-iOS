@@ -22,13 +22,13 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
     
     // MARK: - Properties
     
-    private let diaryWritingView = DiaryWritingView()
-    private let visionKitManager = VisionKitManager()
+    private(set) var diaryWritingView = DiaryWritingView()
+    private(set) var visionKitManager = VisionKitManager()
     private let dialog = Dialog()
     private let textCountSubject = PassthroughSubject<Int, Never>()
     private let topicData: (String, String)?
     private let selectedDate: Date
-    private var currentPickerMode: PickerMode?
+    var currentPickerMode: PickerMode?
     
     // MARK: - LifeCyccle
     
@@ -203,136 +203,3 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
         textCountSubject.send(count)
     }
 }
-
-// MARK: - PHPickerViewControllerDelegate + 이미지 선택기
-
-extension DiaryWritingViewController: PHPickerViewControllerDelegate {
-    
-    func presentImagePicker(mode: PickerMode = .normal) {
-        currentPickerMode = mode
-        
-        var config = PHPickerConfiguration()
-        config.selectionLimit = 1
-        config.filter = .images
-        
-        let picker = PHPickerViewController(configuration: config)
-        picker.delegate = self
-        present(picker, animated: true)
-    }
-    
-    public func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
-        picker.dismiss(animated: true)
-        
-        guard let itemProvider = results.first?.itemProvider,
-              let mode = currentPickerMode else {
-            print("사용자가 선택하지 않고 닫음")
-            return
-        }
-        
-        // 이미지 타입 로드 불가일 때는 에러 다이얼로그
-        guard itemProvider.canLoadObject(ofClass: UIImage.self) else {
-            print("❌ 이미지 로드 불가")
-            DispatchQueue.main.async {
-                self.showErrorDialog(message: "이미지를 불러올 수 없습니다.")
-            }
-            return
-        }
-        
-        itemProvider.loadObject(ofClass: UIImage.self) { [weak self] image, error in
-            guard let self = self else { return }
-            
-            if let error = error {
-                print("❌ 이미지 로드 에러: \(error.localizedDescription)")
-                DispatchQueue.main.async {
-                    self.showErrorDialog(message: "이미지 로드 중 오류가 발생했습니다.")
-                }
-                return
-            }
-            
-            guard let image = image as? UIImage else {
-                print("❌ 이미지 변환 실패")
-                DispatchQueue.main.async {
-                    self.showErrorDialog(message: "이미지를 변환할 수 없습니다.")
-                }
-                return
-            }
-            
-            DispatchQueue.main.async {
-                switch mode {
-                case .ocr:
-                    self.visionKitManager.handleOCRImage(image)
-                case .normal:
-                    self.diaryWritingView.setImage(image)
-                }
-            }
-        }
-    }
-}
-
-// MARK: - UIImagePickerControllerDelegate + 카메라 촬영기
-
-extension DiaryWritingViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
-    
-    func presentCamera() {
-        guard UIImagePickerController.isSourceTypeAvailable(.camera) else {
-            let alert = UIAlertController(
-                title: "카메라 사용 불가",
-                message: "카메라를 사용할 수 없습니다. 설정에서 권한을 확인해주세요.",
-                preferredStyle: .alert
-            )
-            alert.addAction(UIAlertAction(title: "확인", style: .default))
-            present(alert, animated: true)
-            return
-        }
-
-        let picker = UIImagePickerController()
-        picker.sourceType = .camera
-        picker.delegate = self
-        picker.allowsEditing = false
-        present(picker, animated: true)
-    }
-
-    public func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
-        picker.dismiss(animated: true)
-
-        if let image = info[.originalImage] as? UIImage {
-            visionKitManager.handleOCRImage(image)
-        }
-    }
-
-    public func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-        picker.dismiss(animated: true)
-    }
-}
-
-// MARK: - DiaryWritingViewDelegate (카메라/갤러리 버튼 터치 이벤트)
-
-@MainActor
-extension DiaryWritingViewController: DiaryWritingViewDelegate {
-    func didTapCamera() {
-        presentCamera()
-        self.diaryWritingView.modal.isHidden = true
-    }
-
-    func didTapGallery() {
-        presentImagePicker(mode: .normal) // 일반 이미지 선택기
-        self.diaryWritingView.modal.isHidden = true
-    }
-
-    func didTapOCRGallery() {
-        presentImagePicker(mode: .ocr)  // OCR용 이미지 선택기
-        self.diaryWritingView.modal.isHidden = true
-    }
-}
-
-extension DiaryWritingViewController: VisionKitManagerDelegate {
-    func didRecognizeText(_ text: String) {
-        let limitedText = String(text.prefix(diaryWritingView.textView.maxCharacterCount))
-        diaryWritingView.setText(limitedText)
-    }
-    
-    func didFailWithError(_ message: String) {
-        showErrorDialog(title: "텍스트 스캔 에러 발생", message: message)
-    }
-}
-
