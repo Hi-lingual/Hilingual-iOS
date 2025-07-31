@@ -224,11 +224,16 @@ extension DiaryWritingViewController: PHPickerViewControllerDelegate {
         picker.dismiss(animated: true)
         
         guard let itemProvider = results.first?.itemProvider,
-              itemProvider.canLoadObject(ofClass: UIImage.self),
               let mode = currentPickerMode else {
-            print("❌ 이미지 선택 실패 or 불러오기 불가")
+            print("사용자가 선택하지 않고 닫음")
+            return
+        }
+        
+        // 이미지 타입 로드 불가일 때는 에러 다이얼로그
+        guard itemProvider.canLoadObject(ofClass: UIImage.self) else {
+            print("❌ 이미지 로드 불가")
             DispatchQueue.main.async {
-                self.showErrorDialog(message: "이미지 선택 실패 또는 불러올 수 없습니다.")
+                self.showErrorDialog(message: "이미지를 불러올 수 없습니다.")
             }
             return
         }
@@ -324,6 +329,10 @@ extension DiaryWritingViewController: VisionKitManagerDelegate {
     func didRecognizeText(_ text: String) {
         let limitedText = String(text.prefix(diaryWritingView.textView.maxCharacterCount))
         diaryWritingView.setText(limitedText)
+    }
+    
+    func didFailWithError(_ message: String) {
+        showErrorDialog(title: "텍스트 스캔 에러 발생", message: message)
     }
 }
 
