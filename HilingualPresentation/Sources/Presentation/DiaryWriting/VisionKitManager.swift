@@ -12,6 +12,7 @@ import VisionKit
 @MainActor
 protocol VisionKitManagerDelegate: AnyObject {
     func didRecognizeText(_ text: String)
+    func didFailWithError(_ message: String)
 }
 
 @MainActor
@@ -30,6 +31,7 @@ final class VisionKitManager: NSObject {
     func recognizeText(from image: UIImage) {
         guard let cgImage = image.cgImage else {
             print("❌ cgImage 변환 실패")
+            delegate?.didFailWithError("이미지를 처리할 수 없습니다.")
             return
         }
         
@@ -39,6 +41,7 @@ final class VisionKitManager: NSObject {
             try handler.perform([textRecognitionRequest])
             guard let observations = textRecognitionRequest.results else {
                 print("❌ 텍스트 인식 결과가 없음")
+                delegate?.didFailWithError("텍스트를 인식할 수 없습니다.")
                 return
             }
             
@@ -46,13 +49,19 @@ final class VisionKitManager: NSObject {
                 .compactMap { $0.topCandidates(1).first?.string }
                 .joined(separator: "\n")
             
-            print("✅ 인식된 텍스트:\n\(recognizedText)")
+            if recognizedText.isEmpty {
+                print("❌ 텍스트 인식 결과가 비어 있음")
+                delegate?.didFailWithError("텍스트를 인식하지 못했습니다.")
+                return
+            }
             
+            print("✅ 인식된 텍스트:\n\(recognizedText)")
             Task {
                 self.delegate?.didRecognizeText(recognizedText)
             }
         } catch {
             print("❌ 텍스트 인식 실패: \(error.localizedDescription)")
+            delegate?.didFailWithError("텍스트 인식 중 오류가 발생했습니다.")
         }
     }
     
@@ -99,7 +108,8 @@ final class VisionKitManager: NSObject {
 }
 
 extension VisionKitManager: @preconcurrency VNDocumentCameraViewControllerDelegate {
-    @MainActor func documentCameraViewController(_ controller: VNDocumentCameraViewController, didFinishWith scan: VNDocumentCameraScan) {
+    @MainActor
+    func documentCameraViewController(_ controller: VNDocumentCameraViewController, didFinishWith scan: VNDocumentCameraScan) {
         controller.dismiss(animated: true) { [weak self] in
             guard scan.pageCount > 0 else { return }
             let image = scan.imageOfPage(at: 0)
@@ -107,11 +117,16 @@ extension VisionKitManager: @preconcurrency VNDocumentCameraViewControllerDelega
         }
     }
 
-    @MainActor func documentCameraViewControllerDidCancel(_ controller: VNDocumentCameraViewController) {
+    @MainActor
+    func documentCameraViewControllerDidCancel(_ controller: VNDocumentCameraViewController) {
         controller.dismiss(animated: true)
     }
 
-    @MainActor func documentCameraViewController(_ controller: VNDocumentCameraViewController, didFailWithError error: Error) {
-        controller.dismiss(animated: true)
+    @MainActor
+    func documentCameraViewController(_ controller: VNDocumentCameraViewController, didFailWithError error: Error) {
+        controller.dismiss(animated: true) { [weak self] in
+            print("❌ 문서 스캔 실패: \(error.localizedDescription)")
+            self?.delegate?.didFailWithError("문서를 스캔하는 중 오류가 발생했습니다.")
+        }
     }
 }
