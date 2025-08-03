@@ -35,13 +35,18 @@ final class FeedbackView: BaseUIView {
         return label
     }()
     
-    lazy var controlSwitch: CompactSwitch = {
-        let toggle = CompactSwitch()
-        toggle.onTintColor = .hilingualOrange
-        toggle.isOn = true
+    lazy var controlSwitch: CustomToggle = {
+        let toggle = CustomToggle(frame: CGRect(x: 0, y: 0, width: 52, height: 28))
         toggle.addTarget(self, action: #selector(toggleButtonTapped), for: .valueChanged)
-        toggle.transform = CGAffineTransform(scaleX: 0.7, y: 0.7)
         return toggle
+    }()
+    
+    private let trailingSpacerView: UIView = {
+        let view = UIView()
+        view.snp.makeConstraints {
+            $0.width.equalTo(16)
+        }
+        return view
     }()
     
     let headerStackView: UIStackView = {
@@ -122,7 +127,7 @@ final class FeedbackView: BaseUIView {
         scrollView.addSubview(contentView)
         contentView.axis = .vertical
         contentView.addArrangedSubviews(headerStackView, diaryTextView, feedbackStackView)
-        headerStackView.addArrangedSubviews(dateLabel, AILabel, controlSwitch)
+        headerStackView.addArrangedSubviews(dateLabel, AILabel, controlSwitch, trailingSpacerView)
         feedbackStackView.addArrangedSubview(feedbackLabel)
         
         backgroundColor = .gray100
@@ -137,10 +142,11 @@ final class FeedbackView: BaseUIView {
         }
         
         contentView.setCustomSpacing(6, after: headerStackView)
+        headerStackView.setCustomSpacing(4, after: AILabel)
         
         controlSwitch.snp.makeConstraints {
-            $0.trailing.equalToSuperview()
-            $0.width.equalTo(60)
+            $0.height.equalTo(28)
+            $0.width.equalTo(52)
         }
         
         headerStackView.snp.makeConstraints {
@@ -240,12 +246,5 @@ final class FeedbackView: BaseUIView {
         
         configureDiary(data: data)
         currentDiaryData = data
-    }
-}
-
-final class CompactSwitch: UISwitch {
-    override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
-        let bounds = self.bounds.insetBy(dx: 10, dy: 10)
-        return bounds.contains(point)
     }
 }
