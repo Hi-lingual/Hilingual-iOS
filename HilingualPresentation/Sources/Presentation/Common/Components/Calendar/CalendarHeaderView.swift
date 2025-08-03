@@ -5,6 +5,7 @@
 //  Created by 조영서 on 7/7/25.
 //
 
+
 import UIKit
 import SnapKit
 
@@ -15,7 +16,6 @@ final class CalendarHeaderView: UIView {
     private var currentDate: Date = Date() {
         didSet {
             textLabel.text = CalendarHeaderView.format(date: currentDate)
-            onMonthChanged?(currentDate)
         }
     }
 
@@ -75,7 +75,7 @@ final class CalendarHeaderView: UIView {
         setupActions()
         textLabel.text = CalendarHeaderView.format(date: currentDate)
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -83,9 +83,9 @@ final class CalendarHeaderView: UIView {
     // MARK: - Setup Methods
 
     private func setupUI() {
-        
+
         backgroundColor = .white
-        
+
         layer.cornerRadius = 12
         layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         layer.masksToBounds = true
@@ -120,7 +120,7 @@ final class CalendarHeaderView: UIView {
             $0.bottom.equalToSuperview().inset(12)
         }
     }
-    
+
     private func setupActions() {
         monthButton.addTarget(self, action: #selector(monthButtonTapped), for: .touchUpInside)
         previousButton.addTarget(self, action: #selector(previousButtonTapped), for: .touchUpInside)
@@ -132,7 +132,7 @@ final class CalendarHeaderView: UIView {
     @objc private func monthButtonTapped() {
         let monthPicker = MonthPickerModal()
         monthPicker.onDateSelected = { [weak self] selectedDate in
-            self?.currentDate = selectedDate
+            self?.onMonthChanged?(selectedDate)
         }
 
         if let window = UIApplication.shared.connectedScenes
@@ -146,15 +146,19 @@ final class CalendarHeaderView: UIView {
     @objc private func previousButtonTapped() {
         guard let newDate = Calendar.current.date(byAdding: .month, value: -1, to: currentDate)
         else { return }
-        currentDate = newDate
-        onMonthChanged?(currentDate)
+        onMonthChanged?(newDate)
     }
 
     @objc private func nextButtonTapped() {
         guard let newDate = Calendar.current.date(byAdding: .month, value: 1, to: currentDate)
         else { return }
-        currentDate = newDate
-        onMonthChanged?(currentDate)
+        onMonthChanged?(newDate)
+    }
+
+    // MARK: - Public Method
+
+    func setCurrentDate(_ date: Date) {
+        self.currentDate = date
     }
 
     // MARK: - Helper
