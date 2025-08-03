@@ -10,36 +10,11 @@ import SnapKit
 
 final class CalendarView: UIView {
 
-    // MARK: - Properties
-    
-    //CalendarHeaderView한테 알려줌
-    var onMonthChanged: ((Date) -> Void)?
-    
-    //HomeView한테 알려줌
     var onDateSelected: ((Date) -> Void)?
+    var onMonthChanged: ((Date) -> Void)?
 
-    private let calendar = Calendar.current
-    public var currentDate = Date()
-    private var startOfMonth: Date {
-        calendar.date(from: calendar.dateComponents([.year, .month], from: currentDate))!
-    }
-
-    private var days: [Date] = []
-    var filledDates: [Date] = [] {
-        didSet { collectionView.reloadData() }
-    }
-
-    public var selectedDate: Date? {
-        didSet { collectionView.reloadData() }
-    }
-    
-    var rowCount: Int {
-        return Int(ceil(Double(days.count) / 7.0))
-    }
-    
-    // MARK: - UI Components
-
-    private let containerView = UIView()
+    private var currentDate = Date()
+    public var filledDates: [Date] = []
 
     private let weekStackView: UIStackView = {
         let stack = UIStackView()
@@ -48,59 +23,33 @@ final class CalendarView: UIView {
         return stack
     }()
 
-    private let flowLayout: UICollectionViewFlowLayout = {
-        let layout = UICollectionViewFlowLayout()
-        layout.minimumInteritemSpacing = 0
-        layout.minimumLineSpacing = 14
-        return layout
-    }()
+    private let scrollView = UIScrollView()
+    private var calendarViews: [CalendarContentView] = []
+    private var isAnimatingScroll = false
 
-    private lazy var collectionView: UICollectionView = {
-        let cv = UICollectionView(frame: .zero, collectionViewLayout: flowLayout)
-        cv.isScrollEnabled = false
-        cv.register(CustomCalendarCell.self, forCellWithReuseIdentifier: "CustomCalendarCell")
-        cv.dataSource = self
-        cv.delegate = self
-        return cv
-    }()
+    private var scrollViewHeightConstraint: Constraint?
 
-    // MARK: - Lifecycle
+    // MARK: - Init
 
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
         setupLayout()
-        generateDays()
+        setupCalendarViews()
+        configureCalendars(for: currentDate)
     }
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        updateItemSize()
-    }
-    
-    //높이 계산 로직
-    override var intrinsicContentSize: CGSize {
-        let rowHeight: CGFloat = 34
-        let lineSpacing: CGFloat = 14
-        let weekHeight: CGFloat = 20
-        let rowCount = self.rowCount
-        let totalHeight = weekHeight + CGFloat(rowCount) * rowHeight + CGFloat(max(0, rowCount - 1)) * lineSpacing + 8
-        return CGSize(width: UIView.noIntrinsicMetric, height: totalHeight)
-    }
-
-    // MARK: - Setup Methods
+    // MARK: - Setup
 
     private func setupUI() {
-
         backgroundColor = .white
 
-        addSubview(containerView)
-        containerView.addSubview(weekStackView)
-        containerView.addSubview(collectionView)
+        addSubview(weekStackView)
+        addSubview(scrollView)
 
         ["일", "월", "화", "수", "목", "금", "토"].forEach { symbol in
             let label = UILabel()
@@ -110,126 +59,145 @@ final class CalendarView: UIView {
             label.textColor = symbol == "일" ? .alertRed : (symbol == "토" ? .infoBlue : .gray500)
             weekStackView.addArrangedSubview(label)
         }
+
+        scrollView.isPagingEnabled = true
+        scrollView.showsHorizontalScrollIndicator = false
+        scrollView.delegate = self
     }
 
     private func setupLayout() {
-        containerView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
-        }
-
         weekStackView.snp.makeConstraints {
             $0.top.leading.trailing.equalToSuperview()
             $0.height.equalTo(20)
         }
 
-        collectionView.snp.makeConstraints {
+        scrollView.snp.makeConstraints {
             $0.top.equalTo(weekStackView.snp.bottom).offset(8)
             $0.leading.trailing.bottom.equalToSuperview()
+            scrollViewHeightConstraint = $0.height.equalTo(0).constraint
         }
     }
-    
-    // MARK: - Public Methods
-    
-    public func select(date: Date) {
-        self.selectedDate = date
-        self.reload(for: date)
-        self.onDateSelected?(date)
+
+    private func setupCalendarViews() {
+        for _ in 0..<3 {
+            let calendarView = CalendarContentView()
+            calendarView.onDateSelected = { [weak self] date in
+                self?.onDateSelected?(date)
+            }
+            scrollView.addSubview(calendarView)
+            calendarViews.append(calendarView)
+        }
+
+        calendarViews[0].snp.makeConstraints {
+            $0.leading.equalToSuperview()
+            $0.top.bottom.equalToSuperview()
+            $0.width.equalToSuperview()
+        }
+
+        calendarViews[1].snp.makeConstraints {
+            $0.leading.equalTo(calendarViews[0].snp.trailing)
+            $0.top.bottom.equalToSuperview()
+            $0.width.equalToSuperview()
+        }
+
+        calendarViews[2].snp.makeConstraints {
+            $0.leading.equalTo(calendarViews[1].snp.trailing)
+            $0.top.bottom.equalToSuperview()
+            $0.width.equalToSuperview()
+            $0.trailing.equalToSuperview()
+        }
     }
-    
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        scrollView.contentOffset = CGPoint(x: scrollView.bounds.width, y: 0)
+    }
+
+    // MARK: - Calendar Config
+
+    private func configureCalendars(for date: Date) {
+        let prevMonth = Calendar.current.date(byAdding: .month, value: -1, to: date)!
+        let nextMonth = Calendar.current.date(byAdding: .month, value: 1, to: date)!
+
+        calendarViews[0].reload(for: prevMonth)
+        calendarViews[1].reload(for: date)
+        calendarViews[2].reload(for: nextMonth)
+
+        calendarViews.forEach {
+            $0.filledDates = filledDates
+        }
+
+        updateScrollViewHeight()
+        onMonthChanged?(date)
+    }
+
+    // MARK: - Public Methods
+
+    var selectedDate: Date? {
+        get { return calendarViews[1].selectedDate }
+        set {
+            guard let newDate = newValue else { return }
+            select(date: newDate)
+        }
+    }
+
     func reload(for date: Date) {
         currentDate = date
-        generateDays()
-        collectionView.reloadData()
-        invalidateIntrinsicContentSize()
+        configureCalendars(for: currentDate)
+
+        // 여기 추가!
+        calendarViews[1].setSelectedDate(date)
+
+        scrollView.setContentOffset(CGPoint(x: scrollView.bounds.width, y: 0), animated: false)
+        updateScrollViewHeight()
     }
-    
-    public func reloadData() {
-        collectionView.reloadData()
-        invalidateIntrinsicContentSize()
+
+    func select(date: Date) {
+        currentDate = date
+        configureCalendars(for: currentDate)
+
+        calendarViews[1].setSelectedDate(date)
+
+        onDateSelected?(date)
+        updateScrollViewHeight()
     }
 
-    // MARK: - Private Methods
-
-    private func generateDays() {
-        days.removeAll()
-
-        let range = calendar.range(of: .day, in: .month, for: currentDate)!
-        let firstOfMonthWeekday = calendar.component(.weekday, from: startOfMonth)
-        let firstWeekday = calendar.firstWeekday
-        let offset = (firstOfMonthWeekday - firstWeekday + 7) % 7
-
-        // 이전 달 날짜
-        if offset > 0 {
-            for i in 0..<offset {
-                if let date = calendar.date(byAdding: .day, value: -offset + i, to: startOfMonth) {
-                    days.append(date)
-                }
-            }
-        }
-
-        // 이번 달 날짜
-        for day in range {
-            if let date = calendar.date(byAdding: .day, value: day - 1, to: startOfMonth) {
-                days.append(date)
-            }
-        }
-
-        // 다음 달 날짜 주 단위 맞춤
-        let remainder = days.count % 7
-        if remainder > 0 {
-            let extra = 7 - remainder
-            guard let lastDate = days.last else { return }
-            for i in 1...extra {
-                if let date = calendar.date(byAdding: .day, value: i, to: lastDate) {
-                    days.append(date)
-                }
-            }
+    var filledDatesProxy: [Date] {
+        get { filledDates }
+        set {
+            filledDates = newValue
+            calendarViews.forEach { $0.filledDates = newValue }
+            updateScrollViewHeight()
         }
     }
 
-    private func updateItemSize() {
-        let width = containerView.bounds.width / 7
-        flowLayout.itemSize = CGSize(width: width, height: 34)
+    // MARK: - Height Update
+
+    private func updateScrollViewHeight() {
+        layoutIfNeeded()
+        let contentHeight = calendarViews[1].intrinsicContentSize.height
+        scrollViewHeightConstraint?.update(offset: contentHeight)
     }
 }
 
-// MARK: - Extensions
+// MARK: - UIScrollViewDelegate
 
-extension CalendarView: UICollectionViewDataSource, UICollectionViewDelegate {
+extension CalendarView: UIScrollViewDelegate {
 
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return days.count
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CustomCalendarCell", for: indexPath) as! CustomCalendarCell
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        let pageWidth = scrollView.frame.width
+        let page = Int(scrollView.contentOffset.x / pageWidth)
 
-        let date = days[indexPath.item]
-        let day = calendar.component(.day, from: date)
-        let isToday = calendar.isDateInToday(date)
-        let isSelected = selectedDate != nil && calendar.isDate(selectedDate!, inSameDayAs: date)
-        let isFilled = filledDates.contains { calendar.isDate($0, inSameDayAs: date) }
-        let isWithinMonth = calendar.isDate(date, equalTo: currentDate, toGranularity: .month)
-
-        cell.configure(
-            day: day,
-            isToday: isToday,
-            isSelected: isSelected,
-            isFilled: isFilled,
-            isWithinMonth: isWithinMonth
-        )
-
-        return cell
-    }
-
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        selectedDate = days[indexPath.item]
-        if let selectedDate = selectedDate {
-            onDateSelected?(selectedDate)
+        if page == 0 {
+            currentDate = Calendar.current.date(byAdding: .month, value: -1, to: currentDate)!
+        } else if page == 2 {
+            currentDate = Calendar.current.date(byAdding: .month, value: 1, to: currentDate)!
+        } else {
+            return
         }
-    }
-    
-    func setSelectedDate(_ date: Date) {
-        selectedDate = date
+
+        configureCalendars(for: currentDate)
+        scrollView.setContentOffset(CGPoint(x: pageWidth, y: 0), animated: false)
+        updateScrollViewHeight()
     }
 }
