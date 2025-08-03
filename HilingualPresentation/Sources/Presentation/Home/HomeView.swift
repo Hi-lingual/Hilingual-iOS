@@ -50,6 +50,7 @@ final class HomeView: BaseUIView {
             selectedInfo,
             spacer2
         )
+        
         bindCalendar()
         
     }
@@ -62,11 +63,6 @@ final class HomeView: BaseUIView {
             $0.height.equalTo(46)
         }
         
-//        headerView.snp.makeConstraints {
-//            $0.top.equalTo(profileView.snp.bottom).offset(12)
-//            $0.horizontalEdges.equalToSuperview()
-//        }
-        
         calendarView.snp.makeConstraints {
             $0.top.equalTo(profileView.snp.bottom).offset(12)
             $0.horizontalEdges.equalToSuperview()
@@ -75,7 +71,7 @@ final class HomeView: BaseUIView {
         spacer.snp.makeConstraints {
             $0.top.equalTo(calendarView.snp.bottom)
             $0.horizontalEdges.equalToSuperview()
-            $0.height.equalTo(16)
+            $0.height.equalTo(28)
         }
         
         divider.snp.makeConstraints {
