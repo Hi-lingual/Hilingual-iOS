@@ -14,7 +14,7 @@ public protocol RecommendedExpressionService {
     func fetchRecommendedExpression(diaryId: Int) -> AnyPublisher<RecommendedExpressionResponseDTO, Error>
 }
 
-public final class DefaultRecommendedExpressionService: BaseService<RecommendedExpressionAPI>, RecommendedExpressionService {
+public final class DefaultRecommendedExpressionService: BaseService<DiaryDetailAPI>, RecommendedExpressionService {
     public func fetchRecommendedExpression(diaryId: Int) -> AnyPublisher<RecommendedExpressionResponseDTO, Error> {
         return request(.fetchRecommendedExpression(diaryId: diaryId), as: RecommendedExpressionResponseDTO.self)
             .mapError { $0 as Error }
