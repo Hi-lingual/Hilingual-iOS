@@ -8,14 +8,14 @@
 import Foundation
 import Moya
 
-public enum RecommendedVocaAPI {
-    case fetchRecommendedVoca(diaryId: Int)
+public enum RecommendedExpressionAPI {
+    case fetchRecommendedExpression(diaryId: Int)
 }
 
-extension RecommendedVocaAPI: BaseTargetType {
+extension RecommendedExpressionAPI: BaseTargetType {
     public var path: String {
         switch self {
-        case .fetchRecommendedVoca(let diaryId):
+        case .fetchRecommendedExpression(let diaryId):
             return "diaries/\(diaryId)/recommended"
         }
     }
@@ -26,7 +26,7 @@ extension RecommendedVocaAPI: BaseTargetType {
     
     public var task: Task {
         switch self {
-        case .fetchRecommendedVoca:
+        case .fetchRecommendedExpression:
             return .requestPlain
         }
     }

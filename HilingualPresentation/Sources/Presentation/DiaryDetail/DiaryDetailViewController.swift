@@ -30,7 +30,7 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
     }()
     
     private lazy var vc1 = diContainer.makeFeedbackViewController(diaryId: diaryId)
-    private lazy var vc2 = diContainer.makeVocaViewController(diaryId: diaryId)
+    private lazy var vc2 = diContainer.makeRecommendedExpressionViewController(diaryId: diaryId)
     
     private var segmentedControl: SegmentedControl!
     
