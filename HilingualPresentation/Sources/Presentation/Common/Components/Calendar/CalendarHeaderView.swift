@@ -32,7 +32,7 @@ final class CalendarHeaderView: UIView {
 
     private let iconView: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = UIImage(named: "ic_arrow_down_16_ios", in: .module, compatibleWith: nil)
+        imageView.image = UIImage(named: "ic_arrow_down_24_ios", in: .module, compatibleWith: nil)
         imageView.contentMode = .scaleAspectFit
         return imageView
     }()
@@ -46,14 +46,14 @@ final class CalendarHeaderView: UIView {
 
     private let previousButton: UIButton = {
         let button = UIButton()
-        button.setImage(UIImage(named: "ic_arrow_left_20_ios", in: .module, compatibleWith: nil), for: .normal)
+        button.setImage(UIImage(named: "ic_arrow_left_g_24_ios", in: .module, compatibleWith: nil), for: .normal)
         button.imageView?.contentMode = .scaleAspectFit
         return button
     }()
 
     private let nextButton: UIButton = {
         let button = UIButton()
-        button.setImage(UIImage(named: "ic_arrow_right_20_ios", in: .module, compatibleWith: nil), for: .normal)
+        button.setImage(UIImage(named: "ic_arrow_right_g_24_ios", in: .module, compatibleWith: nil), for: .normal)
         button.imageView?.contentMode = .scaleAspectFit
         return button
     }()
@@ -61,7 +61,7 @@ final class CalendarHeaderView: UIView {
     private let buttonStack: UIStackView = {
         let stack = UIStackView()
         stack.axis = .horizontal
-        stack.spacing = 12
+        stack.spacing = 8
         stack.alignment = .center
         return stack
     }()
