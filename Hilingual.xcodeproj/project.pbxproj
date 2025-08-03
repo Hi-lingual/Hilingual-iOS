@@ -7,7 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		3AA29BE62E2A781C002C3AC7 /* Config.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 3AA29BE52E2A781C002C3AC7 /* Config.xcconfig */; };
+		3AA29BE62E2A781C002C3AC7 /* Release.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 3AA29BE52E2A781C002C3AC7 /* Release.xcconfig */; };
+		E50E38942E3F89E700B77F59 /* Debug.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = E50E38932E3F89E700B77F59 /* Debug.xcconfig */; };
 		E51B4C542E28DC11000B16D0 /* AppIcon.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E51B4C532E28DC11000B16D0 /* AppIcon.xcassets */; };
 		E51DB2052E1D9E8B000C2BEA /* AppConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = E51DB2042E1D9E8B000C2BEA /* AppConfig.swift */; };
 		E51DB2242E1E4407000C2BEA /* AppBaseURLProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E51DB2232E1E4407000C2BEA /* AppBaseURLProvider.swift */; };
@@ -35,7 +36,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		3AA29BE52E2A781C002C3AC7 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
+		3AA29BE52E2A781C002C3AC7 /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
+		E50E38932E3F89E700B77F59 /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
 		E51B4C532E28DC11000B16D0 /* AppIcon.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = AppIcon.xcassets; sourceTree = "<group>"; };
 		E51DB2002E1CF7AD000C2BEA /* Hilingual.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Hilingual.entitlements; sourceTree = "<group>"; };
 		E51DB2042E1D9E8B000C2BEA /* AppConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfig.swift; sourceTree = "<group>"; };
@@ -80,7 +82,8 @@
 				E51DB2042E1D9E8B000C2BEA /* AppConfig.swift */,
 				E51DB2232E1E4407000C2BEA /* AppBaseURLProvider.swift */,
 				E51B4C532E28DC11000B16D0 /* AppIcon.xcassets */,
-				3AA29BE52E2A781C002C3AC7 /* Config.xcconfig */,
+				3AA29BE52E2A781C002C3AC7 /* Release.xcconfig */,
+				E50E38932E3F89E700B77F59 /* Debug.xcconfig */,
 			);
 			path = Config;
 			sourceTree = "<group>";
@@ -197,8 +200,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E50E38942E3F89E700B77F59 /* Debug.xcconfig in Resources */,
 				E51B4C542E28DC11000B16D0 /* AppIcon.xcassets in Resources */,
-				3AA29BE62E2A781C002C3AC7 /* Config.xcconfig in Resources */,
+				3AA29BE62E2A781C002C3AC7 /* Release.xcconfig in Resources */,
 				E5C79B322E15282100E461C3 /* LaunchScreen.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -302,7 +306,7 @@
 		};
 		E5C79B242E15281B00E461C3 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 3AA29BE52E2A781C002C3AC7 /* Config.xcconfig */;
+			baseConfigurationReference = E50E38932E3F89E700B77F59 /* Debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -366,7 +370,7 @@
 		};
 		E5C79B252E15281B00E461C3 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 3AA29BE52E2A781C002C3AC7 /* Config.xcconfig */;
+			baseConfigurationReference = 3AA29BE52E2A781C002C3AC7 /* Release.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
