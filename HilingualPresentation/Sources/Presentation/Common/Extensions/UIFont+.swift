@@ -16,22 +16,28 @@ extension UIFont {
     public static func registerSuitFonts() {
         for weight in Family.allCases {
             guard let fontURL = Bundle.module.url(forResource: "SUIT-\(weight.rawValue)", withExtension: "ttf") else {
-                print("Fail to finding SUIT-\(weight.rawValue).ttf file.")
+    #if DEBUG
+                print("SUIT-\(weight.rawValue).ttf 파일을 찾을 수 없습니다.")
+    #endif
                 continue
             }
             var error: Unmanaged<CFError>?
             if !CTFontManagerRegisterFontsForURL(fontURL as CFURL, .process, &error) {
+    #if DEBUG
                 if let cfError = error?.takeRetainedValue() {
-                    print("Fail to register SUIT-\(weight.rawValue).ttf \(cfError)")
+                    print("SUIT-\(weight.rawValue).ttf 등록 실패: \(cfError)")
                 } else {
-                    print("Fail to register SUIT-\(weight.rawValue).ttf with unknown error")
+                    print("SUIT-\(weight.rawValue).ttf 등록 실패 (원인 미상)")
                 }
+    #endif
             } else {
-                print("Successfully registered SUIT-\(weight.rawValue).ttf")
+    #if DEBUG
+                print("SUIT-\(weight.rawValue).ttf 등록 성공")
+    #endif
             }
         }
     }
-    
+
     static func suit(weight: Family = .Regular, size: CGFloat) -> UIFont {
         if let font = UIFont(name: "SUIT-\(weight.rawValue)", size: size) {
             return font
