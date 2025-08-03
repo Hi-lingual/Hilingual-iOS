@@ -5,6 +5,7 @@
 //  Created by 조영서 on 7/7/25.
 //
 
+
 import UIKit
 import SnapKit
 
@@ -14,7 +15,16 @@ final class CalendarView: UIView {
     var onMonthChanged: ((Date) -> Void)?
 
     private var currentDate = Date()
-    public var filledDates: [Date] = []
+    
+    var filledDates: [Date] = [] {
+        didSet {
+            calendarViews.forEach { $0.filledDates = filledDates }
+            updateScrollViewHeight()
+        }
+    }
+    // MARK: - UI Components
+
+    private let headerView = CalendarHeaderView()
 
     private let weekStackView: UIStackView = {
         let stack = UIStackView()
@@ -25,7 +35,6 @@ final class CalendarView: UIView {
 
     private let scrollView = UIScrollView()
     private var calendarViews: [CalendarContentView] = []
-    private var isAnimatingScroll = false
 
     private var scrollViewHeightConstraint: Constraint?
 
@@ -36,6 +45,7 @@ final class CalendarView: UIView {
         setupUI()
         setupLayout()
         setupCalendarViews()
+        bindHeaderActions()
         configureCalendars(for: currentDate)
     }
 
@@ -48,6 +58,7 @@ final class CalendarView: UIView {
     private func setupUI() {
         backgroundColor = .white
 
+        addSubview(headerView)
         addSubview(weekStackView)
         addSubview(scrollView)
 
@@ -66,8 +77,13 @@ final class CalendarView: UIView {
     }
 
     private func setupLayout() {
-        weekStackView.snp.makeConstraints {
+        headerView.snp.makeConstraints {
             $0.top.leading.trailing.equalToSuperview()
+        }
+
+        weekStackView.snp.makeConstraints {
+            $0.top.equalTo(headerView.snp.bottom)
+            $0.leading.trailing.equalToSuperview()
             $0.height.equalTo(20)
         }
 
@@ -108,6 +124,13 @@ final class CalendarView: UIView {
         }
     }
 
+    private func bindHeaderActions() {
+        headerView.onMonthChanged = { [weak self] date in
+            self?.reload(for: date)
+            self?.onMonthChanged?(date)
+        }
+    }
+
     override func layoutSubviews() {
         super.layoutSubviews()
         scrollView.contentOffset = CGPoint(x: scrollView.bounds.width, y: 0)
@@ -128,7 +151,6 @@ final class CalendarView: UIView {
         }
 
         updateScrollViewHeight()
-        onMonthChanged?(date)
     }
 
     // MARK: - Public Methods
@@ -145,7 +167,7 @@ final class CalendarView: UIView {
         currentDate = date
         configureCalendars(for: currentDate)
 
-        // 여기 추가!
+        headerView.setCurrentDate(currentDate)
         calendarViews[1].setSelectedDate(date)
 
         scrollView.setContentOffset(CGPoint(x: scrollView.bounds.width, y: 0), animated: false)
@@ -160,15 +182,6 @@ final class CalendarView: UIView {
 
         onDateSelected?(date)
         updateScrollViewHeight()
-    }
-
-    var filledDatesProxy: [Date] {
-        get { filledDates }
-        set {
-            filledDates = newValue
-            calendarViews.forEach { $0.filledDates = newValue }
-            updateScrollViewHeight()
-        }
     }
 
     // MARK: - Height Update
@@ -197,7 +210,16 @@ extension CalendarView: UIScrollViewDelegate {
         }
 
         configureCalendars(for: currentDate)
+        headerView.setCurrentDate(currentDate)
+
+        let firstDayOfMonth = Calendar.current.date(from: Calendar.current.dateComponents([.year, .month], from: currentDate))!
+        calendarViews[1].setSelectedDate(firstDayOfMonth)
+        onDateSelected?(firstDayOfMonth)
+
         scrollView.setContentOffset(CGPoint(x: pageWidth, y: 0), animated: false)
         updateScrollViewHeight()
+
+        onMonthChanged?(currentDate)
     }
+
 }
