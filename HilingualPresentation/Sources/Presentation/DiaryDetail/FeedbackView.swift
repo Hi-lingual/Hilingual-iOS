@@ -87,7 +87,7 @@ final class FeedbackView: BaseUIView {
         label.text = "완벽한 일기네요. 틀린 부분 하나 없이 잘 썼어요!"
         label.font = .suit(.body_m_14)
         label.textColor = .hilingualBlack
-        label.textAlignment = .center
+
         label.numberOfLines = 0
         
         let stack = UIStackView(arrangedSubviews: [imageView, separator, label])
@@ -104,17 +104,17 @@ final class FeedbackView: BaseUIView {
         }
         
         stack.snp.makeConstraints {
-            $0.horizontalEdges.equalToSuperview().inset(16)
-            $0.bottom.equalToSuperview().inset(12)
+            $0.edges.equalToSuperview().inset(12)
         }
         
         separator.snp.makeConstraints {
-            $0.horizontalEdges.equalToSuperview().inset(12)
+            $0.horizontalEdges.equalToSuperview()
             $0.height.equalTo(0.5)
         }
         
         label.snp.makeConstraints {
-            $0.centerX.equalToSuperview()
+            $0.horizontalEdges.equalToSuperview()
+            $0.top.equalTo(separator.snp.bottom).offset(8)
         }
         
         return view
