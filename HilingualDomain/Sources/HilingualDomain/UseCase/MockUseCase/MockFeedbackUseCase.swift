@@ -24,7 +24,7 @@ public final class MockFeedbackUseCase: FeedbackUseCase {
                 explain: "'have lunch'가 더 자연스러운 표현입니다."
             )
         ]
-        return Just([])
+        return Just(dummyFeedbackList)
             .setFailureType(to: Error.self)
             .eraseToAnyPublisher()
     }
