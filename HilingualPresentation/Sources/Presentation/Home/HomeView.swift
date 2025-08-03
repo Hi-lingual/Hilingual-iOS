@@ -14,9 +14,9 @@ final class HomeView: BaseUIView {
     
     // MARK: - UI Components
     
-    internal let profileView = ProfileView()
-    internal let calendarView = CalendarView()
-    internal let selectedInfo = SelectedInfo()
+    private(set) var profileView = ProfileView()
+    private(set) var calendarView = CalendarView()
+    private(set) var selectedInfo = SelectedInfo()
     
     private let spacer: UIView = {
         let view = UIView()
