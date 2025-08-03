@@ -22,15 +22,15 @@ final class FeedbackView: BaseUIView {
     
     var dateLabel: UILabel = {
         let label = UILabel()
-        label.font = .suit(.body_sb_14)
+        label.font = .suit(.body_sb_16)
         label.textColor = .gray700
         return label
     }()
     
     let AILabel: UILabel = {
         let label = UILabel()
-        label.font = .suit(.caption_m_12)
-        label.textColor = .gray700
+        label.font = .suit(.caption_r_14)
+        label.textColor = .gray500
         label.text = "AI가 쓴 일기"
         return label
     }()
