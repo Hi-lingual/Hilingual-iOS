@@ -23,7 +23,6 @@ final class ProfileView: UIView {
         imageView.contentMode = .scaleAspectFill
         imageView.layer.cornerRadius = 23
         imageView.clipsToBounds = true
-        imageView.image = UIImage(named: "img_profile_normal_ios", in: .module, compatibleWith: nil)
         return imageView
     }()
     
@@ -82,7 +81,6 @@ final class ProfileView: UIView {
         super.init(frame: frame)
         setupUI()
         setupLayout()
-        //기본값 적용
         updateView()
     }
     
