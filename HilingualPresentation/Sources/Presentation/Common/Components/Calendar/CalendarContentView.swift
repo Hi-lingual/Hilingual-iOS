@@ -14,8 +14,8 @@ final class CalendarContentView: UICollectionView {
 
     private let calendar = Calendar.current
     private var currentDate = Date()
-    private var startOfMonth: Date {
-        calendar.date(from: calendar.dateComponents([.year, .month], from: currentDate))!
+    private var startOfMonth: Date? {
+        calendar.date(from: calendar.dateComponents([.year, .month], from: currentDate))
     }
 
     private var days: [Date] = []
@@ -69,6 +69,8 @@ final class CalendarContentView: UICollectionView {
 
     private func generateDays() {
         days.removeAll()
+        
+        guard let startOfMonth = startOfMonth else { return }
 
         let range = calendar.range(of: .day, in: .month, for: currentDate)!
         let firstOfMonthWeekday = calendar.component(.weekday, from: startOfMonth)
