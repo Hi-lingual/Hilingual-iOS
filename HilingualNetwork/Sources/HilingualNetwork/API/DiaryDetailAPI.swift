@@ -29,14 +29,22 @@ extension DiaryDetailAPI: BaseTargetType {
     
     public var method: Moya.Method {
         switch self {
-        case .fetchDiaryDetail, .fetchFeedback, .fetchRecommendedExpression:
+        case .fetchDiaryDetail:
+            return .get
+        case .fetchFeedback:
+            return .get
+        case .fetchRecommendedExpression:
             return .get
         }
     }
     
     public var task: Task {
         switch self {
-        case .fetchDiaryDetail, .fetchFeedback, .fetchRecommendedExpression:
+        case .fetchDiaryDetail:
+            return .requestPlain
+        case .fetchFeedback:
+            return .requestPlain
+        case .fetchRecommendedExpression:
             return .requestPlain
         }
     }
