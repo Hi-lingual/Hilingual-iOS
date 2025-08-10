@@ -29,8 +29,8 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
         return modal
     }()
     
-    private lazy var vc1 = diContainer.makeFeedbackViewController(diaryId: diaryId)
-    private lazy var vc2 = diContainer.makeVocaViewController(diaryId: diaryId)
+    private lazy var feedbackViewController = diContainer.makeFeedbackViewController(diaryId: diaryId)
+    private lazy var recommendedExpressionViewController = diContainer.makeRecommendedExpressionViewController(diaryId: diaryId)
     
     private var segmentedControl: SegmentedControl!
     
@@ -53,7 +53,7 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
         hideKeyboardWhenTappedAround()
         
         segmentedControl = SegmentedControl(
-            viewControllers: [vc1, vc2],
+            viewControllers: [feedbackViewController, recommendedExpressionViewController],
             titles: ["문법·철자", "추천표현"],
             parentViewController: self
         )
@@ -65,8 +65,8 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
             $0.bottom.equalToSuperview()
         }
         
-        vc1.onDateLoaded = { [weak self] date in
-            self?.vc2.setDate(date)
+        feedbackViewController.onDateLoaded = { [weak self] date in
+            self?.recommendedExpressionViewController.setDate(date)
         }
     }
     

@@ -14,7 +14,7 @@ import HilingualPresentation
 
 // MARK: - DIContainer Entry Point
 
-final class AppDIContainer: ViewControllerFactory {
+final class AppDIContainer: ViewControllerFactory {    
 
     static let shared = AppDIContainer()
 
@@ -50,8 +50,8 @@ final class AppDIContainer: ViewControllerFactory {
         return FeedbackViewController(viewModel: makeFeedbackViewModel(diaryId: diaryId), diContainer: self)
     }
     
-    public func makeVocaViewController(diaryId: Int) -> VocaViewController {
-        return VocaViewController(viewModel: makeVocaViewModel(diaryId: diaryId), diContainer: self)
+    public func makeRecommendedExpressionViewController(diaryId: Int) -> RecommendedExpressionViewController {
+        return RecommendedExpressionViewController(viewModel: makeRecommendedExpressionViewModel(diaryId: diaryId), diContainer: self)
     }
 
     func makeOnboardingViewController() -> HilingualPresentation.OnBoardingViewController {
@@ -220,8 +220,8 @@ extension AppDIContainer {
     
     // MARK: - diaryId 수정
     
-    private func makeVocaViewModel(diaryId: Int) -> VocaViewModel {
-        return VocaViewModel(diaryId: diaryId, recommendedVocaUseCase: makeVocaUseCase(), toggleBookmarkUseCase: makeToggleBookmarkUseCase())
+    private func makeRecommendedExpressionViewModel(diaryId: Int) -> RecommendedExpressionViewModel {
+        return RecommendedExpressionViewModel(diaryId: diaryId, recommendedExpressionUseCase: makeRecommendedExpressionUseCase(), toggleBookmarkUseCase: makeToggleBookmarkUseCase())
     }
     
     private func makeDiaryDetailUseCase() -> DiaryDetailUseCase {
@@ -236,16 +236,16 @@ extension AppDIContainer {
         return DefaultDiaryDetailService()
     }
     
-    private func makeVocaUseCase() -> RecommendedUseCase {
-        return DefaultRecommendedUseCase(repository: makeRecommendedRepository())
+    private func makeRecommendedExpressionUseCase() -> RecommendedExpressionUseCase {
+        return DefaultRecommendedExpressionUseCase(repository: makeRecommendedRepository())
     }
     
-    private func makeRecommendedRepository() -> RecommendedVocaRepository {
-        return DefaultRecommendedVocaRepository(service: makeRecommendedService())
+    private func makeRecommendedRepository() -> RecommendedExpressionRepository {
+        return DefaultRecommendedExpressionRepository(service: makeRecommendedService())
     }
     
-    private func makeRecommendedService() -> RecommendedVocaService {
-        return DefaultRecommendedVocaService()
+    private func makeRecommendedService() -> RecommendedExpressionService {
+        return DefaultRecommendedExpressionService()
     }
 }
 

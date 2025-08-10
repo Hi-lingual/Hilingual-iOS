@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct RecommendedVocaEntity {
+public struct RecommendedExpressionEntity {
     public let vocaList: [Phrase]
     
     public struct Phrase {

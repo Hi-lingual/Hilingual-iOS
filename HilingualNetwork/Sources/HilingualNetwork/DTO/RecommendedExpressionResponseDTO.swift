@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct RecommendedVocaResponseDTO: Decodable {
+public struct RecommendedExpressionResponseDTO: Decodable {
     public let code: Int
     public let data: PhraseList
     public let message: String

@@ -1,5 +1,5 @@
 //
-//  VocaViewController.swift
+//  RecommendedExpressionViewController.swift
 //  HilingualPresentation
 //
 //  Created by 진소은 on 7/10/25.
@@ -9,11 +9,11 @@ import Foundation
 
 import Combine
 
-public final class VocaViewController: BaseUIViewController<VocaViewModel>, ScrollControllable {
+public final class RecommendedExpressionViewController: BaseUIViewController<RecommendedExpressionViewModel>, ScrollControllable {
     
     // MARK: - Properties
     
-    private let vocaView = VocaView()
+    private let recommendedExpressionView = RecommendedExpressionView()
     private var pendingDate: String?
     
     // MARK: - LifeCycle
@@ -27,15 +27,15 @@ public final class VocaViewController: BaseUIViewController<VocaViewModel>, Scro
     // MARK: Custom Method
     
     public override func setUI() {
-        view.addSubview(vocaView)
+        view.addSubview(recommendedExpressionView)
         view.backgroundColor = .gray100
         if let date = pendingDate {
-                vocaView.setDate(date)
+                recommendedExpressionView.setDate(date)
             }
     }
     
     public override func setLayout() {
-        vocaView.snp.makeConstraints {
+        recommendedExpressionView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
     }
@@ -44,19 +44,19 @@ public final class VocaViewController: BaseUIViewController<VocaViewModel>, Scro
     
     private let bookmarkToggleSubject = PassthroughSubject<(Int, Bool), Never>()
 
-    public override func bind(viewModel: VocaViewModel) {
-        vocaView.onBookmarkToggle = { [weak self] phraseId, isBookmarked in
+    public override func bind(viewModel: RecommendedExpressionViewModel) {
+        recommendedExpressionView.onBookmarkToggle = { [weak self] phraseId, isBookmarked in
             self?.bookmarkToggleSubject.send((Int(phraseId), isBookmarked))
         }
 
-        let input = VocaViewModel.Input(
+        let input = RecommendedExpressionViewModel.Input(
             viewDidLoad: Just(()).eraseToAnyPublisher(),
             bookmarkToggled: bookmarkToggleSubject.eraseToAnyPublisher()
         )
 
         let output = viewModel.transform(input: input)
 
-        output.fetchVoca
+        output.fetchExpression
             .map { phraseList in
                 phraseList.map {
                     PhraseViewData(
@@ -72,18 +72,18 @@ public final class VocaViewController: BaseUIViewController<VocaViewModel>, Scro
             }
             .receive(on: RunLoop.main)
             .sink { [weak self] viewDataList in
-                self?.vocaView.configure(dataList: viewDataList)
+                self?.recommendedExpressionView.configure(dataList: viewDataList)
             }
             .store(in: &cancellables)
     }
     
     func scrollToTop() {
-        vocaView.scrollToTop()
+        recommendedExpressionView.scrollToTop()
     }
     
     func setDate(_ date: String) {
         pendingDate = date
-        vocaView.setDate(date)
+        recommendedExpressionView.setDate(date)
     }
 
 }

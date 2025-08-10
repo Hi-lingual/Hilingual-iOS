@@ -10,19 +10,19 @@ import Combine
 import HilingualDomain
 import HilingualNetwork
 
-public final class DefaultRecommendedVocaRepository: RecommendedVocaRepository {
+public final class DefaultRecommendedExpressionRepository: RecommendedExpressionRepository {
     
-    private let service: RecommendedVocaService
+    private let service: RecommendedExpressionService
     
-    public init(service: RecommendedVocaService) {
+    public init(service: RecommendedExpressionService) {
         self.service = service
     }
     
-    public func fetchRecommendedVoca(diaryId: Int) -> AnyPublisher<[RecommendedVocaEntity.Phrase], Error> {
-        return service.fetchRecommendedVoca(diaryId: diaryId)
-            .map { dto -> [RecommendedVocaEntity.Phrase] in
+    public func fetchRecommendedExpression(diaryId: Int) -> AnyPublisher<[RecommendedExpressionEntity.Phrase], Error> {
+        return service.fetchRecommendedExpression(diaryId: diaryId)
+            .map { dto -> [RecommendedExpressionEntity.Phrase] in
                 dto.data.phraseList.map {
-                    RecommendedVocaEntity.Phrase(
+                    RecommendedExpressionEntity.Phrase(
                         phraseId: $0.phraseId,
                         phraseType: $0.phraseType,
                         phrase: $0.phrase,

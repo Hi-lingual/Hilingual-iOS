@@ -18,7 +18,7 @@ struct PhraseViewData {
     let createdAt: String // 빈값 허용
 }
 
-final class VocaView: BaseUIView {
+final class RecommendedExpressionView: BaseUIView {
     
     var onBookmarkToggle: ((Int64, Bool) -> Void)?
 

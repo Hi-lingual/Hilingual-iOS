@@ -8,7 +8,7 @@
 import Combine
 import HilingualDomain
 
-public final class VocaViewModel: BaseViewModel {
+public final class RecommendedExpressionViewModel: BaseViewModel {
     
     let diaryId: Int
     
@@ -22,23 +22,23 @@ public final class VocaViewModel: BaseViewModel {
     // MARK: - Output
 
     public struct Output {
-        let fetchVoca: AnyPublisher<[RecommendedVocaEntity.Phrase], Never>
+        let fetchExpression: AnyPublisher<[RecommendedExpressionEntity.Phrase], Never>
         let errorMessage: AnyPublisher<String, Never>
     }
 
     // MARK: - Properties
 
-    private let recommendedVocaUseCase: RecommendedUseCase
+    private let recommendedExpressionUseCase: RecommendedExpressionUseCase
     private let toggleBookmarkUseCase: ToggleBookmarkUseCase
 
-    private let recommendecVocaSubject = PassthroughSubject<[RecommendedVocaEntity.Phrase], Never>()
+    private let recommendecExpressionSubject = PassthroughSubject<[RecommendedExpressionEntity.Phrase], Never>()
     private let bookmarkToggledSubject = PassthroughSubject<(Int, Bool), Never>()
     
     private let errorSubject = PassthroughSubject<String, Never>()
 
-    public init(diaryId: Int, recommendedVocaUseCase: RecommendedUseCase, toggleBookmarkUseCase: ToggleBookmarkUseCase) {
+    public init(diaryId: Int, recommendedExpressionUseCase: RecommendedExpressionUseCase, toggleBookmarkUseCase: ToggleBookmarkUseCase) {
         self.diaryId = diaryId
-        self.recommendedVocaUseCase = recommendedVocaUseCase
+        self.recommendedExpressionUseCase = recommendedExpressionUseCase
         self.toggleBookmarkUseCase = toggleBookmarkUseCase
     }
 
@@ -47,7 +47,7 @@ public final class VocaViewModel: BaseViewModel {
             .sink { [weak self] in
                 guard let self = self else { return }
 
-                self.recommendedVocaUseCase.fetchRecommendedVoca(diaryId: diaryId)
+                self.recommendedExpressionUseCase.fetchRecommendedExpression(diaryId: diaryId)
                     .sink(receiveCompletion: { [weak self] completion in
                         switch completion {
                         case .failure(let error):
@@ -55,8 +55,8 @@ public final class VocaViewModel: BaseViewModel {
                         case .finished:
                             break
                         }
-                    }, receiveValue: { [weak self] vocaData in
-                        self?.recommendecVocaSubject.send(vocaData)
+                    }, receiveValue: { [weak self] ExpressionData in
+                        self?.recommendecExpressionSubject.send(ExpressionData)
                     })
                     .store(in: &self.cancellables)
             }
@@ -68,7 +68,7 @@ public final class VocaViewModel: BaseViewModel {
             .store(in: &cancellables)
 
         return Output(
-            fetchVoca: recommendecVocaSubject.eraseToAnyPublisher(),
+            fetchExpression: recommendecExpressionSubject.eraseToAnyPublisher(),
             errorMessage: errorSubject.eraseToAnyPublisher()
         )
     }
@@ -88,10 +88,10 @@ public final class VocaViewModel: BaseViewModel {
     }
     
     private func updateBookmarkState(phraseId: Int, isBookmarked: Bool) {
-        let updated = recommendecVocaSubject.map { items -> [RecommendedVocaEntity.Phrase] in
+        let updated = recommendecExpressionSubject.map { items -> [RecommendedExpressionEntity.Phrase] in
             items.map { item in
                 if item.phraseId == phraseId {
-                    return RecommendedVocaEntity.Phrase(
+                    return RecommendedExpressionEntity.Phrase(
                         phraseId: item.phraseId,
                         phraseType: item.phraseType,
                         phrase: item.phrase,

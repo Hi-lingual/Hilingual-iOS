@@ -14,7 +14,7 @@ public protocol FeedbackService {
     func fetchFeedback(diaryId: Int) -> AnyPublisher<FeedbackResponseDTO, Error>
 }
 
-public final class DefaultFeedbackService: BaseService<FeedbackAPI>, FeedbackService {
+public final class DefaultFeedbackService: BaseService<DiaryDetailAPI>, FeedbackService {
     public func fetchFeedback(diaryId: Int) -> AnyPublisher<FeedbackResponseDTO, Error> {
         return request(.fetchFeedback(diaryId: diaryId), as: FeedbackResponseDTO.self)
             .mapError { $0 as Error }
