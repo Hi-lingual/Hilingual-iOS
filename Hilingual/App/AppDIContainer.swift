@@ -59,15 +59,26 @@ final class AppDIContainer: ViewControllerFactory {
     }
     
     func makeDiaryWritingViewController(
-        topicData: (String, String)?,
+        topicData: (String, String)? = ("테스트 주제", "Test Topic"), // 임의 주제
         selectedDate: Date
     ) -> DiaryWritingViewController {
+        
+        let useCase = DummyDiaryWritingUseCase()
+        let viewModel = DiaryWritingViewModel(diaryWritingUseCase: useCase)
+        
         return DiaryWritingViewController(
-            viewModel: makeDiaryWritingViewModel(),
+            viewModel: viewModel,
             diContainer: self,
             topicData: topicData,
             selectedDate: selectedDate
         )
+        
+//        return DiaryWritingViewController(
+//            viewModel: makeDiaryWritingViewModel(),
+//            diContainer: self,
+//            topicData: topicData,
+//            selectedDate: selectedDate
+//        )
     }
 
     func makeLoadingViewController() -> HilingualPresentation.LoadingViewController {
