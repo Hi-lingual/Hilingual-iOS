@@ -8,16 +8,16 @@
 
 import Combine
 
-public final class MockRecommendedUseCase: RecommendedUseCase {
+public final class MockRecommendedUseCase: RecommendedExpressionUseCase {
     private let returnEmpty: Bool
 
     public init(returnEmpty: Bool = false) {
         self.returnEmpty = returnEmpty
     }
 
-    public func fetchRecommendedVoca(diaryId: Int) -> AnyPublisher<[RecommendedVocaEntity.Phrase], Error> {
-        let dummyList: [RecommendedVocaEntity.Phrase] = returnEmpty ? [] : [
-            RecommendedVocaEntity.Phrase(
+    public func fetchRecommendedExpression(diaryId: Int) -> AnyPublisher<[RecommendedExpressionEntity.Phrase], Error> {
+        let dummyList: [RecommendedExpressionEntity.Phrase] = returnEmpty ? [] : [
+            RecommendedExpressionEntity.Phrase(
                 phraseId: 1,
                 phraseType: ["동사", "일상 표현"],
                 phrase: "take a walk",
@@ -25,7 +25,7 @@ public final class MockRecommendedUseCase: RecommendedUseCase {
                 reason: "‘산책했다’는 문장에서 자연스럽게 사용할 수 있어요.",
                 isBookmarked: false
             ),
-            RecommendedVocaEntity.Phrase(
+            RecommendedExpressionEntity.Phrase(
                 phraseId: 2,
                 phraseType: ["형용사"],
                 phrase: "exhausted",
