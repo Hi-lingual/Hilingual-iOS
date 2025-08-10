@@ -47,11 +47,23 @@ final class AppDIContainer: ViewControllerFactory {
     }
     
     public func makeFeedbackViewController(diaryId: Int) -> FeedbackViewController {
-        return FeedbackViewController(viewModel: makeFeedbackViewModel(diaryId: diaryId), diContainer: self)
+//        return FeedbackViewController(viewModel: makeFeedbackViewModel(diaryId: diaryId), diContainer: self)
+        let viewModel = FeedbackViewModel(
+                diaryId: diaryId,
+                diaryDetailUseCase: MockDiaryDetailUseCase(),
+                feedbackUseCase: MockFeedbackUseCase()
+            )
+            return FeedbackViewController(viewModel: viewModel, diContainer:  self)
     }
     
     public func makeRecommendedExpressionViewController(diaryId: Int) -> RecommendedExpressionViewController {
-        return RecommendedExpressionViewController(viewModel: makeRecommendedExpressionViewModel(diaryId: diaryId), diContainer: self)
+//        return VocaViewController(viewModel: makeVocaViewModel(diaryId: diaryId), diContainer: self)
+        let viewModel = RecommendedExpressionViewModel(
+            diaryId: diaryId,
+            recommendedExpressionUseCase: MockRecommendedUseCase(),
+            toggleBookmarkUseCase: makeToggleBookmarkUseCase()
+        )
+        return RecommendedExpressionViewController(viewModel: viewModel, diContainer: self)
     }
 
     func makeOnboardingViewController() -> HilingualPresentation.OnBoardingViewController {

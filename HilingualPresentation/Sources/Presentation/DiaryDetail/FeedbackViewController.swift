@@ -34,10 +34,13 @@ public final class FeedbackViewController: BaseUIViewController<FeedbackViewMode
     private let feedbackView = FeedbackView()
     private var date: String = ""
     
+    private let viewDidLoadSubject = PassthroughSubject<Void, Never>()
+    
     // MARK: - LifeCycle
     
     public override func viewDidLoad() {
         super.viewDidLoad()
+        viewDidLoadSubject.send(())
     }
     
     // MARK: - Custom Method
@@ -64,7 +67,7 @@ public final class FeedbackViewController: BaseUIViewController<FeedbackViewMode
     
     private func makeInput() -> FeedbackViewModel.Input {
         return FeedbackViewModel.Input(
-            viewDidLoad: Just(()).eraseToAnyPublisher()
+            viewDidLoad: viewDidLoadSubject.eraseToAnyPublisher()
         )
     }
     

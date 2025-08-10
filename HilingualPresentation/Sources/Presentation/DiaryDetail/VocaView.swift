@@ -31,7 +31,7 @@ final class RecommendedExpressionView: BaseUIView {
     
     var dateLabel: UILabel = {
         let label = UILabel()
-        label.font = .suit(.body_sb_14)
+        label.font = .suit(.body_sb_16)
         label.textColor = .gray700
         return label
     }()

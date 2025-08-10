@@ -69,10 +69,10 @@ final class WordCard: UIView {
         reasonLabel.isHidden = false
         savedDateLabel.isHidden = false
         
-        phraseLabel.snp.removeConstraints()
-        explanationLabel.snp.removeConstraints()
-        reasonLabel.snp.removeConstraints()
-        savedDateLabel.snp.removeConstraints()
+//        phraseLabel.snp.removeConstraints()
+//        explanationLabel.snp.removeConstraints()
+//        reasonLabel.snp.removeConstraints()
+//        savedDateLabel.snp.removeConstraints()
         
         switch type {
         case .basic:
@@ -130,7 +130,7 @@ final class WordCard: UIView {
             
             reasonLabel.isHidden = true
             
-            chipStackView.snp.updateConstraints {
+            chipStackView.snp.remakeConstraints {
                 $0.top.leading.equalToSuperview().inset(24)
             }
             
