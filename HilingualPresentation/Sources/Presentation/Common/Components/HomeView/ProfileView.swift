@@ -10,7 +10,7 @@ import SnapKit
 import Kingfisher
 
 final class ProfileView: UIView {
-
+    
     private let nameLabel: UILabel = {
         let label = UILabel()
         label.font = .suit(.head_b_18)
@@ -23,7 +23,6 @@ final class ProfileView: UIView {
         imageView.contentMode = .scaleAspectFill
         imageView.layer.cornerRadius = 23
         imageView.clipsToBounds = true
-        imageView.image = UIImage(named: "img_profile_normal_ios", in: .module, compatibleWith: nil)
         return imageView
     }()
     
@@ -77,19 +76,18 @@ final class ProfileView: UIView {
         stack.alignment = .center
         return stack
     }()
-
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
         setupLayout()
-        //기본값 적용
         updateView()
     }
-
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
+    
     private func setupUI() {
         
         addSubviews(profileImageView, profileStack)
@@ -124,7 +122,7 @@ final class ProfileView: UIView {
     }
     
     func updateView(
-        nickname: String = "하링이",
+        nickname: String = "닉네임을 입력해주세요",
         profileImageURL: String? = nil,
         totalDiaries: Int = 0,
         streak: Int = 0
@@ -133,10 +131,16 @@ final class ProfileView: UIView {
         totalLabel.text = "총 \(totalDiaries)편"
         streakLabel.text = "\(streak)일 연속 작성 중"
         
-//        if let urlString = profileImageURL, let url = URL(string: urlString) {
-//            profileImageView.kf.setImage(with: url)
-//        } else {
-//            profileImageView.image = UIImage(named: "img_profile_normal_ios", in: .module, compatibleWith: nil)
-//        }
+        if let urlString = profileImageURL,
+           !urlString.isEmpty,
+           let url = URL(string: urlString) {
+            profileImageView.kf.setImage(with: url)
+        } else {
+            profileImageView.image = UIImage(
+                named: "img_profile_normal_ios",
+                in: .module,
+                compatibleWith: nil
+            )
+        }
     }
 }

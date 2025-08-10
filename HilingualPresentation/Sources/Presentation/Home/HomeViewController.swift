@@ -78,7 +78,11 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         // 사용자 정보 바인딩
         output.userInfo
             .receive(on: RunLoop.main)
-            .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] entity in
+            .sink(receiveCompletion: { completion in
+                if case let .failure(error) = completion {
+                    print("🚨 [UserInfo] API 호출 실패: \(error.localizedDescription)")
+                }
+            }, receiveValue: { [weak self] entity in
                 self?.homeView.profileView.updateView(
                     nickname: entity.nickname,
                     profileImageURL: entity.profileImg,
