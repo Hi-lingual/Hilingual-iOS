@@ -99,6 +99,9 @@ final class AppDIContainer: ViewControllerFactory {
     public func makeWordBookViewController() -> WordBookViewController {
         return WordBookViewController(viewModel: makeWordBookViewmodel(), diContainer: self)
     }
+    public func makeVerificationCodeViewController() -> VerificationCodeViewController {
+        return VerificationCodeViewController(viewModel: makeHomeViewModel(), diContainer: self)
+    }
 }
 // MARK: - SplashDIContainer
 
@@ -161,6 +164,13 @@ extension AppDIContainer {
         )
     }
 }
+
+// MARK: - VerificationCodeDIContainer
+
+extension AppDIContainer {
+
+}
+
 
 // MARK: - OnBoardingDiContainer
 

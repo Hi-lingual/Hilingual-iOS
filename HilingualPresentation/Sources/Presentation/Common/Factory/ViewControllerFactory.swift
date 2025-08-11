@@ -21,5 +21,6 @@ public protocol ViewControllerFactory {
         topicData: (String, String)?,
         selectedDate: Date
     ) -> DiaryWritingViewController
+    func makeVerificationCodeViewController() -> VerificationCodeViewController
     func makeFollowListViewController() -> FollowListViewController
 }

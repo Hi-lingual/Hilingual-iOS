@@ -30,7 +30,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // Step 2: 0.7초 후 SplashViewController로 전환
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) {
             let appDI = AppDIContainer.shared
-            let splashVC = appDI.makeSplashViewController()
+            let splashVC = appDI.makeVerificationCodeViewController()
             let navigation = UINavigationController(rootViewController: splashVC)
             navigation.setNavigationBarHidden(true, animated: false)
 
