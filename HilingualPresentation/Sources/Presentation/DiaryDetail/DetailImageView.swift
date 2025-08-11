@@ -13,17 +13,18 @@ final class DetailImageView: UIView {
     // MARK: - UI Components
     
     private let imageView: UIImageView = {
-        let image = UIImageView()
-        image.image = UIImage(named: "img_load_fail_large_ios", in: .module, with: nil)
-        image.contentMode = .scaleAspectFit
-        return image
+        let imageView = UIImageView()
+        imageView.image = UIImage(named: "img_load_fail_large_ios", in: .module, with: nil)
+        imageView.contentMode = .scaleAspectFit
+        return imageView
     }()
     
     private let button: UIButton = {
-        let closeButton = UIButton(type: .system)
-        closeButton.setImage(UIImage(named: "ic_close_24_w_ios", in: .module, with: nil), for: .normal)
-        closeButton.tintColor = .white
-        return closeButton
+        let button = UIButton(type: .system)
+        button.setImage(UIImage(named: "ic_close_24_w_ios", in: .module, with: nil), for: .normal)
+        button.tintColor = .white
+        button.addTarget(self, action: #selector(close), for: .touchUpInside)
+        return button
     }()
     
     // MARK: - LifeCycle
