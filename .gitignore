@@ -141,3 +141,7 @@ xcuserdata
 
 Ignore actual config (local only)
 Hilingual/App/Config/Config.xcconfig
+
+Hilingual/App/Config/Debug.xcconfig
+
+Hilingual/App/Config/Release.xcconfig
