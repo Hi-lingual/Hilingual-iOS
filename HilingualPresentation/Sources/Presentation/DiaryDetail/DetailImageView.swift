@@ -33,7 +33,6 @@ final class DetailImageView: UIView {
         super.init(frame: .zero)
         imageView.image = image
         setUI()
-        applyLayout(for: imageView.image)
     }
     
     required init?(coder: NSCoder) {
@@ -46,54 +45,54 @@ final class DetailImageView: UIView {
         backgroundColor = .black
         addSubviews(imageView, button)
         
-        imageView.snp.makeConstraints {
-            $0.center.equalToSuperview()
-            $0.width.equalToSuperview()
-            $0.height.equalTo(imageView.snp.width).multipliedBy(16.0 / 9.0)
-        }
-        
         button.snp.makeConstraints {
             $0.top.equalTo(safeAreaLayoutGuide).inset(12)
             $0.leading.equalToSuperview().inset(12)
         }
-        
-        button.addTarget(self, action: #selector(close), for: .touchUpInside)
     }
     
     // MARK: - Layout Logic
     
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        applyLayout(for: imageView.image)
+    }
+    
     private func applyLayout(for image: UIImage?) {
+        let safe = safeAreaInsets
         let target: CGFloat = 9.0 / 16.0
         let ratio: CGFloat = {
             guard let img = image, img.size.height > 0 else { return target }
             return img.size.width / img.size.height
         }()
-
-        imageView.snp.remakeConstraints {
-            $0.leading.trailing.equalToSuperview()
-
-            if ratio < target {
-                imageView.contentMode = .scaleAspectFill
-                imageView.clipsToBounds = true
-                $0.height.equalTo(imageView.snp.width).multipliedBy(16.0 / 9.0)
-                $0.bottom.equalTo(safeAreaLayoutGuide)
-            } else {
-                imageView.contentMode = .scaleAspectFit
-                imageView.clipsToBounds = false
-                $0.height.equalTo(imageView.snp.width).multipliedBy(1.0 / ratio)
-                $0.centerY.equalToSuperview()
-            }
+        
+        let availableBounds = bounds.inset(by: safe)
+        
+        if ratio < target {
+            // 세로가 더 긴 경우: 가로를 꽉 채우는 16:9 비율, 하단 고정
+            let width = availableBounds.width
+            let height = width * (16.0 / 9.0)
+            let y = bounds.height - safe.bottom - height
+            imageView.frame = CGRect(x: 0, y: y, width: width, height: height)
+            imageView.contentMode = .scaleAspectFill
+            imageView.clipsToBounds = true
+        } else {
+            // 원본 비율 유지, 중앙 배치
+            let width = availableBounds.width
+            let height = width * (1.0 / ratio)
+            let y = (bounds.height - height) / 2.0
+            imageView.frame = CGRect(x: 0, y: y, width: width, height: height)
+            imageView.contentMode = .scaleAspectFit
+            imageView.clipsToBounds = false
         }
 
         bringSubviewToFront(button)
-        setNeedsLayout()
-        layoutIfNeeded()
     }
 
     func update(image: UIImage?) {
         guard let img = image else { return }
         imageView.image = img
-        applyLayout(for: img)
+        setNeedsLayout()
     }
     
     // MARK: - Actions
