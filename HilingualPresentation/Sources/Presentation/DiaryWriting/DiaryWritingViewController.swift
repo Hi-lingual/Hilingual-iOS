@@ -115,7 +115,6 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
         loadingVC.viewModel?.requestFeedback(with: entity)
         navigationController?.pushViewController(loadingVC, animated: true)
     }
-
     
     private func showDialog() {
         dialog.configure(
