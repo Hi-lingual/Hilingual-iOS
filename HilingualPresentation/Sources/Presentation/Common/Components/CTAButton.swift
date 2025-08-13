@@ -76,11 +76,11 @@ final class CTAButton: UIButton {
         private func configure(with style: CTAButtonStyle) {
             switch style {
             case .TextButton(let text):
-                setTitle(text, for: .normal)
+                setAttributedTitle(.suit(.body_sb_16, text: text), for: .normal)
                 setImage(nil, for: .normal)
 
             case .IconTextButton(let iconName, let text):
-                setTitle(text, for: .normal)
+                setAttributedTitle(.suit(.body_sb_16, text: text), for: .normal)
                 titleEdgeInsets = UIEdgeInsets(top: 0, left: 8, bottom: 0, right: -8)
 
                 //아이콘 터치 이벤트 무효화 위해서
