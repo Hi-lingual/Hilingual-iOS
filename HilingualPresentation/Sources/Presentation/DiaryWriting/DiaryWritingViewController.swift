@@ -78,23 +78,17 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
     
     // MARK: - Private Methods
     
-    func showErrorDialog(title: String = "이미지 에러 발생", message: String) {
+    func showErrorDialog() {
         dialog.configure(
-            title: title,
-            content: message,
-            leftButtonTitle: "확인",
-            rightButtonTitle: "닫기"
+            style: .error,
+            image: UIImage(resource: .imgErrorIos),
+            title: "앗! 일시적인 오류가 발생했어요.",
+            rightButtonTitle: "확인",
+            rightAction: { [weak self] in
+                self?.navigationController?.popViewController(animated: true)
+            }
         )
         
-        dialog.rightButton.removeTarget(nil, action: nil, for: .allEvents)
-        dialog.rightButton.addAction(UIAction { [weak self] _ in
-            self?.dialog.dismiss()
-        }, for: .touchUpInside)
-        
-        dialog.leftButton.removeTarget(nil, action: nil, for: .allEvents)
-        dialog.leftButton.addAction(UIAction { _ in
-            self.dialog.dismiss()
-        }, for: .touchUpInside)
         dialog.showAnimation()
     }
     
@@ -125,22 +119,20 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
     
     private func showDialog() {
         dialog.configure(
+            style: .normal,
             title: "일기 작성을 취소하시겠어요?",
             content: "지금 나가면 작성한 내용이 모두 사라져요!",
             leftButtonTitle: "아니요",
-            rightButtonTitle: "네, 취소할게요"
+            rightButtonTitle: "취소하기",
+            leftAction: { [weak self] in
+                self?.dialog.dismiss()
+            },
+            rightAction: { [weak self] in
+                self?.navigationController?.popViewController(animated: true)
+            }
         )
+        
         dialog.showAnimation()
-        
-        dialog.leftButton.removeTarget(nil, action: nil, for: .allEvents)
-        dialog.leftButton.addAction(UIAction { [weak self] _ in
-            self?.dialog.dismiss()
-        }, for: .touchUpInside)
-        
-        dialog.rightButton.removeTarget(nil, action: nil, for: .allEvents)
-        dialog.rightButton.addAction(UIAction { [weak self] _ in
-            self?.navigationController?.popViewController(animated: true)
-        }, for: .touchUpInside)
     }
     
     // MARK: - Navigation

@@ -36,7 +36,7 @@ extension DiaryWritingViewController: PHPickerViewControllerDelegate {
         guard itemProvider.canLoadObject(ofClass: UIImage.self) else {
             print("❌ 이미지 로드 불가")
             DispatchQueue.main.async {
-                self.showErrorDialog(message: "이미지를 불러올 수 없습니다.")
+                self.showErrorDialog()
             }
             return
         }
@@ -47,7 +47,7 @@ extension DiaryWritingViewController: PHPickerViewControllerDelegate {
             if let error = error {
                 print("❌ 이미지 로드 에러: \(error.localizedDescription)")
                 DispatchQueue.main.async {
-                    self.showErrorDialog(message: "이미지 로드 중 오류가 발생했습니다.")
+                    self.showErrorDialog()
                 }
                 return
             }
@@ -55,7 +55,7 @@ extension DiaryWritingViewController: PHPickerViewControllerDelegate {
             guard let image = image as? UIImage else {
                 print("❌ 이미지 변환 실패")
                 DispatchQueue.main.async {
-                    self.showErrorDialog(message: "이미지를 변환할 수 없습니다.")
+                    self.showErrorDialog()
                 }
                 return
             }
