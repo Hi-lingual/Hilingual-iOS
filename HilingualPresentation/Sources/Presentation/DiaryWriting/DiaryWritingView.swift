@@ -28,8 +28,7 @@ final class DiaryWritingView: BaseUIView {
     
     let dateLabel: UILabel = {
         let label = UILabel()
-        label.text = ""
-        label.font = .suit(.body_sb_16)
+        label.attributedText = .suit(.body_sb_16, text: "")
         label.textAlignment = .center
         label.textColor = .gray850
         return label
@@ -273,7 +272,7 @@ final class DiaryWritingView: BaseUIView {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "ko_KR")
         formatter.dateFormat = "M월 d일 EEEE"
-        dateLabel.text = formatter.string(from: date)
+        dateLabel.attributedText = .suit(.body_sb_16, text: formatter.string(from: date))
     }
     
     // MARK: - Keyboard Handling

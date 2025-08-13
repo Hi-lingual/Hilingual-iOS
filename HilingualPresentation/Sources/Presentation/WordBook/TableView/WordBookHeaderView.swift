@@ -40,5 +40,6 @@ final class WordBookHeaderView: UITableViewHeaderFooterView {
     
     func configure(title: String) {
         titleLabel.text = title.uppercased()
+        titleLabel.attributedText = .suit(.body_sb_16, text: title.uppercased())
     }
 }

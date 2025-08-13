@@ -141,18 +141,18 @@ final class CardTopicView: UIView {
     // MARK: - Actions
 
     private func addTargets() {
-            iconButton.addTarget(
-                self,
-                action: #selector(didTapChangeTopic),
-                for: .touchUpInside
-            )
+        iconButton.addTarget(
+            self,
+            action: #selector(didTapChangeTopic),
+            for: .touchUpInside
+        )
 
-            diaryAddButton.addTarget(
-                self,
-                action: #selector(didTapWriteDiary),
-                for: .touchUpInside
-            )
-        }
+        diaryAddButton.addTarget(
+            self,
+            action: #selector(didTapWriteDiary),
+            for: .touchUpInside
+        )
+    }
     
     @objc private func didTapChangeTopic() {
         let isEnglishVisible = !topicEnLabel.isHidden
@@ -161,14 +161,17 @@ final class CardTopicView: UIView {
     }
     
     @objc private func didTapWriteDiary() {
-            onTapWriteDiary?()
-        }
+        onTapWriteDiary?()
+    }
     
     // MARK: - Configuration
     
     func configure(kor: String? = nil, en: String? = nil) {
-        topicKorLabel.text = kor ?? "한글 주제 아직 없지롱"
-        topicEnLabel.text = en ?? "Bringing up the English topic"
+        let korText = kor ?? "한글 주제 아직 없지롱"
+        let enText  = en  ?? "Bringing up the English topic"
+        
+        topicKorLabel.attributedText = .suit(.body_sb_16, text: korText)
+        topicEnLabel.attributedText  = .suit(.body_sb_16, text: enText)
         
         if let kor = kor, let en = en {
             topicData = (kor, en)

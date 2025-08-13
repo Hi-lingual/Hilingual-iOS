@@ -39,7 +39,6 @@ final class HighlightTextView: BaseUIView {
     
     let textView: UITextView = {
         let textView = UITextView()
-        textView.font = .suit(.body_r_16)
         textView.isScrollEnabled = false
         textView.textColor = .hilingualBlack
         return textView
@@ -104,27 +103,17 @@ final class HighlightTextView: BaseUIView {
     }
     
     func highlightCorrections(textType: String, diffRanges: [DiffRange]) {
-        let paragraphStyle = NSMutableParagraphStyle()
-        paragraphStyle.lineHeightMultiple = 1.4
-        
-        let attributedString = NSMutableAttributedString(string: textType, attributes: [
-            .font: UIFont.suit(.body_r_16),
-            .paragraphStyle: paragraphStyle,
-            .foregroundColor: UIColor.hilingualBlack
-        ])
+        let attributed = NSMutableAttributedString(attributedString: .suit(.body_r_16, text: textType))
+        attributed.addAttribute(.foregroundColor, value: UIColor.hilingualBlack, range: NSRange(location: 0, length: attributed.length))
         
         for range in diffRanges {
             let nsRange = NSRange(location: range.start, length: range.end - range.start)
-            attributedString.addAttributes(
-                [
-                    .foregroundColor: UIColor.hilingualOrange,
-                    .font: UIFont.suit(.body_m_16)
-                ],
-                range: nsRange
-            )
+            attributed.addAttributes([.font: UIFont.suit(.body_m_16),
+                                      .foregroundColor: UIColor.hilingualOrange],
+                                     range: nsRange)
         }
         
-        textView.attributedText = attributedString
+        textView.attributedText = attributed
     }
     
     func toggleText() {
@@ -132,8 +121,9 @@ final class HighlightTextView: BaseUIView {
             highlightCorrections(textType: highlightText, diffRanges: diffRanges)
             textCountLabel.text = "\(highlightText.count)/1500"
         } else {
-            textView.text = originalText
-            textView.textColor = .hilingualBlack
+            let attr = NSMutableAttributedString(attributedString: .suit(.body_r_16, text: originalText))
+            attr.addAttribute(.foregroundColor, value: UIColor.hilingualBlack, range: NSRange(location: 0, length: attr.length))
+            textView.attributedText = attr
             textCountLabel.text = "\(originalText.count)/1000"
         }
         isHighlightingEnabled.toggle()

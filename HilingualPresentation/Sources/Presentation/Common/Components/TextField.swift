@@ -33,7 +33,7 @@ final class TextField: BaseUIView {
 
     let textField:  UITextField = {
         let textField = UITextField()
-        textField.font = .suit(.body_sb_16)
+        textField.attributedText = .suit(.body_sb_16, text: "")
         textField.borderStyle = .none
         textField.layer.cornerRadius = 8
         textField.layer.borderWidth = 1
@@ -207,9 +207,8 @@ final class TextField: BaseUIView {
     @objc
     private func textDidChange() {
         let current = textField.text ?? ""
-        if current.count > maxLength {
-            textField.text = String(current.prefix(maxLength))
-        }
+        let trimmed = current.count > maxLength ? String(current.prefix(maxLength)) : current
+        textField.attributedText = .suit(.body_sb_16, text: trimmed)
         updateCharacterCount()
     }
 }

@@ -69,11 +69,6 @@ final class WordCard: UIView {
         reasonLabel.isHidden = false
         savedDateLabel.isHidden = false
         
-//        phraseLabel.snp.removeConstraints()
-//        explanationLabel.snp.removeConstraints()
-//        reasonLabel.snp.removeConstraints()
-//        savedDateLabel.snp.removeConstraints()
-        
         switch type {
         case .basic:
             phraseLabel.font = .suit(.head_m_18)
@@ -99,7 +94,7 @@ final class WordCard: UIView {
             }
 
         case .withExample:
-            phraseLabel.font = .suit(.body_sb_16)
+            phraseLabel.attributedText = .suit(.body_sb_16, text: data.phrase)
             explanationLabel.font = .suit(.body_b_14)
             reasonLabel.font = .suit(.caption_m_12)
             
@@ -109,7 +104,6 @@ final class WordCard: UIView {
                 $0.top.equalTo(chipStackView.snp.bottom).offset(4)
                 $0.leading.trailing.equalToSuperview().inset(12)
             }
-            
             
             explanationLabel.snp.makeConstraints {
                 $0.top.equalTo(phraseLabel.snp.bottom).offset(4)
@@ -153,7 +147,7 @@ final class WordCard: UIView {
         
         bookmarkButton.snp.remakeConstraints {
             let inset: CGFloat = (type == .withDate) ? 24 : 12
-            let size: CGFloat = (type == .withDate) ? 36 : 28 
+            let size: CGFloat = (type == .withDate) ? 36 : 28
             $0.top.trailing.equalToSuperview().inset(inset)
             $0.width.height.equalTo(size)
         }
@@ -208,8 +202,6 @@ final class WordCard: UIView {
         print("✅ 북마크 상태: \(isMarked), imageName: \(imageName), image 존재 여부: \(image != nil)")
         bookmarkButton.setImage(image, for: .normal)
     }
-
-
 
     private func chipType(from korTitle: String) -> ChipType? {
         switch korTitle {

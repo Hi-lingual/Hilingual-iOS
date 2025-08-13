@@ -171,8 +171,8 @@ extension Dialog {
     func configure(title: String, content: String, leftButtonTitle: String, rightButtonTitle: String) {
         dialogTitleLabel.text = title
         dialogContentLabel.text = content
-        leftButton.setTitle(leftButtonTitle, for: .normal)
-        rightButton.setTitle(rightButtonTitle, for: .normal)
+        leftButton.setAttributedTitle(.suit(.body_sb_16, text: leftButtonTitle), for: .normal)
+        rightButton.setAttributedTitle(.suit(.body_sb_16, text: rightButtonTitle), for: .normal)
     }
 }
 

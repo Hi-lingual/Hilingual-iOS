@@ -33,7 +33,8 @@ final class WordBookView: BaseUIView {
         searchBar.searchTextField.clipsToBounds = true
         searchBar.setImage(UIImage(named: "ic_search_20_ios", in: .module, compatibleWith: nil), for: .search, state: .normal)
         searchBar.setImage(UIImage(named: "ic_close_20_ios", in: .module, compatibleWith: nil), for: .clear, state: .normal)
-        searchBar.searchTextField.font = .suit(.body_m_16)
+        searchBar.searchTextField.attributedText = .suit(.body_m_16, text: "")
+        searchBar.searchTextField.defaultTextAttributes[.font] = UIFont.suit(.body_m_16)
         searchBar.updateHeight(height: 46)
         searchBar.searchTextField.keyboardType = .asciiCapable
         searchBar.searchTextField.autocorrectionType = .no

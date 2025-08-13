@@ -124,8 +124,8 @@ final class HighlightingFeedback: UIView {
     }
     
     func configure(original: String, rewrite: String, explanation: String) {
-        originalLabel.text = original
-        rewriteLabel.text = rewrite
-        explainLabel.text = explanation
+        originalLabel.attributedText = .suit(.body_r_16, text: original)
+        rewriteLabel.attributedText = .suit(.body_m_16, text: rewrite)
+        explainLabel.attributedText = .suit(.body_m_14, text: explanation)
     }
 }

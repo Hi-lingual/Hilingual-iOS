@@ -12,7 +12,7 @@ final class CustomToggle: UIControl {
 
     // MARK: - Properties
 
-    private(set) var isOn: Bool = false {
+    private(set) var isOn: Bool = true {
         didSet {
             updateUI(animated: true)
             sendActions(for: .valueChanged)
