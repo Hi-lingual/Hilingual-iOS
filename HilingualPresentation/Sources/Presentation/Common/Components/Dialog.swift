@@ -246,9 +246,10 @@ extension Dialog {
         }
         
         if let leftTitle = leftButtonTitle {
-            leftButton.setTitle(leftTitle, for: .normal)
+            leftButton.setAttributedTitle(.suit(.body_sb_16, text: leftTitle), for: .normal)
         }
-        rightButton.setTitle(rightButtonTitle, for: .normal)
+
+        rightButton.setAttributedTitle(.suit(.body_sb_16, text: rightButtonTitle), for: .normal)
         
         self.leftAction = leftAction
         self.rightAction = rightAction

@@ -41,6 +41,7 @@ final class OnBoardingView: BaseUIView {
     let nickNameLabel: UILabel = {
         let label = UILabel()
         label.font = .suit(.body_sb_16)
+        label.attributedText = .suit(.body_sb_16, text: "닉네임")
         label.textAlignment = .left
         label.textColor = .black
         label.text = "닉네임"

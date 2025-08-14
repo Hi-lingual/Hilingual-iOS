@@ -78,8 +78,7 @@ final class Dropdown: UIView {
     
     private let topicEnLabel: UILabel = {
         let label = UILabel()
-        label.text = "What surprised you today?"
-        label.font = .suit(.body_sb_16)
+        label.attributedText = .suit(.body_sb_16, text: "What surprised you today?")
         label.textColor = .gray700
         label.numberOfLines = 2
         return label
@@ -169,7 +168,8 @@ final class Dropdown: UIView {
     }
     
     private func updateLabel() {
-        topicEnLabel.text = isKorean ? (topicKor ?? "What surprised you today?") : (topicEn ?? "What surprised you today?")
+        let text = isKorean ? (topicKor ?? "What surprised you today?") : (topicEn ?? "What surprised you today?")
+        topicEnLabel.attributedText = .suit(.body_sb_16, text: text)
     }
     
     func configure(kor: String?, en: String?) {

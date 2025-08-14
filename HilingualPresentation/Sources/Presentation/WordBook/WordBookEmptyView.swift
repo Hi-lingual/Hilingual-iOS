@@ -89,7 +89,7 @@ final class WordBookEmptyView: UIView {
             emptyImageView.image = UIImage(named: "img_word_ios", in: .module, compatibleWith: nil)
             emptyImageView.isHidden = false
             emptyLabel.text = "아직 단어가 추가되지 않았어요."
-            emptyButton.setTitle("일기 쓰고 단어 추가하기", for: .normal)
+            emptyButton.setAttributedTitle(.suit(.body_m_16, text: "일기 쓰고 단어 추가하기"), for: .normal)
             emptyButton.isHidden = false
 
         case .noSearchResult:

@@ -177,7 +177,8 @@ final class FeedbackView: BaseUIView {
     
     func configureDiary(data: DiaryViewData) {
         currentDiaryData = data
-        dateLabel.text = data.date
+        dateLabel.attributedText = .suit(.body_sb_16, text: data.date)
+        
         diaryTextView.configure(
             image: data.imageURL,
             originalText: data.originalText,
@@ -191,6 +192,7 @@ final class FeedbackView: BaseUIView {
         feedbackStackView.arrangedSubviews.dropFirst().forEach { $0.removeFromSuperview() }
         
         if data.isEmpty {
+            feedbackLabel.font = .suit(.body_m_14)
             feedbackLabel.text = "일기에서 발견된 피드백이 없어요!"
             feedbackStackView.addArrangedSubview(emptyFeedbackView)
             emptyFeedbackView.snp.makeConstraints {
@@ -201,7 +203,9 @@ final class FeedbackView: BaseUIView {
         
         let count = data.count
         let fullText = "주요 피드백 \(count)개를 알려드릴게요!"
-        let attributedText = NSMutableAttributedString(string: fullText)
+        let attributedText = NSMutableAttributedString(
+            attributedString: .suit(.body_sb_16, text: fullText)
+        )
         
         if let range = fullText.range(of: "\(count)") {
             let nsRange = NSRange(range, in: fullText)

@@ -32,6 +32,7 @@ final class TextView: UIView {
         let textView = UITextView()
         textView.backgroundColor = .gray100
         textView.font = .suit(.body_r_16)
+        textView.attributedText = .suit(.body_r_16, text: "")
         textView.textColor = .black
         textView.isScrollEnabled = true
         textView.autocorrectionType = .no
@@ -43,9 +44,8 @@ final class TextView: UIView {
     
     private var placeholderLabel: UILabel = {
         let label = UILabel()
-        label.font = .suit(.body_r_16)
+        label.attributedText = .suit(.body_r_16, text: "What’s been going on today?")
         label.textColor = .gray400
-        label.text = "What’s been going on today?"
         return label
     }()
 
@@ -104,6 +104,7 @@ final class TextView: UIView {
     
     private func setDelegate() {
         textView.delegate = self
+        setTypingAttributesToSuitBodyR16()
         updateUI()
     }
     
@@ -121,9 +122,17 @@ final class TextView: UIView {
     
     func configure(text: String) {
         let limitedText = String(text.prefix(maxCharacterCount))
-        textView.text = limitedText
+        textView.attributedText = .suit(.body_r_16, text: limitedText)
+        setTypingAttributesToSuitBodyR16()
         updateUI()
         scrollToTop()
+    }
+    
+    // MARK: - Helper
+    private func setTypingAttributesToSuitBodyR16() {
+        let probe = NSAttributedString.suit(.body_r_16, text: " ")
+        let attrs = probe.attributes(at: 0, effectiveRange: nil)
+        textView.typingAttributes = attrs
     }
 }
 

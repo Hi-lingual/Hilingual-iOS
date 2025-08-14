@@ -100,6 +100,6 @@ final class RecommendedExpressionView: BaseUIView {
     }
     
     func setDate(_ date: String) {
-        self.dateLabel.text = date
+        self.dateLabel.attributedText = .suit(.body_sb_16, text: date)
     }
 }

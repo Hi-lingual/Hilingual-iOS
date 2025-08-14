@@ -102,13 +102,15 @@ final class CardPreview: UIView {
     func configure(type: CardPreviewType) {
         switch type {
         case .textOnly(let text):
-            originalText.text = text ?? "일기를 불러오지 못했습니다."
+            let display = text ?? "일기를 불러오지 못했습니다."
+            originalText.attributedText = .suit(.body_m_16, text: display)
+
             previewImage.isHidden = true
-            
+
             originalText.snp.remakeConstraints {
                 $0.trailing.equalTo(previewImage.snp.leading).offset(-16)
             }
-            
+
             previewImage.snp.remakeConstraints {
                 $0.trailing.equalToSuperview()
                 $0.centerY.equalToSuperview()
@@ -116,17 +118,22 @@ final class CardPreview: UIView {
             }
 
         case .textWithImage(let text, let imageUrl):
-            originalText.text = text ?? "일기를 불러오지 못했습니다."
+            let display = text ?? "일기를 불러오지 못했습니다."
+            originalText.attributedText = .suit(.body_m_16, text: display)
 
             previewImage.isHidden = false
             if let urlString = imageUrl, let url = URL(string: urlString) {
                 previewImage.kf.setImage(with: url)
             } else {
-                previewImage.image = UIImage(named: "img_load_fail_small_ios", in: .module, compatibleWith: nil)
+                previewImage.image = UIImage(
+                    named: "img_load_fail_small_ios",
+                    in: .module,
+                    compatibleWith: nil
+                )
             }
         }
     }
-    
+
     func configure(text: String?, imageUrl: String?) {
         if let url = imageUrl, !url.isEmpty {
             configure(type: .textWithImage(text: text, imageUrl: url))
