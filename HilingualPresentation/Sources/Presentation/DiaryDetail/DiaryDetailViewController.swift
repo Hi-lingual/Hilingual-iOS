@@ -134,22 +134,18 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
             title: "AI 피드백을 신고하시겠어요?",
             content: "신고된 AI 피드백은 확인 후\n서비스의 운영원칙에 따라 처리됩니다.",
             leftButtonTitle: "취소",
-            rightButtonTitle: "네, 신고할게요"
+            rightButtonTitle: "네, 신고할게요",
+            leftAction: { [weak self] in
+                self?.dialog.dismiss()
+            },
+            rightAction: { [weak self] in
+                self?.dialog.dismiss()
+                guard let url = URL(string: "https://hilingual.notion.site/230829677ebf801c965be24b0ef444e9") else { return }
+                let safariVC = SFSafariViewController(url: url)
+                self?.present(safariVC, animated: true)
+            }
         )
         
         dialog.showAnimation()
-        
-        dialog.leftButton.removeTarget(nil, action: nil, for: .allEvents)
-        dialog.leftButton.addAction(UIAction { [weak self] _ in
-            self?.dialog.dismiss()
-        }, for: .touchUpInside)
-        
-        dialog.rightButton.removeTarget(nil, action: nil, for: .allEvents)
-        dialog.rightButton.addAction(UIAction { [weak self] _ in
-            self?.dialog.dismiss()
-            guard let url = URL(string: "https://hilingual.notion.site/230829677ebf801c965be24b0ef444e9") else { return }
-            let safariVC = SFSafariViewController(url: url)
-            self?.present(safariVC, animated: true, completion: nil)
-        }, for: .touchUpInside)
     }
 }

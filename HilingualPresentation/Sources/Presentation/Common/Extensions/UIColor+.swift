@@ -34,6 +34,7 @@ enum HilingualColor: String {
     case gray100 = "Gray100"
     case white = "White"
     case dim = "dim"
+    case dim2 = "dim2"
     
     case alertRed = "AlertREd"
     case infoBlue = "InfoBlue"
@@ -71,6 +72,7 @@ extension UIColor {
     static var gray100: UIColor { .color(.gray100) }
     static var white: UIColor { .color(.white) }
     static var dim: UIColor { .color(.dim) }
+    static var dim2: UIColor { .color(.dim2) }
     
     static var alertRed: UIColor { .color(.alertRed) }
     static var infoBlue: UIColor { .color(.infoBlue) }

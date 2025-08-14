@@ -7,11 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		24C5DD322E243C8D009B59F6 /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = 24C5DD312E243C8D009B59F6 /* Lottie */; };
-		3AA29BE62E2A781C002C3AC7 /* Config.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 3AA29BE52E2A781C002C3AC7 /* Config.xcconfig */; };
 		E51B4C542E28DC11000B16D0 /* AppIcon.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E51B4C532E28DC11000B16D0 /* AppIcon.xcassets */; };
 		E51DB2052E1D9E8B000C2BEA /* AppConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = E51DB2042E1D9E8B000C2BEA /* AppConfig.swift */; };
 		E51DB2242E1E4407000C2BEA /* AppBaseURLProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E51DB2232E1E4407000C2BEA /* AppBaseURLProvider.swift */; };
+		E55F7D6A2E4A32C4007E03C4 /* Release.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = E55F7D692E4A32C4007E03C4 /* Release.xcconfig */; };
+		E55F7D6C2E4A32D3007E03C4 /* Debug.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = E55F7D6B2E4A32D3007E03C4 /* Debug.xcconfig */; };
 		E5C2F3952E170A01003DF6C4 /* HilingualNetwork in Frameworks */ = {isa = PBXBuildFile; productRef = E5C2F3942E170A01003DF6C4 /* HilingualNetwork */; };
 		E5C2F3992E171575003DF6C4 /* HilingualDomain in Frameworks */ = {isa = PBXBuildFile; productRef = E5C2F3982E171575003DF6C4 /* HilingualDomain */; };
 		E5C79B322E15282100E461C3 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E5C79B2A2E15282100E461C3 /* LaunchScreen.storyboard */; };
@@ -36,14 +36,15 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		3AA29BE52E2A781C002C3AC7 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 		E51B4C532E28DC11000B16D0 /* AppIcon.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = AppIcon.xcassets; sourceTree = "<group>"; };
 		E51DB2002E1CF7AD000C2BEA /* Hilingual.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Hilingual.entitlements; sourceTree = "<group>"; };
 		E51DB2042E1D9E8B000C2BEA /* AppConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfig.swift; sourceTree = "<group>"; };
 		E51DB2232E1E4407000C2BEA /* AppBaseURLProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppBaseURLProvider.swift; sourceTree = "<group>"; };
+		E55F7D692E4A32C4007E03C4 /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
+		E55F7D6B2E4A32D3007E03C4 /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
 		E5C2F3932E1709DC003DF6C4 /* HilingualNetwork */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = HilingualNetwork; sourceTree = "<group>"; };
 		E5C2F3972E171509003DF6C4 /* HilingualDomain */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = HilingualDomain; sourceTree = "<group>"; };
-		E5C79B0E2E15281900E461C3 /* Hilingual.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Hilingual.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E5C79B0E2E15281900E461C3 /* Hilingual-Dev.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Hilingual-Dev.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E5C79B262E15282100E461C3 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E5C79B282E15282100E461C3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E5C79B292E15282100E461C3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -58,7 +59,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				24C5DD322E243C8D009B59F6 /* Lottie in Frameworks */,
 				E5D5D0A92E171AC300DABE8D /* HilingualData in Frameworks */,
 				E5C2F3992E171575003DF6C4 /* HilingualDomain in Frameworks */,
 				E5C2F3952E170A01003DF6C4 /* HilingualNetwork in Frameworks */,
@@ -82,7 +82,8 @@
 				E51DB2042E1D9E8B000C2BEA /* AppConfig.swift */,
 				E51DB2232E1E4407000C2BEA /* AppBaseURLProvider.swift */,
 				E51B4C532E28DC11000B16D0 /* AppIcon.xcassets */,
-				3AA29BE52E2A781C002C3AC7 /* Config.xcconfig */,
+				E55F7D692E4A32C4007E03C4 /* Release.xcconfig */,
+				E55F7D6B2E4A32D3007E03C4 /* Debug.xcconfig */,
 			);
 			path = Config;
 			sourceTree = "<group>";
@@ -104,7 +105,7 @@
 		E5C79B0F2E15281900E461C3 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				E5C79B0E2E15281900E461C3 /* Hilingual.app */,
+				E5C79B0E2E15281900E461C3 /* Hilingual-Dev.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -153,10 +154,9 @@
 				E5C2F3982E171575003DF6C4 /* HilingualDomain */,
 				E5D5D0A82E171AC300DABE8D /* HilingualData */,
 				E5D5D0AB2E17289000DABE8D /* HilingualPresentation */,
-				24C5DD312E243C8D009B59F6 /* Lottie */,
 			);
 			productName = Hilingual;
-			productReference = E5C79B0E2E15281900E461C3 /* Hilingual.app */;
+			productReference = E5C79B0E2E15281900E461C3 /* Hilingual-Dev.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -184,7 +184,6 @@
 			mainGroup = E5C79B052E15281900E461C3;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				24C5DD302E243C8D009B59F6 /* XCRemoteSwiftPackageReference "lottie-spm" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = E5C79B0F2E15281900E461C3 /* Products */;
@@ -201,8 +200,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E55F7D6C2E4A32D3007E03C4 /* Debug.xcconfig in Resources */,
+				E55F7D6A2E4A32C4007E03C4 /* Release.xcconfig in Resources */,
 				E51B4C542E28DC11000B16D0 /* AppIcon.xcassets in Resources */,
-				3AA29BE62E2A781C002C3AC7 /* Config.xcconfig in Resources */,
 				E5C79B322E15282100E461C3 /* LaunchScreen.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -239,8 +239,10 @@
 		E5C79B222E15281B00E461C3 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon$(BUNDLE_ID_SUFFIX)";
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				BUNDLE_ID_SUFFIX = .dev;
+				BUNDLE_NAME = "Hilingual-Dev";
 				CODE_SIGN_ENTITLEMENTS = Hilingual/Hilingual.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -260,8 +262,8 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = Hilingual.com;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.Hilingual$(BUNDLE_ID_SUFFIX)";
+				PRODUCT_NAME = "Hilingual-Dev";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -271,8 +273,10 @@
 		E5C79B232E15281B00E461C3 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon$(BUNDLE_ID_SUFFIX)";
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				BUNDLE_ID_SUFFIX = "";
+				BUNDLE_NAME = Hilingual;
 				CODE_SIGN_ENTITLEMENTS = Hilingual/Hilingual.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -292,7 +296,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = Hilingual.com;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.Hilingual$(BUNDLE_ID_SUFFIX)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -302,7 +306,7 @@
 		};
 		E5C79B242E15281B00E461C3 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 3AA29BE52E2A781C002C3AC7 /* Config.xcconfig */;
+			baseConfigurationReference = E55F7D6B2E4A32D3007E03C4 /* Debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -366,7 +370,7 @@
 		};
 		E5C79B252E15281B00E461C3 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 3AA29BE52E2A781C002C3AC7 /* Config.xcconfig */;
+			baseConfigurationReference = E55F7D692E4A32C4007E03C4 /* Release.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -444,23 +448,7 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCRemoteSwiftPackageReference section */
-		24C5DD302E243C8D009B59F6 /* XCRemoteSwiftPackageReference "lottie-spm" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/airbnb/lottie-spm";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 4.5.2;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
-
 /* Begin XCSwiftPackageProductDependency section */
-		24C5DD312E243C8D009B59F6 /* Lottie */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 24C5DD302E243C8D009B59F6 /* XCRemoteSwiftPackageReference "lottie-spm" */;
-			productName = Lottie;
-		};
 		E5C2F3942E170A01003DF6C4 /* HilingualNetwork */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = HilingualNetwork;

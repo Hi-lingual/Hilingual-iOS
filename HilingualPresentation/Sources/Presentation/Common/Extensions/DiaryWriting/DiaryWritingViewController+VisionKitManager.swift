@@ -14,6 +14,6 @@ extension DiaryWritingViewController: VisionKitManagerDelegate {
     }
     
     func didFailWithError(_ message: String) {
-        showErrorDialog(title: "텍스트 스캔 에러 발생", message: message)
+        showErrorDialog()
     }
 }
