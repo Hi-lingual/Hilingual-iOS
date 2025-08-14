@@ -240,17 +240,16 @@ extension Dialog {
         
         dialogTitleLabel.text = title
         dialogContentLabel.text = content
-        leftButton.titleLabel.setAttributed(.suit(.body_sb_16, text: leftButtonTitle), for: .normal)
-        rightButton.titleLabel.setAttributed(.suit(.body_sb_16, text: rightButtonTitle), for: .normal)
         
         if let image = image {
             dialogErrorImageView.image = image
         }
         
         if let leftTitle = leftButtonTitle {
-            leftButton.setTitle(leftTitle, for: .normal)
+            leftButton.setAttributedTitle(.suit(.body_sb_16, text: leftTitle), for: .normal)
         }
-        rightButton.setTitle(rightButtonTitle, for: .normal)
+
+        rightButton.setAttributedTitle(.suit(.body_sb_16, text: rightButtonTitle), for: .normal)
         
         self.leftAction = leftAction
         self.rightAction = rightAction
