@@ -10,6 +10,18 @@ import SnapKit
 
 final class Dialog: UIView {
     
+    // MARK: - enum
+    
+    enum DialogStyle {
+        case normal
+        case error
+    }
+    
+    // MARK: - Properties
+    
+    private var leftAction: (() -> Void)?
+    private var rightAction: (() -> Void)?
+    
     // MARK: - UI Components
     
     private let dialogContainerView: UIView = {
@@ -18,6 +30,14 @@ final class Dialog: UIView {
         view.layer.cornerRadius = 12
         view.clipsToBounds = true
         return view
+    }()
+    
+    private let dialogErrorImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFit
+        imageView.image = UIImage(resource: .imgErrorIos)
+        imageView.isHidden = true
+        return imageView
     }()
     
     private let dialogTitleLabel: UILabel = {
@@ -31,7 +51,7 @@ final class Dialog: UIView {
     
     private let dialogContentLabel: UILabel = {
         let label = UILabel()
-        label.font = .suit(.caption_m_12)
+        label.font = .suit(.caption_r_14)
         label.textColor = .gray400
         label.lineBreakMode = .byCharWrapping
         label.textAlignment = .center
@@ -73,7 +93,7 @@ final class Dialog: UIView {
         super.init(frame: frame)
         setStyle()
         setUI()
-        setLayout()
+        setLayout(for: .normal)
     }
     
     required init?(coder: NSCoder) {
@@ -83,7 +103,7 @@ final class Dialog: UIView {
     // MARK: - Setup Methods
     
     private func setStyle() {
-        backgroundColor = .dim
+        backgroundColor = .dim2
         self.isHidden = true
         
         let tap = UITapGestureRecognizer(target: self, action: #selector(dismiss(_:)))
@@ -92,39 +112,85 @@ final class Dialog: UIView {
     
     private func setUI() {
         addSubviews(dialogContainerView)
-        dialogContainerView.addSubviews(dialogTitleLabel, dialogContentLabel, buttonStackView)
+        dialogContainerView.addSubviews(dialogErrorImageView,
+                                        dialogTitleLabel,
+                                        dialogContentLabel,
+                                        buttonStackView)
         buttonStackView.addArrangedSubviews(leftButton, rightButton)
     }
     
-    private func setLayout() {
+    private func setLayout(for style: DialogStyle) {
+        dialogContainerView.snp.removeConstraints()
+        dialogErrorImageView.snp.removeConstraints()
+        dialogTitleLabel.snp.removeConstraints()
+        dialogContentLabel.snp.removeConstraints()
+        buttonStackView.snp.removeConstraints()
+        leftButton.snp.removeConstraints()
+        rightButton.snp.removeConstraints()
+        
         dialogContainerView.snp.makeConstraints {
             $0.center.equalToSuperview()
+            $0.width.equalTo(343)
         }
         
-        dialogTitleLabel.snp.makeConstraints {
-            $0.top.equalToSuperview().inset(34)
-            $0.horizontalEdges.equalToSuperview().inset(24)
+        dialogErrorImageView.snp.makeConstraints {
+            $0.top.equalToSuperview().inset(20)
+            $0.centerX.equalToSuperview()
+            $0.height.equalTo(175)
+            $0.width.equalTo(200)
         }
         
-        dialogContentLabel.snp.makeConstraints {
-            $0.top.equalTo(dialogTitleLabel.snp.bottom).offset(8)
-            $0.horizontalEdges.equalTo(dialogTitleLabel)
-        }
-        
-        buttonStackView.snp.makeConstraints {
-            $0.top.equalTo(dialogContentLabel.snp.bottom).offset(32)
-            $0.horizontalEdges.equalToSuperview().inset(24)
-            $0.bottom.equalToSuperview().inset(24)
-        }
-        
-        leftButton.snp.makeConstraints {
-            $0.height.equalTo(48)
-            $0.width.equalTo(143)
-        }
-        
-        rightButton.snp.makeConstraints {
-            $0.height.equalTo(48)
-            $0.width.equalTo(143)
+        switch style {
+        case .normal:
+            dialogErrorImageView.isHidden = true
+            dialogContentLabel.isHidden = false
+            leftButton.isHidden = false
+            
+            dialogTitleLabel.snp.makeConstraints {
+                $0.top.equalToSuperview().inset(34)
+                $0.horizontalEdges.equalToSuperview().inset(24)
+            }
+            
+            dialogContentLabel.snp.makeConstraints {
+                $0.top.equalTo(dialogTitleLabel.snp.bottom).offset(8)
+                $0.horizontalEdges.equalTo(dialogTitleLabel)
+            }
+            
+            buttonStackView.snp.makeConstraints {
+                $0.top.equalTo(dialogContentLabel.snp.bottom).offset(32)
+                $0.horizontalEdges.equalToSuperview().inset(24)
+                $0.bottom.equalToSuperview().inset(24)
+            }
+            
+            leftButton.snp.makeConstraints {
+                $0.height.equalTo(48)
+                $0.width.equalTo(143)
+            }
+            
+            rightButton.snp.makeConstraints {
+                $0.height.equalTo(48)
+                $0.width.equalTo(143)
+            }
+            
+        case .error:
+            dialogErrorImageView.isHidden = false
+            dialogContentLabel.isHidden = true
+            leftButton.isHidden = true
+            
+            dialogTitleLabel.snp.makeConstraints {
+                $0.top.equalTo(dialogErrorImageView.snp.bottom).offset(8)
+                $0.horizontalEdges.equalToSuperview().inset(24)
+            }
+            
+            buttonStackView.snp.makeConstraints{
+                $0.top.equalTo(dialogTitleLabel.snp.bottom).offset(20)
+                $0.horizontalEdges.equalToSuperview().inset(23)
+                $0.bottom.equalToSuperview().inset(24)
+            }
+            
+            rightButton.snp.makeConstraints {
+                $0.height.equalTo(48)
+            }
         }
     }
     
@@ -168,25 +234,40 @@ final class Dialog: UIView {
 // MARK: - Extensions
 
 extension Dialog {
-    func configure(title: String, content: String, leftButtonTitle: String, rightButtonTitle: String) {
+    func configure(style: DialogStyle = .normal, image: UIImage? = nil, title: String,
+                   content: String? = nil, leftButtonTitle: String? = nil, rightButtonTitle: String,
+                   leftAction: (() -> Void)? = nil, rightAction: (() -> Void)? = nil) {
+        
         dialogTitleLabel.text = title
         dialogContentLabel.text = content
-        leftButton.setTitle(leftButtonTitle, for: .normal)
+        
+        if let image = image {
+            dialogErrorImageView.image = image
+        }
+        
+        if let leftTitle = leftButtonTitle {
+            leftButton.setTitle(leftTitle, for: .normal)
+        }
         rightButton.setTitle(rightButtonTitle, for: .normal)
+        
+        self.leftAction = leftAction
+        self.rightAction = rightAction
+        
+        leftButton.removeTarget(nil, action: nil, for: .allEvents)
+        rightButton.removeTarget(nil, action: nil, for: .allEvents)
+        
+        if leftAction != nil {
+            leftButton.addAction(UIAction { [weak self] _ in
+                self?.leftAction?()
+                self?.dismiss()
+            }, for: .touchUpInside)
+        }
+        
+        rightButton.addAction(UIAction { [weak self] _ in
+            self?.rightAction?()
+            self?.dismiss()
+        }, for: .touchUpInside)
+        
+        setLayout(for: style)
     }
-}
-
-// MARK: - Preview
-
-#Preview {
-    let dialog = Dialog()
-    dialog.configure(
-        title: "AI 피드백을 신고하시겠어요?",
-        content: "신고된 AI 피드백은 확인 후\n서비스의 운영원칙에 따라 처리됩니다.",
-        leftButtonTitle: "취소",
-        rightButtonTitle: "확인"
-    )
-    
-    dialog.isHidden = false
-    return dialog
 }

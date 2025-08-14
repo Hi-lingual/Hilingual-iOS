@@ -225,7 +225,6 @@ final class DiaryWritingView: BaseUIView {
     private func addTarget() {
         deleteImageButton.addTarget(self, action: #selector(deleteImage), for: .touchUpInside)
         textScanButton.addTarget(self, action: #selector(showModal), for: .touchUpInside)
-        cameraButton.addTarget(self, action: #selector(cameraButtonTapped), for: .touchUpInside)
     }
     
     // MARK: - Private Methods
@@ -251,10 +250,6 @@ final class DiaryWritingView: BaseUIView {
     @objc private func showModal() {
         modal.isHidden = false
         modal.showAnimation()
-    }
-    
-    @objc private func cameraButtonTapped() {
-        delegate?.didTapGallery()
     }
     
     func setText(_ text: String) {
