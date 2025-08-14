@@ -38,7 +38,6 @@ final class FollowButton: UIButton {
     
     // MARK: - UI Components
     
-    // stroke 추가
     private let followButton: UIButton = {
         let button = UIButton()
         button.titleLabel?.font = .suit(.body_sb_14)
