@@ -8,88 +8,109 @@
 
 import UIKit
 import SnapKit
-import Combine
 
 final class VerificationCodeView: BaseUIView {
 
     // MARK: - UI
 
-    let codeView: OneTimeCodeView = {
-        let v = OneTimeCodeView()
-        v.setState(.error("ddd"))
-        return v
+    let codeView: VerificationCodeInputView = {
+        let view = VerificationCodeInputView()
+        view.setState(.error("ddd"))
+        return view
+    }()
+
+    private let infoContainer: UIView = {
+        let view = UIView()
+        view.backgroundColor = .gray100
+        view.layer.masksToBounds = true
+        view.isUserInteractionEnabled = false
+        return view
+    }()
+
+    private let infoStack: UIStackView = {
+        let stack = UIStackView()
+        stack.axis = .vertical
+        stack.spacing = 8
+        return stack
     }()
 
     let questionTitleLabel: UILabel = {
-        let l = UILabel()
-        l.text = "Q. 인증 번호란?"
-        l.font = .systemFont(ofSize: 15, weight: .semibold)
-        l.textColor = .label
-        return l
+        let label = UILabel()
+        label.text = "Q. 인증 번호란?"
+        label.font = .suit(.head_b_16)
+        label.textColor = .label
+        return label
     }()
 
     let guideLabel: UILabel = {
-        let l = UILabel()
-        l.text = "사전 예약 신청한 분들을 대상으로 가입 인증 번호가 발급되었어요. 인증 번호를 보유하신 경우에만 가입이 가능해요."
-        l.font = .systemFont(ofSize: 13)
-        l.textColor = .secondaryLabel
-        l.numberOfLines = 0
-        return l
+        let label = UILabel()
+        label.text = "사전 예약을 신청한 분들을 대상으로 가입 인증 번호가 발급되었어요. 인증 번호를 보유하신 경우에만 가입이 가능해요.\n\n알림을 신청한 이메일을 확인해주세요."
+        label.font = .suit(.body_m_14)
+        label.textColor = .gray500
+        label.numberOfLines = 0
+        return label
     }()
 
     let notReceivedButton: UIButton = {
-        let b = UIButton(type: .system)
-        b.setTitle("인증 번호가 오지 않았나요?", for: .normal)
-        b.titleLabel?.font = .systemFont(ofSize: 13, weight: .semibold)
-        return b
+        let button = UIButton(type: .system)
+        let title = "인증 번호가 오지 않았나요?"
+        let color: UIColor = .gray500
+        let attr = NSAttributedString(
+            string: title,
+            attributes: [
+                .font: UIFont.suit(.body_m_14),
+                .foregroundColor: color,
+                .underlineStyle: NSUnderlineStyle.single.rawValue,
+                .underlineColor: color
+            ]
+        )
+        button.setAttributedTitle(attr, for: .normal)
+        button.contentHorizontalAlignment = .leading
+        button.titleLabel?.numberOfLines = 1
+        return button
     }()
 
-    let submitButton: UIButton = {
-        let b = UIButton(type: .system)
-        b.setTitle("인증하기", for: .normal)
-        b.setTitleColor(.white, for: .normal)
-        b.setTitleColor(.white.withAlphaComponent(0.5), for: .disabled)
-        b.backgroundColor = .black
-        b.layer.cornerRadius = 10
-        b.isEnabled = false
-        return b
-    }()
 
-    private let bottomSpacer = UIView()
+    let submitButton: CTAButton = {
+        CTAButton(style: .TextButton("인증하기"), autoBackground: true)
+    }()
 
     // MARK: - Methods
     override func setUI() {
-        addSubviews(codeView, questionTitleLabel, guideLabel, notReceivedButton, submitButton, bottomSpacer)
+        addSubviews(codeView,
+                    infoContainer,
+                    notReceivedButton,
+                    submitButton)
+
+        infoContainer.addSubview(infoStack)
+        infoStack.addArrangedSubview(questionTitleLabel)
+        infoStack.addArrangedSubview(guideLabel)
     }
 
     override func setLayout() {
-
         codeView.snp.makeConstraints {
             $0.top.equalTo(safeAreaLayoutGuide).offset(32)
-            $0.leading.trailing.equalToSuperview().inset(24)
-            $0.height.equalTo(52)
+            $0.leading.trailing.equalToSuperview().inset(16)
+            $0.height.greaterThanOrEqualTo(52)
         }
 
-        questionTitleLabel.snp.makeConstraints {
-            $0.top.equalTo(codeView.snp.bottom).offset(24)
-            $0.leading.trailing.equalToSuperview().inset(20)
+        infoContainer.snp.makeConstraints {
+            $0.top.equalTo(codeView.snp.bottom).offset(17)
+            $0.leading.trailing.equalToSuperview()
         }
 
-        guideLabel.snp.makeConstraints {
-            $0.top.equalTo(questionTitleLabel.snp.bottom).offset(8)
-            $0.leading.trailing.equalToSuperview().inset(20)
+        infoStack.snp.makeConstraints {
+            $0.edges.equalToSuperview().inset(UIEdgeInsets(top: 16, left: 16, bottom: 16, right: 16))
         }
 
         notReceivedButton.snp.makeConstraints {
-            $0.top.equalTo(guideLabel.snp.bottom).offset(12)
-            $0.leading.trailing.equalToSuperview().inset(20)
+            $0.top.equalTo(infoContainer.snp.bottom).offset(12)
+            $0.leading.trailing.equalToSuperview().inset(16)
         }
 
         submitButton.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview().inset(20)
-            $0.height.equalTo(52)
             $0.bottom.equalTo(safeAreaLayoutGuide).offset(-12)
         }
-
     }
 }

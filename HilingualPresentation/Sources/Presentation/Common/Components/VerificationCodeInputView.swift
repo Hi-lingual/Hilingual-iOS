@@ -1,5 +1,5 @@
 //
-//  OneTimeCodeView.swift
+//  VerificationCodeInputView.swift
 //  HilingualPresentation
 //
 //  Created by 성현주 on 8/12/25.
@@ -8,7 +8,7 @@
 import UIKit
 import SnapKit
 
-final class OneTimeCodeView: BaseUIView, UIKeyInput, UITextInputTraits {
+final class VerificationCodeInputView: BaseUIView, UIKeyInput, UITextInputTraits {
 
     // MARK: - State
     enum State {
@@ -21,7 +21,6 @@ final class OneTimeCodeView: BaseUIView, UIKeyInput, UITextInputTraits {
     var text: String { internalText }
     var isComplete: Bool { internalText.count == 6 }
 
-    /// 상태 변경 (외부에서 호출)
     func setState(_ state: State) {
         currentState = state
         applyStateAppearance()
@@ -39,37 +38,37 @@ final class OneTimeCodeView: BaseUIView, UIKeyInput, UITextInputTraits {
     // MARK: - UI Components
 
     private let mainStack: UIStackView = {
-        let v = UIStackView()
-        v.axis = .vertical
-        v.spacing = 6
-        return v
+        let stack = UIStackView()
+        stack.axis = .vertical
+        stack.spacing = 8
+        return stack
     }()
 
     private let stack: UIStackView = {
-        let v = UIStackView()
-        v.axis = .horizontal
-        v.alignment = .fill
-        v.distribution = .equalSpacing
-        v.spacing = 8
-        return v
+        let stack = UIStackView()
+        stack.axis = .horizontal
+        stack.alignment = .fill
+        stack.distribution = .equalSpacing
+        stack.spacing = 8
+        return stack
     }()
 
     private let messageLabel: UILabel = {
-        let l = UILabel()
-        l.font = .systemFont(ofSize: 12, weight: .regular)
-        l.textColor = .systemRed
-        l.numberOfLines = 0
-        return l
+        let label = UILabel()
+        label.font = .suit(.caption_r_12)
+        label.textColor = .alertRed
+        label.numberOfLines = 0
+        return label
     }()
 
     private let hiddenTextField: UITextField = {
-        let tf = UITextField()
-        tf.keyboardType = .numberPad
-        tf.textContentType = .oneTimeCode
-        tf.tintColor = .clear
-        tf.textColor = .clear
-        tf.backgroundColor = .clear
-        return tf
+        let textField = UITextField()
+        textField.keyboardType = .numberPad
+        textField.textContentType = .oneTimeCode
+        textField.tintColor = .clear
+        textField.textColor = .clear
+        textField.backgroundColor = .clear
+        return textField
     }()
 
     private var boxViews: [UILabel] = []
@@ -112,18 +111,20 @@ final class OneTimeCodeView: BaseUIView, UIKeyInput, UITextInputTraits {
 
         for _ in 0..<6 {
             let label: UILabel = {
-                let l = UILabel()
-                l.textAlignment = .center
-                l.font = .systemFont(ofSize: 20, weight: .medium)
-                l.textColor = .label
-                l.backgroundColor = .secondarySystemBackground
-                l.layer.cornerRadius = 10
-                l.layer.masksToBounds = true
-                return l
+                let label = UILabel()
+                label.textAlignment = .center
+                label.font = .suit(.head_sb_20)
+                label.textColor = .label
+                label.backgroundColor = .gray100   
+                label.layer.cornerRadius = 8
+                label.layer.masksToBounds = true
+                label.layer.borderWidth = 1
+                label.layer.borderColor = UIColor.gray100.cgColor
+                return label
             }()
             label.snp.makeConstraints { make in
-                make.width.equalTo(44)
-                make.height.equalTo(52)
+                make.width.equalTo(50)
+                make.height.equalTo(60)
             }
             stack.addArrangedSubview(label)
             boxViews.append(label)
@@ -133,39 +134,46 @@ final class OneTimeCodeView: BaseUIView, UIKeyInput, UITextInputTraits {
     }
 
     private func applyStateAppearance() {
-        // 메시지 표시
         switch currentState {
         case .normal:
             messageLabel.text = nil
             messageLabel.isHidden = true
+
+            for (idx, label) in boxViews.enumerated() {
+                let isFilled = idx < internalText.count
+                if isFilled {
+                    label.backgroundColor = .white
+                    label.layer.borderColor = UIColor.black.cgColor
+                    label.layer.borderWidth = 1
+                } else {
+                    label.backgroundColor = .gray100
+                    label.layer.borderColor = UIColor.gray100.cgColor
+                    label.layer.borderWidth = 1
+                }
+            }
+
         case .error(let message):
             messageLabel.text = message
             messageLabel.isHidden = false
-        }
-
-        // 테두리 색 일괄 적용
-        let color: CGColor = {
-            switch currentState {
-            case .normal: return UIColor.systemGray4.cgColor
-            case .error:  return UIColor.systemRed.cgColor
+            for label in boxViews {
+                label.backgroundColor = .white
+                label.layer.borderColor = UIColor.alertRed.cgColor
+                label.layer.borderWidth = 1
             }
-        }()
-        boxViews.forEach { $0.layer.borderColor = color }
+        }
     }
 
     // MARK: - Update
 
     @objc private func textDidChange() {
-        let didChange = clampAndAssign(from: hiddenTextField.text ?? "")
-        if didChange, case .error = currentState {
-            // 에러 상태에서 입력이 변경되면 즉시 normal로 복귀
+        let changed = clampAndAssign(from: hiddenTextField.text ?? "")
+        if changed, case .error = currentState {
             setState(.normal)
+        } else {
+            refreshBoxes()
         }
-        refreshBoxes()
     }
 
-    /// 숫자만 허용 + 6자리 클램프. 실제 변경 여부 반환.
-    @discardableResult
     private func clampAndAssign(from raw: String) -> Bool {
         let prev = internalText
         let filtered = raw.filter { $0.isNumber }
@@ -183,14 +191,22 @@ final class OneTimeCodeView: BaseUIView, UIKeyInput, UITextInputTraits {
     }
 
     private func updateBox(_ label: UILabel, at index: Int, chars: [Character]) {
+        if case .error = currentState {
+            label.text = (index < chars.count) ? String(chars[index]) : ""
+            return
+        }
+
         if index < chars.count {
             label.text = String(chars[index])
-            label.layer.borderWidth = 2
+            label.backgroundColor = .white
+            label.layer.borderColor = UIColor.black.cgColor
+            label.layer.borderWidth = 1
         } else {
             label.text = ""
+            label.backgroundColor = .gray100
+            label.layer.borderColor = UIColor.gray100.cgColor
             label.layer.borderWidth = 1
         }
-        // borderColor는 applyStateAppearance()에서 일괄 관리
     }
 
     // MARK: - UIResponder
@@ -213,9 +229,12 @@ final class OneTimeCodeView: BaseUIView, UIKeyInput, UITextInputTraits {
         guard text.rangeOfCharacter(from: CharacterSet.decimalDigits.inverted) == nil else { return }
         let new = String((internalText + text).prefix(6))
         hiddenTextField.text = new
-        let didChange = clampAndAssign(from: new)
-        if didChange, case .error = currentState { setState(.normal) }
-        refreshBoxes()
+        let changed = clampAndAssign(from: new)
+        if changed, case .error = currentState {
+            setState(.normal)
+        } else {
+            refreshBoxes()
+        }
     }
 
     func deleteBackward() {
@@ -223,9 +242,12 @@ final class OneTimeCodeView: BaseUIView, UIKeyInput, UITextInputTraits {
         var new = internalText
         _ = new.popLast()
         hiddenTextField.text = new
-        let didChange = clampAndAssign(from: new)
-        if didChange, case .error = currentState { setState(.normal) }
-        refreshBoxes()
+        let changed = clampAndAssign(from: new)
+        if changed, case .error = currentState {
+            setState(.normal)
+        } else {
+            refreshBoxes()
+        }
     }
 
     // MARK: - UITextInputTraits
@@ -237,11 +259,11 @@ final class OneTimeCodeView: BaseUIView, UIKeyInput, UITextInputTraits {
 }
 
 // MARK: - UITextFieldDelegate
-extension OneTimeCodeView: UITextFieldDelegate {
+
+extension VerificationCodeInputView: UITextFieldDelegate {
     func textField(_ textField: UITextField,
                    shouldChangeCharactersIn range: NSRange,
                    replacementString string: String) -> Bool {
-        // oneTimeCode 자동 입력 허용
         return true
     }
 }
