@@ -7,21 +7,24 @@
 
 import Foundation
 import Combine
+import SafariServices
 
 public final class VerificationCodeViewController: BaseUIViewController<VerificationCodeViewModel> {
 
     // MARK: - Properties
 
     private let verificationCodeView = VerificationCodeView()
+    private let dialog = Dialog()
 
     // MARK: - Custom Method
 
     public override func setUI() {
-        view.addSubviews(verificationCodeView)
+        view.addSubviews(verificationCodeView, dialog)
     }
 
     public override func setLayout() {
         verificationCodeView.snp.makeConstraints { $0.edges.equalToSuperview() }
+        dialog.snp.makeConstraints { $0.edges.equalToSuperview() }
     }
 
     // MARK: - Navigation
@@ -37,10 +40,26 @@ public final class VerificationCodeViewController: BaseUIViewController<Verifica
 
         output.errorMessage
             .sink { [weak self] message in
+                guard let self else { return }
+
                 if let msg = message {
-                    self?.verificationCodeView.codeView.setState(.error(msg))
+                    self.verificationCodeView.codeView.setState(.error(msg))
+                    dialog.configure(
+                        style: .normal,
+                        title: "인증에 실패했어요",
+                        content: "사전 예약 알림신청을 통해 발급한 \n인증코드가 맞는지 다시 한번 확인해주세요.",
+                        leftButtonTitle: "앱 종료",
+                        rightButtonTitle: "문의하기",
+                        leftAction: { [weak self] in
+                            self?.exitApp()
+                        },
+                        rightAction: { [weak self] in
+                            self?.policyButtonTapped()
+                        }
+                    )
+                    dialog.showAnimation()
                 } else {
-                    self?.verificationCodeView.codeView.setState(.normal)
+                    self.verificationCodeView.codeView.setState(.normal)
                 }
             }
             .store(in: &cancellables)
@@ -69,5 +88,24 @@ public final class VerificationCodeViewController: BaseUIViewController<Verifica
     @objc private func submitTapped() {
         let code = verificationCodeView.codeView.text
         viewModel?.submit(code: code)
+    }
+
+    private func dialogConfigure() {
+
+    }
+
+    // MARK: - Private Method
+
+    private func policyButtonTapped() {
+        guard let url = URL(string: "https://hilingual.notion.site/230829677ebf801c965be24b0ef444e9") else { return }
+        let safariVC = SFSafariViewController(url: url)
+        self.present(safariVC, animated: true, completion: nil)
+    }
+
+    private func exitApp() {
+        UIApplication.shared.perform(#selector(NSXPCConnection.suspend))
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            exit(0)
+        }
     }
 }
