@@ -20,14 +20,14 @@ final class LikeCounterView: UIView {
     private(set) var isLiked: Bool = false {
         didSet {
             updateIcon()
-            onToggle?(count, isLiked)
+            onToggle?(likeCount, isLiked)
         }
     }
     
-    private(set) var count: Int = 0 {
+    private(set) var likeCount: Int = 0 {
         didSet {
             updateCount()
-            onToggle?(count, isLiked)
+            onToggle?(likeCount, isLiked)
         }
     }
     
@@ -110,18 +110,18 @@ final class LikeCounterView: UIView {
     }
     
     private func updateCount() {
-        countLabel.text = "\(count)"
+        countLabel.text = "\(likeCount)"
     }
     
     // MARK: - Actions
     
     @objc private func didTap() {
         isLiked.toggle()
-        count = max(0, count + (isLiked ? 1 : -1))
+        likeCount = max(0, likeCount + (isLiked ? 1 : -1))
     }
     
-    func configure(count: Int, isLiked: Bool) {
-        self.count = max(0, count)
+    func configure(likeCount: Int, isLiked: Bool) {
+        self.likeCount = max(0, likeCount)
         self.isLiked = isLiked
     }
 }
