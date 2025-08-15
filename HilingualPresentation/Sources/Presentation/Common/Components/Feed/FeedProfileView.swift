@@ -145,24 +145,24 @@ final class FeedProfileView: UIView {
     }
 
     private func setLayout() {
-        mainStackView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+        mainStackView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
         }
 
-        profileImageView.snp.makeConstraints { make in
-            make.width.height.equalTo(60)
+        profileImageView.snp.makeConstraints {
+            $0.size.equalTo(60)
         }
         
-        profileSpacer.snp.makeConstraints { make in
-            make.width.height.equalTo(0)
+        profileSpacer.snp.makeConstraints {
+            $0.size.equalTo(0)
         }
 
-        followSpacer.snp.makeConstraints { make in
-            make.width.height.equalTo(2)
+        followSpacer.snp.makeConstraints {
+            $0.size.equalTo(2)
         }
 
-        streakImageView.snp.makeConstraints { make in
-            make.width.height.equalTo(16)
+        streakImageView.snp.makeConstraints {
+            $0.size.equalTo(16)
         }
     }
 
