@@ -10,6 +10,9 @@ import SnapKit
 
 final class VerificationCodeInputView: BaseUIView, UIKeyInput, UITextInputTraits {
 
+    // MARK: - Callback
+    var onTextChanged: ((String) -> Void)?
+
     // MARK: - State
     enum State {
         case normal
@@ -17,7 +20,6 @@ final class VerificationCodeInputView: BaseUIView, UIKeyInput, UITextInputTraits
     }
 
     // MARK: - Public
-
     var text: String { internalText }
     var isComplete: Bool { internalText.count == 6 }
 
@@ -28,9 +30,11 @@ final class VerificationCodeInputView: BaseUIView, UIKeyInput, UITextInputTraits
     }
 
     // MARK: - Private State
-
     private var internalText: String = "" {
-        didSet { internalText = String(internalText.prefix(6)) }
+        didSet {
+            internalText = String(internalText.prefix(6))
+            onTextChanged?(internalText)
+        }
     }
 
     private var currentState: State = .normal

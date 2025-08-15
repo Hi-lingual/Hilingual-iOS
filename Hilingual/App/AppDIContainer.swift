@@ -100,7 +100,7 @@ final class AppDIContainer: ViewControllerFactory {
         return WordBookViewController(viewModel: makeWordBookViewmodel(), diContainer: self)
     }
     public func makeVerificationCodeViewController() -> VerificationCodeViewController {
-        return VerificationCodeViewController(viewModel: makeHomeViewModel(), diContainer: self)
+        return VerificationCodeViewController(viewModel: makeVerificationCodeViewModel(), diContainer: self)
     }
 }
 // MARK: - SplashDIContainer
@@ -168,9 +168,24 @@ extension AppDIContainer {
 // MARK: - VerificationCodeDIContainer
 
 extension AppDIContainer {
+    //TODO: MOCK 제거
+    private func makeVerificationCodeService() -> VerifyCodeService {
+        return MockVerifyCodeService()
+    }
+
+    private func makeVerificationCodeRespository() -> VerificationCodeRepository {
+        return DefaultVerificationCodeRepository(service: makeVerificationCodeService())
+    }
+
+    private func makeVerifyCodeUseCase() -> VerificationCodeUseCase {
+        return DefaultVerificationCodeUseCase(repository: makeVerificationCodeRespository())
+    }
+
+    private func makeVerificationCodeViewModel() -> VerificationCodeViewModel {
+        return VerificationCodeViewModel(verifyCodeUseCase: makeVerifyCodeUseCase())
+    }
 
 }
-
 
 // MARK: - OnBoardingDiContainer
 
