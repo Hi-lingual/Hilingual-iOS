@@ -18,25 +18,27 @@ final class LikeCounterView: UIView {
     // MARK: - Public State
     
     private(set) var isLiked: Bool = false {
-        didSet { updateIcon() }
+        didSet {
+            updateIcon()
+            onToggle?(count, isLiked)
+        }
     }
     
     private(set) var count: Int = 0 {
-        didSet { updateCount() }
+        didSet {
+            updateCount()
+            onToggle?(count, isLiked)
+        }
     }
     
-    var onToggle: ((Bool, Int) -> Void)?
+    var onToggle: ((Int, Bool) -> Void)?
     
     // MARK: - UI
     
-    private let likeButton: UIButton = {
-        let button = UIButton(type: .custom)
-        return button
-    }()
-    
+    private let likeButton = UIButton(type: .custom)
     private let countLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .black
+        label.textColor = .gray850
         label.textAlignment = .left
         return label
     }()
@@ -77,33 +79,34 @@ final class LikeCounterView: UIView {
         switch style {
         case .horizontal:
             countLabel.font = .suit(.body_sb_14)
+
             likeButton.snp.makeConstraints {
                 $0.top.bottom.leading.equalToSuperview()
-                $0.width.height.equalTo(24)
+                $0.size.equalTo(24)
             }
             countLabel.snp.makeConstraints {
-                $0.centerY.equalTo(likeButton)
                 $0.leading.equalTo(likeButton.snp.trailing).offset(4)
                 $0.trailing.equalToSuperview()
+                $0.centerY.equalTo(likeButton)
             }
         case .vertical:
             countLabel.font = .suit(.caption_m_12)
+            
             likeButton.snp.makeConstraints {
                 $0.top.leading.trailing.equalToSuperview()
-                $0.width.height.equalTo(24)
+                $0.size.equalTo(24)
             }
             countLabel.snp.makeConstraints {
-                $0.top.equalTo(likeButton.snp.bottom).offset(0)
-                $0.centerX.equalTo(likeButton)
+                $0.top.equalTo(likeButton.snp.bottom)
                 $0.bottom.equalToSuperview()
+                $0.centerX.equalTo(likeButton)
             }
         }
     }
     
     private func updateIcon() {
         let imageName = isLiked ? "ic_like_24_ios" : "ic_unlike_24_ios"
-        let image = UIImage(named: imageName, in: .module, with: nil) ?? UIImage(named: imageName)
-        likeButton.setImage(image, for: .normal)
+        likeButton.setImage(UIImage(named: imageName, in: .module, with: nil), for: .normal)
     }
     
     private func updateCount() {
@@ -115,15 +118,10 @@ final class LikeCounterView: UIView {
     @objc private func didTap() {
         isLiked.toggle()
         count = max(0, count + (isLiked ? 1 : -1))
-        onToggle?(isLiked, count)
     }
-    
-    // MARK: - Public API
     
     func configure(count: Int, isLiked: Bool) {
         self.count = max(0, count)
         self.isLiked = isLiked
-        updateIcon()
-        updateCount()
     }
 }
