@@ -62,4 +62,18 @@ final class NoFeedView: UIView {
             $0.height.equalTo(100)
         }
     }
+    
+    // MARK: - Configure
+    func configure(message: String? = nil, imageName: String? = nil) {
+        if let message = message {
+            noFeedLabel.text = message
+        }
+        if let imageName = imageName {
+            noFeedView.image = UIImage(
+                named: imageName,
+                in: .module,
+                compatibleWith: nil
+            )
+        }
+    }
 }
