@@ -10,13 +10,14 @@ import Combine
 import HilingualDomain
 
 public final class VerificationCodeViewModel: BaseViewModel {
-
+    
     // MARK: - Input / Output
 
     struct Output {
         let errorMessage: AnyPublisher<String?, Never>
         let isSubmitEnabled: AnyPublisher<Bool, Never>
         let didVerifySuccess: AnyPublisher<Void, Never>
+        let showLockout: AnyPublisher<Void, Never>
     }
 
     // MARK: - Private
@@ -25,6 +26,10 @@ public final class VerificationCodeViewModel: BaseViewModel {
     private let errorSubject = CurrentValueSubject<String?, Never>(nil)
     private let submitEnabledSubject = CurrentValueSubject<Bool, Never>(false)
     private let successSubject = PassthroughSubject<Void, Never>()
+    private let lockoutSubject = PassthroughSubject<Void, Never>()
+
+    private var failCount: Int = 0
+    private let maxAttempts: Int = 5
 
     // MARK: - Init
 
@@ -38,7 +43,8 @@ public final class VerificationCodeViewModel: BaseViewModel {
         Output(
             errorMessage: errorSubject.eraseToAnyPublisher(),
             isSubmitEnabled: submitEnabledSubject.eraseToAnyPublisher(),
-            didVerifySuccess: successSubject.eraseToAnyPublisher()
+            didVerifySuccess: successSubject.eraseToAnyPublisher(),
+            showLockout: lockoutSubject.eraseToAnyPublisher()
         )
     }
 
@@ -52,15 +58,26 @@ public final class VerificationCodeViewModel: BaseViewModel {
             errorSubject.send("인증코드는 숫자 6자리여야 합니다.")
             return
         }
+
         verifyCodeUseCase.execute(code: code)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] completion in
+                guard let self else { return }
                 if case let .failure(error) = completion {
-                    self?.errorSubject.send(Self.parseError(error))
+                    self.failCount += 1
+                    let base = Self.parseError(error)
+                    let msg = "\(base) [실패 횟수 \(self.failCount)/\(self.maxAttempts)]"
+                    self.errorSubject.send(msg)
+
+                    if self.failCount >= self.maxAttempts {
+                        self.lockoutSubject.send(())
+                    }
                 }
             } receiveValue: { [weak self] _ in
-                self?.errorSubject.send(nil)
-                self?.successSubject.send(())
+                guard let self else { return }
+                self.errorSubject.send(nil)
+                self.failCount = 0             
+                self.successSubject.send(())
             }
             .store(in: &cancellables)
     }
@@ -70,6 +87,6 @@ public final class VerificationCodeViewModel: BaseViewModel {
     }
 
     private static func parseError(_ error: Error) -> String {
-        "인증에 실패했습니다. 다시 시도해주세요."
+        "유효하지 않은 인증코드입니다."
     }
 }

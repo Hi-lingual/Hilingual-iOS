@@ -41,26 +41,27 @@ public final class VerificationCodeViewController: BaseUIViewController<Verifica
         output.errorMessage
             .sink { [weak self] message in
                 guard let self else { return }
-
                 if let msg = message {
                     self.verificationCodeView.codeView.setState(.error(msg))
-                    dialog.configure(
-                        style: .normal,
-                        title: "인증에 실패했어요",
-                        content: "사전 예약 알림신청을 통해 발급한 \n인증코드가 맞는지 다시 한번 확인해주세요.",
-                        leftButtonTitle: "앱 종료",
-                        rightButtonTitle: "문의하기",
-                        leftAction: { [weak self] in
-                            self?.exitApp()
-                        },
-                        rightAction: { [weak self] in
-                            self?.policyButtonTapped()
-                        }
-                    )
-                    dialog.showAnimation()
                 } else {
                     self.verificationCodeView.codeView.setState(.normal)
                 }
+            }
+            .store(in: &cancellables)
+
+        output.showLockout
+            .sink { [weak self] in
+                guard let self else { return }
+                self.dialog.configure(
+                    style: .normal,
+                    title: "인증에 실패했어요",
+                    content: "사전 예약 알림신청을 통해 발급한 \n인증코드가 맞는지 다시 한번 확인해주세요.",
+                    leftButtonTitle: "앱 종료",
+                    rightButtonTitle: "문의하기",
+                    leftAction: { [weak self] in self?.exitApp() },
+                    rightAction: { [weak self] in self?.policyButtonTapped() }
+                )
+                self.dialog.showAnimation()
             }
             .store(in: &cancellables)
 
@@ -97,7 +98,7 @@ public final class VerificationCodeViewController: BaseUIViewController<Verifica
     // MARK: - Private Method
 
     private func policyButtonTapped() {
-        guard let url = URL(string: "https://hilingual.notion.site/230829677ebf801c965be24b0ef444e9") else { return }
+        guard let url = URL(string: "https://pf.kakao.com/_kNTvn/chat") else { return }
         let safariVC = SFSafariViewController(url: url)
         self.present(safariVC, animated: true, completion: nil)
     }

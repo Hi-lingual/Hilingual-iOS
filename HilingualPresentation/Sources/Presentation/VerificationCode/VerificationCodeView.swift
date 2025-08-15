@@ -15,7 +15,6 @@ final class VerificationCodeView: BaseUIView {
 
     let codeView: VerificationCodeInputView = {
         let view = VerificationCodeInputView()
-        view.setState(.error("ddd"))
         return view
     }()
 
