@@ -8,12 +8,21 @@
 import UIKit
 import SnapKit
 
+// MARK: - Protocol
+
+@MainActor
+protocol ActionMenuDelegate: AnyObject {
+    func actionMenu(_ menu: ActionMenu, didSelectItemAt index: Int)
+}
+
 final class ActionMenu: UIView {
     
     // MARK: - Properties
-    private var actions: [() -> Void] = []
     
+    weak var delegate: ActionMenuDelegate?
+   
     // MARK: - UI Components
+    
     private let stackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
@@ -23,6 +32,7 @@ final class ActionMenu: UIView {
     }()
     
     // MARK: - Lifecycle
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         setUI()
@@ -34,6 +44,7 @@ final class ActionMenu: UIView {
     }
     
     // MARK: - Setup Methods
+    
     private func setUI() {
         backgroundColor = .white
         layer.cornerRadius = 8
@@ -53,15 +64,23 @@ final class ActionMenu: UIView {
     }
     
     // MARK: - Public Methods
-    func configure(items: [(title: String, icon: UIImage?, action: () -> Void)]) {
-        actions = items.map { $0.action }
+    
+    func configure(items: [(title: String, icon: UIImage?, titleColor: UIColor)]) {
+        
         stackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
         
         for (index, item) in items.enumerated() {
-            let row = createMenuRow(title: item.title, icon: item.icon)
+            let row = createMenuRow(
+                title: item.title,
+                icon: item.icon,
+                titleColor: item.titleColor
+            )
             row.tag = index
             
-            let tap = UITapGestureRecognizer(target: self, action: #selector(menuTapped(_:)))
+            let tap = UITapGestureRecognizer(
+                target: self,
+                action: #selector(menuTapped(_:))
+            )
             row.addGestureRecognizer(tap)
             
             stackView.addArrangedSubview(row)
@@ -75,9 +94,11 @@ final class ActionMenu: UIView {
             }
         }
     }
+
     
     // MARK: - Private Methods
-    private func createMenuRow(title: String, icon: UIImage?) -> UIView {
+    
+    private func createMenuRow(title: String, icon: UIImage?, titleColor: UIColor = .gray700) -> UIView {
         
         let titleStackView = UIStackView()
         titleStackView.axis = .horizontal
@@ -91,19 +112,20 @@ final class ActionMenu: UIView {
         iconView.tintColor = .gray400
         iconView.snp.makeConstraints { $0.size.equalTo(24) }
         
-        let textLabel = UILabel()
-        textLabel.text = title
-        textLabel.font = .suit(.body_sb_14)
-        textLabel.textColor = .gray700
+        let titleLabel = UILabel()
+        titleLabel.text = title
+        titleLabel.font = .suit(.body_sb_14)
+        titleLabel.textColor = titleColor
         
-        titleStackView.addArrangedSubviews(iconView, textLabel)
+        titleStackView.addArrangedSubviews(iconView, titleLabel)
         
         return titleStackView
     }
+
     
     @objc private func menuTapped(_ sender: UITapGestureRecognizer) {
         guard let index = sender.view?.tag else { return }
-        actions[index]()
+        delegate?.actionMenu(self, didSelectItemAt: index)
     }
 }
 
