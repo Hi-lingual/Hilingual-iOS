@@ -136,6 +136,7 @@ final class FeedProfileView: UIView {
         addSubview(mainStackView)
 
         mainStackView.addArrangedSubviews(profileImageView, profileStack)
+        
         profileStack.addArrangedSubviews(nameLabel, followStack, profileSpacer, streakStack)
 
         followStack.addArrangedSubviews(followerTitleLabel, followerCountLabel, followSpacer, followingTitleLabel, followingCountLabel)
@@ -145,7 +146,7 @@ final class FeedProfileView: UIView {
 
     private func setLayout() {
         mainStackView.snp.makeConstraints { make in
-            make.edges.equalToSuperview().inset(16)
+            make.edges.equalToSuperview()
         }
 
         profileImageView.snp.makeConstraints { make in
@@ -162,10 +163,6 @@ final class FeedProfileView: UIView {
 
         streakImageView.snp.makeConstraints { make in
             make.width.height.equalTo(16)
-        }
-
-        profileStack.snp.makeConstraints { make in
-            make.trailing.lessThanOrEqualToSuperview().inset(16)
         }
     }
 
@@ -200,8 +197,4 @@ final class FeedProfileView: UIView {
             )
         }
     }
-}
-
-#Preview {
-    FeedProfileView()
 }
