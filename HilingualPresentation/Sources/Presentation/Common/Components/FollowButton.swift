@@ -27,25 +27,12 @@ final class FollowButton: UIButton {
     // MARK: - Properties
     
     private var currentState: FollowButtonState = .follow {
-        didSet {
-            updateFollowingState()
-            setStyle()
-        }
+        didSet { setStyle() }
     }
     
-    private var isFollowing: Bool = false
-    private var currentSize: ButtonSize = .short
-    
-    // MARK: - UI Components
-    
-    private let followButton: UIButton = {
-        let button = UIButton()
-        button.titleLabel?.font = .suit(.body_sb_14)
-        button.layer.cornerRadius = 4
-        button.layer.borderWidth = 1
-        button.layer.borderColor = UIColor.gray200.cgColor
-        return button
-    }()
+    private var currentSize: ButtonSize = .short {
+        didSet { updateSize() }
+    }
     
     // MARK: - Lifecycle
     
@@ -53,70 +40,63 @@ final class FollowButton: UIButton {
         super.init(frame: frame)
         
         setStyle()
-        setUI()
-        setLayout()
+        updateSize()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private func updateFollowingState() {
-        switch currentState {
-        case .following, .unblock:
-            isFollowing = true
-        default:
-            isFollowing = false
-        }
-        
-        let title: String
-        switch currentState {
-        case .follow: title = "팔로우"
-        case .following: title = "팔로잉"
-        case .mutualFollow: title = "맞팔로우"
-        case .block: title = "차단"
-        case .unblock: title = "차단 해제"
-        }
-        followButton.setTitle(title, for: .normal)
-    }
-    
     // MARK: - Setup Methods
     
     private func setStyle() {
-        if isFollowing {
-            followButton.backgroundColor = .white
-            followButton.layer.borderWidth = 1
-            followButton.layer.borderColor = UIColor.gray200.cgColor
-            followButton.setTitleColor(.gray500, for: .normal)
-        } else {
-            followButton.backgroundColor = .hilingualBlack
-            followButton.layer.borderWidth = 0
-            followButton.setTitleColor(.white, for: .normal)
+        titleLabel?.font = .suit(.body_sb_14)
+        layer.cornerRadius = 4
+        clipsToBounds = true
+        
+        switch currentState {
+        case .follow:
+            backgroundColor = .hilingualBlack
+            setTitle("팔로우", for: .normal)
+            setTitleColor(.white, for: .normal)
+            layer.borderWidth = 0
+        case .following:
+            backgroundColor = .white
+            setTitle("팔로잉", for: .normal)
+            setTitleColor(.gray500, for: .normal)
+            layer.borderWidth = 1
+            layer.borderColor = UIColor.gray200.cgColor
+        case .mutualFollow:
+            backgroundColor = .white
+            setTitle("맞팔로우", for: .normal)
+            setTitleColor(.gray500, for: .normal)
+            layer.borderWidth = 1
+            layer.borderColor = UIColor.gray200.cgColor
+        case .block:
+            backgroundColor = .hilingualBlack
+            setTitle("차단", for: .normal)
+            setTitleColor(.white, for: .normal)
+            layer.borderWidth = 0
+        case .unblock:
+            backgroundColor = .white
+            setTitle("차단 해제", for: .normal)
+            setTitleColor(.gray500, for: .normal)
+            layer.borderWidth = 1
+            layer.borderColor = UIColor.gray200.cgColor
         }
     }
     
-    private func setUI() {
-        addSubview(followButton)
-    }
-    
-    private func setLayout() {
-        followButton.snp.makeConstraints {
+    private func updateSize() {
+        snp.remakeConstraints {
             $0.height.equalTo(33)
-            $0.center.equalToSuperview()
+            $0.width.equalTo(currentSize == .short ? 80 : 343)
         }
     }
     
     // MARK: - Public Methods
     
     func configure(state: FollowButtonState, size: ButtonSize) {
-        self.currentSize = size
         self.currentState = state
-        followButton.snp.makeConstraints {
-            $0.width.equalTo(size == .short ? 80 : 343)
-        }
-    }
-    
-    func setFollowing(_ isFollowing: Bool) {
-        self.isFollowing = isFollowing
+        self.currentSize = size
     }
 }

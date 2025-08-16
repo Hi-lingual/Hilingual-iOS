@@ -50,3 +50,9 @@ final class FollowListEmptyView: UIView {
         noFeedView.configure(message: message)
     }
 }
+
+//MARK: - Preview
+
+#Preview {
+    FollowListEmptyView()
+}
