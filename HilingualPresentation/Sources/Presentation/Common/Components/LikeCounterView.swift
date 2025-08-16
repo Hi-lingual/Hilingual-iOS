@@ -62,8 +62,7 @@ final class LikeCounterView: UIView {
     // MARK: - Setup
     
     private func setup() {
-        addSubview(likeButton)
-        addSubview(countLabel)
+        addSubviews(likeButton, countLabel)
         
         likeButton.addTarget(self, action: #selector(didTap), for: .touchUpInside)
         
@@ -124,4 +123,8 @@ final class LikeCounterView: UIView {
         self.likeCount = max(0, likeCount)
         self.isLiked = isLiked
     }
+}
+
+#Preview {
+    LikeCounterView(style: .vertical)
 }
