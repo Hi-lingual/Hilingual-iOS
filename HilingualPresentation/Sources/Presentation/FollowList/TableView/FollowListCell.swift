@@ -7,13 +7,36 @@
 
 import UIKit
 
+@MainActor
+protocol FollowListCellDelegate: AnyObject {
+    func followButtonTapped(cell: FollowListCell)
+}
+
 final class FollowListCell: UITableViewCell {
     
     // MARK: - Properties
     
     static let identifier = "FollowListCell"
     
+    weak var delegate: FollowListCellDelegate?
+    
     // MARK: - UI Components
+    
+    private lazy var leftStack: UIStackView = {
+        let stack = UIStackView(arrangedSubviews: [profileImg, nickname])
+        stack.axis = .horizontal
+        stack.spacing = 8
+        stack.alignment = .center
+        return stack
+    }()
+    
+    private lazy var mainStack: UIStackView = {
+        let stack = UIStackView(arrangedSubviews: [leftStack, button])
+        stack.axis = .horizontal
+        stack.alignment = .center
+        stack.distribution = .equalSpacing
+        return stack
+    }()
     
     private let profileImg: UIImageView = {
         let imageView = UIImageView(image: UIImage(resource: .imgProfileNormalIos))
@@ -24,7 +47,7 @@ final class FollowListCell: UITableViewCell {
         return imageView
     }()
     
-    private let nickname: UILabel = {
+    private(set) var nickname: UILabel = {
         let label = UILabel()
         label.font = .suit(.head_b_16)
         label.text = "닉네임"
@@ -34,18 +57,19 @@ final class FollowListCell: UITableViewCell {
         return label
     }()
     
-    private let button = FollowButton()
+    private(set) var button = FollowButton()
     
     // MARK: - Life Cycle
-
+    
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         
         setStyle()
         setUI()
         setLayout()
+        button.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
     }
-
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -58,26 +82,24 @@ final class FollowListCell: UITableViewCell {
     }
     
     private func setUI() {
-         addSubviews(profileImg, nickname, button)
+        contentView.addSubview(mainStack)
     }
     
     private func setLayout() {
         profileImg.snp.makeConstraints {
-            $0.verticalEdges.equalTo(8)
-            $0.centerY.equalToSuperview()
-            $0.leading.equalToSuperview()
             $0.size.equalTo(42)
         }
         
-        nickname.snp.makeConstraints {
-            $0.leading.equalTo(profileImg.snp.trailing).offset(8)
-            $0.centerY.equalTo(profileImg)
+        mainStack.snp.makeConstraints {
+            $0.horizontalEdges.equalToSuperview().inset(16)
+            $0.centerY.equalToSuperview()
         }
-        
-        button.snp.makeConstraints {
-            $0.trailing.equalToSuperview()
-            $0.centerY.equalTo(profileImg)
-        }
+    }
+    
+    // MARK: - Action
+    
+    @objc private func buttonTapped() {
+        delegate?.followButtonTapped(cell: self)
     }
 }
 

@@ -7,24 +7,28 @@
 
 import UIKit
 
-public final class FollowListViewController: BaseUIViewController<DiaryDetailViewModel> {
+public final class FollowListViewController: BaseUIViewController<FollowListViewModel> {
     
     // MARK: - SegmentedControl
     
-//    private lazy var feedbackViewController = diContainer.makeFeedbackViewController(diaryId: diaryId)
-//    private lazy var recommendedExpressionViewController = diContainer.makeRecommendedExpressionViewController(diaryId: diaryId)
+    private lazy var followerListViewController = diContainer.makeFollowerListViewController()
+    private lazy var followingListViewController = diContainer.makeFollowingListViewController()
     
-//    private let segmentedControl = SegmentedControl(
-//        viewControllers: [FollowerListViewController, FollowingListViewController],
-//        titles: ["팔로워", "팔로잉"],
-//        parentViewController: self
-//    )
+    private lazy var segmentedControl = SegmentedControl(
+        viewControllers: [followerListViewController, followingListViewController],
+        titles: ["팔로워", "팔로잉"],
+        parentViewController: self
+    )
     
     // MARK: - UI Components
     
-    // FollowListView
+     private let followListView = FollowListView()
     
     // MARK: - Life Cycle
+    
+    public override init(viewModel: FollowListViewModel, diContainer: ViewControllerFactory) {
+        super.init(viewModel: viewModel, diContainer: diContainer)
+    }
     
     public override func viewDidLoad() {
         super.viewDidLoad()
@@ -36,11 +40,15 @@ public final class FollowListViewController: BaseUIViewController<DiaryDetailVie
     // MARK: - Setup Methods
     
     public override func setUI() {
-        
+        view.addSubview(segmentedControl)
     }
     
     public override func setLayout() {
-       
+        segmentedControl.snp.makeConstraints {
+          $0.top.equalTo(view.safeAreaLayoutGuide.snp.top)
+          $0.leading.trailing.equalToSuperview()
+          $0.bottom.equalToSuperview()
+        }
     }
     
     // MARK: - Navigation
