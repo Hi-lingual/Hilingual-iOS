@@ -67,11 +67,10 @@ final class FollowButton: UIButton {
             layer.borderWidth = 1
             layer.borderColor = UIColor.gray200.cgColor
         case .mutualFollow:
-            backgroundColor = .white
+            backgroundColor = .hilingualBlack
             setTitle("맞팔로우", for: .normal)
-            setTitleColor(.gray500, for: .normal)
-            layer.borderWidth = 1
-            layer.borderColor = UIColor.gray200.cgColor
+            setTitleColor(.white, for: .normal)
+            layer.borderWidth = 0
         case .block:
             backgroundColor = .hilingualBlack
             setTitle("차단", for: .normal)
