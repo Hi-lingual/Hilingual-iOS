@@ -190,7 +190,7 @@ final class FeedDiaryCell: UITableViewCell {
     // MARK: - Setup
 
     private func setUI() {
-        contentView.addSubviews(containerStack, divider)
+        contentView.addSubviews(containerStack, divider, menu)
 
         containerStack.addArrangedSubviews(profileImageView, mainStack)
         
@@ -220,11 +220,13 @@ final class FeedDiaryCell: UITableViewCell {
         
         containerStack.snp.makeConstraints {
             $0.top.equalTo(20)
-            $0.horizontalEdges.equalToSuperview()
+            $0.horizontalEdges.equalToSuperview().inset(16)
         }
         
         menu.snp.makeConstraints {
             $0.top.equalTo(moreImageView.snp.bottom).offset(4)
+            $0.height.equalTo(48)
+            $0.width.equalTo(182)
             $0.trailing.equalTo(moreImageView.snp.trailing)
         }
         
