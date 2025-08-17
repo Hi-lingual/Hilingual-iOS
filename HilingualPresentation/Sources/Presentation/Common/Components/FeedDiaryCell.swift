@@ -63,6 +63,7 @@ final class FeedDiaryCell: UITableViewCell {
         let label = UILabel()
         label.font = .suit(.head_b_16)
         label.textColor = .gray850
+        label.numberOfLines = 1
         label.setContentHuggingPriority(.required, for: .horizontal)
         return label
     }()
@@ -114,9 +115,9 @@ final class FeedDiaryCell: UITableViewCell {
     
     private let diaryImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.contentMode = .scaleAspectFit
+        imageView.contentMode = .scaleAspectFill
         imageView.layer.cornerRadius = 8
-        imageView.image = UIImage(named: "img_load_fail_large_ios", in: .module, compatibleWith: nil)
+        imageView.clipsToBounds = true
         return imageView
     }()
 
@@ -216,6 +217,11 @@ final class FeedDiaryCell: UITableViewCell {
             $0.horizontalEdges.equalToSuperview()
         }
         
+        //하트로 교체
+        detailImageView2.snp.makeConstraints {
+            $0.size.equalTo(16)
+        }
+        
         profileImageView.snp.makeConstraints {
             $0.size.equalTo(42)
         }
@@ -237,10 +243,6 @@ final class FeedDiaryCell: UITableViewCell {
             $0.size.equalTo(16)
         }
         
-        detailImageView2.snp.makeConstraints {
-            $0.size.equalTo(16)
-        }
-        
         spacer1.snp.makeConstraints {
             $0.height.equalTo(0)
         }
@@ -251,9 +253,9 @@ final class FeedDiaryCell: UITableViewCell {
         
         divider.snp.makeConstraints {
             $0.top.equalTo(containerStack.snp.bottom).offset(20)
-            $0.height.equalTo(1)
             $0.horizontalEdges.equalToSuperview()
             $0.bottom.equalToSuperview()
+            $0.height.equalTo(1)
         }
     }
 
@@ -264,7 +266,9 @@ final class FeedDiaryCell: UITableViewCell {
         profileImageURL: String? = nil,
         streak: Int = 0,
         sharedDateMinutes: Int,
-        diaryPreviewText: String? = nil
+        diaryPreviewText: String? = nil,
+        diaryImageURL: String? = nil,
+        isLast: Bool = false
     ) {
         nameLabel.text = nickname
 
@@ -283,31 +287,42 @@ final class FeedDiaryCell: UITableViewCell {
             !urlString.isEmpty,
             let url = URL(string: urlString)
         {
-            profileImageView.kf.setImage(with: url)
-        } else {
+            profileImageView.kf.setImage(
+                with: url,
+                placeholder: UIImage(named: "img_profile_normal_ios", in: .module, compatibleWith: nil)
+            )        } else {
             profileImageView.image = UIImage(
                 named: "img_profile_normal_ios",
                 in: .module,
                 compatibleWith: nil
             )
         }
+        
+        if
+            let urlString = diaryImageURL,
+            !urlString.isEmpty,
+            let url = URL(string: urlString)
+        {
+            diaryImageView.kf.setImage(
+                with: url,
+                placeholder: UIImage(named: "img_load_fail_large_ios", in: .module, compatibleWith: nil)
+            )
+            diaryImageView.isHidden = false
+        } else {
+            diaryImageView.image = nil
+            diaryImageView.isHidden = true
+        }
+        
+        divider.isHidden = isLast
+        
     }
-
-
+    
     override func prepareForReuse() {
         super.prepareForReuse()
         profileImageView.kf.cancelDownloadTask()
-        profileImageView.image = UIImage(
-            named: "img_profile_normal_ios",
-            in: .module,
-            compatibleWith: nil
-        )
-        nameLabel.text = nil
-        streakLabel.text = nil
-        sharedDateLabel.text = nil
+        diaryImageView.kf.cancelDownloadTask()
+        diaryImageView.isHidden = false
+        divider.isHidden = false
     }
+    
 }
-
-//#Preview {
-//    FeedDiaryExampleViewController()
-//}
