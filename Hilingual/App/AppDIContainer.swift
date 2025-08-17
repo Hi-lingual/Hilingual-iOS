@@ -14,7 +14,7 @@ import HilingualPresentation
 
 // MARK: - DIContainer Entry Point
 
-final class AppDIContainer: ViewControllerFactory {    
+final class AppDIContainer: ViewControllerFactory {
 
     static let shared = AppDIContainer()
 
@@ -99,7 +99,6 @@ final class AppDIContainer: ViewControllerFactory {
     public func makeWordBookViewController() -> WordBookViewController {
         return WordBookViewController(viewModel: makeWordBookViewmodel(), diContainer: self)
     }
-
 }
 // MARK: - SplashDIContainer
 
@@ -290,7 +289,6 @@ extension AppDIContainer {
     }
 }
 
-
 // MARK: - WordBookDIContainer
 
 extension AppDIContainer {
@@ -312,5 +310,22 @@ extension AppDIContainer {
 
     private func makeWordBookViewmodel() -> WordBookViewModel {
         return WordBookViewModel(fetchWordListUseCase: makeWordBookUseCase(), toggleBookmarkUseCase: makeToggleBookmarkUseCase())
+    }
+}
+
+// MARK: - FollowListDIContainer
+
+extension AppDIContainer {
+    func makeFollowListViewController() -> FollowListViewController {
+        let viewController = FollowListViewController(viewModel: FollowListViewModel(), diContainer: self)
+        return viewController
+    }
+    
+    func makeFollowerListViewController() -> HilingualPresentation.FollowerListViewController {
+        return FollowerListViewController()
+    }
+    
+    func makeFollowingListViewController() -> HilingualPresentation.FollowingListViewController {
+        return FollowingListViewController()
     }
 }
