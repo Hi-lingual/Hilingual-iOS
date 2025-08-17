@@ -46,11 +46,19 @@ final class FeedDiaryCell: UITableViewCell {
     private let headerStack: UIStackView = {
         let stack = UIStackView()
         stack.axis = .horizontal
-        stack.spacing = 2
         stack.alignment = .center
+        stack.distribution = .equalSpacing
         return stack
     }()
 
+    private let userInfoStack: UIStackView = {
+        let stack = UIStackView()
+        stack.axis = .horizontal
+        stack.spacing = 4
+        stack.alignment = .center
+        return stack
+    }()
+    
     private let nameLabel: UILabel = {
         let label = UILabel()
         label.font = .suit(.head_b_16)
@@ -58,25 +66,7 @@ final class FeedDiaryCell: UITableViewCell {
         label.setContentHuggingPriority(.required, for: .horizontal)
         return label
     }()
-
-    private let spacer1: UIView = {
-        let view = UIView()
-        view.backgroundColor = .clear
-        return view
-    }()
-
-    private let spacer2: UIView = {
-        let view = UIView()
-        view.backgroundColor = .clear
-        return view
-    }()
-
-    private let spacer3: UIView = {
-        let view = UIView()
-        view.backgroundColor = .clear
-        return view
-    }()
-
+    
     private let streakStack: UIStackView = {
         let stack = UIStackView()
         stack.axis = .horizontal
@@ -115,15 +105,37 @@ final class FeedDiaryCell: UITableViewCell {
 
     private let diaryLabel: UILabel = {
         let label = UILabel()
-        label.text = "I sent a message to my friend, but she didn’t reply all day. Maybe I said something wrong yesterday? Or maybe she’s just busy. I feel a little lonely today. I know I shouldn’t worry too much, but it’s"
         label.font = .suit(.body_r_16)
         label.textColor = .black
         label.numberOfLines = 5
         label.textAlignment = .left
         return label
     }()
+    
+    private let diaryImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFit
+        imageView.layer.cornerRadius = 8
+        imageView.image = UIImage(named: "img_load_fail_large_ios", in: .module, compatibleWith: nil)
+        return imageView
+    }()
 
     private let footerStack: UIStackView = {
+        let stack = UIStackView()
+        stack.axis = .horizontal
+        stack.alignment = .center
+        stack.distribution = .equalSpacing
+        return stack
+    }()
+    
+    private let detailImageView2: UIImageView = {
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFit
+        imageView.image = UIImage(named: "ic_arrow_right_16_ios", in: .module, compatibleWith: nil)
+        return imageView
+    }()
+    
+    private let detailStack: UIStackView = {
         let stack = UIStackView()
         stack.axis = .horizontal
         stack.spacing = 0
@@ -145,6 +157,24 @@ final class FeedDiaryCell: UITableViewCell {
         imageView.image = UIImage(named: "ic_arrow_right_16_ios", in: .module, compatibleWith: nil)
         return imageView
     }()
+    
+    private let spacer1: UIView = {
+        let view = UIView()
+        view.backgroundColor = .clear
+        return view
+    }()
+    
+    private let spacer2: UIView = {
+        let view = UIView()
+        view.backgroundColor = .clear
+        return view
+    }()
+    
+    private let divider: UIView = {
+        let view = UIView()
+        view.backgroundColor = .gray100
+        return view
+    }()
 
     // MARK: - Init
 
@@ -162,22 +192,28 @@ final class FeedDiaryCell: UITableViewCell {
     // MARK: - Setup
 
     private func setUI() {
-        contentView.addSubview(containerStack)
+        contentView.addSubviews(containerStack, divider)
 
         containerStack.addArrangedSubviews(profileImageView, mainStack)
+        
+        mainStack.addArrangedSubviews(headerStack, diaryLabel, diaryImageView, spacer1, footerStack)
 
-        headerStack.addArrangedSubviews(
-            nameLabel, streakStack, spacer1, sharedDateLabel, spacer2, moreImageView
-        )
-        streakStack.addArrangedSubviews(streakImageView, streakLabel)
-        footerStack.addArrangedSubviews(detailLabel, detailImageView)
-        mainStack.addArrangedSubviews(headerStack, diaryLabel, spacer3, footerStack)
+        headerStack.addArrangedSubviews(userInfoStack, moreImageView)
+        
+        userInfoStack.addArrangedSubviews(nameLabel,streakStack,spacer2, sharedDateLabel)
+        
+        streakStack.addArrangedSubviews(streakImageView,streakLabel)
+        
+        footerStack.addArrangedSubviews(detailImageView2, detailStack)
+        
+        detailStack.addArrangedSubviews(detailLabel, detailImageView)
     }
 
     private func setLayout() {
         
         containerStack.snp.makeConstraints {
-            $0.edges.equalToSuperview()
+            $0.top.equalTo(20)
+            $0.horizontalEdges.equalToSuperview()
         }
         
         profileImageView.snp.makeConstraints {
@@ -191,21 +227,33 @@ final class FeedDiaryCell: UITableViewCell {
         moreImageView.snp.makeConstraints {
             $0.size.equalTo(24)
         }
+        
+        diaryImageView.snp.makeConstraints {
+            $0.height.equalTo(182)
+            $0.width.equalToSuperview()
+        }
 
         detailImageView.snp.makeConstraints {
             $0.size.equalTo(16)
         }
-
+        
+        detailImageView2.snp.makeConstraints {
+            $0.size.equalTo(16)
+        }
+        
         spacer1.snp.makeConstraints {
-            $0.width.equalTo(4)
+            $0.height.equalTo(0)
         }
         
         spacer2.snp.makeConstraints {
-            $0.width.equalTo(80)
+            $0.width.equalTo(0)
         }
         
-        spacer3.snp.makeConstraints {
-            $0.height.equalTo(0)
+        divider.snp.makeConstraints {
+            $0.top.equalTo(containerStack.snp.bottom).offset(20)
+            $0.height.equalTo(1)
+            $0.horizontalEdges.equalToSuperview()
+            $0.bottom.equalToSuperview()
         }
     }
 
@@ -215,7 +263,7 @@ final class FeedDiaryCell: UITableViewCell {
         nickname: String = "이름을 입력해주세요",
         profileImageURL: String? = nil,
         streak: Int = 0,
-        sharedDateText: String? = nil,
+        sharedDateMinutes: Int,
         diaryPreviewText: String? = nil
     ) {
         nameLabel.text = nickname
@@ -224,9 +272,7 @@ final class FeedDiaryCell: UITableViewCell {
         streakLabel.text = "\(streakValue)"
         streakLabel.textColor = streakValue > 0 ? .hilingualOrange : .gray400
 
-        if let shared = sharedDateText {
-            sharedDateLabel.text = shared
-        }
+        sharedDateLabel.text = sharedDateMinutes.asRelativeTimeTextKR
 
         if let preview = diaryPreviewText {
             diaryLabel.text = preview
@@ -247,6 +293,7 @@ final class FeedDiaryCell: UITableViewCell {
         }
     }
 
+
     override func prepareForReuse() {
         super.prepareForReuse()
         profileImageView.kf.cancelDownloadTask()
@@ -261,6 +308,6 @@ final class FeedDiaryCell: UITableViewCell {
     }
 }
 
-#Preview {
-    FeedDiaryExampleViewController()
-}
+//#Preview {
+//    FeedDiaryExampleViewController()
+//}
