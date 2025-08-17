@@ -34,6 +34,12 @@ final class FollowButton: UIButton {
         didSet { updateSize() }
     }
     
+    override var isHighlighted: Bool {
+        didSet {
+            alpha = isHighlighted ? 0.6 : 1.0
+        }
+    }
+    
     // MARK: - Lifecycle
     
     override init(frame: CGRect) {
