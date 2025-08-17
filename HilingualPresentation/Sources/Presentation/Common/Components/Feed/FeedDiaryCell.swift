@@ -103,6 +103,8 @@ final class FeedDiaryCell: UITableViewCell {
         imageView.image = UIImage(named: "ic_more_24_ios", in: .module, compatibleWith: nil)
         return imageView
     }()
+    
+    private let menu = ActionMenu()
 
     private let diaryLabel: UILabel = {
         let label = UILabel()
@@ -129,13 +131,8 @@ final class FeedDiaryCell: UITableViewCell {
         return stack
     }()
     
-    private let detailImageView2: UIImageView = {
-        let imageView = UIImageView()
-        imageView.contentMode = .scaleAspectFit
-        imageView.image = UIImage(named: "ic_arrow_right_16_ios", in: .module, compatibleWith: nil)
-        return imageView
-    }()
-    
+    private let likeView = LikeCounterView(style: .horizontal)
+
     private let detailStack: UIStackView = {
         let stack = UIStackView()
         stack.axis = .horizontal
@@ -205,9 +202,18 @@ final class FeedDiaryCell: UITableViewCell {
         
         streakStack.addArrangedSubviews(streakImageView,streakLabel)
         
-        footerStack.addArrangedSubviews(detailImageView2, detailStack)
+        footerStack.addArrangedSubviews(likeView, detailStack)
         
         detailStack.addArrangedSubviews(detailLabel, detailImageView)
+        
+        menu.isHidden = true
+        menu.configure(items: [
+            ("신고하기", UIImage(named: "ic_report_24_ios", in: .module, compatibleWith: nil), .gray700)
+        ])
+        
+        moreImageView.isUserInteractionEnabled = true
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(moreButtonTapped))
+        moreImageView.addGestureRecognizer(tapGesture)
     }
 
     private func setLayout() {
@@ -217,9 +223,14 @@ final class FeedDiaryCell: UITableViewCell {
             $0.horizontalEdges.equalToSuperview()
         }
         
-        //하트로 교체
-        detailImageView2.snp.makeConstraints {
-            $0.size.equalTo(16)
+        menu.snp.makeConstraints {
+            $0.top.equalTo(moreImageView.snp.bottom).offset(4)
+            $0.trailing.equalTo(moreImageView.snp.trailing)
+        }
+        
+        likeView.snp.makeConstraints {
+            $0.height.equalTo(24)
+            $0.width.equalTo(45)
         }
         
         profileImageView.snp.makeConstraints {
@@ -268,6 +279,8 @@ final class FeedDiaryCell: UITableViewCell {
         sharedDateMinutes: Int,
         diaryPreviewText: String? = nil,
         diaryImageURL: String? = nil,
+        isLiked: Bool = false,
+        likeCount: Int = 0,
         isLast: Bool = false
     ) {
         nameLabel.text = nickname
@@ -313,6 +326,8 @@ final class FeedDiaryCell: UITableViewCell {
             diaryImageView.isHidden = true
         }
         
+        likeView.configure(likeCount: likeCount, isLiked: isLiked)
+
         divider.isHidden = isLast
         
     }
@@ -322,7 +337,13 @@ final class FeedDiaryCell: UITableViewCell {
         profileImageView.kf.cancelDownloadTask()
         diaryImageView.kf.cancelDownloadTask()
         diaryImageView.isHidden = false
+        likeView.configure(likeCount: 0, isLiked: false)
         divider.isHidden = false
     }
     
+    // MARK: - Actions
+
+    @objc private func moreButtonTapped() {
+        menu.isHidden.toggle()
+    }
 }
