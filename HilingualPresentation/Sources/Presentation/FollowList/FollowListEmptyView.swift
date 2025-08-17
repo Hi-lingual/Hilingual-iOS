@@ -45,7 +45,7 @@ final class FollowListEmptyView: UIView {
         case .follower:
             message = "아직 팔로워가 없어요."
         case .following:
-            message = "아직 팔로우 중인 계정이 없어요."
+            message = "아직 팔로잉한 유저가 없어요."
         }
         noFeedView.configure(message: message)
     }
