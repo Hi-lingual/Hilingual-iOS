@@ -108,7 +108,7 @@ final class FeedDiaryCell: UITableViewCell {
 
     private let diaryLabel: UILabel = {
         let label = UILabel()
-        label.font = .suit(.body_r_16)
+        label.attributedText = .suit(.body_r_16, text: "")
         label.textColor = .black
         label.numberOfLines = 5
         label.textAlignment = .left
@@ -294,7 +294,7 @@ final class FeedDiaryCell: UITableViewCell {
         sharedDateLabel.text = sharedDateMinutes.asRelativeTimeTextKR
 
         if let preview = diaryPreviewText {
-            diaryLabel.text = preview
+            diaryLabel.attributedText = .suit(.body_r_16, text: preview)
         }
 
         if
@@ -337,6 +337,7 @@ final class FeedDiaryCell: UITableViewCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         profileImageView.kf.cancelDownloadTask()
+        diaryLabel.attributedText = .suit(.body_r_16, text: "")
         diaryImageView.kf.cancelDownloadTask()
         diaryImageView.isHidden = false
         likeView.configure(likeCount: 0, isLiked: false)
