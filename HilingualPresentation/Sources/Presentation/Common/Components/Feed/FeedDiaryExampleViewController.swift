@@ -13,10 +13,11 @@ struct FeedDiaryItem {
     let nickname: String
     let profileImg: String?
     let streak: Int
-    /// 서버에서 내려오는 '공유 후 경과 시간(분)'
     let sharedDateMinutes: Int
     let diaryImg: String?
     let diaryPreviewText: String
+    let likeCount: Int
+    let isLiked: Bool
 }
 
 // MARK: - ViewController
@@ -29,11 +30,13 @@ final class FeedDiaryExampleViewController: UIViewController {
     private var items: [FeedDiaryItem] = [
         .init(
             nickname: "영도리",
-            profileImg: "",
+            profileImg: "https://ilovecharacter.com/news/data/20250501/p1065572674315832_650_thum.png",
             streak: 3,
             sharedDateMinutes: 0,
             diaryImg: "https://i.namu.wiki/i/9aUQQ4YjU9vmKuHT_cZAL61VKpKsLolynnI46BhOZQuKxGJygZ6BJK2zTHoX3pcNQmmcfzcVEZQcythY1lRXBQ.webp",
-            diaryPreviewText: "Had a presentation today and it went better than I expected. Learned a lot from the feedbackHad a presentation today and it went better than I expected. Learned a lot from the feedbackHad a presentation today and it went better than I expected. Learned a lot from the feedbackHad a presentation today and it went better than I expected. Learned a lot from the feedbackHad a presentation today and it went better than I expected. Learned a lot from the feedback..."
+            diaryPreviewText: "Had a presentation today and it went better than I expected. Learned a lot from the feedbackHad a presentation today and it went better than I expected. Learned a lot from the feedbackHad a presentation today and it went better than I expected. Learned a lot from the feedbackHad a presentation today and it went better than I expected. Learned a lot from the feedbackHad a presentation today and it went better than I expected. Learned a lot from the feedback...",
+            likeCount: 6,
+            isLiked: true
         ),
         .init(
             nickname: "제로제로",
@@ -41,7 +44,9 @@ final class FeedDiaryExampleViewController: UIViewController {
             streak: 0,
             sharedDateMinutes: 2,
             diaryImg: nil,
-            diaryPreviewText: "듀라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라"
+            diaryPreviewText: "듀라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라",
+            likeCount: 0,
+            isLiked: false
         ),
         .init(
             nickname: "아요링",
@@ -49,7 +54,9 @@ final class FeedDiaryExampleViewController: UIViewController {
             streak: 5,
             sharedDateMinutes: 2500,
             diaryImg: "https://mblogthumb-phinf.pstatic.net/MjAyMTA4MjJfMTYw/MDAxNjI5NTYwODY2MjI0.Vco-WmnxXlIRj08eYipQIVjzvUgeAGrIKZDSPmwvcnog.yzwYknZ2eUK5ZnNyz4nRSxXNoyPYDRC_a8RgPeqRCA8g.JPEG.chooddingg/output_4182079403.jpg?type=w800",
-            diaryPreviewText: "​My beloved, Waiting for you who never comes, I am finally coming to you. From a very far away place, I am coming to you. After so many years, you are now coming. From a very far away place, you are still slowly approaching. While waiting for you, I am also going.."
+            diaryPreviewText: "​My beloved, Waiting for you who never comes, I am finally coming to you. From a very far away place, I am coming to you. After so many years, you are now coming. From a very far away place, you are still slowly approaching. While waiting for you, I am also going..",
+            likeCount: 2,
+            isLiked: false
         ),
         .init(
             nickname: "하링이",
@@ -57,7 +64,9 @@ final class FeedDiaryExampleViewController: UIViewController {
             streak: 1,
             sharedDateMinutes: 11520,
             diaryImg: nil,
-            diaryPreviewText: "바보"
+            diaryPreviewText: "바보",
+            likeCount: 12,
+            isLiked: true
         )
     ]
 
@@ -85,7 +94,6 @@ final class FeedDiaryExampleViewController: UIViewController {
         tableView.rowHeight = UITableView.automaticDimension
         tableView.estimatedRowHeight = 140
 
-        // 빈 상태 기본 문구
         emptyView.configure(message: "피드에 아직 공유된 일기가 없어요.")
         tableView.backgroundView = emptyView
     }
@@ -128,6 +136,8 @@ extension FeedDiaryExampleViewController: UITableViewDataSource {
             sharedDateMinutes: item.sharedDateMinutes,
             diaryPreviewText: item.diaryPreviewText,
             diaryImageURL: item.diaryImg,
+            isLiked: item.isLiked,
+            likeCount: item.likeCount,
             isLast: indexPath.row == items.count - 1
         )
         return cell
