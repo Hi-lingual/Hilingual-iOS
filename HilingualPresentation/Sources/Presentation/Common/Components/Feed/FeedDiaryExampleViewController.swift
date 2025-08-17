@@ -100,8 +100,7 @@ final class FeedDiaryExampleViewController: UIViewController {
 
     private func setLayout() {
         tableView.snp.makeConstraints { make in
-            make.top.bottom.equalToSuperview()
-            make.horizontalEdges.equalToSuperview().inset(16)
+            make.edges.equalToSuperview()
         }
     }
 
