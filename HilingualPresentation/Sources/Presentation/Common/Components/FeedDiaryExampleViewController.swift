@@ -13,7 +13,9 @@ struct FeedDiaryItem {
     let nickname: String
     let profileImg: String?
     let streak: Int
-    let sharedDateText: String
+    /// 서버에서 내려오는 '공유 후 경과 시간(분)'
+    let sharedDateMinutes: Int
+    let diaryImg: String?
     let diaryPreviewText: String
 }
 
@@ -26,25 +28,36 @@ final class FeedDiaryExampleViewController: UIViewController {
     // 더미 데이터
     private var items: [FeedDiaryItem] = [
         .init(
-            nickname: "밍",
-            profileImg: nil,
+            nickname: "영도리",
+            profileImg: "",
             streak: 3,
-            sharedDateText: "2분 전",
-            diaryPreviewText: "Had a presentation today and it went better than I expected. Learned a lot from the feedback."
+            sharedDateMinutes: 0,
+            diaryImg: "https://i.namu.wiki/i/9aUQQ4YjU9vmKuHT_cZAL61VKpKsLolynnI46BhOZQuKxGJygZ6BJK2zTHoX3pcNQmmcfzcVEZQcythY1lRXBQ.webp",
+            diaryPreviewText: "Had a presentation today and it went better than I expected. Learned a lot from the feedbackHad a presentation today and it went better than I expected. Learned a lot from the feedbackHad a presentation today and it went better than I expected. Learned a lot from the feedbackHad a presentation today and it went better than I expected. Learned a lot from the feedbackHad a presentation today and it went better than I expected. Learned a lot from the feedback..."
         ),
         .init(
-            nickname: "영서",
+            nickname: "제로제로",
             profileImg: nil,
             streak: 0,
-            sharedDateText: "어제",
-            diaryPreviewText: "오늘은 비가 와서 집에서 책만 읽었다. 조용히 시간을 보내는 것도 나쁘지 않다."
+            sharedDateMinutes: 2,
+            diaryImg: nil,
+            diaryPreviewText: "듀라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라라"
         ),
         .init(
-            nickname: "SOPT",
-            profileImg: "https://picsum.photos/80",
+            nickname: "아요링",
+            profileImg: "https://image.aladin.co.kr/Tobe/Thumbs/7AS4S2/Y3S223/638799314905503647_0.png?RS=600&FI=100",
             streak: 5,
-            sharedDateText: "3일 전",
-            diaryPreviewText: "Team sync went smoothly. Wrapped up the UI polish and started integrating the API."
+            sharedDateMinutes: 2500,
+            diaryImg: "https://mblogthumb-phinf.pstatic.net/MjAyMTA4MjJfMTYw/MDAxNjI5NTYwODY2MjI0.Vco-WmnxXlIRj08eYipQIVjzvUgeAGrIKZDSPmwvcnog.yzwYknZ2eUK5ZnNyz4nRSxXNoyPYDRC_a8RgPeqRCA8g.JPEG.chooddingg/output_4182079403.jpg?type=w800",
+            diaryPreviewText: "​My beloved, Waiting for you who never comes, I am finally coming to you. From a very far away place, I am coming to you. After so many years, you are now coming. From a very far away place, you are still slowly approaching. While waiting for you, I am also going.."
+        ),
+        .init(
+            nickname: "하링이",
+            profileImg: nil,
+            streak: 1,
+            sharedDateMinutes: 11520,
+            diaryImg: nil,
+            diaryPreviewText: "바보"
         )
     ]
 
@@ -79,13 +92,13 @@ final class FeedDiaryExampleViewController: UIViewController {
 
     private func setLayout() {
         tableView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+            make.top.bottom.equalToSuperview()
+            make.horizontalEdges.equalToSuperview().inset(16)
         }
     }
 
     // MARK: - Private Methods
     private func bindEmptyState() {
-        // items 변화에 따라 emptyView 노출 제어할 때 호출해주면 됨
         tableView.backgroundView?.isHidden = !items.isEmpty
     }
 }
@@ -112,8 +125,10 @@ extension FeedDiaryExampleViewController: UITableViewDataSource {
             nickname: item.nickname,
             profileImageURL: item.profileImg,
             streak: item.streak,
-            sharedDateText: item.sharedDateText,
-            diaryPreviewText: item.diaryPreviewText
+            sharedDateMinutes: item.sharedDateMinutes,
+            diaryPreviewText: item.diaryPreviewText,
+            diaryImageURL: item.diaryImg,
+            isLast: indexPath.row == items.count - 1
         )
         return cell
     }
@@ -122,13 +137,11 @@ extension FeedDiaryExampleViewController: UITableViewDataSource {
 // MARK: - UITableViewDelegate
 extension FeedDiaryExampleViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        // 상세 화면 이동 등 액션 배치
         print("Tapped row: \(indexPath.row)")
     }
 }
 
 // MARK: - Preview
 #Preview {
-    // 더미 데이터로 미리보기
     FeedDiaryExampleViewController()
 }
