@@ -32,6 +32,7 @@ final class ToastMessage: UIView {
         super.init(frame: frame)
         setupUI()
         setupLayout()
+        dismissToastMessage()
     }
     
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
@@ -123,6 +124,27 @@ final class ToastMessage: UIView {
 
     // MARK: - Action
     
-    @objc private func handleAction() { action?() }
+    @objc private func handleAction() {
+        dismissToastMessage()
+        action?()
+    }
+    
+    private func dismissToastMessage() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+            UIView.animate(withDuration: 0.3, animations: {
+                self.alpha = 0
+            }) { _ in
+                self.removeFromSuperview()
+            }
+        }
+    }
 }
 
+#Preview {
+    let toast = ToastMessage()
+    toast.configure(type: .withButton, message: "일기가 게시되었어요!"){
+        // 뷰컨을 띄운다등가...
+    }
+//    toast.configure(type: .basic, message: "피드의 일기를 모두 확인했어요")
+    return toast
+}
