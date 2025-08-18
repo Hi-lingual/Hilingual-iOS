@@ -104,7 +104,7 @@ public final class OnBoardingViewModel: BaseViewModel {
                                                     profileImg: "https://default.image.url/profile.png")
                 .handleEvents(receiveOutput: { [weak self] in
                     UserDefaults.standard.set(true, forKey: "isProfileCompleted")
-                    print("[OnBoardingVM] ✅ 프로필 등록 완료 → isProfileCompleted = true 저장")
+                    print("[OnBoardingVM] 프로필 등록 완료 → isProfileCompleted = true 저장")
                     self?.navigateToHomeSubject.send()
                 })
                 .catch { _ in Empty() }
