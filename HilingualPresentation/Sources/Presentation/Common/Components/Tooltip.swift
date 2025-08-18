@@ -25,7 +25,7 @@ final class Tooltip: UIView {
     
     let tooltipLabel: UILabel = {
         let label = UILabel()
-        label.font = .suit(.caption_m_12)
+        label.font = .suit(.body_m_16)
         label.textColor = .white
         label.numberOfLines = 0
         return label
@@ -37,7 +37,7 @@ final class Tooltip: UIView {
     
     init(_ text: String) {
         super.init(frame: .zero)
-        tooltipLabel.text = text
+        tooltipLabel.attributedText = .suit(.body_m_16, text: text)
         setUI()
         setLayout()
         dismissTooltip()
@@ -56,19 +56,19 @@ final class Tooltip: UIView {
     private func setLayout() {
         tooltip.snp.makeConstraints {
             $0.center.equalToSuperview()
-            $0.height.equalTo(31)
+            $0.height.equalTo(38)
         }
         
         tooltipLabel.snp.makeConstraints {
             $0.verticalEdges.equalTo(tooltip).inset(8)
-            $0.horizontalEdges.equalToSuperview().inset(14)
+            $0.horizontalEdges.equalToSuperview().inset(12)
         }
         
         triangleView.snp.makeConstraints {
             $0.top.equalTo(tooltip.snp.bottom)
             $0.centerX.equalToSuperview()
-            $0.width.equalTo(13)
-            $0.height.equalTo(7)
+            $0.width.equalTo(16)
+            $0.height.equalTo(9)
             $0.bottom.equalToSuperview()
         }
     }
