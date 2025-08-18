@@ -87,6 +87,22 @@ final class ToastMessage: UIView {
         messageTrailingToSuperview?.activate()
     }
     
+    override func didMoveToSuperview() {
+        super.didMoveToSuperview()
+        
+        guard superview != nil else { return }
+
+        self.snp.makeConstraints {
+            $0.centerX.equalToSuperview()
+            $0.bottom.equalToSuperview().inset(82)
+            
+            if !actionButton.isHidden {
+                $0.height.equalTo(52)
+                $0.horizontalEdges.equalToSuperview().inset(16)
+            }
+        }
+    }
+    
     // MARK: - Configure
     
     func configure(
@@ -109,11 +125,6 @@ final class ToastMessage: UIView {
             actionButton.isHidden = false
             messageTrailingToSuperview?.deactivate()
             messageTrailingToButton?.activate()
-            
-            self.snp.makeConstraints {
-                $0.width.equalTo(343)
-                $0.height.equalTo(52)
-            }
 
         case .basic:
             actionButton.isHidden = true
