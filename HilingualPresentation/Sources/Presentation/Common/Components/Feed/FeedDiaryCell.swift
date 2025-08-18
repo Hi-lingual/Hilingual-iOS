@@ -368,6 +368,11 @@ final class FeedDiaryCell: UITableViewCell {
         menu.isHidden.toggle()
         delegate?.feedDiaryCell(self, didTapMoreButton: isMine)
     }
+    func closeMenuIfNeeded() {
+        if !menu.isHidden {
+            menu.isHidden = true
+        }
+    }
 }
 
 // MARK: - Extensions
