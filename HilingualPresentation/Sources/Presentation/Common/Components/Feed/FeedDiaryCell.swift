@@ -10,10 +10,19 @@ import SnapKit
 import Kingfisher
 
 final class FeedDiaryCell: UITableViewCell {
+    
+    // MARK: - Delegate
+    protocol FeedDiaryCellDelegate: AnyObject {
+        func feedDiaryCell(_ cell: FeedDiaryCell, didTapMoreButton isMine: Bool)
+        func feedDiaryCell(_ cell: FeedDiaryCell, didTapMenuItemAt index: Int, isMine: Bool)
+    }
 
     // MARK: - Properties
     
     static let identifier = "FeedDiaryCell"
+    
+    weak var delegate: FeedDiaryCellDelegate?
+    private var isMine: Bool = false
 
     // MARK: - UI Components
 
@@ -178,6 +187,7 @@ final class FeedDiaryCell: UITableViewCell {
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
+        menu.delegate = self
         setUI()
         setLayout()
         selectionStyle = .none
@@ -193,24 +203,17 @@ final class FeedDiaryCell: UITableViewCell {
         contentView.addSubviews(containerStack, divider, menu)
 
         containerStack.addArrangedSubviews(profileImageView, mainStack)
-        
         mainStack.addArrangedSubviews(headerStack, diaryLabel, diaryImageView, spacer1, footerStack)
-
         headerStack.addArrangedSubviews(userInfoStack, moreImageView)
-        
-        userInfoStack.addArrangedSubviews(nameLabel,streakStack,spacer2, sharedDateLabel)
-        
-        streakStack.addArrangedSubviews(streakImageView,streakLabel)
-        
+        userInfoStack.addArrangedSubviews(nameLabel, streakStack, spacer2, sharedDateLabel)
+        streakStack.addArrangedSubviews(streakImageView, streakLabel)
         footerStack.addArrangedSubviews(likeView, detailStack)
-        
         detailStack.addArrangedSubviews(detailLabel, detailImageView)
-        
-        menu.isHidden = true
-        menu.configure(items: [
-            ("신고하기", UIImage(named: "ic_report_24_ios", in: .module, compatibleWith: nil), .gray700)
-        ])
-        
+
+        moreImageGesture()
+    }
+
+    private func moreImageGesture() {
         moreImageView.isUserInteractionEnabled = true
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(moreButtonTapped))
         moreImageView.addGestureRecognizer(tapGesture)
@@ -277,6 +280,7 @@ final class FeedDiaryCell: UITableViewCell {
     func configure(
         nickname: String = "이름을 입력해주세요",
         profileImageURL: String? = nil,
+        isMine: Bool,
         streak: Int = 0,
         sharedDateMinutes: Int,
         diaryPreviewText: String? = nil,
@@ -285,7 +289,21 @@ final class FeedDiaryCell: UITableViewCell {
         likeCount: Int = 0,
         isLast: Bool = false
     ) {
+        self.isMine = isMine
+        
         nameLabel.text = nickname
+        
+        if isMine {
+            menu.configure(items: [
+                ("비공개하기", UIImage(named: "ic_hide_24_ios", in: .module, compatibleWith: nil), .gray700)
+            ])
+        } else {
+            menu.configure(items: [
+                ("신고하기", UIImage(named: "ic_report_24_ios", in: .module, compatibleWith: nil), .gray700)
+            ])
+        }
+        
+        menu.isHidden = true
 
         let streakValue = max(streak, 0)
         streakLabel.text = "\(streakValue)"
@@ -348,5 +366,14 @@ final class FeedDiaryCell: UITableViewCell {
 
     @objc private func moreButtonTapped() {
         menu.isHidden.toggle()
+        delegate?.feedDiaryCell(self, didTapMoreButton: isMine)
+    }
+}
+
+// MARK: - Extensions
+
+extension FeedDiaryCell: ActionMenuDelegate {
+    func actionMenu(_ menu: ActionMenu, didSelectItemAt index: Int) {
+        delegate?.feedDiaryCell(self, didTapMenuItemAt: index, isMine: isMine)
     }
 }
