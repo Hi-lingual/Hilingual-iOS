@@ -1,0 +1,85 @@
+//
+//  FeedView.swift
+//  HilingualPresentation
+//
+//  Created by 조영서 on 8/18/25.
+//
+
+import UIKit
+import SnapKit
+
+final class FeedView: BaseUIView {
+    
+    // MARK: - UI Components
+    
+    private let headerStack: UIStackView = {
+        let stack = UIStackView()
+        stack.axis = .horizontal
+        stack.alignment = .center
+        stack.distribution = .equalSpacing
+        return stack
+    }()
+    
+    private let titleLabel: UILabel = {
+        let label = UILabel()
+        label.font = .suit(.head_b_18)
+        label.text = "피드"
+        return label
+    }()
+    
+    private let searchStack: UIStackView = {
+        let stack = UIStackView()
+        stack.axis = .horizontal
+        stack.spacing = 14
+        stack.alignment = .center
+        return stack
+    }()
+    
+    private let searchImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFit
+        imageView.image = UIImage(named: "ic_search_24_ios", in: .module, compatibleWith: nil)
+        return imageView
+    }()
+    
+    private let profileImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFill
+        imageView.layer.cornerRadius = 21
+        imageView.clipsToBounds = true
+        imageView.layer.borderWidth = 1
+        imageView.layer.borderColor = UIColor.gray200.cgColor
+        return imageView
+    }()
+    
+    // MARK: - Setup
+    
+    override func setUI() {
+        addSubviews(headerStack)
+        
+        headerStack.addArrangedSubviews(titleLabel, searchStack)
+        searchStack.addArrangedSubviews(searchImageView, profileImageView)
+    }
+    
+    override func setLayout() {
+        headerStack.snp.makeConstraints {
+            $0.edges.equalToSuperview().inset(16)
+        }
+        
+        searchImageView.snp.makeConstraints {
+            $0.size.equalTo(24)
+        }
+
+        profileImageView.snp.makeConstraints {
+            $0.size.equalTo(36)
+        }
+        
+        // MARK: - Custom Method
+        
+    }
+}
+
+
+#Preview {
+    FeedView()
+}
