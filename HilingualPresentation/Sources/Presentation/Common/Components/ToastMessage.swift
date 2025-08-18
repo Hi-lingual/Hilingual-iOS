@@ -20,7 +20,7 @@ final class ToastMessage: UIView {
     private var messageTrailingToButton: Constraint?
     private var messageTrailingToSuperview: Constraint?
     
-    private var action: (() -> Void)?
+    public var action: (() -> Void)?
 
     // MARK: - UI Components
     
