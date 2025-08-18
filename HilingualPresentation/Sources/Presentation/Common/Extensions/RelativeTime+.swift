@@ -8,7 +8,7 @@
 import Foundation
 
 extension Int {
-    var asRelativeTimeTextKR: String {
+    var timeToText: String {
         //음수 방지
         let minutes = Swift.max(0, self)
 

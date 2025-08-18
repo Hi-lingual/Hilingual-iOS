@@ -309,7 +309,7 @@ final class FeedDiaryCell: UITableViewCell {
         streakLabel.text = "\(streakValue)"
         streakLabel.textColor = streakValue > 0 ? .hilingualOrange : .gray400
 
-        sharedDateLabel.text = sharedDateMinutes.asRelativeTimeTextKR
+        sharedDateLabel.text = sharedDateMinutes.timeToText
 
         if let preview = diaryPreviewText {
             diaryLabel.attributedText = .suit(.body_r_16, text: preview)
