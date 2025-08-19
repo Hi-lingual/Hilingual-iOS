@@ -12,6 +12,7 @@ public protocol ViewControllerFactory {
     func makeLoginViewController() -> LoginViewController
     func makeOnboardingViewController() -> OnBoardingViewController
     func makeHomeViewController() -> HomeViewController
+    func makeMypageViewController() -> MypageViewController
     func makeLoadingViewController() -> LoadingViewController
     func makeWordBookViewController() -> WordBookViewController
     func makeDiaryDetailViewController(diaryId: Int) -> DiaryDetailViewController

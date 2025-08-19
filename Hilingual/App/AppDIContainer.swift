@@ -102,6 +102,10 @@ final class AppDIContainer: ViewControllerFactory {
     public func makeVerificationCodeViewController() -> VerificationCodeViewController {
         return VerificationCodeViewController(viewModel: makeVerificationCodeViewModel(), diContainer: self)
     }
+
+    public func makeMypageViewController() -> MypageViewController {
+        return MypageViewController(viewModel: makeHomeViewModel(), diContainer: self)
+    }
 }
 // MARK: - SplashDIContainer
 
