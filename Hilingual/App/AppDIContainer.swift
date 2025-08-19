@@ -320,12 +320,4 @@ extension AppDIContainer {
         let viewController = FollowListViewController(viewModel: FollowListViewModel(), diContainer: self)
         return viewController
     }
-    
-    func makeFollowerListViewController() -> HilingualPresentation.FollowerListViewController {
-        return FollowerListViewController()
-    }
-    
-    func makeFollowingListViewController() -> HilingualPresentation.FollowingListViewController {
-        return FollowingListViewController()
-    }
 }

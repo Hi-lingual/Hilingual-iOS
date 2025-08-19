@@ -11,8 +11,8 @@ public final class FollowListViewController: BaseUIViewController<FollowListView
     
     // MARK: - SegmentedControl
     
-    private lazy var followerListViewController = diContainer.makeFollowerListViewController()
-    private lazy var followingListViewController = diContainer.makeFollowingListViewController()
+    private lazy var followerListViewController = FollowerListViewController()
+    private lazy var followingListViewController = FollowingListViewController()
     
     private lazy var segmentedControl = SegmentedControl(
         viewControllers: [followerListViewController, followingListViewController],
