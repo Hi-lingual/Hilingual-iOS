@@ -9,9 +9,9 @@ import UIKit
 import SnapKit
 
 final class FeedView: BaseUIView {
-    
+
     // MARK: - UI Components
-    
+
     private let headerStack: UIStackView = {
         let stack = UIStackView()
         stack.axis = .horizontal
@@ -19,14 +19,14 @@ final class FeedView: BaseUIView {
         stack.distribution = .equalSpacing
         return stack
     }()
-    
+
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.font = .suit(.head_b_18)
         label.text = "피드"
         return label
     }()
-    
+
     private let searchStack: UIStackView = {
         let stack = UIStackView()
         stack.axis = .horizontal
@@ -34,14 +34,14 @@ final class FeedView: BaseUIView {
         stack.alignment = .center
         return stack
     }()
-    
+
     private let searchImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFit
         imageView.image = UIImage(named: "ic_search_24_ios", in: .module, compatibleWith: nil)
         return imageView
     }()
-    
+
     private let profileImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
@@ -51,21 +51,23 @@ final class FeedView: BaseUIView {
         imageView.layer.borderColor = UIColor.gray200.cgColor
         return imageView
     }()
-    
+
+    private var segmentedControl: SegmentedControl?
+
     // MARK: - Setup
-    
+
     override func setUI() {
-        addSubviews(headerStack)
-        
+        addSubview(headerStack)
         headerStack.addArrangedSubviews(titleLabel, searchStack)
         searchStack.addArrangedSubviews(searchImageView, profileImageView)
     }
-    
+
     override func setLayout() {
         headerStack.snp.makeConstraints {
-            $0.edges.equalToSuperview().inset(16)
+            $0.top.equalTo(safeAreaLayoutGuide.snp.top).offset(9)
+            $0.horizontalEdges.equalToSuperview().inset(16)
         }
-        
+
         searchImageView.snp.makeConstraints {
             $0.size.equalTo(24)
         }
@@ -73,13 +75,38 @@ final class FeedView: BaseUIView {
         profileImageView.snp.makeConstraints {
             $0.size.equalTo(36)
         }
-        
-        // MARK: - Custom Method
-        
+    }
+
+    // MARK: - Public Method
+
+    func configureSegmentedControl(
+        parentVC: UIViewController,
+        viewControllers: [UIViewController],
+        titles: [String]
+    ) {
+        let control = SegmentedControl(
+            viewControllers: viewControllers,
+            titles: titles,
+            parentViewController: parentVC
+        )
+        self.segmentedControl = control
+        addSubview(control)
+
+        control.snp.makeConstraints {
+            $0.top.equalTo(headerStack.snp.bottom).offset(12)
+            $0.leading.trailing.bottom.equalToSuperview()
+        }
     }
 }
 
-
 #Preview {
-    FeedView()
+    let view = FeedView()
+    view.configureSegmentedControl(
+        parentVC: UIViewController(), // dummy VC
+        viewControllers: [
+            UIViewController(), UIViewController()
+        ],
+        titles: ["탭1", "탭2"]
+    )
+    return view
 }
