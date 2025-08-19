@@ -9,7 +9,7 @@
 import Combine
 
 public protocol VerificationCodeUseCase {
-    func execute(code: String) -> AnyPublisher<Void, Error>
+    func verficationCode(code: String) -> AnyPublisher<Void, Error>
 }
 
 public final class DefaultVerificationCodeUseCase: VerificationCodeUseCase {
@@ -19,7 +19,7 @@ public final class DefaultVerificationCodeUseCase: VerificationCodeUseCase {
         self.repository = repository
     }
 
-    public func execute(code: String) -> AnyPublisher<Void, Error> {
-        repository.verifyCode(code: code)
+    public func verficationCode(code: String) -> AnyPublisher<Void, Error> {
+        repository.verificationCode(code: code)
     }
 }

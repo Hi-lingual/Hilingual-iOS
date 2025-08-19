@@ -1,5 +1,5 @@
 //
-//  VerifyCodeService.swift
+//  VerificationCodeService.swift
 //  HilingualNetwork
 //
 //  Created by 성현주 on 8/14/25.
@@ -8,11 +8,11 @@
 import Foundation
 import Combine
 
-public protocol VerifyCodeService {
+public protocol VerificationCodeService {
     func verifyCode(code: String) -> AnyPublisher<Void, Error>
 }
 
-public final class MockVerifyCodeService: VerifyCodeService {
+public final class MockVerificationCodeService: VerificationCodeService {
     public init() {}
 
     public func verifyCode(code: String) -> AnyPublisher<Void, Error> {

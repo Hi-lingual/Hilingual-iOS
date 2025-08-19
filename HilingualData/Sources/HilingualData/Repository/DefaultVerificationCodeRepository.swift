@@ -11,13 +11,13 @@ import HilingualDomain
 import HilingualNetwork
 
 public final class DefaultVerificationCodeRepository: VerificationCodeRepository {
-    private let service: VerifyCodeService
+    private let service: VerificationCodeService
 
-    public init(service: VerifyCodeService) {
+    public init(service: VerificationCodeService) {
         self.service = service
     }
 
-    public func verifyCode(code: String) -> AnyPublisher<Void, Error> {
+    public func verificationCode(code: String) -> AnyPublisher<Void, Error> {
         service.verifyCode(code: code)
     }
 }

@@ -9,5 +9,5 @@
 import Combine
 
 public protocol VerificationCodeRepository {
-    func verifyCode(code: String) -> AnyPublisher<Void, Error>
+    func verificationCode(code: String) -> AnyPublisher<Void, Error>
 }

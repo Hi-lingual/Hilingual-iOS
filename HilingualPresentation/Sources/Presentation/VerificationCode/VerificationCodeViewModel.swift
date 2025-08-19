@@ -59,7 +59,7 @@ public final class VerificationCodeViewModel: BaseViewModel {
             return
         }
 
-        verifyCodeUseCase.execute(code: code)
+        verifyCodeUseCase.verficationCode(code: code)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] completion in
                 guard let self else { return }

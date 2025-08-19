@@ -169,8 +169,8 @@ extension AppDIContainer {
 
 extension AppDIContainer {
     //TODO: MOCK 제거
-    private func makeVerificationCodeService() -> VerifyCodeService {
-        return MockVerifyCodeService()
+    private func makeVerificationCodeService() -> VerificationCodeService {
+        return MockVerificationCodeService()
     }
 
     private func makeVerificationCodeRespository() -> VerificationCodeRepository {
