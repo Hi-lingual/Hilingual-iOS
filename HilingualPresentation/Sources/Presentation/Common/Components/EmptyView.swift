@@ -1,5 +1,5 @@
 //
-//  NoFeedView.swift
+//  EmptyView.swift
 //  HilingualPresentation
 //
 //  Created by 조영서 on 8/15/25.
@@ -8,7 +8,7 @@
 import UIKit
 import SnapKit
 
-final class NoFeedView: UIView {
+final class EmptyView: UIView {
 
     private let noFeedLabel: UILabel = {
         let label = UILabel()

@@ -5,7 +5,6 @@
 //  Created by 성현주 on 7/15/25.
 //
 
-
 public struct ProfileEntity {
     public let nickname: String
     public let profileImg: String

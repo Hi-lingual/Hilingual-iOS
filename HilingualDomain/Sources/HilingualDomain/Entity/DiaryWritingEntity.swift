@@ -7,8 +7,6 @@
 
 import Foundation
 
-import Foundation
-
 public struct DiaryWritingEntity {
     public let originalText: String
     public let date: String
