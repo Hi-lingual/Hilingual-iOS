@@ -26,7 +26,7 @@ public final class MypageViewController: BaseUIViewController<HomeViewModel> {
         mypageView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
-
+        navigationController?.setNavigationBarHidden(true, animated: false)
     }
 
     // MARK: - Bind
