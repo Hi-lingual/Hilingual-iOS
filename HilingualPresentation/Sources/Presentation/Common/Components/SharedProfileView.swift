@@ -11,6 +11,7 @@ import SnapKit
 public class SharedProfileView: UIView {
     
     public var onProfileTapped: (() -> Void)?
+    public var onLikeToggled: ((Bool) -> Void)?
     
     // MARK: - UI Components
     
@@ -82,6 +83,7 @@ public class SharedProfileView: UIView {
         setUI()
         setLayout()
         setupGestureRecognizers()
+        bindActions()
     }
     
     required init?(coder: NSCoder) {
@@ -131,6 +133,7 @@ public class SharedProfileView: UIView {
             $0.width.equalTo(24)
         }
     }
+    
     private func setupGestureRecognizers() {
         profileImageView.isUserInteractionEnabled = true
         nameLabel.isUserInteractionEnabled = true
@@ -140,6 +143,12 @@ public class SharedProfileView: UIView {
 
         profileImageView.addGestureRecognizer(profileTap)
         nameLabel.addGestureRecognizer(nameTap)
+    }
+    
+    private func bindActions() {
+        likeView.onToggle = { [weak self] isLiked in
+            self?.onLikeToggled?(isLiked)
+        }
     }
 
     @objc private func handleProfileTap() {

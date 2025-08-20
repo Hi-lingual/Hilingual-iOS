@@ -20,18 +20,18 @@ final class LikeCounterView: UIView {
     private(set) var isLiked: Bool = false {
         didSet {
             updateIcon()
-            onToggle?(likeCount, isLiked)
+            onToggle?( isLiked)
         }
     }
     
     private(set) var likeCount: Int = 0 {
         didSet {
             updateCount()
-            onToggle?(likeCount, isLiked)
+            onToggle?(isLiked)
         }
     }
     
-    var onToggle: ((Int, Bool) -> Void)?
+    var onToggle: ((Bool) -> Void)?
     
     // MARK: - UI
     
