@@ -181,9 +181,7 @@ public class SharedProfileView: UIView {
                 placeholder: UIImage(named: "img_profile_normal_ios", in: .module, compatibleWith: nil)
             )
         } else {
-            profileImageView.image = UIImage(
-                named: "img_profile_normal_ios", in: .module, compatibleWith: nil
-            )
+            profileImageView.image = UIImage(named: "img_profile_normal_ios", in: .module, compatibleWith: nil)
         }
     }
 }
