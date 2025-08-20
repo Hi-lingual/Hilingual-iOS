@@ -102,7 +102,6 @@ public class SharedProfileView: UIView {
     }
     
     private func setLayout() {
-        
         self.snp.makeConstraints {
             $0.height.equalTo(62)
             $0.horizontalEdges.equalTo(safeAreaLayoutGuide.snp.horizontalEdges)
@@ -163,7 +162,6 @@ public class SharedProfileView: UIView {
         isLiked: Bool = false,
         likeCount: Int = 0
     ) {
-        
         nameLabel.text = nickname
         
         let streakValue = max(streak, 0)
@@ -184,9 +182,7 @@ public class SharedProfileView: UIView {
             )
         } else {
             profileImageView.image = UIImage(
-                named: "img_profile_normal_ios",
-                in: .module,
-                compatibleWith: nil
+                named: "img_profile_normal_ios", in: .module, compatibleWith: nil
             )
         }
     }
