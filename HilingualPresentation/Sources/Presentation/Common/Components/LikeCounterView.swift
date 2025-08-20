@@ -96,7 +96,7 @@ final class LikeCounterView: UIView {
                 $0.size.equalTo(24)
             }
             countLabel.snp.makeConstraints {
-                $0.top.equalTo(likeButton.snp.bottom)
+                $0.top.equalTo(likeButton.snp.bottom).offset(3)
                 $0.bottom.equalToSuperview()
                 $0.centerX.equalTo(likeButton)
             }
