@@ -8,5 +8,6 @@
 import Combine
 
 public protocol FollowListRepository {
-
+    func fetchFollowers() -> AnyPublisher<[Follower], Error>
+    func fetchFollowing() -> AnyPublisher<[Follower], Error>
 }

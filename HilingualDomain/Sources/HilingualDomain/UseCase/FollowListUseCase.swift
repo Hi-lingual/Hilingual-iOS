@@ -8,7 +8,8 @@
 import Combine
 
 public protocol FollowListUseCase {
-
+    func fetchFollowers() -> AnyPublisher<[Follower], Error>
+    func fetchFollowing() -> AnyPublisher<[Follower], Error>
 }
 
 public final class DefaultFollowListUseCase: FollowListUseCase {
@@ -17,5 +18,13 @@ public final class DefaultFollowListUseCase: FollowListUseCase {
     
     public init(repository: FollowListRepository) {
         self.repository = repository
+    }
+    
+    public func fetchFollowers() -> AnyPublisher<[Follower], Error> {
+        repository.fetchFollowers()
+    }
+    
+    public func fetchFollowing() -> AnyPublisher<[Follower], Error> {
+        repository.fetchFollowing()
     }
 }

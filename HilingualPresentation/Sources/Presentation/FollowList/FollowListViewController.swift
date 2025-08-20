@@ -6,23 +6,31 @@
 //
 
 import UIKit
+import Combine
 
 public final class FollowListViewController: BaseUIViewController<FollowListViewModel> {
     
     // MARK: - SegmentedControl
     
-    private lazy var followerListViewController = FollowerListViewController()
-    private lazy var followingListViewController = FollowingListViewController()
+    private lazy var followerListViewController: FollowerListViewController = {
+        guard let viewModel = self.viewModel else {
+            fatalError("FollowListViewModel is not initialized")
+        }
+        return FollowerListViewController(viewModel: viewModel, diContainer: self.diContainer)
+    }()
+
+    private lazy var followingListViewController: FollowingListViewController = {
+        guard let viewModel = self.viewModel else {
+            fatalError("FollowListViewModel is not initialized")
+        }
+        return FollowingListViewController(viewModel: viewModel, diContainer: self.diContainer)
+    }()
     
     private lazy var segmentedControl = SegmentedControl(
         viewControllers: [followerListViewController, followingListViewController],
         titles: ["팔로워", "팔로잉"],
         parentViewController: self
     )
-    
-    // MARK: - UI Components
-    
-     private let followListView = FollowListView()
     
     // MARK: - Life Cycle
     
@@ -35,6 +43,10 @@ public final class FollowListViewController: BaseUIViewController<FollowListView
         
         setUI()
         setLayout()
+        
+        viewModel?.bind()
+        viewModel?.fetchFollowers()
+        viewModel?.fetchFollowing()
     }
     
     // MARK: - Setup Methods

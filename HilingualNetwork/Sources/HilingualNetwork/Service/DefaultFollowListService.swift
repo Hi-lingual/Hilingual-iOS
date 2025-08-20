@@ -10,9 +10,9 @@ import Foundation
 import Moya
 import Combine
 
-public protocol FollowListService {
-  
-}
+//public protocol FollowListService {
+//  
+//}
 
 //public final class DefaultFollowListService: BaseService<DiaryDetailAPI>, FollowListService {
 //
