@@ -128,4 +128,40 @@ public class SharedProfileView: UIView {
             $0.width.equalTo(24)
         }
     }
+    
+    public func configure(
+        profileImageURL: String? = nil,
+        nickname: String = "이름을 입력해주세요",
+        streak: Int = 0,
+        sharedDateMinutes: Int,
+        isLiked: Bool = false,
+        likeCount: Int = 0
+    ) {
+        
+        nameLabel.text = nickname
+        
+        let streakValue = max(streak, 0)
+        streakLabel.text = "\(streakValue)"
+        streakLabel.textColor = streakValue > 0 ? .hilingualOrange : .gray400
+        
+        sharedDateLabel.text = sharedDateMinutes.timeToText + " 공유"
+        
+        likeView.configure(likeCount: likeCount, isLiked: isLiked)
+        
+        if let urlString = profileImageURL,
+           !urlString.isEmpty,
+           let url = URL(string: urlString)
+        {
+            profileImageView.kf.setImage(
+                with: url,
+                placeholder: UIImage(named: "img_profile_normal_ios", in: .module, compatibleWith: nil)
+            )
+        } else {
+            profileImageView.image = UIImage(
+                named: "img_profile_normal_ios",
+                in: .module,
+                compatibleWith: nil
+            )
+        }
+    }
 }
