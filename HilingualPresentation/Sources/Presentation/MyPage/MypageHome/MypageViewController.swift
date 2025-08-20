@@ -18,6 +18,13 @@ public final class MypageViewController: BaseUIViewController<MypageViewModel> {
 
     // MARK: - Life Cycle
 
+    public override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(true, animated: false)
+    }
+
+    // MARK: - Custom Method
+
     public override func setUI() {
         super.setUI()
         view.addSubview(mypageView)
@@ -25,11 +32,11 @@ public final class MypageViewController: BaseUIViewController<MypageViewModel> {
 
     public override func setLayout() {
         mypageView.snp.makeConstraints { $0.edges.equalToSuperview() }
-        navigationController?.setNavigationBarHidden(true, animated: false)
     }
 
     public override func addTarget() {
         mypageView.logoutButton.addTarget(self, action: #selector(presentLogoutDialog), for: .touchUpInside)
+        mypageView.editButton.addTarget(self, action: #selector(editButtonTapped), for: .touchUpInside)
     }
 
     public override func bind(viewModel: MypageViewModel) {
@@ -86,4 +93,11 @@ public final class MypageViewController: BaseUIViewController<MypageViewModel> {
         dialog.showAnimation()
     }
 
+    @objc
+    func editButtonTapped() {
+        let editProfileVC = self.diContainer.makeEditProfileViewController()
+        editProfileVC.hidesBottomBarWhenPushed = true
+        navigationController?.setNavigationBarHidden(false, animated: false)
+        navigationController?.pushViewController(editProfileVC, animated: true)
+    }
 }

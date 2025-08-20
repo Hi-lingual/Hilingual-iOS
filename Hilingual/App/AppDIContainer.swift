@@ -110,6 +110,10 @@ final class AppDIContainer: ViewControllerFactory {
     public func makeMypageViewController() -> MypageViewController {
         return MypageViewController(viewModel: makeMypageViewModel(), diContainer: self)
     }
+
+    public func makeEditProfileViewController() -> EditProfileViewController {
+        return EditProfileViewController(viewModel: makeHomeViewModel(), diContainer: self)
+    }
 }
 // MARK: - SplashDIContainer
 
