@@ -10,6 +10,8 @@ import SnapKit
 
 public class SharedProfileView: UIView {
     
+    public var onProfileTapped: (() -> Void)?
+    
     // MARK: - UI Components
     
     private let profileImageView: UIImageView = {
@@ -79,6 +81,7 @@ public class SharedProfileView: UIView {
         super.init(frame: frame)
         setUI()
         setLayout()
+        setupGestureRecognizers()
     }
     
     required init?(coder: NSCoder) {
@@ -127,6 +130,20 @@ public class SharedProfileView: UIView {
             $0.centerY.equalToSuperview()
             $0.width.equalTo(24)
         }
+    }
+    private func setupGestureRecognizers() {
+        profileImageView.isUserInteractionEnabled = true
+        nameLabel.isUserInteractionEnabled = true
+
+        let profileTap = UITapGestureRecognizer(target: self, action: #selector(handleProfileTap))
+        let nameTap = UITapGestureRecognizer(target: self, action: #selector(handleProfileTap))
+
+        profileImageView.addGestureRecognizer(profileTap)
+        nameLabel.addGestureRecognizer(nameTap)
+    }
+
+    @objc private func handleProfileTap() {
+        onProfileTapped?()
     }
     
     public func configure(
