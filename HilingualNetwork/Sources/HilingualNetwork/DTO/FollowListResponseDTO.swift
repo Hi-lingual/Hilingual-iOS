@@ -50,6 +50,7 @@ public struct FollowerDTO: Codable {
 }
 
 // MARK: - Mock 팔로워/팔로잉 데이터
+
 extension FollowListResponseDTO {
     
     public static let mockFollowers: FollowListResponseDTO = {
@@ -58,6 +59,7 @@ extension FollowListResponseDTO {
             FollowerDTO(userId: 2, profileImg: "image/url/.jpg", nickname: "닉네임이지롱2", isFollowing: false, isFollowed: true),
             FollowerDTO(userId: 3, profileImg: "image/url/.jpg", nickname: "닉네임이지롱3", isFollowing: true, isFollowed: true)
         ]
+//        let followers: [FollowerDTO] = [] // EmptyView 확인용
         let data = FollowListDataDTO(followerList: followers, followingList: nil)
         let dto = FollowListResponseDTO(code: 20000, data: data, message: "팔로워 리스트를 조회했습니다.")
         

@@ -30,7 +30,7 @@ final class FollowListView: BaseUIView {
         return table
     }()
     
-    private let emptyView = FollowListEmptyView()
+    private let emptyView = EmptyView()
     
     // MARK: - Life Cycle
     
@@ -58,7 +58,8 @@ final class FollowListView: BaseUIView {
         }
         
         emptyView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
+            $0.top.equalToSuperview().offset(160)
+            $0.centerX.equalToSuperview()
         }
     }
     
@@ -67,7 +68,16 @@ final class FollowListView: BaseUIView {
     private func updateView() {
         let users = followListModel.users
         currentType = followListModel.type
-        emptyView.configure(type: currentType)
+        
+        let message: String
+        switch currentType {
+        case .follower:
+            message = "아직 팔로워가 없어요."
+        case .following:
+            message = "아직 팔로잉한 유저가 없어요."
+        }
+        
+        emptyView.configure(message: message)
         
         emptyView.isHidden = !users.isEmpty
         tableView.isHidden = users.isEmpty
