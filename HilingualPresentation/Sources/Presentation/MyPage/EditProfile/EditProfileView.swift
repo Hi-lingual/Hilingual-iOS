@@ -28,8 +28,8 @@ final class EditProfileView: BaseUIView {
 
     let profileImageView = EditableProfileImageView()
 
-    let nicknameRow = ProfileRow(title: "닉네임", value: "내 닉네임")
-    let socialRow = ProfileRow(title: "연결된 소셜 계정", value: "구글 로그인")
+    let nicknameRow = ProfileRow(title: "닉네임", value: "sereal")
+    let socialRow = ProfileRow(title: "연결된 소셜 계정", value: "애플 로그인")
 
     let withdrawButton: UIButton = {
         let button = UIButton()

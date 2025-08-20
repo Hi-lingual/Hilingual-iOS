@@ -18,6 +18,11 @@ public final class EditProfileViewController: BaseUIViewController<HomeViewModel
 
     // MARK: - Life Cycle
 
+    public override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(false, animated: animated)
+    }
+
     public override func setUI() {
         super.setUI()
         view.addSubview(editProfileView)

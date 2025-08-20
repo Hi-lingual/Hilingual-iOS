@@ -97,7 +97,6 @@ public final class MypageViewController: BaseUIViewController<MypageViewModel> {
     func editButtonTapped() {
         let editProfileVC = self.diContainer.makeEditProfileViewController()
         editProfileVC.hidesBottomBarWhenPushed = true
-        navigationController?.setNavigationBarHidden(false, animated: false)
         navigationController?.pushViewController(editProfileVC, animated: true)
     }
 }
