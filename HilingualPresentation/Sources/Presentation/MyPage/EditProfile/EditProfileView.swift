@@ -18,6 +18,21 @@ final class EditProfileView: BaseUIView {
         return button
     }()
 
+    let modal: Modal = {
+        let modal = Modal()
+        modal.isHidden = true
+        modal.configure(
+            title: "이미지 선택하기",
+            items: [
+                ("기본 이미지로 변경하기", UIImage(resource: .icImage24Ios), {
+                }),
+                ("갤러리에서 선택하기", UIImage(resource: .icGallary24Ios), {
+                })
+            ]
+        )
+        return modal
+    }()
+
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.text = "내 정보 수정"
@@ -43,10 +58,14 @@ final class EditProfileView: BaseUIView {
 
     override func setUI() {
         backgroundColor = .white
-        addSubviews(backButton, titleLabel, profileImageView, nicknameRow, socialRow, withdrawButton)
+        addSubviews(backButton, titleLabel, profileImageView, nicknameRow, socialRow, withdrawButton, modal)
     }
 
     override func setLayout() {
+
+        modal.snp.makeConstraints { $0.edges.equalToSuperview() }
+
+
         backButton.snp.makeConstraints {
             $0.top.equalToSuperview().inset(16)
             $0.leading.equalToSuperview().inset(16)

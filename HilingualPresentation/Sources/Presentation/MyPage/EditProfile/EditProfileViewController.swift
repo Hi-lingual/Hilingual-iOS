@@ -14,7 +14,6 @@ public final class EditProfileViewController: BaseUIViewController<HomeViewModel
     // MARK: - Properties
 
     private let editProfileView = EditProfileView()
-    private let logoutTappedSubject = PassthroughSubject<Void, Never>()
 
     // MARK: - Life Cycle
 
@@ -25,7 +24,7 @@ public final class EditProfileViewController: BaseUIViewController<HomeViewModel
 
     public override func setUI() {
         super.setUI()
-        view.addSubview(editProfileView)
+        view.addSubviews(editProfileView)
     }
 
     public override func setLayout() {
@@ -37,11 +36,15 @@ public final class EditProfileViewController: BaseUIViewController<HomeViewModel
     }
 
     public override func addTarget() {
+        editProfileView.profileImageView.editButton.addTarget(self, action: #selector(profileTapped), for: .touchUpInside)
     }
 
-    public override func bind(viewModel: HomeViewModel) {
+    // MARK: - Actions
 
+    @objc private func profileTapped() {
+        editProfileView.modal.isHidden = false
+        editProfileView.modal.showAnimation()
     }
 
-    // MARK: - PrivatMethod
+    public override func bind(viewModel: HomeViewModel) {}
 }
