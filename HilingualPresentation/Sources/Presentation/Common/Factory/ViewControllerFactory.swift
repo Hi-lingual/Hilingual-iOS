@@ -8,6 +8,7 @@
 import Foundation
 
 public protocol ViewControllerFactory {
+    func makeSplashViewController() -> SplashViewController
     func makeTabBarViewController() -> TabBarViewController
     func makeLoginViewController() -> LoginViewController
     func makeOnboardingViewController() -> OnBoardingViewController

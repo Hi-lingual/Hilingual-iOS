@@ -30,6 +30,10 @@ final class AppDIContainer: ViewControllerFactory {
         return TabBarViewController(diContainer: self)
     }
 
+    public func makeSplashViewController() -> SplashViewController {
+        return SplashViewController(viewModel: makeSplashViewModel(), diContainer: self)
+    }
+
     public func makeHomeViewController() -> HomeViewController {
         return HomeViewController(viewModel: makeHomeViewModel(), diContainer: self)
     }
@@ -104,7 +108,7 @@ final class AppDIContainer: ViewControllerFactory {
     }
 
     public func makeMypageViewController() -> MypageViewController {
-        return MypageViewController(viewModel: makeHomeViewModel(), diContainer: self)
+        return MypageViewController(viewModel: makeMypageViewModel(), diContainer: self)
     }
 }
 // MARK: - SplashDIContainer
@@ -115,13 +119,6 @@ extension AppDIContainer {
         return SplashViewModel(
             tokenStore: makeTokenStoreUseCase(),
             socialLoginUseCase: makeSocialLoginUseCase()
-        )
-    }
-
-    func makeSplashViewController() -> SplashViewController {
-        return SplashViewController(
-            viewModel: makeSplashViewModel(),
-            diContainer: self
         )
     }
 }
@@ -338,6 +335,19 @@ extension AppDIContainer {
 
     private func makeWordBookViewmodel() -> WordBookViewModel {
         return WordBookViewModel(fetchWordListUseCase: makeWordBookUseCase(), toggleBookmarkUseCase: makeToggleBookmarkUseCase())
+    }
+}
+
+//MARK: - MypageDIContainer
+
+extension AppDIContainer {
+
+    private func makeMypageUseCase() -> MypageUseCase {
+        return DefaultMypageUseCase(authRepository: makeAuthRepository())
+    }
+
+    private func makeMypageViewModel() -> MypageViewModel {
+        return MypageViewModel(mypageUseCase: makeMypageUseCase())
     }
 }
 
