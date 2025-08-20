@@ -342,3 +342,13 @@ extension AppDIContainer {
     }
 }
 
+// MARK: - FeedSearchDIContainer
+
+extension AppDIContainer {
+    func makeFeedSearchViewController() -> FeedSearchViewController {
+        return FeedSearchViewController(
+            viewModel: FeedSearchViewModel(),
+            diContainer: self
+        )
+    }
+}
