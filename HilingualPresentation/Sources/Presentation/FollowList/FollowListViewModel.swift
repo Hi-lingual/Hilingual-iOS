@@ -26,6 +26,7 @@ public struct FollowListModel {
     var type: FollowListType
     var users: [FollowUserModel]
 }
+
 public final class FollowListViewModel: BaseViewModel {
     
     // MARK: - Published Properties
