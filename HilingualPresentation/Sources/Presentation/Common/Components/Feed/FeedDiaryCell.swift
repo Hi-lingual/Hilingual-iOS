@@ -19,7 +19,7 @@ final class FeedDiaryCell: UITableViewCell {
 
     // MARK: - Properties
     
-    static let identifier = "FeedDiaryCell"
+    static let reuseIdentifier = "FeedDiaryCell"
     
     weak var delegate: FeedDiaryCellDelegate?
     private var isMine: Bool = false
