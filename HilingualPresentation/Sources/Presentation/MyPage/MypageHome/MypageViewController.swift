@@ -28,6 +28,9 @@ public final class MypageViewController: BaseUIViewController<MypageViewModel> {
     public override func setUI() {
         super.setUI()
         view.addSubview(mypageView)
+        if let value = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String {
+            mypageView.versionValueLabel.text = "v\(value)"
+        }
     }
 
     public override func setLayout() {
@@ -105,12 +108,12 @@ public final class MypageViewController: BaseUIViewController<MypageViewModel> {
                 self?.logoutTappedSubject.send(())
             }
         )
-
+        
         window.addSubview(dialog)
         dialog.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
-        
+
         dialog.showAnimation()
     }
 
