@@ -64,7 +64,7 @@ final class FeedView: BaseUIView {
 
     override func setLayout() {
         headerStack.snp.makeConstraints {
-            $0.top.equalTo(safeAreaLayoutGuide.snp.top).offset(9)
+            $0.top.equalTo(safeAreaLayoutGuide).offset(9)
             $0.horizontalEdges.equalToSuperview().inset(16)
         }
 
@@ -93,20 +93,9 @@ final class FeedView: BaseUIView {
         addSubview(control)
 
         control.snp.makeConstraints {
-            $0.top.equalTo(headerStack.snp.bottom).offset(12)
-            $0.leading.trailing.bottom.equalToSuperview()
+            $0.top.equalTo(headerStack.snp.bottom).offset(9)
+            $0.horizontalEdges.equalToSuperview()
+            $0.bottom.equalTo(safeAreaLayoutGuide)
         }
     }
-}
-
-#Preview {
-    let view = FeedView()
-    view.configureSegmentedControl(
-        parentVC: UIViewController(), // dummy VC
-        viewControllers: [
-            UIViewController(), UIViewController()
-        ],
-        titles: ["탭1", "탭2"]
-    )
-    return view
 }
