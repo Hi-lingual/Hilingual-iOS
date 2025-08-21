@@ -57,11 +57,11 @@ final class AgreementModalView: UIView {
         addSubview(modalSheetView)
 
         titleLabel.text = "하이링구얼이 처음이시군요!"
-        titleLabel.font = .boldSystemFont(ofSize: 20)
+        titleLabel.font = .suit(.head_b_18)
         titleLabel.textColor = .black
 
         descriptionLabel.text = "아래 약관에 동의 후 서비스 이용이 가능해요."
-        descriptionLabel.font = .systemFont(ofSize: 14)
+        descriptionLabel.font = .suit(.body_m_14)
         descriptionLabel.textColor = .gray
 
         allAgreeContainer.backgroundColor = .gray100
@@ -154,7 +154,7 @@ final class AgreementModalView: UIView {
     private func updateAgreementState() {
         let requiredAgreed = serviceAgree.isChecked && privacyAgree.isChecked
         startButton.isEnabled = requiredAgreed
-        startButton.backgroundColor = requiredAgreed ? .black : .systemGray4
+        startButton.backgroundColor = requiredAgreed ? .black : .gray300
         allAgree.isChecked = [serviceAgree, privacyAgree, marketingAgree].allSatisfy { $0.isChecked }
     }
 
@@ -168,7 +168,7 @@ final class AgreementModalView: UIView {
 
         UIView.animate(withDuration: 0.3) {
             self.modalSheetView.transform = .identity
-            self.backgroundColor = UIColor.black.withAlphaComponent(0.3)
+            self.backgroundColor = UIColor.dim
             self.isHidden = false
         }
     }

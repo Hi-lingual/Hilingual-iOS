@@ -69,7 +69,6 @@ final class VerificationCodeView: BaseUIView {
         return button
     }()
 
-
     let submitButton: CTAButton = {
         CTAButton(style: .TextButton("인증하기"), autoBackground: true)
     }()
@@ -109,7 +108,7 @@ final class VerificationCodeView: BaseUIView {
 
         submitButton.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview().inset(20)
-            $0.bottom.equalTo(safeAreaLayoutGuide).offset(-12)
+            $0.bottom.equalToSuperview().inset(50)
         }
     }
 }

@@ -93,7 +93,7 @@ final class VerificationCodeInputView: BaseUIView, UIKeyInput, UITextInputTraits
 
     override func setLayout() {
         hiddenTextField.snp.makeConstraints {
-            $0.size.equalTo(CGSize(width: 1, height: 1))
+            $0.size.equalTo(1)
             $0.center.equalToSuperview()
         }
         mainStack.snp.makeConstraints { $0.edges.equalToSuperview() }

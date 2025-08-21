@@ -184,7 +184,6 @@ extension AppDIContainer {
     private func makeVerificationCodeViewModel() -> VerificationCodeViewModel {
         return VerificationCodeViewModel(verifyCodeUseCase: makeVerifyCodeUseCase())
     }
-
 }
 
 // MARK: - OnBoardingDiContainer

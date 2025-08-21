@@ -55,7 +55,7 @@ public final class VerificationCodeViewController: BaseUIViewController<Verifica
                 self.dialog.configure(
                     style: .normal,
                     title: "인증에 실패했어요",
-                    content: "사전 예약 알림신청을 통해 발급한 \n인증코드가 맞는지 다시 한번 확인해주세요.",
+                    content: "사전 예약 알림신청을 통해 발급한\n인증코드가 맞는지 다시 한번 확인해주세요.",
                     leftButtonTitle: "앱 종료",
                     rightButtonTitle: "문의하기",
                     leftAction: { [weak self] in self?.exitApp() },
