@@ -114,6 +114,10 @@ final class AppDIContainer: ViewControllerFactory {
     public func makeEditProfileViewController() -> EditProfileViewController {
         return EditProfileViewController(viewModel: makeHomeViewModel(), diContainer: self)
     }
+
+    public func makeBlockUserViewController() -> BlockUserViewController {
+        return BlockUserViewController(viewModel: makeBlockUserViewModel(), diContainer: self)
+    }
 }
 // MARK: - SplashDIContainer
 
@@ -355,42 +359,24 @@ extension AppDIContainer {
     }
 }
 
-// MARK: - FollowListDIContainer
+//MARK: - BlockUserDIContainer
 
 extension AppDIContainer {
-    
-    private func makeFollowListService() -> MockFollowListService {
-        return MockFollowListService() // TODO: 실제 API 서비스로 교체
+
+    private func makeMockBlockUserService() -> BlockUserService {
+        //TODO: - mock 변경하기!
+        return MockBlockUserService()
     }
-    
-    private func makeFollowListRepository() -> FollowListRepository {
-        return DefaultFollowListRepository(service: makeFollowListService())
+
+    private func makeBlockUserRepository() -> BlockUserRepository {
+        return DefaultBlockUserRepository(service: makeMockBlockUserService())
     }
-    
-    private func makeFollowListUseCase() -> FollowListUseCase {
-        return DefaultFollowListUseCase(repository: makeFollowListRepository())
+    private func makeBlockUserUsecase() -> BlockUserUseCase {
+        return DefaultBlockUserUseCase(repository: makeBlockUserRepository())
     }
-    
-    private func makeFollowListViewModel() -> FollowListViewModel {
-        return FollowListViewModel(followListUseCase: makeFollowListUseCase())
-    }
-    
-    func makeFollowListViewController() -> FollowListViewController {
-        let viewController = FollowListViewController(
-            viewModel: makeFollowListViewModel(),
-            diContainer: self
-        )
-        return viewController
+
+    private func makeBlockUserViewModel() -> BlockUserViewModel {
+        return BlockUserViewModel(blockUserUseCase: makeBlockUserUsecase())
     }
 }
 
-// MARK: - FeedSearchDIContainer
-
-extension AppDIContainer {
-    func makeFeedSearchViewController() -> FeedSearchViewController {
-        return FeedSearchViewController(
-            viewModel: FeedSearchViewModel(),
-            diContainer: self
-        )
-    }
-}

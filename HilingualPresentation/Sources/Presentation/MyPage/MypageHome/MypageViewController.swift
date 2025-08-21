@@ -46,7 +46,7 @@ public final class MypageViewController: BaseUIViewController<MypageViewModel> {
                 self.navigationController?.pushViewController(vc, animated: true)
 
             case .blockedUsers:
-                let vc = self.diContainer.makeEditProfileViewController()
+                let vc = self.diContainer.makeBlockUserViewController()
                 self.navigationController?.pushViewController(vc, animated: true)
 
             case .support:
