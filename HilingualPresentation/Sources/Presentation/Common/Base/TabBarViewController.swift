@@ -51,7 +51,7 @@ public final class TabBarViewController: UITabBarController {
         )
 
         let feedVC = makeTabItem(
-            viewController: PreparingViewController(),
+            viewController: factory.makeFeedViewController(),
             title: "피드",
             selectedImageName: "ic_community_black_24_ios",
             unselectedImageName: "ic_community_gray_24_ios"
