@@ -10,14 +10,6 @@ import SnapKit
 
 public final class SearchBar: UISearchBar {
 
-    // MARK: - Properties
-
-    override public var placeholder: String? {
-        didSet {
-            updatePlaceholder()
-        }
-    }
-
     // MARK: - Init
 
     override public init(frame: CGRect) {
@@ -27,12 +19,6 @@ public final class SearchBar: UISearchBar {
 
     required public init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-
-    // MARK: - Size
-    
-    override public var intrinsicContentSize: CGSize {
-        return CGSize(width: UIView.noIntrinsicMetric, height: 38)
     }
 
     // MARK: - Setup Methods
@@ -46,9 +32,10 @@ public final class SearchBar: UISearchBar {
         self.setImage(UIImage(named: "ic_close_20_ios", in: .module, compatibleWith: nil), for: .clear, state: .normal)
         self.searchTextField.attributedText = .suit(.body_m_16, text: "")
         self.searchTextField.defaultTextAttributes[.font] = UIFont.suit(.body_m_16)
-        self.searchTextField.keyboardType = .asciiCapable
         self.searchTextField.autocorrectionType = .no
         self.searchTextField.autocapitalizationType = .none
+        self.searchTextField.returnKeyType = .done
+        self.searchTextField.placeholder = "닉네임을 입력해주세요."
     }
 
     private func updatePlaceholder() {

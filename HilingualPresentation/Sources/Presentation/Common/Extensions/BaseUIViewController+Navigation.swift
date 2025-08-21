@@ -17,7 +17,7 @@ public extension BaseUIViewController {
         case backTitle(String)
         case backTitleMenu(String)
         case backOnly
-        case backSearchBar(placeholder: String)
+        case backSearchBar
     }
 
     // MARK: - Setup
@@ -58,16 +58,13 @@ public extension BaseUIViewController {
             )
             navigationItem.rightBarButtonItem = nil
             
-        case .backSearchBar(let placeholder):
+        case .backSearchBar:
             navigationItem.leftBarButtonItem = makeBarButton(
                 imageName: "ic_arrow_left_b_24_ios",
                 action: #selector(backButtonTapped)
             )
             
-            let searchBar = SearchBar()
-            searchBar.placeholder = placeholder
-            
-            navigationItem.titleView = searchBar
+            navigationItem.titleView = SearchBar()
             navigationItem.rightBarButtonItem = nil
         }
     }
