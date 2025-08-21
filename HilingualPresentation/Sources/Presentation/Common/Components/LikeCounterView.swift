@@ -20,18 +20,18 @@ final class LikeCounterView: UIView {
     private(set) var isLiked: Bool = false {
         didSet {
             updateIcon()
-            onToggle?(likeCount, isLiked)
+            onToggle?( isLiked)
         }
     }
     
     private(set) var likeCount: Int = 0 {
         didSet {
             updateCount()
-            onToggle?(likeCount, isLiked)
+            onToggle?(isLiked)
         }
     }
     
-    var onToggle: ((Int, Bool) -> Void)?
+    var onToggle: ((Bool) -> Void)?
     
     // MARK: - UI
     
@@ -96,7 +96,7 @@ final class LikeCounterView: UIView {
                 $0.size.equalTo(24)
             }
             countLabel.snp.makeConstraints {
-                $0.top.equalTo(likeButton.snp.bottom)
+                $0.top.equalTo(likeButton.snp.bottom).offset(3)
                 $0.bottom.equalToSuperview()
                 $0.centerX.equalTo(likeButton)
             }
