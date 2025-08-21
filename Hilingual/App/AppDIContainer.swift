@@ -102,7 +102,43 @@ final class AppDIContainer: ViewControllerFactory {
     public func makeVerificationCodeViewController() -> VerificationCodeViewController {
         return VerificationCodeViewController(viewModel: makeVerificationCodeViewModel(), diContainer: self)
     }
+    
+    public func makeFeedViewController() -> FeedViewController {
+        return FeedViewController(
+            viewModel: makeFeedViewModel(),
+            diContainer: self
+        )
+    }
+    
+    public func makeRecommendFeedViewController() -> RecommendFeedViewController {
+        return RecommendFeedViewController(
+            viewModel: makeRecommendFeedViewModel(),
+            diContainer: self
+        )
+    }
+
+    public func makeFollowingFeedViewController() -> FollowingFeedViewController {
+        return FollowingFeedViewController(
+            viewModel: makeFollowingFeedViewModel(),
+            diContainer: self
+        )
+    }
+    
+    public func makeMyFeedProfileViewController() -> MyFeedProfileViewController {
+        return MyFeedProfileViewController(
+            viewModel: makeMyFeedProfileViewModel(),
+            diContainer: self
+        )
+    }
+    
+    public func makeUserFeedProfileViewController() -> UserFeedProfileViewController {
+        return UserFeedProfileViewController(
+            viewModel: makeUserFeedProfileViewModel(),
+            diContainer: self
+        )
+    }
 }
+
 // MARK: - SplashDIContainer
 
 extension AppDIContainer {
@@ -374,5 +410,56 @@ extension AppDIContainer {
             viewModel: FeedSearchViewModel(),
             diContainer: self
         )
+    }
+}
+
+// MARK: - FeedDIContainer
+extension AppDIContainer {
+    
+    // ViewModel
+    private func makeFeedViewModel() -> FeedViewModel {
+        return FeedViewModel()
+    }
+    
+    private func makeRecommendFeedViewModel() -> RecommendFeedViewModel {
+        RecommendFeedViewModel(feedUseCase: makeFeedUseCase())
+    }
+    private func makeFollowingFeedViewModel() -> FollowingFeedViewModel {
+        FollowingFeedViewModel(feedUseCase: makeFeedUseCase())
+    }
+    
+    // UseCase
+    
+    private func makeFeedUseCase() -> FeedUseCase {
+        DefaultFeedUseCase(repository: makeFeedRepository())
+    }
+    
+    // Repository
+    private func makeFeedRepository() -> FeedRepository {
+        return DefaultFeedRepository(service: makeFeedService())
+    }
+    
+    // Service
+    
+//    private func makeFeedService() -> FeedService {
+//        return DefaultFeedService()
+//    }
+    
+    private func makeFeedService() -> FeedService {
+        return MockFeedService()
+    }
+}
+
+
+// MARK: - FeedProfileDIContainer
+extension AppDIContainer {
+    
+    // ViewModel
+    private func makeMyFeedProfileViewModel() -> MyFeedProfileViewModel {
+        return MyFeedProfileViewModel()
+    }
+    
+    private func makeUserFeedProfileViewModel() -> UserFeedProfileViewModel {
+        return UserFeedProfileViewModel()
     }
 }
