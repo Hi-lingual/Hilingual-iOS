@@ -8,6 +8,7 @@
 import Combine
 import Foundation
 import UIKit
+import SafariServices
 
 public final class MypageViewController: BaseUIViewController<MypageViewModel> {
 
@@ -53,12 +54,14 @@ public final class MypageViewController: BaseUIViewController<MypageViewModel> {
                 self.navigationController?.pushViewController(vc, animated: true)
 
             case .support:
-                let vc = self.diContainer.makeEditProfileViewController()
-                self.navigationController?.pushViewController(vc, animated: true)
+                guard let url = URL(string: "https://pf.kakao.com/_kNTvn/chat") else { return }
+                let safariVC = SFSafariViewController(url: url)
+                self.present(safariVC, animated: true)
 
             case .policy:
-                let vc = self.diContainer.makeEditProfileViewController()
-                self.navigationController?.pushViewController(vc, animated: true)
+                guard let url = URL(string: "https://hilingual.notion.site/230829677ebf8104b52ce74c65c27607") else { return }
+                let safariVC = SFSafariViewController(url: url)
+                self.present(safariVC, animated: true)
             }
         }
     }
@@ -108,7 +111,7 @@ public final class MypageViewController: BaseUIViewController<MypageViewModel> {
                 self?.logoutTappedSubject.send(())
             }
         )
-        
+
         window.addSubview(dialog)
         dialog.snp.makeConstraints {
             $0.edges.equalToSuperview()
