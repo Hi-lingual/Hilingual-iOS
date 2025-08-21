@@ -10,4 +10,5 @@ import Foundation
 import HilingualDomain
 
 public final class FeedViewModel: BaseViewModel {
+    //
 }
