@@ -37,6 +37,27 @@ public final class MypageViewController: BaseUIViewController<MypageViewModel> {
     public override func addTarget() {
         mypageView.logoutButton.addTarget(self, action: #selector(presentLogoutDialog), for: .touchUpInside)
         mypageView.editButton.addTarget(self, action: #selector(editButtonTapped), for: .touchUpInside)
+
+        mypageView.onMenuTap = { [weak self] menu in
+            guard let self else { return }
+            switch menu {
+            case .notification:
+                let vc = self.diContainer.makeEditProfileViewController()
+                self.navigationController?.pushViewController(vc, animated: true)
+
+            case .blockedUsers:
+                let vc = self.diContainer.makeEditProfileViewController()
+                self.navigationController?.pushViewController(vc, animated: true)
+
+            case .support:
+                let vc = self.diContainer.makeEditProfileViewController()
+                self.navigationController?.pushViewController(vc, animated: true)
+
+            case .policy:
+                let vc = self.diContainer.makeEditProfileViewController()
+                self.navigationController?.pushViewController(vc, animated: true)
+            }
+        }
     }
 
     public override func bind(viewModel: MypageViewModel) {
@@ -89,7 +110,7 @@ public final class MypageViewController: BaseUIViewController<MypageViewModel> {
         dialog.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
-
+        
         dialog.showAnimation()
     }
 

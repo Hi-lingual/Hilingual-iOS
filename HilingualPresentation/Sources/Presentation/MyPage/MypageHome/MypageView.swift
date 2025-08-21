@@ -10,6 +10,19 @@ import SnapKit
 
 final class MypageView: BaseUIView {
 
+    // MARK: - Menu Enum
+
+    enum MenuItem {
+        case notification
+        case blockedUsers
+        case support
+        case policy
+    }
+
+    // MARK: - Output
+
+    var onMenuTap: ((MenuItem) -> Void)?
+
     // MARK: - UI Components
 
     private let scrollView = UIScrollView()
@@ -107,14 +120,14 @@ final class MypageView: BaseUIView {
         return button
     }()
 
-    private let menuItems: [(title: String, icon: String)] = [
-        ("알림 설정", "ic_bell_24_ios"),
-        ("차단한 유저", "ic_block_black_24_ios"),
-        ("고객센터", "ic_customer_24_ios"),
-        ("개인정보 처리방침 및 이용약관", "ic_document_24_ios")
+    private let menuItems: [(item: MenuItem, title: String, icon: String)] = [
+        (.notification, "알림 설정", "ic_bell_24_ios"),
+        (.blockedUsers, "차단한 유저", "ic_block_black_24_ios"),
+        (.support, "고객센터", "ic_customer_24_ios"),
+        (.policy, "개인정보 처리방침 및 이용약관", "ic_document_24_ios")
     ]
 
-    private var menuRows: [UIView] = []
+    private var menuRows: [UIControl] = []
 
     // MARK: - UI Setup
 
@@ -127,7 +140,9 @@ final class MypageView: BaseUIView {
         profileCardView.addSubviews(profileImageView, nicknameLabel, editButton, feedButton)
 
         for item in menuItems {
-            let row = makeMenuRowView(title: item.title, icon: item.icon)
+            let row = makeMenuRowView(title: item.title, icon: item.icon) { [weak self] in
+                self?.onMenuTap?(item.item)
+            }
             menuCardView.addSubview(row)
             menuRows.append(row)
         }
@@ -216,16 +231,17 @@ final class MypageView: BaseUIView {
             $0.top.equalTo(versionLabel.snp.bottom).offset(20)
             $0.leading.trailing.equalToSuperview().inset(28)
             $0.height.equalTo(44)
+            // ✅ scrollView content 높이 마감
             $0.bottom.equalToSuperview().inset(40)
         }
     }
 
     // MARK: - Helper
 
-    private func makeMenuRowView(title: String, icon: String) -> UIView {
-        let container = UIView()
+    private func makeMenuRowView(title: String, icon: String, action: @escaping () -> Void) -> UIControl {
+        let container = UIControl()
 
-        let iconView = UIImageView(image:  UIImage(named: icon, in: .module, compatibleWith: nil))
+        let iconView = UIImageView(image: UIImage(named: icon, in: .module, compatibleWith: nil))
         iconView.tintColor = .black
 
         let titleLabel = UILabel()
@@ -235,6 +251,7 @@ final class MypageView: BaseUIView {
 
         let chevron = UIImageView(image: UIImage(named: "ic_arrow_right_g_24_ios", in: .module, compatibleWith: nil))
         chevron.tintColor = .gray300
+
         container.addSubviews(iconView, titleLabel, chevron)
 
         iconView.snp.makeConstraints {
@@ -242,18 +259,29 @@ final class MypageView: BaseUIView {
             $0.centerY.equalToSuperview()
             $0.size.equalTo(24)
         }
-
         titleLabel.snp.makeConstraints {
             $0.leading.equalTo(iconView.snp.trailing).offset(8)
             $0.centerY.equalToSuperview()
         }
-
         chevron.snp.makeConstraints {
             $0.trailing.equalToSuperview().inset(12)
             $0.centerY.equalToSuperview()
             $0.size.equalTo(24)
         }
+//
+        container.addAction(UIAction { _ in action() }, for: .touchUpInside)
+//
+//        container.addTarget(self, action: #selector(highlightDown(_:)), for: .touchDown)
+//        container.addTarget(self, action: #selector(highlightCancel(_:)), for: [.touchUpInside, .touchDragExit, .touchCancel])
 
         return container
     }
+
+//    @objc private func highlightDown(_ sender: UIControl) {
+//        sender.backgroundColor = UIColor.black.withAlphaComponent(0.03)
+//    }
+//
+//    @objc private func highlightCancel(_ sender: UIControl) {
+//        UIView.animate(withDuration: 0.15) { sender.backgroundColor = .clear }
+//    }
 }
