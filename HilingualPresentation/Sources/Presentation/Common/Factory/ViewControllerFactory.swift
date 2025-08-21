@@ -24,4 +24,9 @@ public protocol ViewControllerFactory {
     func makeVerificationCodeViewController() -> VerificationCodeViewController
     func makeFollowListViewController() -> FollowListViewController
     func makeFeedSearchViewController() -> FeedSearchViewController
+    func makeFeedViewController() -> FeedViewController
+    func makeRecommendFeedViewController() -> RecommendFeedViewController
+    func makeFollowingFeedViewController() -> FollowingFeedViewController
+    func makeMyFeedProfileViewController() -> MyFeedProfileViewController
+    func makeUserFeedProfileViewController() -> UserFeedProfileViewController
 }
