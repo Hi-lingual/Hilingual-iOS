@@ -20,11 +20,16 @@ public struct FeedEntity {
 public struct FeedProfile {
     public let userId: Int
     public let isMine: Bool
-    public let profileImg: String?
+    public let profileImg: String
     public let nickname: String
-    public let streak: Int
+    public let streak: Int?
 
-    public init(userId: Int, isMine: Bool, profileImg: String?, nickname: String, streak: Int) {
+    public init(userId: Int,
+                isMine: Bool,
+                profileImg: String,
+                nickname: String,
+                streak: Int?)
+    {
         self.userId = userId
         self.isMine = isMine
         self.profileImg = profileImg
@@ -41,7 +46,14 @@ public struct FeedDiary {
     public let diaryImg: String?
     public let originalText: String
 
-    public init(diaryId: Int, sharedDate: Int, likeCount: Int, isLiked: Bool, diaryImg: String?, originalText: String) {
+    public init(
+        diaryId: Int,
+        sharedDate: Int,
+        likeCount: Int,
+        isLiked: Bool,
+        diaryImg: String?,
+        originalText: String)
+    {
         self.diaryId = diaryId
         self.sharedDate = sharedDate
         self.likeCount = likeCount

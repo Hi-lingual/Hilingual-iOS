@@ -78,6 +78,23 @@ final class FeedView: BaseUIView {
     }
 
     // MARK: - Public Method
+    
+    // 프로필 정보 갱신
+    func configure(
+        profileImageURL: String? = nil
+    ) {
+        if let urlString = profileImageURL,
+           !urlString.isEmpty,
+           let url = URL(string: urlString) {
+            profileImageView.kf.setImage(with: url)
+        } else {
+            profileImageView.image = UIImage(
+                named: "img_profile_normal_ios",
+                in: .module,
+                compatibleWith: nil
+            )
+        }
+    }
 
     func configureSegmentedControl(
         parentVC: UIViewController,

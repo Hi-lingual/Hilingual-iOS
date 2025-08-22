@@ -5,7 +5,6 @@
 //  Created by 조영서 on 8/20/25.
 //
 
-
 import Foundation
 import Moya
 
@@ -17,8 +16,8 @@ public enum FeedAPI {
 extension FeedAPI: BaseTargetType {
     public var path: String {
         switch self {
-        case .fetchRecommendedFeed: return "/feeds/recommended"
-        case .fetchFollowingFeed:   return "/feeds/following"
+        case .fetchRecommendedFeed: return "/feed/recommended"
+        case .fetchFollowingFeed:   return "/feed/following"
         }
     }
     public var method: Moya.Method { .get }

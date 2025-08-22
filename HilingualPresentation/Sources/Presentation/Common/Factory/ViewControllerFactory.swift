@@ -29,4 +29,6 @@ public protocol ViewControllerFactory {
     func makeFollowingFeedViewController() -> FollowingFeedViewController
     func makeMyFeedProfileViewController() -> MyFeedProfileViewController
     func makeUserFeedProfileViewController() -> UserFeedProfileViewController
+    func makeLikedFeedViewController() -> LikedFeedViewController
+    func makeSharedFeedViewController() -> SharedFeedViewController
 }
