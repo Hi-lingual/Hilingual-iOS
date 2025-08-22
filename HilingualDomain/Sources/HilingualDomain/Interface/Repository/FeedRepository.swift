@@ -8,5 +8,5 @@
 import Combine
 
 public protocol FeedRepository {
-    func fetch(type: FeedType) -> AnyPublisher<[FeedEntity], Error>
+    func fetch(type: FeedType) -> AnyPublisher<([FeedEntity], Bool?), Error>
 }

@@ -8,7 +8,7 @@
 import Combine
 
 public protocol FeedUseCase {
-    func execute(type: FeedType) -> AnyPublisher<[FeedEntity], Error>
+    func execute(type: FeedType) -> AnyPublisher<([FeedEntity], Bool?), Error>
 }
 
 public final class DefaultFeedUseCase: FeedUseCase {
@@ -18,7 +18,7 @@ public final class DefaultFeedUseCase: FeedUseCase {
         self.repository = repository
     }
 
-    public func execute(type: FeedType) -> AnyPublisher<[FeedEntity], Error> {
+    public func execute(type: FeedType) -> AnyPublisher<([FeedEntity], Bool?), Error> {
         return repository.fetch(type: type)
     }
 }

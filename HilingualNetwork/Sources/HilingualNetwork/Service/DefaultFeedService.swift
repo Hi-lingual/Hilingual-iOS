@@ -1,5 +1,5 @@
 //
-//  FeedService.swift
+//  DefaultFeedService.swift
 //  HilingualNetwork
 //
 //  Created by 조영서 on 8/20/25.
