@@ -15,21 +15,12 @@ public enum FollowButtonState {
     case unblock        // 차단 해제
 }
 
-enum ButtonSize {
-    case short
-    case long
-}
-
 final class FollowButton: UIButton {
     
     // MARK: - Properties
     
     private var currentState: FollowButtonState = .follow {
         didSet { setStyle() }
-    }
-    
-    private var currentSize: ButtonSize = .short {
-        didSet { updateSize() }
     }
     
     override var isHighlighted: Bool {
@@ -44,7 +35,7 @@ final class FollowButton: UIButton {
         super.init(frame: frame)
         
         setStyle()
-        updateSize()
+        setLayout()
     }
     
     required init?(coder: NSCoder) {
@@ -89,17 +80,15 @@ final class FollowButton: UIButton {
         }
     }
     
-    private func updateSize() {
-        snp.remakeConstraints {
+    private func setLayout() {
+        snp.makeConstraints {
             $0.height.equalTo(33)
-            $0.width.equalTo(currentSize == .short ? 80 : 343)
         }
     }
     
-    // MARK: - Public Methods
+    // MARK: - Configure
     
-    func configure(state: FollowButtonState, size: ButtonSize) {
+    func configure(state: FollowButtonState) {
         self.currentState = state
-        self.currentSize = size
     }
 }

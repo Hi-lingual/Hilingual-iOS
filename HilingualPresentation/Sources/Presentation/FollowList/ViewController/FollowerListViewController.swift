@@ -72,7 +72,7 @@ extension FollowerListViewController: UITableViewDataSource {
         
         if let user = viewModel?.followerList[indexPath.row] {
             cell.nickname.text = user.nickname
-            cell.button.configure(state: user.buttonState, size: .short)
+            cell.button.configure(state: user.buttonState)
         }
         
         cell.delegate = self
