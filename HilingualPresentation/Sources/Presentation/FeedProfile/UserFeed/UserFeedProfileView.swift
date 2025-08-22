@@ -12,32 +12,25 @@ final class UserFeedProfileView: BaseUIView {
 
     // MARK: - UI Components
     
-    private let userFeedView = FeedProfileView()
+    private let myFeedView = FeedProfileView()
     private let button = FollowButton()
-    private let noFeedView = EmptyView()
-    
+
     // MARK: - Setup
 
     override func setUI() {
-        addSubviews(userFeedView, button)
-        
+        addSubviews(myFeedView, button)
         button.configure(state: .follow, size: .long)
-        noFeedView.configure(message: "아직 좋아요한 다이어리가 없어요.")
     }
 
     override func setLayout() {
-        userFeedView.snp.makeConstraints {
-            $0.top.equalTo(safeAreaLayoutGuide).offset(9)
+        myFeedView.snp.makeConstraints {
+            $0.top.equalTo(safeAreaLayoutGuide).offset(8)
             $0.horizontalEdges.equalToSuperview().inset(16)
         }
+        
         button.snp.makeConstraints {
-            $0.top.equalTo(userFeedView.snp.bottom).offset(20)
+            $0.top.equalTo(myFeedView.snp.bottom).offset(20)
             $0.horizontalEdges.equalToSuperview().inset(16)
-        }
-        noFeedView.snp.makeConstraints {
-            $0.top.equalTo(button.snp.bottom).offset(140)
-            $0.horizontalEdges.equalToSuperview().inset(66.5)
-            $0.bottom.equalTo(safeAreaLayoutGuide)
         }
     }
 }
