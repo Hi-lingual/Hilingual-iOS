@@ -95,11 +95,6 @@ final class ToastMessage: UIView {
         self.snp.makeConstraints {
             $0.centerX.equalToSuperview()
             $0.bottom.equalToSuperview().inset(82)
-            
-            if !actionButton.isHidden {
-                $0.height.equalTo(52)
-                $0.horizontalEdges.equalToSuperview().inset(16)
-            }
         }
     }
     
@@ -125,6 +120,11 @@ final class ToastMessage: UIView {
             actionButton.isHidden = false
             messageTrailingToSuperview?.deactivate()
             messageTrailingToButton?.activate()
+
+            self.snp.updateConstraints {
+                $0.height.equalTo(52)
+                $0.horizontalEdges.equalToSuperview().inset(16)
+            }
 
         case .basic:
             actionButton.isHidden = true
