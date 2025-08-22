@@ -96,6 +96,17 @@ final class FollowListCell: UITableViewCell {
         }
     }
     
+    // MARK: - Configure
+    
+    func configure(with user: UserDisplayable) {
+        // profileImg.setImage(with: URL(string: user.profileImg))
+        nickname.text = user.nickname
+        button.configure(state: user.buttonState, size: .short)
+        
+        button.removeTarget(nil, action: nil, for: .allEvents)
+        button.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
+    }
+    
     // MARK: - Action
     
     @objc private func buttonTapped() {

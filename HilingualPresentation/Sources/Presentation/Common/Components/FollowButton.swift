@@ -7,22 +7,20 @@
 
 import UIKit
 
+public enum FollowButtonState {
+    case follow         // 팔로우
+    case following      // 팔로잉
+    case mutualFollow   // 맞팔로우
+    case block          // 차단
+    case unblock        // 차단 해제
+}
+
+enum ButtonSize {
+    case short
+    case long
+}
+
 final class FollowButton: UIButton {
-    
-    // MARK: - Enum
-    
-    enum FollowButtonState {
-        case follow         // 팔로우
-        case following      // 팔로잉
-        case mutualFollow   // 맞팔로우
-        case block          // 차단
-        case unblock        // 차단 해제
-    }
-    
-    enum ButtonSize {
-        case short
-        case long
-    }
     
     // MARK: - Properties
     
