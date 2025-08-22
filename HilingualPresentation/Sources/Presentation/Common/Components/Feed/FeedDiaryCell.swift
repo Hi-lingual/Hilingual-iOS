@@ -281,7 +281,7 @@ final class FeedDiaryCell: UITableViewCell {
         nickname: String = "이름을 입력해주세요",
         profileImageURL: String? = nil,
         isMine: Bool,
-        streak: Int = 0,
+        streak: Int? = 0,
         sharedDateMinutes: Int,
         diaryPreviewText: String? = nil,
         diaryImageURL: String? = nil,
@@ -305,7 +305,7 @@ final class FeedDiaryCell: UITableViewCell {
         
         menu.isHidden = true
 
-        let streakValue = max(streak, 0)
+        let streakValue = max(streak ?? 0, 0)
         streakLabel.text = "\(streakValue)"
         streakLabel.textColor = streakValue > 0 ? .hilingualOrange : .gray400
 

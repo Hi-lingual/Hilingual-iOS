@@ -1,20 +1,20 @@
 //
-//  FeedDiaryItem.swift
+//  FeedProfileDiaryItem.swift
 //  HilingualPresentation
 //
-//  Created by 조영서 on 8/21/25.
+//  Created by 조영서 on 8/22/25.
 //
 
 import Foundation
 
-struct FeedDiaryItem {
+struct FeedProfileDiaryItem {
     let id: Int
     let nickname: String
-    let profileImg: String?
+    let profileImg: String
     let isMine: Bool
     let streak: Int?
     let sharedDateMinutes: Int
-    let diaryPreviewText: String?
+    let diaryPreviewText: String
     let diaryImageUrl: String?
     let isLiked: Bool
     let likeCount: Int

@@ -14,15 +14,15 @@ public final class MyFeedProfileViewController: BaseUIViewController<MyFeedProfi
 
     private let myFeedProfileView = MyFeedProfileView()
 
-    private lazy var recommendFeedVC = diContainer.makeRecommendFeedViewController()
-    private lazy var followingFeedVC = diContainer.makeFollowingFeedViewController()
+    private lazy var likedFeedVC = diContainer.makeLikedFeedViewController()
+    private lazy var sharedFeedVC = diContainer.makeSharedFeedViewController()
 
     // MARK: - Lifecycle
 
     public override func setUI() {
         myFeedProfileView.configureSegmentedControl(
             parentVC: self,
-            viewControllers: [recommendFeedVC, followingFeedVC],
+            viewControllers: [sharedFeedVC, likedFeedVC],
             titles: ["공유한 일기", "공감한 일기"]
         )
     }

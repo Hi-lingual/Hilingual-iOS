@@ -1,18 +1,18 @@
 //
-//  FeedCellView.swift
+//  FeedProfileCellView.swift
 //  HilingualPresentation
 //
-//  Created by 조영서 on 8/19/25.
+//  Created by 조영서 on 8/22/25.
 //
 
 import UIKit
 import SnapKit
 
-final class FeedCellView: BaseUIView {
+final class FeedProfileCellView: BaseUIView {
     
     // MARK: - Properties
 
-    private var items: [FeedDiaryItem] = [] {
+    private var items: [FeedProfileDiaryItem] = [] {
         didSet {
             tableView.reloadData()
             updateEmptyState()
@@ -26,8 +26,7 @@ final class FeedCellView: BaseUIView {
     // MARK: - Setup Methods
 
     override func setUI() {
-        addSubview(tableView)
-        addSubview(noFeedView)
+        addSubviews(tableView, noFeedView)
 
         tableView.dataSource = self
         tableView.register(FeedDiaryCell.self, forCellReuseIdentifier: FeedDiaryCell.reuseIdentifier)
@@ -47,7 +46,7 @@ final class FeedCellView: BaseUIView {
         }
 
         noFeedView.snp.makeConstraints {
-            $0.top.equalToSuperview().offset(160)
+            $0.top.equalToSuperview().offset(140)
             $0.centerX.equalToSuperview()
             $0.width.equalTo(242)
             $0.height.equalTo(130)
@@ -57,29 +56,22 @@ final class FeedCellView: BaseUIView {
 
 // MARK: - Public API
 
-extension FeedCellView {
-    func apply(items: [FeedDiaryItem], haveFollowing: Bool? = nil) {
+extension FeedProfileCellView {
+    func apply(items: [FeedProfileDiaryItem], emptyMessage: String?) {
         self.items = items
 
-        /// 팔로잉 피드 엠티뷰
-        if items.isEmpty {
-            if let haveFollowing = haveFollowing {
-                if haveFollowing {
-                    noFeedView.configure(message: "피드에 아직 공유된 일기가 없어요.")
-                } else {
-                    noFeedView.configure(message: "아직 팔로잉한 유저가 없어요.\n마음에 드는 사람을 찾아 팔로우해 보세요!")
-                }
-            } else {
-                /// 추천 피드 엠티뷰
-                noFeedView.configure(message: "피드에 아직 공유된 일기가 없어요.")
-            }
+        if let emptyMessage = emptyMessage, items.isEmpty {
+            noFeedView.configure(message: emptyMessage)
+            noFeedView.isHidden = false
+        } else {
+            noFeedView.isHidden = true
         }
     }
 }
 
 // MARK: - UITableViewDataSource
 
-extension FeedCellView: UITableViewDataSource {
+extension FeedProfileCellView: UITableViewDataSource {
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return items.count
@@ -113,7 +105,7 @@ extension FeedCellView: UITableViewDataSource {
 
 // MARK: - Private Methods
 
-private extension FeedCellView {
+private extension FeedProfileCellView {
     func updateEmptyState() {
         noFeedView.isHidden = !items.isEmpty
         bringSubviewToFront(noFeedView)
