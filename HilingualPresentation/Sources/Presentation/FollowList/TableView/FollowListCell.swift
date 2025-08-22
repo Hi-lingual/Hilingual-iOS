@@ -98,10 +98,10 @@ final class FollowListCell: UITableViewCell {
     
     // MARK: - Configure
     
-    func configure(with user: FeedSearchUser) {
+    func configure(with user: UserDisplayable) {
         // profileImg.setImage(with: URL(string: user.profileImg))
         nickname.text = user.nickname
-        button.configure(state: user.isFollowing ? .following : .follow, size: .short)
+        button.configure(state: user.buttonState, size: .short)
         
         button.removeTarget(nil, action: nil, for: .allEvents)
         button.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)

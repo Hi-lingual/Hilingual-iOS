@@ -10,17 +10,26 @@ import Combine
 
 import HilingualDomain
 
-public struct FeedSearchUser {
+public struct FeedSearchUserModel: UserDisplayable {
     public let userId: Int
     public let profileImg: String
     public let nickname: String
     public var isFollowing: Bool
     public var isFollowed: Bool
+    public var buttonState: FollowButtonState {
+        if isFollowing && isFollowed {
+            return .mutualFollow
+        } else if isFollowing {
+            return .following
+        } else {
+            return .follow
+        }
+    }
 }
 
 public enum SearchState {
     case enter // 처음 진입 시
-    case searchResult([FeedSearchUser]) // 검색 결과가 있으면
+    case searchResult([FeedSearchUserModel]) // 검색 결과가 있으면
     case empty // 검색 결과가 없으면
 }
 
@@ -53,7 +62,6 @@ public final class FeedSearchViewModel: BaseViewModel {
     private func setBinding() {
         input.followButtonTapped
             .sink { userId in
-                print("Follow 버튼 탭 userId:", userId)
             }
             .store(in: &cancellables)
     }
@@ -65,11 +73,11 @@ public final class FeedSearchViewModel: BaseViewModel {
             .map { query -> SearchState in
                 guard !query.isEmpty else { return .enter }
 
-                let mockData: [FeedSearchUser] = [
-                    FeedSearchUser(userId: 1, profileImg: "https://example.com/image1.jpg", nickname: "하링이", isFollowing: false, isFollowed: true),
-                    FeedSearchUser(userId: 2, profileImg: "https://example.com/image2.jpg", nickname: "하이링구얼", isFollowing: true, isFollowed: true),
-                    FeedSearchUser(userId: 3, profileImg: "https://example.com/image3.jpg", nickname: "하이링궐", isFollowing: false, isFollowed: false),
-                    FeedSearchUser(userId: 4, profileImg: "https://example.com/image4.jpg", nickname: "하품그만해", isFollowing: true, isFollowed: false)
+                let mockData: [FeedSearchUserModel] = [
+                    FeedSearchUserModel(userId: 1, profileImg: "https://example.com/image1.jpg", nickname: "하링이", isFollowing: false, isFollowed: true),
+                    FeedSearchUserModel(userId: 2, profileImg: "https://example.com/image2.jpg", nickname: "하이링구얼", isFollowing: true, isFollowed: true),
+                    FeedSearchUserModel(userId: 3, profileImg: "https://example.com/image3.jpg", nickname: "하이링궐", isFollowing: false, isFollowed: false),
+                    FeedSearchUserModel(userId: 4, profileImg: "https://example.com/image4.jpg", nickname: "하품그만해", isFollowing: true, isFollowed: false)
                 ]
 
                 let filtered = mockData.filter { $0.nickname.contains(query) }

@@ -13,7 +13,7 @@ public final class FeedSearchViewController: BaseUIViewController<FeedSearchView
     // MARK: - Properties
     
     private let searchBar = SearchBar()
-    private var userList: [FeedSearchUser] = []
+    private var userList: [FeedSearchUserModel] = []
     private let searchTrigger = PassthroughSubject<String, Never>()
     
     // MARK: - UI Components
