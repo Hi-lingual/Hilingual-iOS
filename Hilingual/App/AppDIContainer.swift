@@ -131,6 +131,20 @@ final class AppDIContainer: ViewControllerFactory {
         )
     }
     
+    public func makeLikedFeedViewController() -> LikedFeedViewController {
+        return LikedFeedViewController(
+            viewModel: makeLikedFeedViewModel(),
+            diContainer: self
+        )
+    }
+    
+    public func makeSharedFeedViewController() -> SharedFeedViewController {
+        return SharedFeedViewController(
+            viewModel: makeSharedFeedViewModel(),
+            diContainer: self
+        )
+    }
+    
     public func makeUserFeedProfileViewController() -> UserFeedProfileViewController {
         return UserFeedProfileViewController(
             viewModel: makeUserFeedProfileViewModel(),
@@ -459,7 +473,36 @@ extension AppDIContainer {
         return MyFeedProfileViewModel()
     }
     
+    private func makeLikedFeedViewModel() -> LikedFeedViewModel {
+        LikedFeedViewModel(feedUseCase: makeFeedProfileUseCase())
+    }
+    
+    private func makeSharedFeedViewModel() -> SharedFeedViewModel {
+        SharedFeedViewModel(feedUseCase: makeFeedProfileUseCase())
+    }
+    
     private func makeUserFeedProfileViewModel() -> UserFeedProfileViewModel {
-        return UserFeedProfileViewModel()
+        UserFeedProfileViewModel(feedUseCase: makeFeedProfileUseCase())
+    }
+    
+    // UseCase
+    
+    private func makeFeedProfileUseCase() -> FeedProfileUseCase {
+        DefaultFeedProfileUseCase(repository: makeFeedProfileRepository())
+    }
+    
+    // Repository
+    private func makeFeedProfileRepository() -> FeedProfileRepository {
+        return DefaultFeedProfileRepository(service: makeFeedProfileService())
+    }
+    
+    //Service
+    
+//    private func makeFeedProfileService() -> FeedProfileService {
+//        return DefaultFeedProfileService()
+//    }
+    
+    private func makeFeedProfileService() -> FeedProfileService {
+        return MockFeedProfileService()
     }
 }
