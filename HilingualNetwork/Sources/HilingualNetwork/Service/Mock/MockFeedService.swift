@@ -26,8 +26,8 @@ public final class MockFeedService: FeedService {
         let dto = FollowingFeedResponseDTO(
             code: 20000,
             data: FeedListDTO(
-                diaryList: sampleItemsForFollowing(),
-                haveFollowing: true
+                diaryList: [],
+                haveFollowing: false
             ),
             message: "팔로잉한 유저들의 일기를 조회했습니다."
         )
