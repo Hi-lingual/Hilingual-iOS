@@ -123,7 +123,7 @@ final class ToastMessage: UIView {
 
             self.snp.updateConstraints {
                 $0.height.equalTo(52)
-                $0.horizontalEdges.equalToSuperview().inset(16)
+                $0.horizontalEdges.equalTo(safeAreaLayoutGuide).inset(16)
             }
 
         case .basic:
