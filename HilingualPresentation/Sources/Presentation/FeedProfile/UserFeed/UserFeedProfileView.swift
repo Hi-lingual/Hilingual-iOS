@@ -14,7 +14,7 @@ final class UserFeedProfileView: BaseUIView {
     
     private let userFeedView = FeedProfileView()
     private let button = FollowButton()
-    private let noFeedView = NoFeedView()
+    private let noFeedView = EmptyView()
     
     // MARK: - Setup
 

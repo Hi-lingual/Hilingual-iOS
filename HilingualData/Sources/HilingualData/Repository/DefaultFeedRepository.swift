@@ -17,12 +17,12 @@ public final class DefaultFeedRepository: FeedRepository {
         self.service = service
     }
 
-    public func fetch(type: FeedType) -> AnyPublisher<[FeedEntity], Error> {
+    public func fetch(type: FeedType) -> AnyPublisher<([FeedEntity], Bool?), Error> {
         switch type {
         case .recommended:
             return service.fetchRecommendedFeed()
                 .map { dto in
-                    dto.data.diaryList.map { item in
+                    let entities = dto.data.diaryList.map { item in
                         FeedEntity(
                             profile: FeedProfile(
                                 userId: item.profile.userId,
@@ -41,13 +41,14 @@ public final class DefaultFeedRepository: FeedRepository {
                             )
                         )
                     }
+                    return (entities, nil)
                 }
                 .eraseToAnyPublisher()
 
         case .following:
             return service.fetchFollowingFeed()
                 .map { dto in
-                    dto.data.diaryList.map { item in
+                    let entities = dto.data.diaryList.map { item in
                         FeedEntity(
                             profile: FeedProfile(
                                 userId: item.profile.userId,
@@ -66,6 +67,7 @@ public final class DefaultFeedRepository: FeedRepository {
                             )
                         )
                     }
+                    return (entities, dto.data.haveFollowing)
                 }
                 .eraseToAnyPublisher()
         }

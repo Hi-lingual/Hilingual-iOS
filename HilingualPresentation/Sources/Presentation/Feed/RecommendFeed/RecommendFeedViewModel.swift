@@ -49,7 +49,7 @@ public final class RecommendFeedViewModel: BaseViewModel, BaseViewModelType {
                 self.errorSubject.send(nil)
 
                 return self.feedUseCase.execute(type: .recommended)
-                    .map { (entities: [FeedEntity]) -> [FeedDiaryItem] in
+                    .map { (entities, _) -> [FeedDiaryItem] in
                         entities.map { entity in
                             FeedDiaryItem(
                                 id: entity.diary.diaryId,

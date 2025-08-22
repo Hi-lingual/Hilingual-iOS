@@ -28,8 +28,9 @@ public final class FollowingFeedViewController: BaseUIViewController<FollowingFe
         
         output?.feeds
             .receive(on: RunLoop.main)
-            .sink { [weak self] feeds in
-                self?.feedCellView.apply(items: feeds)
+            .sink { [weak self] (feeds, haveFollowing) in
+                guard let self = self else { return }
+                self.feedCellView.apply(items: feeds, haveFollowing: haveFollowing)
             }
             .store(in: &cancellables)
     }

@@ -22,7 +22,7 @@ final class FeedCellView: BaseUIView {
 
     private let tableView = UITableView(frame: .zero, style: .plain)
 
-    private let noFeedView = NoFeedView()
+    private let noFeedView = EmptyView()
 
     // MARK: - Setup Methods
 
@@ -37,7 +37,6 @@ final class FeedCellView: BaseUIView {
         tableView.estimatedRowHeight = 140
         tableView.showsVerticalScrollIndicator = false
 
-        noFeedView.configure(message: "아직 좋아요한 다이어리가 없어요.")
         noFeedView.isHidden = true
     }
 
@@ -50,8 +49,9 @@ final class FeedCellView: BaseUIView {
 
         noFeedView.snp.makeConstraints {
             $0.top.equalToSuperview().offset(160)
-            $0.horizontalEdges.equalToSuperview().inset(66.5)
-            $0.bottom.equalTo(safeAreaLayoutGuide)
+            $0.centerX.equalToSuperview()
+            $0.width.equalTo(242)
+            $0.height.equalTo(130)
         }
     }
 }
@@ -59,8 +59,22 @@ final class FeedCellView: BaseUIView {
 // MARK: - Public API
 
 extension FeedCellView {
-    func apply(items: [FeedDiaryItem]) {
+    func apply(items: [FeedDiaryItem], haveFollowing: Bool? = nil) {
         self.items = items
+
+        /// 팔로잉 피드 엠티뷰
+        if items.isEmpty {
+            if let haveFollowing = haveFollowing {
+                if haveFollowing {
+                    noFeedView.configure(message: "피드에 아직 공유된 일기가 없어요.")
+                } else {
+                    noFeedView.configure(message: "아직 팔로잉한 유저가 없어요.\n마음에 드는 사람을 찾아 팔로우해 보세요!")
+                }
+            } else {
+                /// 추천 피드 엠티뷰
+                noFeedView.configure(message: "피드에 아직 공유된 일기가 없어요.")
+            }
+        }
     }
 }
 

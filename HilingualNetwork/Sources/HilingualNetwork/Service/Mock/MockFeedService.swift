@@ -22,6 +22,37 @@ public final class MockFeedService: FeedService {
         return just(dto)
     }
 
+    // 데이터 있을 경우
+//    public func fetchFollowingFeed() -> AnyPublisher<FollowingFeedResponseDTO, Error> {
+//        let dto = FollowingFeedResponseDTO(
+//            code: 20000,
+//            data: FeedListDTO(
+//                diaryList: sampleItemsForFollowing(),
+//                haveFollowing: true
+//            ),
+//            message: "팔로잉한 유저들의 일기를 조회했습니다."
+//        )
+//        return Just(dto)
+//            .setFailureType(to: Error.self)
+//            .eraseToAnyPublisher()
+//    }
+    
+    // 데이터 없을 경우
+//    public func fetchFollowingFeed() -> AnyPublisher<FollowingFeedResponseDTO, Error> {
+//        let dto = FollowingFeedResponseDTO(
+//            code: 20000,
+//            data: FeedListDTO(
+//                diaryList: [],
+//                haveFollowing: true
+//            ),
+//            message: "팔로잉한 유저들의 일기를 조회했습니다."
+//        )
+//        return Just(dto)
+//            .setFailureType(to: Error.self)
+//            .eraseToAnyPublisher()
+//    }
+    
+    // 팔로잉 없을 경우
     public func fetchFollowingFeed() -> AnyPublisher<FollowingFeedResponseDTO, Error> {
         let dto = FollowingFeedResponseDTO(
             code: 20000,
@@ -29,7 +60,7 @@ public final class MockFeedService: FeedService {
                 diaryList: [],
                 haveFollowing: false
             ),
-            message: "팔로잉한 유저들의 일기를 조회했습니다."
+            message: "팔로잉한 유저가 없습니다."
         )
         return Just(dto)
             .setFailureType(to: Error.self)
