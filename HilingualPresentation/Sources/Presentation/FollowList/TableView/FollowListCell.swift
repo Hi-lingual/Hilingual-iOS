@@ -78,7 +78,7 @@ final class FollowListCell: UITableViewCell {
     
     private func setStyle() {
         backgroundColor = .white
-        button.configure(state: .following, size: .short)
+        button.configure(state: .following)
     }
     
     private func setUI() {
@@ -94,6 +94,10 @@ final class FollowListCell: UITableViewCell {
             $0.horizontalEdges.equalToSuperview().inset(16)
             $0.centerY.equalToSuperview()
         }
+        
+        button.snp.makeConstraints {
+            $0.width.equalTo(80)
+        }
     }
     
     // MARK: - Configure
@@ -101,7 +105,7 @@ final class FollowListCell: UITableViewCell {
     func configure(with user: UserDisplayable) {
         // profileImg.setImage(with: URL(string: user.profileImg))
         nickname.text = user.nickname
-        button.configure(state: user.buttonState, size: .short)
+        button.configure(state: user.buttonState)
         
         button.removeTarget(nil, action: nil, for: .allEvents)
         button.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
