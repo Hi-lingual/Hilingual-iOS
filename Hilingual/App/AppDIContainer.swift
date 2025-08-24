@@ -482,7 +482,7 @@ extension AppDIContainer {
     }
     
     private func makeUserFeedProfileViewModel() -> UserFeedProfileViewModel {
-        UserFeedProfileViewModel(feedUseCase: makeFeedProfileUseCase())
+        return UserFeedProfileViewModel()
     }
     
     // UseCase
