@@ -19,7 +19,7 @@ final class UserFeedProfileView: BaseUIView {
 
     override func setUI() {
         addSubviews(myFeedView, button)
-        button.configure(state: .follow, size: .long)
+        button.configure(state: .follow)
     }
 
     override func setLayout() {
