@@ -2,7 +2,7 @@
 //  FeedProfileCellView.swift
 //  HilingualPresentation
 //
-//  Created by 조영서 on 8/24/25.
+//  Created by 조영서 on 8/22/25.
 //
 
 import UIKit
