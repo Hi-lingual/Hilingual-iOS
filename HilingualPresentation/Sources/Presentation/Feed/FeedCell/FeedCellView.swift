@@ -19,15 +19,14 @@ final class FeedCellView: BaseUIView {
         }
     }
 
-    private let tableView = UITableView(frame: .zero, style: .plain)
-
+    private(set) var tableView = UITableView(frame: .zero, style: .plain)
     private let noFeedView = EmptyView()
+    private let toast = ToastMessage()
 
     // MARK: - Setup Methods
 
     override func setUI() {
-        addSubview(tableView)
-        addSubview(noFeedView)
+        addSubviews(tableView, noFeedView, toast)
 
         tableView.dataSource = self
         tableView.register(FeedDiaryCell.self, forCellReuseIdentifier: FeedDiaryCell.reuseIdentifier)
@@ -35,6 +34,7 @@ final class FeedCellView: BaseUIView {
         tableView.rowHeight = UITableView.automaticDimension
         tableView.estimatedRowHeight = 140
         tableView.showsVerticalScrollIndicator = false
+        tableView.refreshControl = UIRefreshControl()
 
         noFeedView.isHidden = true
     }
@@ -52,6 +52,8 @@ final class FeedCellView: BaseUIView {
             $0.width.equalTo(242)
             $0.height.equalTo(130)
         }
+        
+        toast.isHidden = true
     }
 }
 
@@ -88,6 +90,25 @@ extension FeedCellView {
             noFeedView.isHidden = false
         } else {
             noFeedView.isHidden = true
+        }
+    }
+    
+    // 토스트 메세지
+    func showToast(message: String) {
+        toast.configure(type: .basic, message: message)
+        toast.isHidden = false
+        toast.alpha = 0
+        
+        UIView.animate(withDuration: 0.3) {
+            self.toast.alpha = 1
+        }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+            UIView.animate(withDuration: 0.3, animations: {
+                self.toast.alpha = 0
+            }, completion: { _ in
+                self.toast.isHidden = true
+            })
         }
     }
 }
@@ -134,7 +155,6 @@ private extension FeedCellView {
         bringSubviewToFront(noFeedView)
     }
 }
-
 
 // MARK: - Extension
 
