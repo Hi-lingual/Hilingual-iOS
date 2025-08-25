@@ -1,5 +1,5 @@
 //
-//  AlarmSettingView.swift
+//  NotificationSettingView.swift
 //  HilingualPresentation
 //
 //  Created by 성현주 on 8/25/25.
@@ -8,9 +8,12 @@
 import UIKit
 import SnapKit
 
-final class AlarmSettingView: BaseUIView {
+final class NotificationSettingView: BaseUIView {
 
     // MARK: - UI Components
+
+    let marketingToggle = CustomToggle()
+    let feedToggle = CustomToggle()
 
     private let marketingLabel: UILabel = {
         let label = UILabel()
@@ -27,9 +30,6 @@ final class AlarmSettingView: BaseUIView {
         label.textColor = .black
         return label
     }()
-
-    private let marketingToggle = CustomToggle()
-    private let feedToggle = CustomToggle()
 
     private lazy var marketingRow: UIStackView = {
         let stack = UIStackView(arrangedSubviews: [marketingLabel, marketingToggle])

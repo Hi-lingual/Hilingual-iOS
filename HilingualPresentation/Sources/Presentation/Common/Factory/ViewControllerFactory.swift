@@ -28,5 +28,5 @@ public protocol ViewControllerFactory {
     func makeFeedSearchViewController() -> FeedSearchViewController
     func makeEditProfileViewController() -> EditProfileViewController
     func makeBlockUserViewController() -> BlockUserViewController
-    func makeAlarmSettingViewController() -> AlarmSettingViewController
+    func makeNotificationSettingViewController() -> NotificationSettingViewController
 }

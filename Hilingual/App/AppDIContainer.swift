@@ -119,8 +119,8 @@ final class AppDIContainer: ViewControllerFactory {
         return BlockUserViewController(viewModel: makeBlockUserViewModel(), diContainer: self)
     }
 
-    public func makeAlarmSettingViewController() -> AlarmSettingViewController {
-        return AlarmSettingViewController(viewModel: makeHomeViewModel(), diContainer: self)
+    public func makeNotificationSettingViewController() -> NotificationSettingViewController {
+        return NotificationSettingViewController(viewModel: makeNotificationViewModel(), diContainer: self)
     }
 }
 // MARK: - SplashDIContainer
@@ -384,9 +384,25 @@ extension AppDIContainer {
     }
 }
 
-// MARK: - AlarmDIContainer
+// MARK: - NotificationDIContainer
 
 extension AppDIContainer {
+
+    private func makeNotificationSettingService() -> MockAlarmSettingService {
+        return MockAlarmSettingService()
+    }
+
+    private func makeNotificationRepository() -> AlarmSettingRepository {
+        return DefaultAlarmSettingRepository(service: makeNotificationSettingService())
+    }
+
+    private func makeNotificationUseCase() -> AlarmSettingUseCase {
+        return DefaultAlarmSettingUseCase(repository: makeNotificationRepository())
+    }
+
+    private func makeNotificationViewModel() -> NotificationSettingViewModel {
+        return NotificationSettingViewModel(useCase: makeNotificationUseCase())
+    }
 }
 
 // MARK: - FollowListDIContainer
