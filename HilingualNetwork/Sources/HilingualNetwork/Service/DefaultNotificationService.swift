@@ -24,7 +24,7 @@ public final class MockNotificationService: NotificationService {
                 notiId: 1,
                 type: "LIKE_DIARY",
                 title: "홍길동님이 당신의 일기에 공감했습니다.",
-                deeplink: "myapp://diarydetail?id=1",
+                deeplink: "Hilingual://notification/diarydetail?diaryId=1",
                 isRead: false,
                 publishedAt: "2025-08-04"
             ),
@@ -32,7 +32,7 @@ public final class MockNotificationService: NotificationService {
                 notiId: 2,
                 type: "FOLLOW_USER",
                 title: "이몽룡님이 당신을 팔로우했습니다.",
-                deeplink: "myapp://user/45?notif=2",
+                deeplink: "Hilingual://notification/feedprofile?userId=45",
                 isRead: true,
                 publishedAt: "2025-07-21"
             )

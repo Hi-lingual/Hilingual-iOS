@@ -84,7 +84,7 @@ public final class NotificationListViewController: BaseUIViewController<Notifica
     }
 
     //MARK: - Private Method
-    
+
     private func setupRefreshControl() {
         notificationView.refreshControl.addTarget(self, action: #selector(handleRefresh), for: .valueChanged)
     }
@@ -133,9 +133,12 @@ extension NotificationListViewController: UITableViewDelegate {
             navigationController?.pushViewController(detailVC, animated: true)
 
         case .feed:
-            if let deeplink = selectedItem.deeplink, let url = URL(string: deeplink) {
-                UIApplication.shared.open(url)
-            }
+            guard let deeplink = selectedItem.deeplink,
+                  let url = URL(string: deeplink),
+                  let destination = DeeplinkParser.parse(url: url),
+                  let nav = navigationController else { return }
+
+            DeeplinkManager.shared.handle(destination, from: nav, di: diContainer)
         }
     }
 
