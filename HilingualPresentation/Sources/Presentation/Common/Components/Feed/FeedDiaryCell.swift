@@ -299,7 +299,7 @@ final class FeedDiaryCell: UITableViewCell {
             ])
         } else {
             menu.configure(items: [
-                ("신고하기", UIImage(named: "ic_report_24_ios", in: .module, compatibleWith: nil), .gray700)
+                ("게시글 신고하기", UIImage(named: "ic_report_24_ios", in: .module, compatibleWith: nil), .gray700)
             ])
         }
         
