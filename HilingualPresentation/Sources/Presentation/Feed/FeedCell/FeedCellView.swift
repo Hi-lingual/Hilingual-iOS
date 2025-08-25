@@ -92,7 +92,6 @@ extension FeedCellView {
     }
 }
 
-
 // MARK: - UITableViewDataSource
 
 extension FeedCellView: UITableViewDataSource {
@@ -133,5 +132,24 @@ private extension FeedCellView {
     func updateEmptyState() {
         noFeedView.isHidden = !items.isEmpty
         bringSubviewToFront(noFeedView)
+    }
+}
+
+
+// MARK: - Extension
+
+extension FeedCellView {
+    func closeAllMenus() {
+        for cell in tableView.visibleCells {
+            if let feedCell = cell as? FeedDiaryCell {
+                feedCell.closeMenuIfNeeded()
+            }
+        }
+    }
+    
+    func addTableTapGesture(target: Any, action: Selector) {
+        let tapGesture = UITapGestureRecognizer(target: target, action: action)
+        tapGesture.cancelsTouchesInView = false
+        tableView.addGestureRecognizer(tapGesture)
     }
 }
