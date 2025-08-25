@@ -9,5 +9,5 @@ struct BlockedUserModel {
     let userId: Int
     let nickname: String
     let profileImg: String
-    var isBlocked: Bool
+    let buttonState: FollowButtonState
 }

@@ -54,8 +54,7 @@ final class BlockedUserCell: UITableViewCell {
         profileImageView.image = UIImage(named: user.profileImg) ?? UIImage(resource: .imgProfileNormalIos)
         userId = user.userId
 
-        let state: FollowButtonState = user.isBlocked ? .unblock : .block
-        unblockButton.configure(state: state)
+        unblockButton.configure(state: user.buttonState)
     }
 
     private func setUI() {

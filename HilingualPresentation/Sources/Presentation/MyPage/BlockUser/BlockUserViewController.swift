@@ -39,6 +39,10 @@ public final class BlockUserViewController: BaseUIViewController<BlockUserViewMo
         return .backTitle("차단한 유저")
     }
 
+    public override func addTarget() {
+        blockUserView.refreshControl.addTarget(self, action: #selector(refreshPulled), for: .valueChanged)
+    }
+
     // MARK: - Bind
 
     public override func bind(viewModel: BlockUserViewModel) {
@@ -55,8 +59,15 @@ public final class BlockUserViewController: BaseUIViewController<BlockUserViewMo
             .receive(on: RunLoop.main)
             .sink { [weak self] _ in
                 self?.blockUserView.tableView.reloadData()
+                self?.blockUserView.refreshControl.endRefreshing()
             }
             .store(in: &cancellables)
+    }
+
+    //MARK: - Action
+
+    @objc private func refreshPulled() {
+        refreshTriggeredSubject.send(())
     }
 }
 

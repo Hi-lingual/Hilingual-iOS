@@ -12,13 +12,13 @@ final class BlockUserView: BaseUIView {
 
     // MARK: - UI Components
 
+    let refreshControl = UIRefreshControl()
+
     let tableView: UITableView = {
         let tableView = UITableView()
         tableView.separatorStyle = .none
-        tableView.showsVerticalScrollIndicator = false
         tableView.backgroundColor = .white
         tableView.register(BlockedUserCell.self, forCellReuseIdentifier: "BlockedUserCell")
-        tableView.rowHeight = 60
         return tableView
     }()
 
@@ -26,6 +26,7 @@ final class BlockUserView: BaseUIView {
 
     override func setUI() {
         addSubview(tableView)
+        tableView.refreshControl = refreshControl
     }
 
     override func setLayout() {
