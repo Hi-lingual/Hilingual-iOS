@@ -47,7 +47,7 @@ final class FeedCellView: BaseUIView {
         }
 
         noFeedView.snp.makeConstraints {
-            $0.top.equalToSuperview().offset(160)
+            $0.top.equalToSuperview().offset(140)
             $0.centerX.equalToSuperview()
             $0.width.equalTo(242)
             $0.height.equalTo(130)
@@ -64,16 +64,25 @@ extension FeedCellView {
     /// 피드 홈
     func apply(items: [FeedDiaryItem], followingState haveFollowing: Bool? = nil) {
         self.items = items
-
+        
         if items.isEmpty {
             if let haveFollowing = haveFollowing {
                 if haveFollowing {
                     noFeedView.configure(message: "피드에 아직 공유된 일기가 없어요.")
+                    noFeedView.snp.updateConstraints {
+                        $0.top.equalToSuperview().offset(160)
+                    }
                 } else {
                     noFeedView.configure(message: "아직 팔로잉한 유저가 없어요.\n마음에 드는 사람을 찾아 팔로우해 보세요!")
+                    noFeedView.snp.updateConstraints {
+                        $0.top.equalToSuperview().offset(160)
+                    }
                 }
             } else {
                 noFeedView.configure(message: "피드에 아직 공유된 일기가 없어요.")
+                noFeedView.snp.updateConstraints {
+                    $0.top.equalToSuperview().offset(160)
+                }
             }
             noFeedView.isHidden = false
         } else {
