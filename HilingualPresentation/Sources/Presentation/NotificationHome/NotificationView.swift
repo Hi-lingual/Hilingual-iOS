@@ -12,9 +12,7 @@ final class NotificationView: BaseUIView {
     // MARK: - Properties
 
     var notificationListModel: NotificationListModel = NotificationListModel(type: .feed, items: []) {
-        didSet {
-            updateView()
-        }
+        didSet { updateView() }
     }
 
     // MARK: - UI Components
@@ -26,6 +24,8 @@ final class NotificationView: BaseUIView {
         table.register(NotificationCell.self, forCellReuseIdentifier: NotificationCell.identifier)
         return table
     }()
+
+    let refreshControl = UIRefreshControl()
 
     private let emptyView = EmptyView()
 
@@ -46,20 +46,19 @@ final class NotificationView: BaseUIView {
 
     override func setUI() {
         addSubviews(tableView, emptyView)
+        tableView.refreshControl = refreshControl
     }
 
     override func setLayout() {
         tableView.snp.makeConstraints { $0.edges.equalToSuperview() }
-        emptyView.snp.makeConstraints {
-            $0.center.equalToSuperview()
-        }
+        emptyView.snp.makeConstraints { $0.center.equalToSuperview() }
     }
 
     // MARK: - Private
 
     private func updateView() {
         let items = notificationListModel.items
-        let message = notificationListModel.type == .feed ? "피드 알림이 없어요" : "공지사항이 없어요"
+        let message = "아직 알림이 없어요"
         emptyView.configure(message: message)
 
         tableView.isHidden = items.isEmpty

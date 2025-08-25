@@ -36,7 +36,12 @@ public final class NotificationListViewController: BaseUIViewController<Notifica
     public override func viewDidLoad() {
         super.viewDidLoad()
         setDelegate()
-        bindViewModel()
+        setupRefreshControl()
+        fetchTrigger.send(())
+    }
+
+    public override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         fetchTrigger.send(())
     }
 
@@ -47,8 +52,8 @@ public final class NotificationListViewController: BaseUIViewController<Notifica
 
     // MARK: - Bind
 
-    private func bindViewModel() {
-        guard let viewModel else { return }
+    public override func bind(viewModel: NotificationViewModel) {
+        super.bind(viewModel: viewModel)
 
         let input = NotificationViewModel.Input(
             fetchGeneral: type == .feed ? fetchTrigger.eraseToAnyPublisher() : Empty().eraseToAnyPublisher(),
@@ -63,6 +68,7 @@ public final class NotificationListViewController: BaseUIViewController<Notifica
                 .receive(on: DispatchQueue.main)
                 .sink { [weak self] list in
                     self?.notificationView.notificationListModel = NotificationListModel(type: .feed, items: list)
+                    self?.notificationView.refreshControl.endRefreshing()
                 }
                 .store(in: &cancellables)
 
@@ -71,9 +77,20 @@ public final class NotificationListViewController: BaseUIViewController<Notifica
                 .receive(on: DispatchQueue.main)
                 .sink { [weak self] list in
                     self?.notificationView.notificationListModel = NotificationListModel(type: .notice, items: list)
+                    self?.notificationView.refreshControl.endRefreshing()
                 }
                 .store(in: &cancellables)
         }
+    }
+
+    //MARK: - Private Method
+    
+    private func setupRefreshControl() {
+        notificationView.refreshControl.addTarget(self, action: #selector(handleRefresh), for: .valueChanged)
+    }
+
+    @objc private func handleRefresh() {
+        fetchTrigger.send(())
     }
 }
 
