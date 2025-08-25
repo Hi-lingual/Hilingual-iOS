@@ -30,4 +30,10 @@ public final class DefaultNotificationRepository: NotificationRepository {
             .map { $0.map { $0.toEntity() } }
             .eraseToAnyPublisher()
     }
+
+    public func fetchNotificationDetail(notiId: Int) -> AnyPublisher<NotificationDetailEntity, Error> {
+            return service.fetchNotificationDetail(notiId: notiId)
+                .map { $0.toEntity() }
+                .eraseToAnyPublisher()
+        }
 }

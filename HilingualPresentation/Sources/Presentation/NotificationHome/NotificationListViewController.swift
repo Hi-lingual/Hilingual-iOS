@@ -107,6 +107,19 @@ extension NotificationListViewController: UITableViewDelegate {
 
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        // TODO: handle deeplink or navigation from selected notification
+
+        let selectedItem = notificationView.notificationListModel.items[indexPath.row]
+
+        switch selectedItem.type {
+        case .notice:
+            let detailVC = self.diContainer.makeNotificationDetailViewController(notiId: selectedItem.id)
+            navigationController?.pushViewController(detailVC, animated: true)
+
+        case .feed:
+            if let deeplink = selectedItem.deeplink, let url = URL(string: deeplink) {
+                UIApplication.shared.open(url)
+            }
+        }
     }
+
 }

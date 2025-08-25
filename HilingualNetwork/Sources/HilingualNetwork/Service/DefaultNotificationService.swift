@@ -10,6 +10,7 @@ import Combine
 public protocol NotificationService {
     func fetchGeneralNotifications() -> AnyPublisher<[GeneralNotificationDTO], Error>
     func fetchNoticeNotifications() -> AnyPublisher<[NoticeNotificationDTO], Error>
+    func fetchNotificationDetail(notiId: Int) -> AnyPublisher<NotificationDetailDTO, Error>
 }
 
 public final class MockNotificationService: NotificationService {
@@ -63,4 +64,29 @@ public final class MockNotificationService: NotificationService {
             .setFailureType(to: Error.self)
             .eraseToAnyPublisher()
     }
+
+    public func fetchNotificationDetail(notiId: Int) -> AnyPublisher<NotificationDetailDTO, Error> {
+           let mock = NotificationDetailDTO(
+               title: "v1.1.1 업데이트 알림",
+               createdAt: "2025.08.08",
+               content: """
+               안녕하세요. 하이링구얼 입니다.
+
+               하이링구얼 앱이 v.1.1.1 로 업데이트 되었습니다!
+
+               [업데이트 내용]
+               • 앱 안정화를 위한 관련 수정
+
+               앱 최신 버전을 설치하여 새로워진 하이링구얼 앱을 사용해보세요.
+
+               감사합니다.
+
+               설치하러가기
+               """
+           )
+
+           return Just(mock)
+               .setFailureType(to: Error.self)
+               .eraseToAnyPublisher()
+       }
 }

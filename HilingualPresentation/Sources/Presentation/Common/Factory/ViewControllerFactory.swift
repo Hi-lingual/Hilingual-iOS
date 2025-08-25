@@ -25,4 +25,5 @@ public protocol ViewControllerFactory {
     func makeFollowListViewController() -> FollowListViewController
     func makeFeedSearchViewController() -> FeedSearchViewController
     func makeNotificationViewController() -> NotificationViewController
+    func makeNotificationDetailViewController(notiId: Int) -> NotificationDetailViewController
 }

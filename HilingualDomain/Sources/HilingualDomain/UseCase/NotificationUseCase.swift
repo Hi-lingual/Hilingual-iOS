@@ -10,6 +10,7 @@ import Combine
 public protocol NotificationUseCase {
     func fetchFeedNotifications() -> AnyPublisher<[NotificationEntity], Error>
     func fetchNoticeNotifications() -> AnyPublisher<[NotificationEntity], Error>
+    func fetchNotificationDetail(notiId: Int) -> AnyPublisher<NotificationDetailEntity, Error>
 }
 
 public final class DefaultNotificationUseCase: NotificationUseCase {
@@ -23,8 +24,12 @@ public final class DefaultNotificationUseCase: NotificationUseCase {
     public func fetchFeedNotifications() -> AnyPublisher<[NotificationEntity], Error> {
         return repository.fetchGeneralNotifications()
     }
-
+    
     public func fetchNoticeNotifications() -> AnyPublisher<[NotificationEntity], Error> {
         return repository.fetchNoticeNotifications()
+    }
+
+    public func fetchNotificationDetail(notiId: Int) -> AnyPublisher<NotificationDetailEntity, Error> {
+        return repository.fetchNotificationDetail(notiId: notiId)
     }
 }

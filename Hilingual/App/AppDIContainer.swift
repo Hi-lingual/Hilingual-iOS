@@ -108,6 +108,10 @@ final class AppDIContainer: ViewControllerFactory {
     public func makeNotificationViewController() -> NotificationViewController {
         return NotificationViewController(viewModel: makeNotificationViewModel(), diContainer: self)
     }
+
+    public func makeNotificationDetailViewController(notiId: Int) -> NotificationDetailViewController {
+        return NotificationDetailViewController(viewModel: makeNotificationDetailviewmodel(notiId: notiId), diContainer: self)
+    }
 }
 // MARK: - SplashDIContainer
 
@@ -402,3 +406,12 @@ extension AppDIContainer {
         return NotificationViewModel(useCase: makeNotificationuseCase())
     }
 }
+
+// MARK: - NotificationDetailDIContainer
+
+extension AppDIContainer {
+    private func makeNotificationDetailviewmodel(notiId: Int) -> NotificationDetailViewModel {
+        return NotificationDetailViewModel(notiId: notiId, useCase: makeNotificationuseCase())
+    }
+}
+
