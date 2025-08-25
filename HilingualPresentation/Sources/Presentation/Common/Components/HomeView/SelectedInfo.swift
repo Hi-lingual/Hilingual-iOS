@@ -148,6 +148,7 @@ final class SelectedInfo: UIView {
     func updateView(
         for date: Date,
         diaryId: Int?,
+        isPublished: Bool? = nil,
         remainingTime: Int,
         topicData: (kor: String, en: String)? = nil,
         diaryData: String? = nil,
@@ -173,9 +174,14 @@ final class SelectedInfo: UIView {
         }
 
         if let _ = diaryId {
-            notWrittenLabel.text = "작성완료"
-            notWrittenLabel.textColor = .hilingualBlue
-
+            if isPublished == true {
+                notWrittenLabel.text = "게시된 일기"
+                notWrittenLabel.textColor = .hilingualBlue
+            } else {
+                notWrittenLabel.text = "비공개 일기"
+                notWrittenLabel.textColor = .gray400
+            }
+            
             cardPreview.isHidden = false
             if let imageURL, !imageURL.isEmpty {
                 cardPreview.configure(type: .textWithImage(text: diaryData ?? "", imageUrl: imageURL))
