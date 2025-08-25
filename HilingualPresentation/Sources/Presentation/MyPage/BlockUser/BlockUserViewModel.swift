@@ -11,7 +11,7 @@ import HilingualDomain
 
 public final class BlockUserViewModel: BaseViewModel {
 
-    // MARK: - Input / Output
+    // MARK: - Input
 
     public struct Input {
         let viewDidLoad: AnyPublisher<Void, Never>
@@ -19,11 +19,13 @@ public final class BlockUserViewModel: BaseViewModel {
         let refreshTriggered: AnyPublisher<Void, Never>
     }
 
+    // MARK: - Output
+
     public struct Output {
         let blockedUsers: AnyPublisher<[BlockedUserModel], Never>
     }
 
-    // MARK: - Dependencies
+    // MARK: - Properties
 
     private let blockUserUseCase: BlockUserUseCase
 

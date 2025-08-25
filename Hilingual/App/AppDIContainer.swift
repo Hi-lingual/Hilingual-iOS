@@ -118,6 +118,10 @@ final class AppDIContainer: ViewControllerFactory {
     public func makeBlockUserViewController() -> BlockUserViewController {
         return BlockUserViewController(viewModel: makeBlockUserViewModel(), diContainer: self)
     }
+
+    public func makeAlarmSettingViewController() -> AlarmSettingViewController {
+        return AlarmSettingViewController(viewModel: makeHomeViewModel(), diContainer: self)
+    }
 }
 // MARK: - SplashDIContainer
 
@@ -378,5 +382,10 @@ extension AppDIContainer {
     private func makeBlockUserViewModel() -> BlockUserViewModel {
         return BlockUserViewModel(blockUserUseCase: makeBlockUserUsecase())
     }
+}
+
+// MARK: - AlarmDIContainer
+
+extension AppDIContainer {
 }
 

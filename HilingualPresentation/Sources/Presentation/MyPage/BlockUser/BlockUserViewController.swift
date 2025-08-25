@@ -10,12 +10,9 @@ import Combine
 
 public final class BlockUserViewController: BaseUIViewController<BlockUserViewModel> {
 
-    // MARK: - UI
+    // MARK: - Properties
 
     private let blockUserView = BlockUserView()
-    private var tableView: UITableView { blockUserView.tableView }
-
-    // MARK: - Combine
 
     private var unblockTappedSubject = PassthroughSubject<Int, Never>()
     private var refreshTriggeredSubject = PassthroughSubject<Void, Never>()
@@ -27,29 +24,24 @@ public final class BlockUserViewController: BaseUIViewController<BlockUserViewMo
         navigationController?.setNavigationBarHidden(false, animated: animated)
     }
 
+    //MARK: - Custom Method
+
     public override func loadView() {
         self.view = blockUserView
     }
 
-    public override func viewDidLoad() {
-        super.viewDidLoad()
-        setDelegate()
-        bindViewModel()
-    }
-
     public override func setDelegate() {
-        tableView.dataSource = self
-        tableView.delegate = self
+        blockUserView.tableView.dataSource = self
+        blockUserView.tableView.delegate = self
     }
 
     public override func navigationType() -> NavigationType? {
         return .backTitle("차단한 유저")
     }
 
-    // MARK: - Bind ViewModel
+    // MARK: - Bind
 
-    private func bindViewModel() {
-        guard let viewModel else { return }
+    public override func bind(viewModel: BlockUserViewModel) {
 
         let input = BlockUserViewModel.Input(
             viewDidLoad: Just(()).eraseToAnyPublisher(),
@@ -62,12 +54,13 @@ public final class BlockUserViewController: BaseUIViewController<BlockUserViewMo
         output.blockedUsers
             .receive(on: RunLoop.main)
             .sink { [weak self] _ in
-                self?.tableView.reloadData()
+                self?.blockUserView.tableView.reloadData()
             }
             .store(in: &cancellables)
     }
 }
 
+//MARK: TableView Extension
 extension BlockUserViewController: UITableViewDataSource, UITableViewDelegate {
 
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {

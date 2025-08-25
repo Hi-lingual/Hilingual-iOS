@@ -46,7 +46,7 @@ public final class MypageViewController: BaseUIViewController<MypageViewModel> {
             guard let self else { return }
             switch menu {
             case .notification:
-                let vc = self.diContainer.makeEditProfileViewController()
+                let vc = self.diContainer.makeAlarmSettingViewController()
                 self.navigationController?.pushViewController(vc, animated: true)
 
             case .blockedUsers:
