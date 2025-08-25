@@ -109,17 +109,10 @@ final class AppDIContainer: ViewControllerFactory {
             diContainer: self
         )
     }
-    
-    public func makeRecommendFeedViewController() -> RecommendFeedViewController {
-        return RecommendFeedViewController(
-            viewModel: makeRecommendFeedViewModel(),
-            diContainer: self
-        )
-    }
 
-    public func makeFollowingFeedViewController() -> FollowingFeedViewController {
-        return FollowingFeedViewController(
-            viewModel: makeFollowingFeedViewModel(),
+    public func makeFeedListViewController(type: FeedListType) -> FeedListViewController {
+        return FeedListViewController(
+            viewModel: makeFeedViewModel(type: type),
             diContainer: self
         )
     }
@@ -431,19 +424,17 @@ extension AppDIContainer {
 extension AppDIContainer {
     
     // ViewModel
+    /// FeedViewController용 ViewModel
     private func makeFeedViewModel() -> FeedViewModel {
         return FeedViewModel()
     }
     
-    private func makeRecommendFeedViewModel() -> RecommendFeedViewModel {
-        RecommendFeedViewModel(feedUseCase: makeFeedUseCase())
-    }
-    private func makeFollowingFeedViewModel() -> FollowingFeedViewModel {
-        FollowingFeedViewModel(feedUseCase: makeFeedUseCase())
+    /// FeedListViewController용 ViewModel
+    private func makeFeedViewModel(type: FeedListType) -> FeedViewModel {
+        return FeedViewModel(feedUseCase: makeFeedUseCase(), type: type)
     }
     
     // UseCase
-    
     private func makeFeedUseCase() -> FeedUseCase {
         DefaultFeedUseCase(repository: makeFeedRepository())
     }

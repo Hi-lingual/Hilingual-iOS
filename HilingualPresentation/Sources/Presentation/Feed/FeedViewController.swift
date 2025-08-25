@@ -14,8 +14,8 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
 
     private let feedView = FeedView()
 
-    private lazy var recommendFeedVC = diContainer.makeRecommendFeedViewController()
-    private lazy var followingFeedVC = diContainer.makeFollowingFeedViewController()
+    private lazy var recommendFeedVC = diContainer.makeFeedListViewController(type: .recommended)
+    private lazy var followingFeedVC = diContainer.makeFeedListViewController(type: .following)
 
     // MARK: - Lifecycle
 
