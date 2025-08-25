@@ -118,30 +118,40 @@ final class AppDIContainer: ViewControllerFactory {
     }
     
     public func makeMyFeedProfileViewController() -> MyFeedProfileViewController {
+        let likedVC = makeFeedProfileListViewController(type: .liked, userId: 0)
+        let sharedVC = makeFeedProfileListViewController(type: .shared, userId: 0)
+        
         return MyFeedProfileViewController(
-            viewModel: makeMyFeedProfileViewModel(),
-            diContainer: self
+            viewModel: makeFeedProfileViewModel(type: .liked, targetUserId: 0),
+            diContainer: self,
+            likedVC: likedVC,
+            sharedVC: sharedVC
         )
     }
-    
-    public func makeLikedFeedViewController() -> LikedFeedViewController {
-        return LikedFeedViewController(
-            viewModel: makeLikedFeedViewModel(),
-            diContainer: self
-        )
-    }
-    
-    public func makeSharedFeedViewController() -> SharedFeedViewController {
-        return SharedFeedViewController(
-            viewModel: makeSharedFeedViewModel(),
-            diContainer: self
-        )
-    }
-    
-    public func makeUserFeedProfileViewController() -> UserFeedProfileViewController {
+
+    public func makeUserFeedProfileViewController(userId: Int64) -> UserFeedProfileViewController {
         return UserFeedProfileViewController(
-            viewModel: makeUserFeedProfileViewModel(),
+            viewModel: makeFeedProfileViewModel(type: .shared, targetUserId: userId),
             diContainer: self
+        )
+    }
+
+    public func makeFeedProfileListViewController(
+        type: FeedProfileListType,
+        userId: Int64
+    ) -> FeedProfileListViewController {
+        // Presentation → Domain 변환
+        let domainType: FeedProfileType = {
+            switch type {
+            case .liked: return .liked
+            case .shared: return .shared
+            }
+        }()
+
+        return FeedProfileListViewController(
+            viewModel: makeFeedProfileViewModel(type: domainType, targetUserId: userId),
+            diContainer: self,
+            type: type
         )
     }
 }
@@ -460,20 +470,15 @@ extension AppDIContainer {
 extension AppDIContainer {
     
     // ViewModel
-    private func makeMyFeedProfileViewModel() -> MyFeedProfileViewModel {
-        return MyFeedProfileViewModel()
-    }
-    
-    private func makeLikedFeedViewModel() -> LikedFeedViewModel {
-        LikedFeedViewModel(feedUseCase: makeFeedProfileUseCase())
-    }
-    
-    private func makeSharedFeedViewModel() -> SharedFeedViewModel {
-        SharedFeedViewModel(feedUseCase: makeFeedProfileUseCase())
-    }
-    
-    private func makeUserFeedProfileViewModel() -> UserFeedProfileViewModel {
-        return UserFeedProfileViewModel()
+    private func makeFeedProfileViewModel(
+        type: FeedProfileType,
+        targetUserId: Int64
+    ) -> FeedProfileViewModel {
+        return FeedProfileViewModel(
+            feedUseCase: makeFeedProfileUseCase(),
+            type: type,
+            targetUserId: targetUserId
+        )
     }
     
     // UseCase

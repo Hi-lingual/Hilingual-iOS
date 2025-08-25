@@ -8,7 +8,7 @@
 import UIKit
 import Foundation
 
-public final class UserFeedProfileViewController: BaseUIViewController<UserFeedProfileViewModel> {
+public final class UserFeedProfileViewController: BaseUIViewController<FeedProfileViewModel> {
 
     // MARK: - Properties
 

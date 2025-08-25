@@ -27,7 +27,9 @@ public protocol ViewControllerFactory {
     func makeFeedViewController() -> FeedViewController
     func makeFeedListViewController(type: FeedListType) -> FeedListViewController
     func makeMyFeedProfileViewController() -> MyFeedProfileViewController
-    func makeUserFeedProfileViewController() -> UserFeedProfileViewController
-    func makeLikedFeedViewController() -> LikedFeedViewController
-    func makeSharedFeedViewController() -> SharedFeedViewController
+    func makeUserFeedProfileViewController(userId: Int64) -> UserFeedProfileViewController
+    func makeFeedProfileListViewController(
+        type: FeedProfileListType,
+        userId: Int64
+    ) -> FeedProfileListViewController
 }

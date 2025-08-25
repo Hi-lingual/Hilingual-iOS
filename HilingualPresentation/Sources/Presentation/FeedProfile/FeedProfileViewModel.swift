@@ -1,15 +1,15 @@
 //
-//  LikedFeedViewModel.swift
+//  FeedProfileViewModel.swift
 //  HilingualPresentation
 //
-//  Created by 조영서 on 8/22/25.
+//  Created by 조영서 on 8/25/25.
 //
 
 import Foundation
 import Combine
 import HilingualDomain
 
-public final class LikedFeedViewModel: BaseViewModel, BaseViewModelType {
+public final class FeedProfileViewModel: BaseViewModel, BaseViewModelType {
 
     // MARK: - Input/Output
     public struct Input {
@@ -18,7 +18,7 @@ public final class LikedFeedViewModel: BaseViewModel, BaseViewModelType {
     }
 
     public struct Output {
-        let feeds: AnyPublisher<[FeedProfileDiaryItem], Never>
+        let feeds: AnyPublisher<[FeedDiaryItem], Never>
         let isLoading: AnyPublisher<Bool, Never>
         let errorMessage: AnyPublisher<String?, Never>
         let isEmpty: AnyPublisher<Bool, Never>
@@ -26,16 +26,20 @@ public final class LikedFeedViewModel: BaseViewModel, BaseViewModelType {
     
     // MARK: - Dependencies
     private let feedUseCase: FeedProfileUseCase
+    private let type: FeedProfileType
+    private let targetUserId: Int64
 
     // MARK: - State
-    private let feedsSubject = CurrentValueSubject<[FeedProfileDiaryItem], Never>([])
+    private let feedsSubject = CurrentValueSubject<[FeedDiaryItem], Never>([])
     private let isEmptySubject = CurrentValueSubject<Bool, Never>(false)
     private let isLoadingSubject = CurrentValueSubject<Bool, Never>(false)
     private let errorSubject = CurrentValueSubject<String?, Never>(nil)
 
     // MARK: - Init
-    public init(feedUseCase: FeedProfileUseCase) {
+    public init(feedUseCase: FeedProfileUseCase, type: FeedProfileType, targetUserId: Int64 = 0) {
         self.feedUseCase = feedUseCase
+        self.type = type
+        self.targetUserId = targetUserId
         super.init()
     }
 
@@ -45,15 +49,15 @@ public final class LikedFeedViewModel: BaseViewModel, BaseViewModelType {
             .eraseToAnyPublisher()
 
         trigger
-            .flatMap { [weak self] _ -> AnyPublisher<[FeedProfileDiaryItem], Never> in
+            .flatMap { [weak self] _ -> AnyPublisher<[FeedDiaryItem], Never> in
                 guard let self else { return Just([]).eraseToAnyPublisher() }
                 self.isLoadingSubject.send(true)
                 self.errorSubject.send(nil)
 
-                return self.feedUseCase.execute(type: .liked, targetUserId: 0)
-                    .map { (entities, _) -> [FeedProfileDiaryItem] in
+                return self.feedUseCase.execute(type: self.type, targetUserId: self.targetUserId)
+                    .map { (entities, _) -> [FeedDiaryItem] in
                         entities.map { entity in
-                            FeedProfileDiaryItem(
+                            FeedDiaryItem(
                                 id: entity.diary.diaryId,
                                 nickname: entity.profile.nickname,
                                 profileImg: entity.profile.profileImg,
@@ -72,7 +76,7 @@ public final class LikedFeedViewModel: BaseViewModel, BaseViewModelType {
                     })
                     .catch { [weak self] error in
                         self?.errorSubject.send(error.localizedDescription)
-                        return Just<[FeedProfileDiaryItem]>([])
+                        return Just<[FeedDiaryItem]>([])
                     }
                     .eraseToAnyPublisher()
             }
