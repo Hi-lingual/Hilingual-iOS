@@ -30,7 +30,7 @@ public final class MypageViewController: BaseUIViewController<MypageViewModel> {
         super.setUI()
         view.addSubview(mypageView)
         if let value = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String {
-            mypageView.versionValueLabel.text = "v\(value)"
+            mypageView.versionValueLabel.text = "\(value)"
         }
     }
 
@@ -46,7 +46,7 @@ public final class MypageViewController: BaseUIViewController<MypageViewModel> {
             guard let self else { return }
             switch menu {
             case .notification:
-                let vc = self.diContainer.makeAlarmSettingViewController()
+                let vc = self.diContainer.makeNotificationSettingViewController()
                 self.navigationController?.pushViewController(vc, animated: true)
 
             case .blockedUsers:

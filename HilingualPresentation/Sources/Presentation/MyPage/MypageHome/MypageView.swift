@@ -19,7 +19,7 @@ final class MypageView: BaseUIView {
         case policy
     }
 
-    // MARK: - Output
+    // MARK: - Public
 
     var onMenuTap: ((MenuItem) -> Void)?
 
@@ -129,7 +129,7 @@ final class MypageView: BaseUIView {
 
     private var menuRows: [UIControl] = []
 
-    // MARK: - UI Setup
+    // MARK: - Custom Method
 
     override func setUI() {
         backgroundColor = .gray100
@@ -231,12 +231,11 @@ final class MypageView: BaseUIView {
             $0.top.equalTo(versionLabel.snp.bottom).offset(20)
             $0.leading.trailing.equalToSuperview().inset(28)
             $0.height.equalTo(44)
-            // ✅ scrollView content 높이 마감
             $0.bottom.equalToSuperview().inset(40)
         }
     }
 
-    // MARK: - Helper
+    // MARK: - Private Method
 
     private func makeMenuRowView(title: String, icon: String, action: @escaping () -> Void) -> UIControl {
         let container = UIControl()
@@ -268,20 +267,7 @@ final class MypageView: BaseUIView {
             $0.centerY.equalToSuperview()
             $0.size.equalTo(24)
         }
-//
         container.addAction(UIAction { _ in action() }, for: .touchUpInside)
-//
-//        container.addTarget(self, action: #selector(highlightDown(_:)), for: .touchDown)
-//        container.addTarget(self, action: #selector(highlightCancel(_:)), for: [.touchUpInside, .touchDragExit, .touchCancel])
-
         return container
     }
-
-//    @objc private func highlightDown(_ sender: UIControl) {
-//        sender.backgroundColor = UIColor.black.withAlphaComponent(0.03)
-//    }
-//
-//    @objc private func highlightCancel(_ sender: UIControl) {
-//        UIView.animate(withDuration: 0.15) { sender.backgroundColor = .clear }
-//    }
 }
