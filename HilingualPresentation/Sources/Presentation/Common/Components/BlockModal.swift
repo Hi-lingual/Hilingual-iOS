@@ -10,12 +10,10 @@ import SnapKit
 
 final class BlockModal: UIView {
     
-    
     // MARK: - Callback
     var onApplyTapped: (() -> Void)?
-
+    
     // MARK: - Properties
-
     private let backgroundDimView: UIView = {
         let view = UIView()
         view.backgroundColor = UIColor.dim
@@ -36,6 +34,7 @@ final class BlockModal: UIView {
         let label = UILabel()
         label.font = .suit(.head_b_18)
         label.textColor = .black
+        label.textAlignment = .left
         label.text = "정말 차단하실건가요?"
         return label
     }()
@@ -44,7 +43,8 @@ final class BlockModal: UIView {
         let label = UILabel()
         label.font = .suit(.body_m_14)
         label.textColor = .gray400
-        label.numberOfLines = 2
+        label.numberOfLines = 0
+        label.textAlignment = .left
         label.text = "차단 시 상대방은 차단 여부를 알 수 없으며,\n언제든 차단을 해제 할 수 있어요."
         return label
     }()
@@ -62,7 +62,6 @@ final class BlockModal: UIView {
         stack.axis = .horizontal
         stack.spacing = 4
         stack.alignment = .center
-        stack.distribution = .fill
         return stack
     }()
     
@@ -99,7 +98,6 @@ final class BlockModal: UIView {
     private let applyButton = CTAButton(style: .TextButton("차단하기"), autoBackground: false)
 
     // MARK: - Init
-
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
@@ -112,7 +110,6 @@ final class BlockModal: UIView {
     }
 
     // MARK: - UI Setup
-
     private func setupUI() {
         addSubviews(backgroundDimView, modalSheetView)
         
@@ -162,25 +159,27 @@ final class BlockModal: UIView {
 
     private func setupAction() {
         applyButton.addAction(UIAction { [weak self] _ in
-            guard let self = self else { return }
-            self.onApplyTapped?()
-            self.dismiss()
+            guard let self else { return }
+            self.onApplyTapped?()   // 👈 먼저 외부 콜백 실행
+            self.dismiss()          // 👈 그다음 닫기
         }, for: .touchUpInside)
     }
 
     // MARK: - Animation
-
     public func show(in parentView: UIView) {
+        // 혹시 다른 superview에 남아있을 경우 제거
+        self.removeFromSuperview()
+        
         parentView.addSubview(self)
         self.snp.makeConstraints { $0.edges.equalToSuperview() }
 
         layoutIfNeeded()
         modalSheetView.transform = CGAffineTransform(translationX: 0, y: modalSheetView.frame.height)
 
-        UIView.animate(withDuration: 0.3, animations: {
+        UIView.animate(withDuration: 0.3) {
             self.backgroundDimView.alpha = 1
             self.modalSheetView.transform = .identity
-        })
+        }
     }
 
     @objc public func dismiss() {

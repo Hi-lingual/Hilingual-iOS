@@ -93,7 +93,7 @@ extension FeedCellView {
         }
     }
     
-    // 토스트 메세지
+    /// 토스트 메세지
     func showToast(message: String) {
         toast.configure(type: .basic, message: message)
         toast.isHidden = false

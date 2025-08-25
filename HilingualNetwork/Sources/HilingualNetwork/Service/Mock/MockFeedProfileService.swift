@@ -33,6 +33,8 @@ public final class MockFeedProfileService: FeedProfileService {
                 data: SharedFeedDataDTO(
                     profile: SharedProfileDTO(profileImg: "https://i.namu.wiki/i/ox5e5MMg8cRJiIm65Tm7DhzLAw5Kjz8n-96WESaHdpWm59PhwQJo0gi8pdMWW1cKONtAlitKsLWNrvnPNlHxlQ.webp", nickname: "타인프로필임"),
                     diaryList: sampleSharedItemsForOther()
+//                    diaryList: []
+
                 ),
                 message: "공유된 일기를 조회했습니다."
             )
@@ -88,6 +90,9 @@ public final class MockFeedProfileService: FeedProfileService {
     
     private func sampleSharedItemsForOther() -> [ProfileDiaryDTO] {
         [
+            .init(diaryId: 11, sharedDate: 500, likeCount: 5, isLiked: true, diaryImg: "https://t1.daumcdn.net/gift/pagebuilder/image/page/30364/20250604_VCAWA.jpeg", originalText: "Had a presentation today and it was a disaster. My voice was shaking, my slides didn’t work properly, and I forgot what I wanted to say. So 답답하다. I know I should’ve practiced more, but still. Hate days like this."),
+            .init(diaryId: 11, sharedDate: 500, likeCount: 5, isLiked: true, diaryImg: "https://t1.daumcdn.net/gift/pagebuilder/image/page/30364/20250604_VCAWA.jpeg", originalText: "Had a presentation today and it was a disaster. My voice was shaking, my slides didn’t work properly, and I forgot what I wanted to say. So 답답하다. I know I should’ve practiced more, but still. Hate days like this."),
+            .init(diaryId: 11, sharedDate: 500, likeCount: 5, isLiked: true, diaryImg: "https://t1.daumcdn.net/gift/pagebuilder/image/page/30364/20250604_VCAWA.jpeg", originalText: "Had a presentation today and it was a disaster. My voice was shaking, my slides didn’t work properly, and I forgot what I wanted to say. So 답답하다. I know I should’ve practiced more, but still. Hate days like this."),
             .init(diaryId: 11, sharedDate: 500, likeCount: 5, isLiked: true, diaryImg: "https://t1.daumcdn.net/gift/pagebuilder/image/page/30364/20250604_VCAWA.jpeg", originalText: "Had a presentation today and it was a disaster. My voice was shaking, my slides didn’t work properly, and I forgot what I wanted to say. So 답답하다. I know I should’ve practiced more, but still. Hate days like this.")
         ]
     }

@@ -9,36 +9,58 @@ import UIKit
 import SnapKit
 
 final class UserFeedProfileView: BaseUIView {
-
-    // MARK: - UI Components
     
+    // MARK: - UI Components
     private let myFeedView = FeedProfileView()
-    private let button = FollowButton()
+    private(set) var button = FollowButton()
+    
+    let feedContainer = UIView()
+    
+    private let blockedStack: UIStackView = {
+        let stack = UIStackView()
+        stack.axis = .vertical
+        stack.spacing = 12
+        stack.alignment = .center
+        return stack
+    }()
+    
+    private let titleLabel: UILabel = {
+        let label = UILabel()
+        label.font = .suit(.head_b_18)
+        label.textColor = .black
+        label.text = "밍님의 글을 확인할 수 없어요."
+        return label
+    }()
+    
+    private let subTitleLabel: UILabel = {
+        let label = UILabel()
+        label.font = .suit(.body_m_16)
+        label.textColor = .gray400
+        label.text = "차단을 해제하면 글을 확인할 수 있어요."
+        return label
+    }()
     
     private let modal: Modal = {
         let modal = Modal()
         modal.isHidden = true
-        modal.configure(
-            title: "",
-            items: [
-                ("계정 차단하기", UIImage(resource: .icCamera24Ios), {
-                    print("계정 차단함 ㅋㅋ")
-                }),
-                ("계정 신고하기", UIImage(resource: .icGallary24Ios), {
-                    print("계정 신고함 ㅋㅋ")
-                })
-            ]
-        )
         return modal
     }()
-
+    
+    private let blockModal = BlockModal()
+    
+    // MARK: - Callbacks
+    var onBlockTapped: (() -> Void)?
+    var onBlockConfirmTapped: (() -> Void)?
+    var onReportTapped: (() -> Void)?
+    
     // MARK: - Setup
-
     override func setUI() {
-        addSubviews(myFeedView, button, modal)
+        addSubviews(myFeedView, button, feedContainer, blockedStack, modal)
+        blockedStack.isHidden = true
+        blockedStack.addArrangedSubviews(titleLabel, subTitleLabel)
         button.configure(state: .follow)
     }
-
+    
     override func setLayout() {
         myFeedView.snp.makeConstraints {
             $0.top.equalTo(safeAreaLayoutGuide).offset(8)
@@ -50,17 +72,58 @@ final class UserFeedProfileView: BaseUIView {
             $0.horizontalEdges.equalToSuperview().inset(16)
         }
         
-        modal.snp.makeConstraints {
-            $0.edges.equalToSuperview()
+        feedContainer.snp.makeConstraints {
+            $0.top.equalTo(button.snp.bottom)
+            $0.horizontalEdges.bottom.equalToSuperview()
+        }
+        
+        blockedStack.snp.makeConstraints {
+            $0.top.equalTo(button.snp.bottom).offset(140)
+            $0.centerX.equalToSuperview()
+        }
+        
+        modal.snp.makeConstraints { $0.edges.equalToSuperview() }
+    }
+    
+    // MARK: - Public
+    func showModal() {
+        modal.configure(
+            title: "",
+            items: [
+                ("계정 차단하기", UIImage(named: "ic_block_24_2_ios", in: .module, compatibleWith: nil), { [weak self] in
+                    self?.onBlockTapped?()
+                }),
+                ("계정 신고하기", UIImage(named: "ic_report_24_ios", in: .module, compatibleWith: nil), { [weak self] in
+                    self?.onReportTapped?()
+                })
+            ]
+        )
+        modal.isHidden = false
+        bringSubviewToFront(modal)
+        
+        DispatchQueue.main.async { [weak self] in
+            self?.modal.showAnimation()
         }
     }
+    
+    func showBlockDialog() {
+        blockModal.show(in: self)
+        blockModal.onApplyTapped = { [weak self] in
+            self?.onBlockConfirmTapped?()
+        }
+    }
+    
+    func dismissBlockDialog() {
+        blockModal.dismiss()
+    }
+    
+    func dismissModal() {
+        modal.isHidden = true
+        modal.removeFromSuperview()
+    }
+    
+    func showBlockedView() {
+        feedContainer.isHidden = true
+        blockedStack.isHidden = false
+    }
 }
-
-//private func addTarget() {
-//    textScanButton.addTarget(self, action: #selector(showModal), for: .touchUpInside)
-//}
-//
-//@objc private func showModal() {
-//    modal.isHidden = false
-//    modal.showAnimation()
-//}

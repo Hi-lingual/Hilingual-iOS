@@ -132,7 +132,8 @@ final class AppDIContainer: ViewControllerFactory {
     public func makeUserFeedProfileViewController(userId: Int64) -> UserFeedProfileViewController {
         return UserFeedProfileViewController(
             viewModel: makeFeedProfileViewModel(type: .shared, targetUserId: userId),
-            diContainer: self
+            diContainer: self,
+            targetUserId: userId
         )
     }
 
