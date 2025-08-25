@@ -10,6 +10,8 @@ import SnapKit
 
 final class FeedCellView: BaseUIView {
     
+    var onReportTapped: (() -> Void)?
+    
     // MARK: - Properties
 
     private var items: [FeedDiaryItem] = [] {
@@ -22,11 +24,13 @@ final class FeedCellView: BaseUIView {
     private(set) var tableView = UITableView(frame: .zero, style: .plain)
     private let noFeedView = EmptyView()
     private let toast = ToastMessage()
+    private let dialog = Dialog()
+
 
     // MARK: - Setup Methods
 
     override func setUI() {
-        addSubviews(tableView, noFeedView, toast)
+        addSubviews(tableView, noFeedView, toast, dialog)
 
         tableView.dataSource = self
         tableView.register(FeedDiaryCell.self, forCellReuseIdentifier: FeedDiaryCell.reuseIdentifier)
@@ -37,6 +41,8 @@ final class FeedCellView: BaseUIView {
         tableView.refreshControl = UIRefreshControl()
 
         noFeedView.isHidden = true
+        toast.isHidden = true
+        dialog.isHidden = true
     }
 
     override func setLayout() {
@@ -53,7 +59,7 @@ final class FeedCellView: BaseUIView {
             $0.height.equalTo(130)
         }
         
-        toast.isHidden = true
+        dialog.snp.makeConstraints { $0.edges.equalToSuperview() }
     }
 }
 
@@ -69,20 +75,14 @@ extension FeedCellView {
             if let haveFollowing = haveFollowing {
                 if haveFollowing {
                     noFeedView.configure(message: "피드에 아직 공유된 일기가 없어요.")
-                    noFeedView.snp.updateConstraints {
-                        $0.top.equalToSuperview().offset(160)
-                    }
+                    noFeedView.snp.updateConstraints { $0.top.equalToSuperview().offset(160) }
                 } else {
                     noFeedView.configure(message: "아직 팔로잉한 유저가 없어요.\n마음에 드는 사람을 찾아 팔로우해 보세요!")
-                    noFeedView.snp.updateConstraints {
-                        $0.top.equalToSuperview().offset(160)
-                    }
+                    noFeedView.snp.updateConstraints { $0.top.equalToSuperview().offset(160) }
                 }
             } else {
                 noFeedView.configure(message: "피드에 아직 공유된 일기가 없어요.")
-                noFeedView.snp.updateConstraints {
-                    $0.top.equalToSuperview().offset(160)
-                }
+                noFeedView.snp.updateConstraints { $0.top.equalToSuperview().offset(160) }
             }
             noFeedView.isHidden = false
         } else {
@@ -139,6 +139,7 @@ extension FeedCellView: UITableViewDataSource {
         }
 
         let item = items[indexPath.row]
+        cell.delegate = self
         cell.configure(
             nickname: item.nickname,
             profileImageURL: item.profileImg,
@@ -180,5 +181,39 @@ extension FeedCellView {
         let tapGesture = UITapGestureRecognizer(target: target, action: action)
         tapGesture.cancelsTouchesInView = false
         tableView.addGestureRecognizer(tapGesture)
+    }
+}
+
+// MARK: - FeedDiaryCellDelegate
+
+extension FeedCellView: FeedDiaryCell.FeedDiaryCellDelegate {
+    func feedDiaryCell(_ cell: FeedDiaryCell, didTapMoreButton isMine: Bool) {
+    }
+
+    func feedDiaryCell(_ cell: FeedDiaryCell, didTapMenuItemAt index: Int, isMine: Bool) {
+        if isMine {
+            showDialog(
+                title: "영어 일기를 비공개 하시겠어요?",
+                content: "비공개로 전환 시,\n해당 일기의 피드 활동 내역은 모두 사라져요."
+            )
+        } else {
+            onReportTapped?()
+        }
+    }
+}
+
+private extension FeedCellView {
+    func showDialog(title: String, content: String) {
+        dialog.configure(
+            style: .normal,
+            title: title,
+            content: content,
+            leftButtonTitle: "취소",
+            rightButtonTitle: "확인",
+            leftAction: { [weak self] in self?.dialog.dismiss() },
+            rightAction: { [weak self] in self?.dialog.dismiss() }
+        )
+        dialog.showAnimation()
+        bringSubviewToFront(dialog)
     }
 }

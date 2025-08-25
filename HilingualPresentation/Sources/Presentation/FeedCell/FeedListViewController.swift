@@ -8,6 +8,7 @@
 import UIKit
 import Foundation
 import Combine
+import SafariServices
 
 public final class FeedListViewController: BaseUIViewController<FeedViewModel> {
 
@@ -26,6 +27,13 @@ public final class FeedListViewController: BaseUIViewController<FeedViewModel> {
         input.reload.send(())
         
         feedCellView.addTableTapGesture(target: self, action: #selector(didTapTableView))
+        
+        feedCellView.onReportTapped = { [weak self] in
+            guard let url = URL(string: "https://hilingual.notion.site/230829677ebf801c965be24b0ef444e9"),
+                  let self else { return }
+            let safariVC = SFSafariViewController(url: url)
+            self.present(safariVC, animated: true)
+        }
     }
 
     // MARK: - Bindings

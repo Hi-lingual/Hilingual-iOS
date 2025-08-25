@@ -12,6 +12,8 @@ import Kingfisher
 final class FeedDiaryCell: UITableViewCell {
     
     // MARK: - Delegate
+    
+    @MainActor
     protocol FeedDiaryCellDelegate: AnyObject {
         func feedDiaryCell(_ cell: FeedDiaryCell, didTapMoreButton isMine: Bool)
         func feedDiaryCell(_ cell: FeedDiaryCell, didTapMenuItemAt index: Int, isMine: Bool)
@@ -165,17 +167,8 @@ final class FeedDiaryCell: UITableViewCell {
         return imageView
     }()
     
-    private let spacer1: UIView = {
-        let view = UIView()
-        view.backgroundColor = .clear
-        return view
-    }()
-    
-    private let spacer2: UIView = {
-        let view = UIView()
-        view.backgroundColor = .clear
-        return view
-    }()
+    private let spacer1 = UIView()
+    private let spacer2 = UIView()
     
     private let divider: UIView = {
         let view = UIView()
@@ -220,7 +213,6 @@ final class FeedDiaryCell: UITableViewCell {
     }
 
     private func setLayout() {
-        
         containerStack.snp.makeConstraints {
             $0.top.equalTo(20)
             $0.horizontalEdges.equalToSuperview().inset(16)
@@ -238,34 +230,19 @@ final class FeedDiaryCell: UITableViewCell {
             $0.width.equalTo(45)
         }
         
-        profileImageView.snp.makeConstraints {
-            $0.size.equalTo(42)
-        }
-
-        streakImageView.snp.makeConstraints {
-            $0.size.equalTo(16)
-        }
-
-        moreImageView.snp.makeConstraints {
-            $0.size.equalTo(24)
-        }
+        profileImageView.snp.makeConstraints { $0.size.equalTo(42) }
+        streakImageView.snp.makeConstraints { $0.size.equalTo(16) }
+        moreImageView.snp.makeConstraints { $0.size.equalTo(24) }
         
         diaryImageView.snp.makeConstraints {
             $0.height.equalTo(182)
             $0.width.equalToSuperview()
         }
 
-        detailImageView.snp.makeConstraints {
-            $0.size.equalTo(16)
-        }
+        detailImageView.snp.makeConstraints { $0.size.equalTo(16) }
         
-        spacer1.snp.makeConstraints {
-            $0.height.equalTo(0)
-        }
-        
-        spacer2.snp.makeConstraints {
-            $0.width.equalTo(0)
-        }
+        spacer1.snp.makeConstraints { $0.height.equalTo(0) }
+        spacer2.snp.makeConstraints { $0.width.equalTo(0) }
         
         divider.snp.makeConstraints {
             $0.top.equalTo(containerStack.snp.bottom).offset(20)
@@ -290,9 +267,9 @@ final class FeedDiaryCell: UITableViewCell {
         isLast: Bool = false
     ) {
         self.isMine = isMine
-        
         nameLabel.text = nickname
         
+        // 메뉴 구성
         if isMine {
             menu.configure(items: [
                 ("비공개하기", UIImage(named: "ic_hide_24_ios", in: .module, compatibleWith: nil), .gray700)
@@ -302,28 +279,30 @@ final class FeedDiaryCell: UITableViewCell {
                 ("게시글 신고하기", UIImage(named: "ic_report_24_ios", in: .module, compatibleWith: nil), .gray700)
             ])
         }
-        
         menu.isHidden = true
 
+        // streak
         let streakValue = max(streak ?? 0, 0)
         streakLabel.text = "\(streakValue)"
         streakLabel.textColor = streakValue > 0 ? .hilingualOrange : .gray400
 
+        // 공유 날짜
         sharedDateLabel.text = sharedDateMinutes.timeToText
 
+        // diary preview
         if let preview = diaryPreviewText {
             diaryLabel.attributedText = .suit(.body_r_16, text: preview)
         }
 
-        if
-            let urlString = profileImageURL,
-            !urlString.isEmpty,
-            let url = URL(string: urlString)
-        {
+        // 프로필 이미지
+        if let urlString = profileImageURL,
+           !urlString.isEmpty,
+           let url = URL(string: urlString) {
             profileImageView.kf.setImage(
                 with: url,
                 placeholder: UIImage(named: "img_profile_normal_ios", in: .module, compatibleWith: nil)
-            )        } else {
+            )
+        } else {
             profileImageView.image = UIImage(
                 named: "img_profile_normal_ios",
                 in: .module,
@@ -331,11 +310,10 @@ final class FeedDiaryCell: UITableViewCell {
             )
         }
         
-        if
-            let urlString = diaryImageURL,
-            !urlString.isEmpty,
-            let url = URL(string: urlString)
-        {
+        // 다이어리 이미지
+        if let urlString = diaryImageURL,
+           !urlString.isEmpty,
+           let url = URL(string: urlString) {
             diaryImageView.kf.setImage(
                 with: url,
                 placeholder: UIImage(named: "img_load_fail_large_ios", in: .module, compatibleWith: nil)
@@ -346,10 +324,10 @@ final class FeedDiaryCell: UITableViewCell {
             diaryImageView.isHidden = true
         }
         
+        // 좋아요
         likeView.configure(likeCount: likeCount, isLiked: isLiked)
 
         divider.isHidden = isLast
-        
     }
     
     override func prepareForReuse() {
@@ -368,6 +346,7 @@ final class FeedDiaryCell: UITableViewCell {
         menu.isHidden.toggle()
         delegate?.feedDiaryCell(self, didTapMoreButton: isMine)
     }
+    
     func closeMenuIfNeeded() {
         if !menu.isHidden {
             menu.isHidden = true
