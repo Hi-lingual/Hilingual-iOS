@@ -8,6 +8,7 @@
 import UIKit
 import Foundation
 import Combine
+import SafariServices
 
 public final class FeedProfileListViewController: BaseUIViewController<FeedProfileViewModel> {
     
@@ -17,7 +18,9 @@ public final class FeedProfileListViewController: BaseUIViewController<FeedProfi
     private let type: FeedProfileListType
 
     // MARK: - Init
-    public init(viewModel: FeedProfileViewModel, diContainer: any ViewControllerFactory, type: FeedProfileListType) {
+    public init(viewModel: FeedProfileViewModel,
+                diContainer: any ViewControllerFactory,
+                type: FeedProfileListType) {
         self.type = type
         super.init(viewModel: viewModel, diContainer: diContainer)
     }
@@ -36,6 +39,15 @@ public final class FeedProfileListViewController: BaseUIViewController<FeedProfi
         input.reload.send(())
         
         feedCellView.addTableTapGesture(target: self, action: #selector(didTapTableView))
+        
+        feedCellView.onReportTapped = { [weak self] in
+            guard let self,
+                  let url =
+                    URL(string: "https://hilingual.notion.site/230829677ebf801c965be24b0ef444e9")
+            else { return }
+            let safariVC = SFSafariViewController(url: url)
+            self.present(safariVC, animated: true)
+        }
     }
 
     // MARK: - Bindings
