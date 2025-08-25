@@ -84,11 +84,7 @@ final class CalendarHeaderView: UIView {
 
     private func setupUI() {
 
-        backgroundColor = .white
-
-        layer.cornerRadius = 12
-        layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
-        layer.masksToBounds = true
+        backgroundColor = .clear
 
         let stack = UIStackView(arrangedSubviews: [textLabel, iconView])
         stack.axis = .horizontal
