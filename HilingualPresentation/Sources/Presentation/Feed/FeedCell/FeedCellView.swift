@@ -58,10 +58,11 @@ final class FeedCellView: BaseUIView {
 // MARK: - Public API
 
 extension FeedCellView {
-    func apply(items: [FeedDiaryItem], haveFollowing: Bool? = nil) {
+    
+    /// 피드 홈
+    func apply(items: [FeedDiaryItem], followingState haveFollowing: Bool? = nil) {
         self.items = items
 
-        /// 팔로잉 피드 엠티뷰
         if items.isEmpty {
             if let haveFollowing = haveFollowing {
                 if haveFollowing {
@@ -70,12 +71,27 @@ extension FeedCellView {
                     noFeedView.configure(message: "아직 팔로잉한 유저가 없어요.\n마음에 드는 사람을 찾아 팔로우해 보세요!")
                 }
             } else {
-                /// 추천 피드 엠티뷰
                 noFeedView.configure(message: "피드에 아직 공유된 일기가 없어요.")
             }
+            noFeedView.isHidden = false
+        } else {
+            noFeedView.isHidden = true
+        }
+    }
+    
+    /// 피드 프로필
+    func apply(items: [FeedDiaryItem], emptyMessage: String?) {
+        self.items = items
+
+        if let emptyMessage = emptyMessage, items.isEmpty {
+            noFeedView.configure(message: emptyMessage)
+            noFeedView.isHidden = false
+        } else {
+            noFeedView.isHidden = true
         }
     }
 }
+
 
 // MARK: - UITableViewDataSource
 
