@@ -10,6 +10,7 @@ import Combine
 public protocol BlockUserUseCase {
     func fetchBlockedUsers() -> AnyPublisher<[BlockedUserEntity], Error>
     func unblockUser(id: Int) -> AnyPublisher<Void, Error>
+    func blockUser(id: Int) -> AnyPublisher<Void, Error>
 }
 
 public final class DefaultBlockUserUseCase: BlockUserUseCase {
@@ -26,5 +27,9 @@ public final class DefaultBlockUserUseCase: BlockUserUseCase {
 
     public func unblockUser(id: Int) -> AnyPublisher<Void, Error> {
         return repository.unblockUser(id: id)
+    }
+
+    public func blockUser(id: Int) -> AnyPublisher<Void, Error> {
+        return repository.blockUser(id: id) 
     }
 }

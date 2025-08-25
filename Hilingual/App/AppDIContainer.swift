@@ -389,3 +389,42 @@ extension AppDIContainer {
 extension AppDIContainer {
 }
 
+// MARK: - FollowListDIContainer
+
+extension AppDIContainer {
+
+    private func makeFollowListService() -> MockFollowListService {
+        return MockFollowListService() // TODO: 실제 API 서비스로 교체
+    }
+
+    private func makeFollowListRepository() -> FollowListRepository {
+        return DefaultFollowListRepository(service: makeFollowListService())
+    }
+
+    private func makeFollowListUseCase() -> FollowListUseCase {
+        return DefaultFollowListUseCase(repository: makeFollowListRepository())
+    }
+
+    private func makeFollowListViewModel() -> FollowListViewModel {
+        return FollowListViewModel(followListUseCase: makeFollowListUseCase())
+    }
+
+    func makeFollowListViewController() -> FollowListViewController {
+        let viewController = FollowListViewController(
+            viewModel: makeFollowListViewModel(),
+            diContainer: self
+        )
+        return viewController
+    }
+}
+
+// MARK: - FeedSearchDIContainer
+
+extension AppDIContainer {
+    func makeFeedSearchViewController() -> FeedSearchViewController {
+        return FeedSearchViewController(
+            viewModel: FeedSearchViewModel(),
+            diContainer: self
+        )
+    }
+}

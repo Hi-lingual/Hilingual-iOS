@@ -6,8 +6,8 @@
 //
 
 struct BlockedUserModel {
-    public let userId: Int
-    public let nickname: String
-    public let profileImg: String
-    public let buttonState: FollowButton.FollowButtonState
+    let userId: Int
+    let nickname: String
+    let profileImg: String
+    var isBlocked: Bool
 }

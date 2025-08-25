@@ -7,13 +7,12 @@
 
 import UIKit
 import SnapKit
-import Combine
 
 final class BlockedUserCell: UITableViewCell {
 
     static let identifier = "BlockedUserCell"
 
-    // MARK: - UI
+    var onUnblockTapped: ((Int) -> Void)?
 
     private let profileImageView: UIImageView = {
         let imageView = UIImageView()
@@ -32,35 +31,35 @@ final class BlockedUserCell: UITableViewCell {
 
     private let unblockButton = FollowButton()
 
-    // MARK: - Combine
-
-    private var cancellables = Set<AnyCancellable>()
-    var unblockTapped = PassthroughSubject<Int, Never>()
-
     private var userId: Int?
-
-    // MARK: - Init
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setUI()
         setLayout()
-        addAction()
+        unblockButton.addTarget(self, action: #selector(didTapButton), for: .touchUpInside)
     }
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-}
 
-// MARK: - UI 설정
+    @objc private func didTapButton() {
+        guard let id = userId else { return }
+        onUnblockTapped?(id)
+    }
 
-extension BlockedUserCell {
+    func configure(with user: BlockedUserModel) {
+        nicknameLabel.text = user.nickname
+        profileImageView.image = UIImage(named: user.profileImg) ?? UIImage(resource: .imgProfileNormalIos)
+        userId = user.userId
+
+        let state: FollowButtonState = user.isBlocked ? .unblock : .block
+        unblockButton.configure(state: state)
+    }
 
     private func setUI() {
-        contentView.addSubview(profileImageView)
-        contentView.addSubview(nicknameLabel)
-        contentView.addSubview(unblockButton)
+        contentView.addSubviews(profileImageView, nicknameLabel, unblockButton)
     }
 
     private func setLayout() {
@@ -76,30 +75,10 @@ extension BlockedUserCell {
         }
 
         unblockButton.snp.makeConstraints {
-            $0.trailing.equalToSuperview().inset(40)
+            $0.width.equalTo(80)
+            $0.height.equalTo(33)
+            $0.trailing.equalToSuperview().inset(16)
             $0.centerY.equalToSuperview()
         }
-    }
-
-    private func addAction() {
-        unblockButton.addTarget(self, action: #selector(didTapUnblock), for: .touchUpInside)
-    }
-
-    @objc private func didTapUnblock() {
-        guard let id = userId else { return }
-        unblockTapped.send(id)
-    }
-}
-
-// MARK: - Configure
-
-extension BlockedUserCell {
-
-    func configure(with user: BlockedUserModel) {
-        nicknameLabel.text = user.nickname
-        profileImageView.image = UIImage(named: user.profileImg) ?? UIImage(resource: .imgProfileNormalIos)
-        userId = user.userId
-
-        unblockButton.configure(state: .unblock, size: .short)
     }
 }

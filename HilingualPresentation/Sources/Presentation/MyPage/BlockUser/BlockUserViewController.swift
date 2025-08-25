@@ -24,7 +24,7 @@ public final class BlockUserViewController: BaseUIViewController<BlockUserViewMo
         navigationController?.setNavigationBarHidden(false, animated: animated)
     }
 
-    //MARK: - Custom Method
+    // MARK: - Custom Method
 
     public override func loadView() {
         self.view = blockUserView
@@ -60,7 +60,8 @@ public final class BlockUserViewController: BaseUIViewController<BlockUserViewMo
     }
 }
 
-//MARK: TableView Extension
+// MARK: - TableView Extension
+
 extension BlockUserViewController: UITableViewDataSource, UITableViewDelegate {
 
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -78,13 +79,9 @@ extension BlockUserViewController: UITableViewDataSource, UITableViewDelegate {
         }
 
         cell.configure(with: user)
-
-        cell.unblockTapped
-            .sink { [weak self] userId in
-                self?.unblockTappedSubject.send(userId)
-            }
-            .store(in: &cancellables)
-
+        cell.onUnblockTapped = { [weak self] userId in
+            self?.unblockTappedSubject.send(userId)
+        }
         return cell
     }
 
