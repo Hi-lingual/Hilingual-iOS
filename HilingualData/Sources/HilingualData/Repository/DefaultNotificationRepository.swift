@@ -35,5 +35,9 @@ public final class DefaultNotificationRepository: NotificationRepository {
             return service.fetchNotificationDetail(notiId: notiId)
                 .map { $0.toEntity() }
                 .eraseToAnyPublisher()
-        }
+    }
+
+    public func markNotificationAsRead(notiId: Int) -> AnyPublisher<Void, Error> {
+           return service.markAsRead(notiId: notiId)
+    }
 }

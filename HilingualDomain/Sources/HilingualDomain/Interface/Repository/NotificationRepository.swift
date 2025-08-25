@@ -11,4 +11,5 @@ public protocol NotificationRepository {
     func fetchGeneralNotifications() -> AnyPublisher<[NotificationEntity], Error>
     func fetchNoticeNotifications() -> AnyPublisher<[NotificationEntity], Error>
     func fetchNotificationDetail(notiId: Int) -> AnyPublisher<NotificationDetailEntity, Error>
+    func markNotificationAsRead(notiId: Int) -> AnyPublisher<Void, Error>
 }

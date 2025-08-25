@@ -38,25 +38,30 @@ public final class NotificationDetailViewModel: BaseViewModel {
 
     public func transform(input: Input) -> Output {
         input.appear
-            .flatMap { [weak self] _ -> AnyPublisher<NotificationDetailModel, Never> in
-                guard let self = self else { return Empty().eraseToAnyPublisher() }
-
-                return self.useCase.fetchNotificationDetail(notiId: self.notiId)
-                    .map { entity in
-                        NotificationDetailModel(
-                            title: entity.title,
-                            date: entity.createdAt,
-                            content: entity.content
-                        )
-                    }
-                    .catch { _ in Empty() }
-                    .eraseToAnyPublisher()
-            }
-            .sink { [weak self] model in
-                self?.detailSubject.send(model)
-            }
+            .sink { [weak self] in self?.fetchDetail() }
             .store(in: &cancellables)
 
         return Output(detail: detailSubject.eraseToAnyPublisher())
+    }
+
+    private func fetchDetail() {
+        useCase.fetchNotificationDetail(notiId: notiId)
+            .handleEvents(receiveOutput: { [weak self] _ in
+                self?.useCase.markNotificationAsRead(notiId: self?.notiId ?? -1)
+                    .sink(receiveCompletion: { _ in }, receiveValue: { })
+                    .store(in: &self!.cancellables)
+            })
+            .map {
+                NotificationDetailModel(
+                    title: $0.title,
+                    date: $0.createdAt,
+                    content: $0.content
+                )
+            }
+            .sink(receiveCompletion: { _ in },
+                  receiveValue: { [weak self] model in
+                      self?.detailSubject.send(model)
+                  })
+            .store(in: &cancellables)
     }
 }

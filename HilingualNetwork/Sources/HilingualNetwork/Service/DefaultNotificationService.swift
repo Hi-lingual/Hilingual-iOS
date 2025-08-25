@@ -11,6 +11,7 @@ public protocol NotificationService {
     func fetchGeneralNotifications() -> AnyPublisher<[GeneralNotificationDTO], Error>
     func fetchNoticeNotifications() -> AnyPublisher<[NoticeNotificationDTO], Error>
     func fetchNotificationDetail(notiId: Int) -> AnyPublisher<NotificationDetailDTO, Error>
+    func markAsRead(notiId: Int) -> AnyPublisher<Void, Error>
 }
 
 public final class MockNotificationService: NotificationService {
@@ -89,4 +90,11 @@ public final class MockNotificationService: NotificationService {
                .setFailureType(to: Error.self)
                .eraseToAnyPublisher()
        }
+
+    public func markAsRead(notiId: Int) -> AnyPublisher<Void, Error> {
+            print("[Mock] 알림 읽음 처리 완료 → notiId: \(notiId)")
+            return Just(())
+                .setFailureType(to: Error.self)
+                .eraseToAnyPublisher()
+        }
 }

@@ -11,6 +11,7 @@ public protocol NotificationUseCase {
     func fetchFeedNotifications() -> AnyPublisher<[NotificationEntity], Error>
     func fetchNoticeNotifications() -> AnyPublisher<[NotificationEntity], Error>
     func fetchNotificationDetail(notiId: Int) -> AnyPublisher<NotificationDetailEntity, Error>
+    func markNotificationAsRead(notiId: Int) -> AnyPublisher<Void, Error>
 }
 
 public final class DefaultNotificationUseCase: NotificationUseCase {
@@ -32,4 +33,8 @@ public final class DefaultNotificationUseCase: NotificationUseCase {
     public func fetchNotificationDetail(notiId: Int) -> AnyPublisher<NotificationDetailEntity, Error> {
         return repository.fetchNotificationDetail(notiId: notiId)
     }
+
+    public func markNotificationAsRead(notiId: Int) -> AnyPublisher<Void, Error> {
+            return repository.markNotificationAsRead(notiId: notiId)
+        }
 }
