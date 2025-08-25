@@ -34,6 +34,8 @@ public final class FeedProfileListViewController: BaseUIViewController<FeedProfi
         super.viewDidLoad()
         bindViewModel()
         input.reload.send(())
+        
+        feedCellView.addTableTapGesture(target: self, action: #selector(didTapTableView))
     }
 
     // MARK: - Bindings
@@ -50,5 +52,9 @@ public final class FeedProfileListViewController: BaseUIViewController<FeedProfi
                 )
             }
             .store(in: &cancellables)
+    }
+    
+    @objc private func didTapTableView() {
+        feedCellView.closeAllMenus()
     }
 }
