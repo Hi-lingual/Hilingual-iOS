@@ -31,6 +31,6 @@ public struct NotificationEntity: Equatable {
 }
 
 public enum NotificationType: Equatable {
-    case general(String)  // ex: "LIKE_DIARY", "FOLLOW_USER"
-    case notice(String)   // ex: "NOTIFICATION", "MARKETING"
+    case general(String)
+    case notice(String) 
 }

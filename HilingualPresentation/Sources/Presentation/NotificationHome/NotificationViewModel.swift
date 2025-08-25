@@ -11,12 +11,22 @@ import HilingualDomain
 
 public final class NotificationViewModel: BaseViewModel {
 
-    // MARK: - Published
+    // MARK: - Input
 
-    @Published public private(set) var generalNotifications: [NotificationModel] = []
-    @Published public private(set) var noticeNotifications: [NotificationModel] = []
+    public struct Input {
+        let fetchGeneral: AnyPublisher<Void, Never>
+        let fetchNotice: AnyPublisher<Void, Never>
+    }
 
-    // MARK: - Private
+    public struct Output {
+        let generalNotifications: AnyPublisher<[NotificationModel], Never>
+        let noticeNotifications: AnyPublisher<[NotificationModel], Never>
+    }
+
+    // MARK: - Private Subjects
+
+    private let generalSubject = CurrentValueSubject<[NotificationModel], Never>([])
+    private let noticeSubject = CurrentValueSubject<[NotificationModel], Never>([])
 
     private let useCase: NotificationUseCase
 
@@ -26,73 +36,64 @@ public final class NotificationViewModel: BaseViewModel {
         self.useCase = useCase
     }
 
-    // MARK: - Input / Output
+    // MARK: - Transform
 
-    public struct Input {
-        let fetchGeneral: PassthroughSubject<Void, Never> = .init()
-        let fetchNotice: PassthroughSubject<Void, Never> = .init()
-    }
-
-    public struct Output {
-        let generalNotifications: Published<[NotificationModel]>.Publisher
-        let noticeNotifications: Published<[NotificationModel]>.Publisher
-    }
-
-    public lazy var input = Input()
-    public lazy var output = Output(
-        generalNotifications: $generalNotifications,
-        noticeNotifications: $noticeNotifications
-    )
-
-    // MARK: - Bind
-
-    public func bind() {
+    public func transform(input: Input) -> Output {
         input.fetchGeneral
-            .sink { [weak self] _ in self?.fetchGeneralNotifications() }
+            .flatMap { [weak self] _ -> AnyPublisher<[NotificationModel], Never> in
+                guard let self else { return Just([]).eraseToAnyPublisher() }
+
+                return self.useCase.fetchFeedNotifications()
+                    .map { entities in
+                        entities.map {
+                            NotificationModel(
+                                id: $0.id,
+                                type: .feed,
+                                title: $0.title,
+                                isRead: $0.isRead,
+                                publishedAt: $0.publishedAt,
+                                deeplink: $0.deeplink
+                            )
+                        }
+                    }
+                    .catch { _ in Just([]) }
+                    .handleEvents(receiveOutput: { [weak self] models in
+                        self?.generalSubject.send(models)
+                    })
+                    .eraseToAnyPublisher()
+            }
+            .sink { _ in }
             .store(in: &cancellables)
 
         input.fetchNotice
-            .sink { [weak self] _ in self?.fetchNoticeNotifications() }
-            .store(in: &cancellables)
-    }
+            .flatMap { [weak self] _ -> AnyPublisher<[NotificationModel], Never> in
+                guard let self else { return Just([]).eraseToAnyPublisher() }
 
-    // MARK: - Fetch
-
-    private func fetchGeneralNotifications() {
-        useCase.fetchFeedNotifications()
-            .map { entities in
-                entities.map {
-                    NotificationModel(
-                        id: $0.id,
-                        type: .feed, title: $0.title,
-                        isRead: $0.isRead,
-                        publishedAt: $0.publishedAt, deeplink: $0.deeplink
-                    )
-                }
+                return self.useCase.fetchNoticeNotifications()
+                    .map { entities in
+                        entities.map {
+                            NotificationModel(
+                                id: $0.id,
+                                type: .notice,
+                                title: $0.title,
+                                isRead: $0.isRead,
+                                publishedAt: $0.publishedAt,
+                                deeplink: nil
+                            )
+                        }
+                    }
+                    .catch { _ in Just([]) }
+                    .handleEvents(receiveOutput: { [weak self] models in
+                        self?.noticeSubject.send(models)
+                    })
+                    .eraseToAnyPublisher()
             }
-            .sink(receiveCompletion: { _ in },
-                  receiveValue: { [weak self] items in
-                      self?.generalNotifications = items
-                  })
+            .sink { _ in }
             .store(in: &cancellables)
-    }
 
-    private func fetchNoticeNotifications() {
-        useCase.fetchNoticeNotifications()
-            .map { entities in
-                entities.map {
-                    NotificationModel(
-                        id: $0.id,
-                        type: .notice, title: $0.title,
-                        isRead: $0.isRead,
-                        publishedAt: $0.publishedAt, deeplink: nil
-                    )
-                }
-            }
-            .sink(receiveCompletion: { _ in },
-                  receiveValue: { [weak self] items in
-                      self?.noticeNotifications = items
-                  })
-            .store(in: &cancellables)
+        return Output(
+            generalNotifications: generalSubject.eraseToAnyPublisher(),
+            noticeNotifications: noticeSubject.eraseToAnyPublisher()
+        )
     }
 }

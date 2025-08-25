@@ -46,10 +46,6 @@ public final class NotificationViewController: BaseUIViewController<Notification
         super.viewDidLoad()
         setUI()
         setLayout()
-
-        viewModel?.bind()
-        viewModel?.input.fetchGeneral.send(())
-        viewModel?.input.fetchNotice.send(())
     }
 
     // MARK: - Setup

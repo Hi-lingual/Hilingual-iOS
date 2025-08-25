@@ -14,6 +14,7 @@ public final class NotificationListViewController: BaseUIViewController<Notifica
 
     private let notificationView = NotificationView()
     private let type: NotificationType
+    private let fetchTrigger = PassthroughSubject<Void, Never>()
 
     private var tableView: UITableView {
         return notificationView.tableView
@@ -25,7 +26,7 @@ public final class NotificationListViewController: BaseUIViewController<Notifica
         self.type = type
         super.init(viewModel: viewModel, diContainer: diContainer)
     }
-    
+
     // MARK: - Lifecycle
 
     public override func loadView() {
@@ -36,6 +37,7 @@ public final class NotificationListViewController: BaseUIViewController<Notifica
         super.viewDidLoad()
         setDelegate()
         bindViewModel()
+        fetchTrigger.send(())
     }
 
     public override func setDelegate() {
@@ -46,9 +48,18 @@ public final class NotificationListViewController: BaseUIViewController<Notifica
     // MARK: - Bind
 
     private func bindViewModel() {
+        guard let viewModel else { return }
+
+        let input = NotificationViewModel.Input(
+            fetchGeneral: type == .feed ? fetchTrigger.eraseToAnyPublisher() : Empty().eraseToAnyPublisher(),
+            fetchNotice: type == .notice ? fetchTrigger.eraseToAnyPublisher() : Empty().eraseToAnyPublisher()
+        )
+
+        let output = viewModel.transform(input: input)
+
         switch type {
         case .feed:
-            viewModel?.output.generalNotifications
+            output.generalNotifications
                 .receive(on: DispatchQueue.main)
                 .sink { [weak self] list in
                     self?.notificationView.notificationListModel = NotificationListModel(type: .feed, items: list)
@@ -56,7 +67,7 @@ public final class NotificationListViewController: BaseUIViewController<Notifica
                 .store(in: &cancellables)
 
         case .notice:
-            viewModel?.output.noticeNotifications
+            output.noticeNotifications
                 .receive(on: DispatchQueue.main)
                 .sink { [weak self] list in
                     self?.notificationView.notificationListModel = NotificationListModel(type: .notice, items: list)
@@ -91,7 +102,7 @@ extension NotificationListViewController: UITableViewDataSource {
 
 extension NotificationListViewController: UITableViewDelegate {
     public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 58
+        return 87
     }
 
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
