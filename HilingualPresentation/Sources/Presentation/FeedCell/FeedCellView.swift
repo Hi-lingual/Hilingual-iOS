@@ -11,7 +11,7 @@ import SnapKit
 final class FeedCellView: BaseUIView {
     
     // MARK: - Callbacks
-    var onHideTapped: (() -> Void)?
+    var onHideTapped: ((Int) -> Void)?
     var onReportTapped: (() -> Void)?
     var onRefresh: (() -> Void)?
     
@@ -169,6 +169,12 @@ extension FeedCellView {
         tapGesture.cancelsTouchesInView = false
         tableView.addGestureRecognizer(tapGesture)
     }
+    
+    func removeDiary(at row: Int) {
+        guard row < items.count else { return }
+        items.remove(at: row)
+        tableView.deleteRows(at: [IndexPath(row: row, section: 0)], with: .automatic)
+    }
 }
 
 // MARK: - FeedDiaryCellDelegate
@@ -176,7 +182,9 @@ extension FeedCellView: FeedDiaryCell.FeedDiaryCellDelegate {
     func feedDiaryCell(_ cell: FeedDiaryCell, didTapMoreButton isMine: Bool) { }
     func feedDiaryCell(_ cell: FeedDiaryCell, didTapMenuItemAt index: Int, isMine: Bool) {
         if isMine {
-            onHideTapped?()
+            if let row = tableView.indexPath(for: cell)?.row {
+                onHideTapped?(row)
+            }
         } else {
             onReportTapped?()
         }

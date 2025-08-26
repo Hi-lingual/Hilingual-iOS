@@ -17,7 +17,9 @@ public final class FeedProfileListViewController: BaseUIViewController<FeedProfi
     private let input = FeedProfileViewModel.Input()
     private let type: FeedProfileListType
     
-    var onHideTapped: (() -> Void)?
+    private var currentFeeds: [FeedDiaryItem] = []
+    
+    var onHideTapped: ((Int) -> Void)?
     var onReportTapped: (() -> Void)?
     
     // MARK: - Init
@@ -42,8 +44,8 @@ public final class FeedProfileListViewController: BaseUIViewController<FeedProfi
 
         feedCellView.addTableTapGesture(target: self, action: #selector(didTapTableView))
 
-        feedCellView.onHideTapped = { [weak self] in
-            self?.onHideTapped?()
+        feedCellView.onHideTapped = { [weak self] row in
+            self?.onHideTapped?(row)
         }
 
         feedCellView.onReportTapped = { [weak self] in
@@ -59,12 +61,20 @@ public final class FeedProfileListViewController: BaseUIViewController<FeedProfi
             .receive(on: RunLoop.main)
             .sink { [weak self] feeds in
                 guard let self else { return }
+                self.currentFeeds = feeds
                 self.feedCellView.apply(
                     items: feeds,
                     emptyMessage: type.emptyMessage
                 )
             }
             .store(in: &cancellables)
+    }
+
+    // MARK: - Public API
+    public func removeDiary(at row: Int) {
+        guard row < currentFeeds.count else { return }
+        currentFeeds.remove(at: row)
+        feedCellView.apply(items: currentFeeds, emptyMessage: type.emptyMessage)
     }
 
     // MARK: - Actions

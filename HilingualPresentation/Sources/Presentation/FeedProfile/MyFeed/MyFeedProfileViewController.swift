@@ -16,7 +16,8 @@ public final class MyFeedProfileViewController: BaseUIViewController<FeedProfile
     private let likedVC: FeedProfileListViewController
     private let sharedVC: FeedProfileListViewController
     private let dialog = Dialog()
-    
+    private var pendingDeleteRow: (listVC: FeedProfileListViewController, row: Int)?
+
     // MARK: - Init
     public init(
         viewModel: FeedProfileViewModel,
@@ -50,14 +51,15 @@ public final class MyFeedProfileViewController: BaseUIViewController<FeedProfile
         dialog.isHidden = true
         dialog.snp.makeConstraints { $0.edges.equalToSuperview() }
         
-        sharedVC.onHideTapped = { [weak self] in
-            self?.showHideDialog()
+        sharedVC.onHideTapped = { [weak self] row in
+            self?.showHideDialog(listVC: self?.sharedVC, row: row)
         }
         sharedVC.onReportTapped = { [weak self] in
             self?.openReportPage()
         }
-        likedVC.onHideTapped = { [weak self] in
-            self?.showHideDialog()
+        
+        likedVC.onHideTapped = { [weak self] row in
+            self?.showHideDialog(listVC: self?.likedVC, row: row)
         }
         likedVC.onReportTapped = { [weak self] in
             self?.openReportPage()
@@ -74,15 +76,27 @@ public final class MyFeedProfileViewController: BaseUIViewController<FeedProfile
     }
     
     // MARK: - Private
-    private func showHideDialog() {
+    private func showHideDialog(listVC: FeedProfileListViewController?, row: Int) {
+        guard let listVC else { return }
+        pendingDeleteRow = (listVC, row)
+        
         dialog.configure(
             style: .normal,
             title: "영어 일기를 비공개 하시겠어요?",
             content: "비공개로 전환 시,\n해당 일기의 피드 활동 내역은 모두 사라져요.",
             leftButtonTitle: "취소",
             rightButtonTitle: "확인",
-            leftAction: { [weak self] in self?.dialog.dismiss() },
-            rightAction: { [weak self] in self?.dialog.dismiss() }
+            leftAction: { [weak self] in
+                self?.dialog.dismiss()
+                self?.pendingDeleteRow = nil
+            },
+            rightAction: { [weak self] in
+                guard let self,
+                      let (listVC, row) = self.pendingDeleteRow else { return }
+                self.dialog.dismiss()
+                listVC.removeDiary(at: row)
+                self.pendingDeleteRow = nil
+            }
         )
         dialog.isHidden = false
         dialog.showAnimation()

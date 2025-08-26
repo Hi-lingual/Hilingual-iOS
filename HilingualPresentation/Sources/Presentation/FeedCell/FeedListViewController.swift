@@ -16,9 +16,11 @@ public final class FeedListViewController: BaseUIViewController<FeedViewModel> {
     private let feedCellView = FeedCellView()
     private let input = FeedViewModel.Input()
     
-    var onHideTapped: (() -> Void)?
+    var onHideTapped: ((Int) -> Void)?
     var onReportTapped: (() -> Void)?
     var onRefresh: (() -> Void)?
+
+    private var currentFeeds: [FeedDiaryItem] = []
 
     // MARK: - Lifecycle
     public override func loadView() {
@@ -32,8 +34,8 @@ public final class FeedListViewController: BaseUIViewController<FeedViewModel> {
         
         feedCellView.addTableTapGesture(target: self, action: #selector(didTapTableView))
         
-        feedCellView.onHideTapped = { [weak self] in
-            self?.onHideTapped?()
+        feedCellView.onHideTapped = { [weak self] row in
+            self?.onHideTapped?(row)
         }
         
         feedCellView.onReportTapped = { [weak self] in
@@ -53,6 +55,7 @@ public final class FeedListViewController: BaseUIViewController<FeedViewModel> {
             .receive(on: RunLoop.main)
             .sink { [weak self] (feeds, haveFollowing) in
                 guard let self else { return }
+                self.currentFeeds = feeds
                 self.feedCellView.apply(
                     items: feeds,
                     followingState: haveFollowing
@@ -64,5 +67,13 @@ public final class FeedListViewController: BaseUIViewController<FeedViewModel> {
     // MARK: - Actions
     @objc private func didTapTableView() {
         feedCellView.closeAllMenus()
+    }
+    
+    // MARK: - Public
+    func removeDiary(at row: Int) {
+        guard row < currentFeeds.count else { return }
+        
+        currentFeeds.remove(at: row)
+        feedCellView.apply(items: currentFeeds)
     }
 }

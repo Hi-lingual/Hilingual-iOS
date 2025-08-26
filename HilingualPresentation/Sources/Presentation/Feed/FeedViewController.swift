@@ -17,8 +17,10 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
 
     private lazy var recommendFeedVC: FeedListViewController = {
         let vc = diContainer.makeFeedListViewController(type: .recommended)
-        vc.onHideTapped = { [weak self] in
+        vc.onHideTapped = { [weak self] row in
             self?.showHideDialog(
+                listVC: vc,
+                row: row,
                 title: "영어 일기를 비공개 하시겠어요?",
                 content: "비공개로 전환 시,\n해당 일기의 피드 활동 내역은 모두 사라져요."
             )
@@ -34,8 +36,10 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
 
     private lazy var followingFeedVC: FeedListViewController = {
         let vc = diContainer.makeFeedListViewController(type: .following)
-        vc.onHideTapped = { [weak self] in
+        vc.onHideTapped = { [weak self] row in
             self?.showHideDialog(
+                listVC: vc,
+                row: row,
                 title: "영어 일기를 비공개 하시겠어요?",
                 content: "비공개로 전환 시,\n해당 일기의 피드 활동 내역은 모두 사라져요."
             )
@@ -76,15 +80,21 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
         feedView.showToast(message: message)
     }
 
-    func showHideDialog(title: String, content: String) {
+    /// 다이얼로그 띄우고 "확인" 시 해당 row 삭제
+    func showHideDialog(listVC: FeedListViewController, row: Int, title: String, content: String) {
         dialog.configure(
             style: .normal,
             title: title,
             content: content,
             leftButtonTitle: "취소",
             rightButtonTitle: "확인",
-            leftAction: { [weak self] in self?.dialog.dismiss() },
-            rightAction: { [weak self] in self?.dialog.dismiss() }
+            leftAction: { [weak self] in
+                self?.dialog.dismiss()
+            },
+            rightAction: { [weak self] in
+                self?.dialog.dismiss()
+                listVC.removeDiary(at: row)
+            }
         )
         dialog.isHidden = false
         dialog.showAnimation()
