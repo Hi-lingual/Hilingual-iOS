@@ -7,6 +7,7 @@
 
 import Foundation
 import UIKit
+import Combine
 import SafariServices
 
 public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailViewModel> {
@@ -16,6 +17,7 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
     let diaryId: Int
     var date: String = ""
     private var isPublished: Bool = true
+    private let deleteTappedSubject = PassthroughSubject<Void, Never>()
     
     private let diaryDetailView = DiaryDetailView()
     private var isHighlightingEnabled: Bool = true
@@ -141,6 +143,38 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
         }
     }
     
+    public override func bind(viewModel: DiaryDetailViewModel) {
+        super.bind(viewModel: viewModel)
+        
+        let input = DiaryDetailViewModel.Input(
+            deleteTapped: deleteTappedSubject.eraseToAnyPublisher()
+        )
+        let output = viewModel.transform(input: input)
+        
+        output.deleteResult
+            .receive(on: RunLoop.main)
+            .sink { [weak self] in
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    self?.navigationController?.popToRootViewController(animated: true)
+
+                    if let homeVC = self?.navigationController?.viewControllers.first {
+                        let toast = ToastMessage()
+                        homeVC.view.addSubview(toast)
+                        toast.configure(type: .basic, message: "삭제가 완료되었어요.")
+                    }
+                }
+            }
+            .store(in: &cancellables)
+        
+        output.errorMessage
+            .receive(on: RunLoop.main)
+            .sink { [weak self] message in
+                self?.showErrorDialog(message: message)
+            }
+            .store(in: &cancellables)
+    }
+
+    
     public override func navigationType() -> NavigationType? {
         return .backTitleMenu("일기장")
     }
@@ -202,13 +236,7 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
             },
             rightAction: { [weak self] in
                 self?.dialog.dismiss()
-                self?.navigationController?.popToRootViewController(animated: true)
-                
-                if let homeVC = self?.navigationController?.viewControllers.first {
-                    let toast = ToastMessage()
-                    homeVC.view.addSubview(toast)
-                    toast.configure(type: .basic, message: "삭제가 완료되었어요.")
-                }
+                self?.deleteTappedSubject.send(())
             }
         )
         dialog.showAnimation()
@@ -279,6 +307,20 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
                 
             }
         )
+        dialog.showAnimation()
+    }
+    
+    private func showErrorDialog(message: String) {
+        dialog.configure(
+            style: .error,
+            image: UIImage(resource: .imgErrorIos),
+            title: "앗! 일시적인 오류가 발생했어요.",
+            rightButtonTitle: "확인",
+            rightAction: { [weak self] in
+                self?.navigationController?.popViewController(animated: true)
+            }
+        )
+        
         dialog.showAnimation()
     }
 }

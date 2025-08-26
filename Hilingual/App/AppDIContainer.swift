@@ -207,12 +207,24 @@ extension AppDIContainer {
 // MARK: - DiaryDetailDIContainer
 
 extension AppDIContainer {
-    private func makeDiaryDetailViewModel(diaryId: Int) -> DiaryDetailViewModel {
-        return DiaryDetailViewModel(diaryId: diaryId)
+    private func makeDeleteDiaryUseCase() -> DeleteDiaryUseCase {
+        return DefaultDeleteDiaryUseCase(repository: makeDeleteDiaryRepository())
     }
     
-    // MARK: - diaryId 수정
+    private func makeDeleteDiaryRepository() -> DeleteDiaryRepository {
+        return DefaultDeleteDiaryRepository(service: makeDeleteDiaryService())
+    }
     
+    private func makeDeleteDiaryService() -> DeleteDiaryService {
+        return MockDeleteDiaryService()
+    }
+}
+
+extension AppDIContainer {
+    private func makeDiaryDetailViewModel(diaryId: Int) -> DiaryDetailViewModel {
+        return DiaryDetailViewModel(diaryId: diaryId, deleteDiaryUseCase: makeDeleteDiaryUseCase())
+    }
+        
     private func makeFeedbackViewModel(diaryId: Int) -> FeedbackViewModel {
         return FeedbackViewModel(diaryId: diaryId, diaryDetailUseCase: makeDiaryDetailUseCase(), feedbackUseCase: makeFeedbackUseCase())
     }
@@ -228,9 +240,7 @@ extension AppDIContainer {
     private func makeFeedbackService() -> FeedbackService {
         return DefaultFeedbackService()
     }
-    
-    // MARK: - diaryId 수정
-    
+        
     private func makeRecommendedExpressionViewModel(diaryId: Int) -> RecommendedExpressionViewModel {
         return RecommendedExpressionViewModel(diaryId: diaryId, recommendedExpressionUseCase: makeRecommendedExpressionUseCase(), toggleBookmarkUseCase: makeToggleBookmarkUseCase())
     }
