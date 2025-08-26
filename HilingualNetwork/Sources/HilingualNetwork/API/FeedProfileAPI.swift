@@ -11,6 +11,7 @@ import Moya
 public enum FeedProfileAPI {
     case fetchSharedFeed(targetUserId: Int64)
     case fetchLikedFeed(targetUserId: Int64)
+    case fetchProfileInfo(targetUserId: Int64)
 }
 
 extension FeedProfileAPI: BaseTargetType {
@@ -20,6 +21,8 @@ extension FeedProfileAPI: BaseTargetType {
             return "/api/v1/feed/profiles/\(targetUserId)/diaries/shared"
         case .fetchLikedFeed(let targetUserId):
             return "/api/v1/feed/profiles/\(targetUserId)/diaries/liked"
+        case .fetchProfileInfo(let targetUserId):
+            return "/api/v1/feed/profiles/\(targetUserId)"
         }
     }
     

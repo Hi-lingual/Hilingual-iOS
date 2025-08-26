@@ -470,36 +470,50 @@ extension AppDIContainer {
 // MARK: - FeedProfileDIContainer
 extension AppDIContainer {
     
-    // ViewModel
+    // FeedProfile (공유/공감)
     private func makeFeedProfileViewModel(
         type: FeedProfileType,
         targetUserId: Int64
     ) -> FeedProfileViewModel {
         return FeedProfileViewModel(
             feedUseCase: makeFeedProfileUseCase(),
+            profileInfoUseCase: makeFeedProfileInfoUseCase(),
             type: type,
             targetUserId: targetUserId
         )
     }
     
-    // UseCase
-    
     private func makeFeedProfileUseCase() -> FeedProfileUseCase {
         DefaultFeedProfileUseCase(repository: makeFeedProfileRepository())
     }
     
-    // Repository
     private func makeFeedProfileRepository() -> FeedProfileRepository {
-        return DefaultFeedProfileRepository(service: makeFeedProfileService())
+        DefaultFeedProfileRepository(service: makeFeedProfileService())
     }
     
-    //Service
-    
-//    private func makeFeedProfileService() -> FeedProfileService {
-//        return DefaultFeedProfileService()
-//    }
-    
+    //    private func makeFeedProfileService() -> FeedProfileService {
+    //        return DefaultFeedProfileService()
+    //    }
+
     private func makeFeedProfileService() -> FeedProfileService {
         return MockFeedProfileService()
+    }
+    
+    
+    // FeedProfileInfo (프로필 정보)
+    private func makeFeedProfileInfoUseCase() -> FeedProfileInfoUseCase {
+        DefaultFeedProfileInfoUseCase(repository: makeFeedProfileInfoRepository())
+    }
+    
+    private func makeFeedProfileInfoRepository() -> FeedProfileInfoRepository {
+        DefaultFeedProfileInfoRepository(service: makeFeedProfileInfoService())
+    }
+    
+//    private func makeFeedProfileInfoService() -> FeedProfileInfoService {
+//        return DefaultFeedProfileInfoService()
+//    }
+    
+    private func makeFeedProfileInfoService() -> FeedProfileInfoService {
+        MockFeedProfileInfoService(isMine: false)
     }
 }

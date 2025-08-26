@@ -8,6 +8,7 @@
 import UIKit
 import Foundation
 import SafariServices
+import Combine
 
 public final class UserFeedProfileViewController: BaseUIViewController<FeedProfileViewModel> {
     
@@ -19,7 +20,7 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
     private let dialog = Dialog()
     
     private var pendingDeleteRow: Int?
-    
+
     // MARK: - Init
     public init(
         viewModel: FeedProfileViewModel,
@@ -79,6 +80,9 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
             self.isBlocked = true
             self.updateNavigation()
         }
+        
+        bind()
+        
     }
     
     // MARK: - Navigation
@@ -101,7 +105,30 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
         navigationController?.setNavigationBarHidden(false, animated: false)
     }
     
-    // MARK: - Dialog 띄우기
+    // MARK: - Bind
+    private func bind() {
+        let input = FeedProfileViewModel.Input()
+        guard let viewModel else { return }
+        
+        let output = viewModel.transform(input: input)
+        
+        output.profile
+            .compactMap { $0 }
+            .receive(on: RunLoop.main)
+            .sink { [weak self] entity in
+                self?.userFeedProfileView.configureProfile(
+                    nickname: entity.nickname,
+                    profileImageURL: entity.profileImg,
+                    follower: entity.follower,
+                    following: entity.following,
+                    streak: entity.streak
+                )
+            }
+            .store(in: &cancellables)
+        
+        input.reload.send(())
+    }
+    
     private func showHideDialog() {
         dialog.configure(
             style: .normal,

@@ -8,6 +8,7 @@
 import UIKit
 import Foundation
 import SafariServices
+import Combine
 
 public final class MyFeedProfileViewController: BaseUIViewController<FeedProfileViewModel> {
 
@@ -41,16 +42,19 @@ public final class MyFeedProfileViewController: BaseUIViewController<FeedProfile
     public override func viewDidLoad() {
         super.viewDidLoad()
         
+        // SegmentedControl 연결
         myFeedProfileView.configureSegmentedControl(
             parentVC: self,
             viewControllers: [sharedVC, likedVC],
             titles: ["공유한 일기", "공감한 일기"]
         )
         
+        // Dialog 초기화
         view.addSubview(dialog)
         dialog.isHidden = true
         dialog.snp.makeConstraints { $0.edges.equalToSuperview() }
         
+        // 공유 피드 이벤트
         sharedVC.onHideTapped = { [weak self] row in
             self?.showHideDialog(listVC: self?.sharedVC, row: row)
         }
@@ -58,12 +62,15 @@ public final class MyFeedProfileViewController: BaseUIViewController<FeedProfile
             self?.openReportPage()
         }
         
+        // 공감 피드 이벤트
         likedVC.onHideTapped = { [weak self] row in
             self?.showHideDialog(listVC: self?.likedVC, row: row)
         }
         likedVC.onReportTapped = { [weak self] in
             self?.openReportPage()
         }
+        
+        bind()
     }
     
     public override func navigationType() -> NavigationType? {
@@ -74,6 +81,31 @@ public final class MyFeedProfileViewController: BaseUIViewController<FeedProfile
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(false, animated: false)
     }
+    
+    // MARK: - Bind
+    private func bind() {
+        let input = FeedProfileViewModel.Input()
+        guard let viewModel else { return }
+
+        let output = viewModel.transform(input: input)
+
+        output.profile
+            .compactMap { $0 }
+            .receive(on: RunLoop.main)
+            .sink { [weak self] entity in
+                self?.myFeedProfileView.configureProfile(
+                    nickname: entity.nickname,
+                    profileImageURL: entity.profileImg,
+                    follower: entity.follower,
+                    following: entity.following,
+                    streak: entity.streak
+                )
+            }
+            .store(in: &viewModel.cancellables)
+
+        input.reload.send(())
+    }
+
     
     // MARK: - Private
     private func showHideDialog(listVC: FeedProfileListViewController?, row: Int) {

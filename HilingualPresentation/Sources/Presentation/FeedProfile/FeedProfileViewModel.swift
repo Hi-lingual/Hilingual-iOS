@@ -10,15 +10,16 @@ import Combine
 import HilingualDomain
 
 public final class FeedProfileViewModel: BaseViewModel, BaseViewModelType {
-
+    
     // MARK: - Input/Output
     public struct Input {
         /// 당겨서 새로고침 / 초기 로드 트리거
         let reload = PassthroughSubject<Void, Never>()
     }
-
+    
     public struct Output {
         let feeds: AnyPublisher<[FeedDiaryItem], Never>
+        let profile: AnyPublisher<FeedProfileInfoEntity?, Never>
         let isLoading: AnyPublisher<Bool, Never>
         let errorMessage: AnyPublisher<String?, Never>
         let isEmpty: AnyPublisher<Bool, Never>
@@ -26,34 +27,56 @@ public final class FeedProfileViewModel: BaseViewModel, BaseViewModelType {
     
     // MARK: - Dependencies
     private let feedUseCase: FeedProfileUseCase
+    private let profileInfoUseCase: FeedProfileInfoUseCase
     private let type: FeedProfileType
     private let targetUserId: Int64
-
+    
     // MARK: - State
     private let feedsSubject = CurrentValueSubject<[FeedDiaryItem], Never>([])
+    private let profileSubject = CurrentValueSubject<FeedProfileInfoEntity?, Never>(nil)
     private let isEmptySubject = CurrentValueSubject<Bool, Never>(false)
     private let isLoadingSubject = CurrentValueSubject<Bool, Never>(false)
     private let errorSubject = CurrentValueSubject<String?, Never>(nil)
-
+    
     // MARK: - Init
-    public init(feedUseCase: FeedProfileUseCase, type: FeedProfileType, targetUserId: Int64 = 0) {
+    public init(feedUseCase: FeedProfileUseCase,
+                profileInfoUseCase: FeedProfileInfoUseCase,
+                type: FeedProfileType,
+                targetUserId: Int64 = 0) {
         self.feedUseCase = feedUseCase
+        self.profileInfoUseCase = profileInfoUseCase
         self.type = type
         self.targetUserId = targetUserId
         super.init()
     }
-
+    
     // MARK: - Transform
     public func transform(input: Input) -> Output {
         let trigger = Publishers.Merge(viewDidLoad, input.reload.eraseToAnyPublisher())
             .eraseToAnyPublisher()
-
+        
+        trigger
+            .flatMap { [weak self] _ -> AnyPublisher<FeedProfileInfoEntity?, Never> in
+                guard let self else { return Just(nil).eraseToAnyPublisher() }
+                return self.profileInfoUseCase.execute(targetUserId: self.targetUserId)
+                    .map { Optional($0) }
+                    .catch { [weak self] error -> Just<FeedProfileInfoEntity?> in
+                        self?.errorSubject.send(error.localizedDescription)
+                        return Just(nil)
+                    }
+                    .eraseToAnyPublisher()
+            }
+            .sink { [weak self] entity in
+                self?.profileSubject.send(entity)
+            }
+            .store(in: &cancellables)
+        
         trigger
             .flatMap { [weak self] _ -> AnyPublisher<[FeedDiaryItem], Never> in
                 guard let self else { return Just([]).eraseToAnyPublisher() }
                 self.isLoadingSubject.send(true)
                 self.errorSubject.send(nil)
-
+                
                 return self.feedUseCase.execute(type: self.type, targetUserId: self.targetUserId)
                     .map { (entities, _) -> [FeedDiaryItem] in
                         entities.map { entity in
@@ -85,9 +108,10 @@ public final class FeedProfileViewModel: BaseViewModel, BaseViewModelType {
                 self?.isEmptySubject.send(items.isEmpty)
             }
             .store(in: &cancellables)
-
+        
         return Output(
             feeds: feedsSubject.eraseToAnyPublisher(),
+            profile: profileSubject.eraseToAnyPublisher(),
             isLoading: isLoadingSubject.eraseToAnyPublisher(),
             errorMessage: errorSubject.eraseToAnyPublisher(),
             isEmpty: isEmptySubject.eraseToAnyPublisher()

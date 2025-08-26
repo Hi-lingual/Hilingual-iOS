@@ -28,7 +28,6 @@ final class UserFeedProfileView: BaseUIView {
         let label = UILabel()
         label.font = .suit(.head_b_18)
         label.textColor = .black
-        label.text = "밍님의 글을 확인할 수 없어요."
         return label
     }()
     
@@ -86,16 +85,35 @@ final class UserFeedProfileView: BaseUIView {
     }
     
     // MARK: - Public
+    
+    /// 프로필 데이터 반영
+    func configureProfile(
+        nickname: String,
+        profileImageURL: String?,
+        follower: Int,
+        following: Int,
+        streak: Int
+    ) {
+        myFeedView.configure(
+            nickname: nickname,
+            profileImageURL: profileImageURL,
+            follower: follower,
+            following: following,
+            streak: streak
+        )
+        titleLabel.text = "\(nickname)님의 글을 확인할 수 없어요."
+    }
+    
     func showModal() {
         modal.configure(
             title: "",
             items: [
-                ("계정 차단하기", UIImage(named: "ic_block_24_2_ios", in: .module, compatibleWith: nil), { [weak self] in
-                    self?.onBlockTapped?()
-                }),
-                ("계정 신고하기", UIImage(named: "ic_report_24_ios", in: .module, compatibleWith: nil), { [weak self] in
-                    self?.onReportTapped?()
-                })
+                ("계정 차단하기",
+                 UIImage(named: "ic_block_24_2_ios", in: .module, compatibleWith: nil),
+                 { [weak self] in self?.onBlockTapped?() }),
+                ("계정 신고하기",
+                 UIImage(named: "ic_report_24_ios", in: .module, compatibleWith: nil),
+                 { [weak self] in self?.onReportTapped?() })
             ]
         )
         modal.isHidden = false
