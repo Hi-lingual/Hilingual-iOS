@@ -250,7 +250,7 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
                 self?.view.addSubview(toast)
                 toast.configure(type: .withButton, message: "일기가 게시되었어요!")
                 toast.action = { [weak self] in
-                    let vc = self?.diContainer.makeSharedDiaryViewController()
+                    let vc = self?.diContainer.makeSharedDiaryViewController(diaryId: 1)
                     self?.navigationController?.pushViewController(vc!, animated: true)
                 }
             }

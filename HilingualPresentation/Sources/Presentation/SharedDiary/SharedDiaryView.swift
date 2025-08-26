@@ -34,12 +34,25 @@ final class SharedDiaryView: BaseUIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    // MARK: - Configure
+    
+    public func configure(
+        profileImgURL: String,
+        nickname: String,
+        streak: Int,
+        sharedDateMinutes: Int,
+        isLiked: Bool,
+        likeCount: Int
+    ) {
+        profileView.configure(profileImageURL: profileImgURL, nickname: nickname, streak: streak, sharedDateMinutes: sharedDateMinutes, isLiked: isLiked, likeCount: likeCount)
+    }
+    
     // MARK: - setUI
     
     override func setUI() {
         addSubviews(profileView)
         
-        profileView.configure(profileImageURL: "https://avatars.githubusercontent.com/u/42905243?v=4", nickname: "가나디", streak: 15, sharedDateMinutes: 127, isLiked: true, likeCount: 7)
+//        profileView.configure(profileImageURL: "https://avatars.githubusercontent.com/u/42905243?v=4", nickname: "가나디", streak: 15, sharedDateMinutes: 127, isLiked: true, likeCount: 7)
         
         profileView.onProfileTapped = { [weak self] in
             self?.onProfileAction?()

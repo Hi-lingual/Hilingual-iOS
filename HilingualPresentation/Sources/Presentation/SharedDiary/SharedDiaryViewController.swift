@@ -11,28 +11,41 @@ import UIKit
 
 import Combine
 
-public final class SharedDiaryViewController: BaseUIViewController<DiaryDetailViewModel> {
+public final class SharedDiaryViewController: BaseUIViewController<SharedDiaryViewModel> {
     
     // MARK: - Properties
     
-    public var isMine: Bool = true
+    private var isMine: Bool = true
+    private let diaryId: Int
     
-    private let sharedDiaryView = SharedDiaryView()
-    private lazy var diaryDetailViewController: DiaryDetailViewController = {
-        let vc = diContainer.makeDiaryDetailViewController(diaryId: 1)
-        vc.showsActionButton = false
-        return vc
-    }()
+    private let viewDidLoadSubject = PassthroughSubject<Void, Never>()
+
     
-    private let bottomSafeAreaBackgroundView = UIView()
+    // MARK: - UI Components
     
     private let dialog = Dialog()
-    
     private let modal: Modal = {
         let modal = Modal()
         modal.isHidden = true
         return modal
     }()
+    
+    private let sharedDiaryView = SharedDiaryView()
+    private lazy var diaryDetailViewController: DiaryDetailViewController = {
+        let vc = diContainer.makeDiaryDetailViewController(diaryId: diaryId)
+        vc.showsActionButton = false
+        return vc
+    }()
+    private let bottomSafeAreaBackgroundView = UIView()
+    
+    // MARK: - Init
+    
+    public init(viewModel: SharedDiaryViewModel, diContainer: ViewControllerFactory, diaryId: Int) {
+        self.diaryId = diaryId
+        super.init(viewModel: viewModel, diContainer: diContainer)
+    }
+    
+    // MARK: - LifeCycle
     
     public override func viewDidLoad() {
         super.viewDidLoad()
@@ -42,7 +55,7 @@ public final class SharedDiaryViewController: BaseUIViewController<DiaryDetailVi
         
         sharedDiaryView.onProfileAction = { [weak self] in
             guard let self else { return }
-            let vc = diContainer.makeDiaryDetailViewController(diaryId: 1)
+            let vc = diContainer.makeDiaryDetailViewController(diaryId: diaryId)
             self.navigationController?.pushViewController(vc, animated: true)
         }
 
@@ -50,7 +63,11 @@ public final class SharedDiaryViewController: BaseUIViewController<DiaryDetailVi
             guard let self else { return }
             // 서버에 공감하기 api 호출
         }
+        
+        viewDidLoadSubject.send(())
     }
+    
+    // MARK: SetUI
     
     public override func setUI() {
         view.addSubviews(bottomSafeAreaBackgroundView, sharedDiaryView, diaryDetailViewController.view, modal, dialog)
@@ -88,6 +105,58 @@ public final class SharedDiaryViewController: BaseUIViewController<DiaryDetailVi
         }
     }
     
+    // MARK: - Binding
+    
+    public override func bind(viewModel: SharedDiaryViewModel) {
+        super.bind(viewModel: viewModel)
+        
+        let input = makeInput()
+        let output = viewModel.transform(input: input)
+        
+        bindOutput(output)
+    }
+    
+    private func makeInput() -> SharedDiaryViewModel.Input {
+        return SharedDiaryViewModel.Input(
+            viewDidLoad: viewDidLoadSubject.eraseToAnyPublisher()
+            )
+    }
+    
+    private func bindOutput(_ output: SharedDiaryViewModel.Output) {
+        print("듀...듀..")
+
+        output.fetchDiaryResult
+            .receive(on: RunLoop.main)
+            .sink(
+                receiveCompletion: { [weak self] completion in
+                    if case let .failure(error) = completion {
+                        self?.showErrorDialog(message: error.localizedDescription)
+                    }
+                },
+                receiveValue: { [weak self] entity in
+                    guard let self else { return }
+                    
+                    // 바로 View에 바인딩
+                    self.sharedDiaryView.configure(
+                        profileImgURL: entity.profile.profileImg,
+                        nickname: entity.profile.nickname,
+                        streak: entity.profile.streak,
+                        sharedDateMinutes: entity.diary.sharedDate,
+                        isLiked: entity.diary.isLiked,
+                        likeCount: entity.diary.likeCount
+                    )
+                    
+                    self.isMine = entity.isMine
+                }
+
+            )
+            .store(in: &cancellables)
+    }
+
+
+    
+    // MARK: - Public Methods
+    
     public override func navigationType() -> NavigationType? {
         return .backTitleMenu("")
     }
@@ -100,6 +169,8 @@ public final class SharedDiaryViewController: BaseUIViewController<DiaryDetailVi
         showModal()
     }
     
+    
+    // MARK: - Actions
     // TODO: - 차단하기 modal 연결
     
     @objc private func showModal() {
@@ -152,11 +223,9 @@ public final class SharedDiaryViewController: BaseUIViewController<DiaryDetailVi
                         guard let self else { return }
                         self.dialog.dismiss()
                         
-                        // 1) 이전 화면 참조
                         if let nav = self.navigationController {
                             nav.popViewController(animated: true)
                             
-                            // 2) pop 완료 후 토스트 띄우기
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                                 if let previousVC = nav.viewControllers.last {
                                     let toast = ToastMessage()
@@ -167,6 +236,20 @@ public final class SharedDiaryViewController: BaseUIViewController<DiaryDetailVi
                         }
                     }
         )
+        dialog.showAnimation()
+    }
+    
+    private func showErrorDialog(message: String) {
+        dialog.configure(
+            style: .error,
+            image: UIImage(resource: .imgErrorIos),
+            title: "앗! 일시적인 오류가 발생했어요.",
+            rightButtonTitle: "확인",
+            rightAction: { [weak self] in
+                self?.navigationController?.popViewController(animated: true)
+            }
+        )
+        
         dialog.showAnimation()
     }
 }

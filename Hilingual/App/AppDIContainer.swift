@@ -346,13 +346,23 @@ extension AppDIContainer {
 
 extension AppDIContainer {
     
-//    private func makeSharedDiaryService() ->
+    private func makeSharedDiaryService() -> MockSharedDiaryService {
+        return MockSharedDiaryService()
+    }
     
-    func makeSharedDiaryViewController() -> SharedDiaryViewController {
-        let viewController = SharedDiaryViewController(
-            viewModel: makeDiaryDetailViewModel(diaryId: 1),
-            diContainer: self
-        )
-        return viewController
+    private func makeSharedDiaryRepository() -> SharedDiaryRepository {
+        return DefaultSharedDiaryRepository(service: makeSharedDiaryService())
+    }
+    
+    private func makeSharedDiaryUseCase() -> SharedDiaryUseCase {
+        return DefaultSharedDiaryUseCase(repository: makeSharedDiaryRepository())
+    }
+    
+    private func makeSharedDiaryViewModel(diaryId: Int) -> SharedDiaryViewModel {
+        return SharedDiaryViewModel(diaryId: diaryId, sharedDiaryUseCase: makeSharedDiaryUseCase())
+    }
+    
+    func makeSharedDiaryViewController(diaryId: Int) -> SharedDiaryViewController {
+        return SharedDiaryViewController(viewModel: makeSharedDiaryViewModel(diaryId: diaryId), diContainer: self, diaryId: diaryId)
     }
 }
