@@ -22,4 +22,5 @@ public protocol ViewControllerFactory {
         selectedDate: Date
     ) -> DiaryWritingViewController
     func makeFollowListViewController() -> FollowListViewController
+    func makeSharedDiaryViewController() -> SharedDiaryViewController
 }

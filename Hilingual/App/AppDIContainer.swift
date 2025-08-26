@@ -342,3 +342,17 @@ extension AppDIContainer {
     }
 }
 
+// MARK: - SharedDiaryDIContainer
+
+extension AppDIContainer {
+    
+//    private func makeSharedDiaryService() ->
+    
+    func makeSharedDiaryViewController() -> SharedDiaryViewController {
+        let viewController = SharedDiaryViewController(
+            viewModel: makeDiaryDetailViewModel(diaryId: 1),
+            diContainer: self
+        )
+        return viewController
+    }
+}
