@@ -122,6 +122,16 @@ final class FeedView: BaseUIView {
     }
     
     func showToast(message: String) {
+        if toast.superview == nil {
+            addSubview(toast)
+            toast.snp.makeConstraints {
+                $0.centerX.equalToSuperview()
+                $0.bottom.equalToSuperview().inset(82)
+                $0.horizontalEdges.equalToSuperview().inset(16)
+                $0.height.equalTo(52)
+            }
+        }
+        
         toast.configure(type: .basic, message: message)
         toast.isHidden = false
         toast.alpha = 0
@@ -131,7 +141,7 @@ final class FeedView: BaseUIView {
             self.toast.alpha = 1
         }
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
             UIView.animate(withDuration: 0.3, animations: {
                 self.toast.alpha = 0
             }, completion: { _ in

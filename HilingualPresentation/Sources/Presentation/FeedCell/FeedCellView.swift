@@ -25,11 +25,10 @@ final class FeedCellView: BaseUIView {
 
     private(set) var tableView = UITableView(frame: .zero, style: .plain)
     private let noFeedView = EmptyView()
-    private let toast = ToastMessage()
 
     // MARK: - Setup Methods
     override func setUI() {
-        addSubviews(tableView, noFeedView, toast)
+        addSubviews(tableView, noFeedView)
 
         tableView.dataSource = self
         tableView.delegate = self
@@ -47,7 +46,6 @@ final class FeedCellView: BaseUIView {
         tableView.refreshControl = refreshControl
 
         noFeedView.isHidden = true
-        toast.isHidden = true
     }
 
     override func setLayout() {
@@ -104,19 +102,6 @@ extension FeedCellView {
             noFeedView.isHidden = true
         }
     }
-    
-    func showToast(message: String) {
-        toast.configure(type: .basic, message: message)
-        toast.isHidden = false
-        toast.alpha = 0
-        UIView.animate(withDuration: 0.3) { self.toast.alpha = 1 }
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
-            UIView.animate(withDuration: 0.3, animations: {
-                self.toast.alpha = 0
-            }, completion: { _ in self.toast.isHidden = true })
-        }
-    }
 }
 
 // MARK: - UITableViewDataSource
@@ -156,8 +141,8 @@ extension FeedCellView: UITableViewDelegate {
         let offsetY = scrollView.contentOffset.y
         let contentHeight = scrollView.contentSize.height
         let frameHeight = scrollView.frame.size.height
-        
-        // 바닥에서 50만큼 끌어올린 경우 (조정 가능)
+
+        ///50만큼 끌어당기면 토스트 호출 (당기는 길이 변경 가능)
         if offsetY > contentHeight - frameHeight + 50 {
             onRefresh?()
         }
