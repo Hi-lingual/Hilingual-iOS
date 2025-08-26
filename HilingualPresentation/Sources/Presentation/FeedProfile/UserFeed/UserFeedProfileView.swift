@@ -14,7 +14,6 @@ final class UserFeedProfileView: BaseUIView {
     
     private let myFeedView = FeedProfileView()
     private(set) var button = FollowButton()
-    
     let feedContainer = UIView()
     
     private let blockedStack: UIStackView = {
@@ -53,6 +52,7 @@ final class UserFeedProfileView: BaseUIView {
     var onBlockTapped: (() -> Void)?
     var onBlockConfirmTapped: (() -> Void)?
     var onReportTapped: (() -> Void)?
+    var onUnblockTapped: (() -> Void)?
     
     // MARK: - State
     
@@ -160,7 +160,7 @@ final class UserFeedProfileView: BaseUIView {
         blockedStack.isHidden = false
     }
     
-    private func restoreFeedView() {
+    func restoreFeedView() {
         feedContainer.isHidden = false
         blockedStack.isHidden = true
     }
@@ -174,6 +174,7 @@ final class UserFeedProfileView: BaseUIView {
         case .following:
             setButtonState(.follow)
         case .unblock:
+            onUnblockTapped?()
             setButtonState(.follow)
             restoreFeedView()
         }

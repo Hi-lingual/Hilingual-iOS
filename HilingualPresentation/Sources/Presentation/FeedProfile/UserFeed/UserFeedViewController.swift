@@ -13,6 +13,7 @@ import Combine
 public final class UserFeedProfileViewController: BaseUIViewController<FeedProfileViewModel> {
     
     // MARK: - Properties
+    
     private let userFeedProfileView = UserFeedProfileView()
     private let sharedVC: FeedProfileListViewController
     private let targetUserId: Int64
@@ -22,6 +23,7 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
     private var pendingDeleteRow: Int?
 
     // MARK: - Init
+    
     public init(
         viewModel: FeedProfileViewModel,
         diContainer: any ViewControllerFactory,
@@ -39,6 +41,7 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
     
     // MARK: - Lifecycle
+    
     public override func loadView() {
         self.view = userFeedProfileView
     }
@@ -68,6 +71,10 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
             self?.userFeedProfileView.showBlockDialog()
         }
         
+        userFeedProfileView.onReportTapped = { [weak self] in
+            self?.showAccountReportDialog()
+        }
+        
         userFeedProfileView.onBlockConfirmTapped = { [weak self] in
             guard let self else { return }
             self.userFeedProfileView.dismissBlockDialog()
@@ -77,10 +84,18 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
             self.updateNavigation()
         }
         
+        userFeedProfileView.onUnblockTapped = { [weak self] in
+            guard let self else { return }
+            self.isBlocked = false
+            self.userFeedProfileView.restoreFeedView()
+            self.updateNavigation()
+        }
+        
         bind()
     }
     
     // MARK: - Navigation
+    
     public override func navigationType() -> NavigationType? {
         return isBlocked ? .backOnly : .backTitleMenu("")
     }
@@ -88,9 +103,15 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
     private func updateNavigation() {
         navigationController?.setNavigationBarHidden(false, animated: false)
         setupNavigationBar()
+
+        if case .backTitleMenu = navigationType() {
+            navigationItem.rightBarButtonItem?.target = self
+            navigationItem.rightBarButtonItem?.action = #selector(menuButtonTapped)
+        }
     }
     
     // MARK: - Actions
+    
     public override func menuButtonTapped() {
         userFeedProfileView.showModal()
     }
@@ -101,6 +122,7 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
     }
     
     // MARK: - Bind
+    
     private func bind() {
         let input = FeedProfileViewModel.Input()
         guard let viewModel else { return }
@@ -123,8 +145,7 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
         
         input.reload.send(())
     }
-    
-    // MARK: - Hide Dialog
+        
     private func showHideDialog() {
         dialog.configure(
             style: .normal,
@@ -146,8 +167,7 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
         dialog.showAnimation()
         view.bringSubviewToFront(dialog)
     }
-    
-    // MARK: - Report Dialog
+        
     private func showReportDialog() {
         dialog.configure(
             style: .normal,
@@ -167,6 +187,29 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
         dialog.showAnimation()
         view.bringSubviewToFront(dialog)
     }
+    
+    private func showAccountReportDialog() {
+        userFeedProfileView.dismissModal()
+
+        dialog.configure(
+            style: .normal,
+            title: "계정을 신고하시겠어요?",
+            content: "신고된 계정은 확인 후\n서비스의 운영원칙에 따라 처리돼요.",
+            leftButtonTitle: "아니요",
+            rightButtonTitle: "신고하기",
+            leftAction: { [weak self] in
+                self?.dialog.dismiss()
+            },
+            rightAction: { [weak self] in
+                self?.dialog.dismiss()
+                self?.openReportPage()
+            }
+        )
+        dialog.isHidden = false
+        dialog.showAnimation()
+        view.bringSubviewToFront(dialog)
+    }
+
     
     private func openReportPage() {
         guard let url =
