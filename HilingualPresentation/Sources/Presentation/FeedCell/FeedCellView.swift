@@ -13,6 +13,7 @@ final class FeedCellView: BaseUIView {
     // MARK: - Callbacks
     var onHideTapped: (() -> Void)?
     var onReportTapped: (() -> Void)?
+    var onRefresh: (() -> Void)?
     
     // MARK: - Properties
     private var items: [FeedDiaryItem] = [] {
@@ -31,6 +32,7 @@ final class FeedCellView: BaseUIView {
         addSubviews(tableView, noFeedView, toast)
 
         tableView.dataSource = self
+        tableView.delegate = self
         tableView.register(
             FeedDiaryCell.self,
             forCellReuseIdentifier: FeedDiaryCell.reuseIdentifier
@@ -39,7 +41,10 @@ final class FeedCellView: BaseUIView {
         tableView.rowHeight = UITableView.automaticDimension
         tableView.estimatedRowHeight = 140
         tableView.showsVerticalScrollIndicator = false
-        tableView.refreshControl = UIRefreshControl()
+        
+        let refreshControl = UIRefreshControl()
+        refreshControl.addTarget(self, action: #selector(handleTopRefresh), for: .valueChanged)
+        tableView.refreshControl = refreshControl
 
         noFeedView.isHidden = true
         toast.isHidden = true
@@ -58,6 +63,12 @@ final class FeedCellView: BaseUIView {
             $0.width.equalTo(242)
             $0.height.equalTo(130)
         }
+    }
+    
+    // MARK: - Actions
+    @objc private func handleTopRefresh() {
+        onRefresh?()
+        tableView.refreshControl?.endRefreshing()
     }
 }
 
@@ -113,8 +124,8 @@ extension FeedCellView: UITableViewDataSource {
     func tableView(_ tableView: UITableView,
                    numberOfRowsInSection section: Int) -> Int { items.count }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) ->
-    UITableViewCell {
+    func tableView(_ tableView: UITableView,
+                   cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(
             withIdentifier: FeedDiaryCell.reuseIdentifier,
             for: indexPath
@@ -136,6 +147,20 @@ extension FeedCellView: UITableViewDataSource {
             isLast: indexPath.row == items.count - 1
         )
         return cell
+    }
+}
+
+// MARK: - UITableViewDelegate
+extension FeedCellView: UITableViewDelegate {
+    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        let offsetY = scrollView.contentOffset.y
+        let contentHeight = scrollView.contentSize.height
+        let frameHeight = scrollView.frame.size.height
+        
+        // 바닥에서 50만큼 끌어올린 경우 (조정 가능)
+        if offsetY > contentHeight - frameHeight + 50 {
+            onRefresh?()
+        }
     }
 }
 

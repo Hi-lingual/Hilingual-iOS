@@ -18,6 +18,7 @@ public final class FeedListViewController: BaseUIViewController<FeedViewModel> {
     
     var onHideTapped: (() -> Void)?
     var onReportTapped: (() -> Void)?
+    var onRefresh: (() -> Void)?
 
     // MARK: - Lifecycle
     public override func loadView() {
@@ -37,6 +38,10 @@ public final class FeedListViewController: BaseUIViewController<FeedViewModel> {
         
         feedCellView.onReportTapped = { [weak self] in
             self?.onReportTapped?()
+        }
+        
+        feedCellView.onRefresh = { [weak self] in
+            self?.onRefresh?()
         }
     }
 

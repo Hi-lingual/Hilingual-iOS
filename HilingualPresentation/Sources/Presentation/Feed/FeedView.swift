@@ -38,7 +38,11 @@ final class FeedView: BaseUIView {
     private let searchImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFit
-        imageView.image = UIImage(named: "ic_search_24_ios", in: .module, compatibleWith: nil)
+        imageView.image = UIImage(
+            named: "ic_search_24_ios",
+            in: .module,
+            compatibleWith: nil
+        )
         return imageView
     }()
 
@@ -53,13 +57,17 @@ final class FeedView: BaseUIView {
     }()
 
     private var segmentedControl: SegmentedControl?
+    
+    private let toast = ToastMessage()
 
     // MARK: - Setup
 
     override func setUI() {
-        addSubview(headerStack)
+        addSubviews(headerStack, toast)
         headerStack.addArrangedSubviews(titleLabel, searchStack)
         searchStack.addArrangedSubviews(searchImageView, profileImageView)
+        
+        toast.isHidden = true
     }
 
     override func setLayout() {
@@ -79,10 +87,7 @@ final class FeedView: BaseUIView {
 
     // MARK: - Public Method
     
-    // 프로필 정보 갱신
-    func configure(
-        profileImageURL: String? = nil
-    ) {
+    func configure(profileImageURL: String? = nil) {
         if let urlString = profileImageURL,
            !urlString.isEmpty,
            let url = URL(string: urlString) {
@@ -113,6 +118,25 @@ final class FeedView: BaseUIView {
             $0.top.equalTo(headerStack.snp.bottom).offset(9)
             $0.horizontalEdges.equalToSuperview()
             $0.bottom.equalTo(safeAreaLayoutGuide)
+        }
+    }
+    
+    func showToast(message: String) {
+        toast.configure(type: .basic, message: message)
+        toast.isHidden = false
+        toast.alpha = 0
+        bringSubviewToFront(toast)
+        
+        UIView.animate(withDuration: 0.3) {
+            self.toast.alpha = 1
+        }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+            UIView.animate(withDuration: 0.3, animations: {
+                self.toast.alpha = 0
+            }, completion: { _ in
+                self.toast.isHidden = true
+            })
         }
     }
 }

@@ -26,6 +26,9 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
         vc.onReportTapped = { [weak self] in
             self?.openReportPage()
         }
+        vc.onRefresh = { [weak self] in
+            self?.showToast(message: "피드의 일기를 모두 확인했어요.")
+        }
         return vc
     }()
 
@@ -39,6 +42,9 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
         }
         vc.onReportTapped = { [weak self] in
             self?.openReportPage()
+        }
+        vc.onRefresh = { [weak self] in
+            self?.showToast(message: "피드의 일기를 모두 확인했어요.")
         }
         return vc
     }()
@@ -63,6 +69,11 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: false)
+    }
+    
+    // MARK: - Public
+    func showToast(message: String) {
+        feedView.showToast(message: message)
     }
 
     func showHideDialog(title: String, content: String) {
