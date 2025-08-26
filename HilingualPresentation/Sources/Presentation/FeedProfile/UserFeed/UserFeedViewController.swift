@@ -18,7 +18,6 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
     private var isBlocked: Bool = false
     private let dialog = Dialog()
     
-    /// 삭제 요청된 row 저장
     private var pendingDeleteRow: Int?
     
     // MARK: - Init
@@ -46,18 +45,15 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
     public override func viewDidLoad() {
         super.viewDidLoad()
         
-        // child VC 붙이기
         addChild(sharedVC)
         userFeedProfileView.feedContainer.addSubview(sharedVC.view)
         sharedVC.view.snp.makeConstraints { $0.edges.equalToSuperview() }
         sharedVC.didMove(toParent: self)
         
-        // dialog 준비
         view.addSubview(dialog)
         dialog.isHidden = true
         dialog.snp.makeConstraints { $0.edges.equalToSuperview() }
         
-        // 콜백 연결
         sharedVC.onHideTapped = { [weak self] row in
             self?.pendingDeleteRow = row
             self?.showHideDialog()

@@ -142,7 +142,7 @@ extension FeedCellView: UITableViewDelegate {
         let contentHeight = scrollView.contentSize.height
         let frameHeight = scrollView.frame.size.height
 
-        ///50만큼 끌어당기면 토스트 호출 (당기는 길이 변경 가능)
+        /// 50만큼 끌어당기면 토스트 호출 (당기는 길이 변경 가능)
         if offsetY > contentHeight - frameHeight + 50 {
             onRefresh?()
         }

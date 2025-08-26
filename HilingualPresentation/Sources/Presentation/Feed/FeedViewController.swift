@@ -80,7 +80,6 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
         feedView.showToast(message: message)
     }
 
-    /// 다이얼로그 띄우고 "확인" 시 해당 row 삭제
     func showHideDialog(listVC: FeedListViewController, row: Int, title: String, content: String) {
         dialog.configure(
             style: .normal,
