@@ -77,6 +77,15 @@ final class ProfileView: UIView {
         return stack
     }()
     
+    private(set) var alarmButton: UIButton = {
+        let button = UIButton()
+        button.setImage(
+            UIImage(named: "ic_alarm_28_ios", in: .module, compatibleWith: nil),
+            for: .normal
+        )
+        return button
+    }()
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
@@ -90,7 +99,7 @@ final class ProfileView: UIView {
     
     private func setupUI() {
         
-        addSubviews(profileImageView, profileStack)
+        addSubviews(profileImageView, profileStack, alarmButton)
         
         profileStack.addArrangedSubviews(
             nameLabel,
@@ -118,6 +127,11 @@ final class ProfileView: UIView {
         profileStack.snp.makeConstraints {
             $0.centerY.equalTo(profileImageView.snp.centerY)
             $0.leading.equalTo(profileImageView.snp.trailing).offset(8)
+        }
+        
+        alarmButton.snp.makeConstraints {
+            $0.centerY.equalTo(profileImageView.snp.centerY)
+            $0.trailing.equalToSuperview().inset(18)
         }
     }
     
