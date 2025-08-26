@@ -18,6 +18,7 @@ struct DiaryViewData {
     let rewriteText: String
     let diffRanges: [HighlightTextView.DiffRange]
     let isHighlightingEnabled: Bool
+    let isPublished: Bool
 }
 
 struct FeedbackItem {
@@ -31,6 +32,7 @@ public final class FeedbackViewController: BaseUIViewController<FeedbackViewMode
     // MARK: - Properties
     
     var onDateLoaded: ((String) -> Void)?
+    var publishedInfoLoaded: ((Bool) -> Void)?
     private var date: String = ""
     
     private let feedbackView = FeedbackView()
@@ -80,7 +82,6 @@ public final class FeedbackViewController: BaseUIViewController<FeedbackViewMode
             .sink(
                 receiveCompletion: { [weak self] completion in
                     if case let .failure(error) = completion {
-                        // 에러 처리
                         self?.showErrorDialog(message: error.localizedDescription)
                     }
                 },
@@ -116,10 +117,12 @@ public final class FeedbackViewController: BaseUIViewController<FeedbackViewMode
                         originalText: entity.originalText,
                         rewriteText: entity.rewriteText,
                         diffRanges: diffRanges,
-                        isHighlightingEnabled: true
+                        isHighlightingEnabled: true,
+                        isPublished: entity.isPublished
                     )
                     self?.date = entity.date
                     self?.onDateLoaded?(entity.date)
+                    self?.publishedInfoLoaded?(entity.isPublished)
                     
                     self?.feedbackView.configureDiary(data: diaryViewData)
                 }
@@ -141,7 +144,6 @@ public final class FeedbackViewController: BaseUIViewController<FeedbackViewMode
         
         dialog.showAnimation()
     }
-
     
     func scrollToTop() {
         feedbackView.scrollToTop()

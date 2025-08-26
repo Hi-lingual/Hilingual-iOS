@@ -80,6 +80,11 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
             self?.recommendedExpressionViewController.setDate(date)
         }
         
+        feedbackViewController.publishedInfoLoaded = { [weak self] isPublished in
+            self?.isPublished = isPublished
+            self?.updateButtonTitle()
+        }
+        
         if showsActionButton {
             button.addTarget(self, action: #selector(postButtonTapped), for: .touchUpInside)
         }

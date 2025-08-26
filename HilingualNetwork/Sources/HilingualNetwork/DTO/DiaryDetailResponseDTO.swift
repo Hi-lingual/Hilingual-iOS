@@ -18,6 +18,7 @@ public struct DiaryDetailResponseDTO: Decodable {
         public let rewriteText: String
         public let diffRanges: [DiffRange]
         public let imageUrl: String?
+        public let isPublished: Bool
     }
     
     public struct DiffRange: Decodable {

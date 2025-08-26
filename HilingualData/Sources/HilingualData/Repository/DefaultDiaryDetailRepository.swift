@@ -37,7 +37,8 @@ public final class DefaultDiaryDetailRepository: DiaryDetailRepository {
                     image: data.imageUrl ?? "",
                     originalText: data.originalText,
                     rewriteText: data.rewriteText,
-                    diffRanges: diffRanges
+                    diffRanges: diffRanges,
+                    isPublished: data.isPublished
                 )
             }
             .mapError { $0 as Error }
