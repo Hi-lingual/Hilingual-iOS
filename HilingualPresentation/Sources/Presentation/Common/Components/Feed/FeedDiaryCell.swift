@@ -264,12 +264,12 @@ final class FeedDiaryCell: UITableViewCell {
         diaryImageURL: String? = nil,
         isLiked: Bool = false,
         likeCount: Int = 0,
-        isLast: Bool = false
+        isLast: Bool = false,
+        type: FeedProfileListType? = nil
     ) {
         self.isMine = isMine
         nameLabel.text = nickname
         
-        // 메뉴 구성
         if isMine {
             menu.configure(items: [
                 ("비공개하기", UIImage(named: "ic_hide_24_ios", in: .module, compatibleWith: nil), .gray700)
@@ -281,20 +281,22 @@ final class FeedDiaryCell: UITableViewCell {
         }
         menu.isHidden = true
 
-        // streak
         let streakValue = max(streak ?? 0, 0)
         streakLabel.text = "\(streakValue)"
         streakLabel.textColor = streakValue > 0 ? .hilingualOrange : .gray400
 
-        // 공유 날짜
+        if type == .shared {
+            streakStack.isHidden = true
+        } else {
+            streakStack.isHidden = false
+        }
+
         sharedDateLabel.text = sharedDateMinutes.timeToText
 
-        // diary preview
         if let preview = diaryPreviewText {
             diaryLabel.attributedText = .suit(.body_r_16, text: preview)
         }
 
-        // 프로필 이미지
         if let urlString = profileImageURL,
            !urlString.isEmpty,
            let url = URL(string: urlString) {
@@ -310,7 +312,6 @@ final class FeedDiaryCell: UITableViewCell {
             )
         }
         
-        // 다이어리 이미지
         if let urlString = diaryImageURL,
            !urlString.isEmpty,
            let url = URL(string: urlString) {
@@ -324,7 +325,6 @@ final class FeedDiaryCell: UITableViewCell {
             diaryImageView.isHidden = true
         }
         
-        // 좋아요
         likeView.configure(likeCount: likeCount, isLiked: isLiked)
 
         divider.isHidden = isLast
@@ -338,6 +338,7 @@ final class FeedDiaryCell: UITableViewCell {
         diaryImageView.isHidden = false
         likeView.configure(likeCount: 0, isLiked: false)
         divider.isHidden = false
+        streakStack.isHidden = false
     }
     
     // MARK: - Actions

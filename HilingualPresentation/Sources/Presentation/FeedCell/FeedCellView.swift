@@ -22,7 +22,9 @@ final class FeedCellView: BaseUIView {
             updateEmptyState()
         }
     }
-
+    
+    private var type: FeedProfileListType?
+    
     private(set) var tableView = UITableView(frame: .zero, style: .plain)
     private let noFeedView = EmptyView()
 
@@ -93,8 +95,9 @@ extension FeedCellView {
         }
     }
     
-    func apply(items: [FeedDiaryItem], emptyMessage: String?) {
+    func apply(items: [FeedDiaryItem], emptyMessage: String?, type: FeedProfileListType) {
         self.items = items
+        self.type = type
         if let emptyMessage, items.isEmpty {
             noFeedView.configure(message: emptyMessage)
             noFeedView.isHidden = false
@@ -119,6 +122,7 @@ extension FeedCellView: UITableViewDataSource {
         }
         let item = items[indexPath.row]
         cell.delegate = self
+        
         cell.configure(
             nickname: item.nickname,
             profileImageURL: item.profileImg,
@@ -129,7 +133,8 @@ extension FeedCellView: UITableViewDataSource {
             diaryImageURL: item.diaryImageUrl,
             isLiked: item.isLiked,
             likeCount: item.likeCount,
-            isLast: indexPath.row == items.count - 1
+            isLast: indexPath.row == items.count - 1,
+            type: type
         )
         return cell
     }
@@ -142,7 +147,7 @@ extension FeedCellView: UITableViewDelegate {
         let contentHeight = scrollView.contentSize.height
         let frameHeight = scrollView.frame.size.height
 
-        /// 50만큼 끌어당기면 토스트 호출 (당기는 길이 변경 가능)
+        /// 50만큼 끌어당기면 토스트 호출
         if offsetY > contentHeight - frameHeight + 50 {
             onRefresh?()
         }

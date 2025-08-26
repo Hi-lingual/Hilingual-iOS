@@ -64,7 +64,8 @@ public final class FeedProfileListViewController: BaseUIViewController<FeedProfi
                 self.currentFeeds = feeds
                 self.feedCellView.apply(
                     items: feeds,
-                    emptyMessage: type.emptyMessage
+                    emptyMessage: type.emptyMessage,
+                    type: type
                 )
             }
             .store(in: &cancellables)
@@ -74,7 +75,11 @@ public final class FeedProfileListViewController: BaseUIViewController<FeedProfi
     public func removeDiary(at row: Int) {
         guard row < currentFeeds.count else { return }
         currentFeeds.remove(at: row)
-        feedCellView.apply(items: currentFeeds, emptyMessage: type.emptyMessage)
+        feedCellView.apply(
+            items: currentFeeds,
+            emptyMessage: type.emptyMessage,
+            type: type
+        )
     }
 
     // MARK: - Actions
