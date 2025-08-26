@@ -358,6 +358,7 @@ final class FeedDiaryCell: UITableViewCell {
 
 extension FeedDiaryCell: ActionMenuDelegate {
     func actionMenu(_ menu: ActionMenu, didSelectItemAt index: Int) {
+        menu.isHidden = true
         delegate?.feedDiaryCell(self, didTapMenuItemAt: index, isMine: isMine)
     }
 }
