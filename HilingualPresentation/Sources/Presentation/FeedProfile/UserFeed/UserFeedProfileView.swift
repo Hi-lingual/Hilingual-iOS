@@ -11,6 +11,7 @@ import SnapKit
 final class UserFeedProfileView: BaseUIView {
     
     // MARK: - UI Components
+    
     private let myFeedView = FeedProfileView()
     private(set) var button = FollowButton()
     
@@ -48,16 +49,29 @@ final class UserFeedProfileView: BaseUIView {
     private let blockModal = BlockModal()
     
     // MARK: - Callbacks
+    
     var onBlockTapped: (() -> Void)?
     var onBlockConfirmTapped: (() -> Void)?
     var onReportTapped: (() -> Void)?
     
+    // MARK: - State
+    
+    private enum ButtonState {
+        case follow
+        case following
+        case unblock
+    }
+    private var currentButtonState: ButtonState = .follow
+    
     // MARK: - Setup
+    
     override func setUI() {
         addSubviews(myFeedView, button, feedContainer, blockedStack, modal)
         blockedStack.isHidden = true
         blockedStack.addArrangedSubviews(titleLabel, subTitleLabel)
         button.configure(state: .follow)
+        
+        button.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
     }
     
     override func setLayout() {
@@ -127,6 +141,8 @@ final class UserFeedProfileView: BaseUIView {
         blockModal.show(in: self)
         blockModal.onApplyTapped = { [weak self] in
             self?.onBlockConfirmTapped?()
+            self?.setButtonState(.unblock)
+            self?.showBlockedView()
         }
     }
     
@@ -142,5 +158,36 @@ final class UserFeedProfileView: BaseUIView {
     func showBlockedView() {
         feedContainer.isHidden = true
         blockedStack.isHidden = false
+    }
+    
+    private func restoreFeedView() {
+        feedContainer.isHidden = false
+        blockedStack.isHidden = true
+    }
+    
+    // MARK: - Private
+    
+    @objc private func buttonTapped() {
+        switch currentButtonState {
+        case .follow:
+            setButtonState(.following)
+        case .following:
+            setButtonState(.follow)
+        case .unblock:
+            setButtonState(.follow)
+            restoreFeedView()
+        }
+    }
+    
+    private func setButtonState(_ state: ButtonState) {
+        currentButtonState = state
+        switch state {
+        case .follow:
+            button.configure(state: .follow)
+        case .following:
+            button.configure(state: .following)
+        case .unblock:
+            button.configure(state: .unblock)
+        }
     }
 }
