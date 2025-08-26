@@ -10,6 +10,8 @@ import SnapKit
 
 final class Modal: UIView {
     
+    private var buttons: [UIButton] = []
+    
     // MARK: - UI Components
     
     private let modalSheetView: UIView = {
@@ -37,6 +39,9 @@ final class Modal: UIView {
         stackView.spacing = 8
         return stackView
     }()
+    
+    private var stackTopToLabel: Constraint?
+    private var stackTopToSheet: Constraint?
     
     // MARK: - LifeCycle
     
@@ -74,21 +79,35 @@ final class Modal: UIView {
         }
         
         stackView.snp.makeConstraints {
-            $0.top.equalTo(modalLabel.snp.bottom).offset(24)
+            self.stackTopToLabel = $0.top.equalTo(modalLabel.snp.bottom).offset(24).constraint
+            self.stackTopToSheet = $0.top.equalTo(modalSheetView).offset(24).constraint
             $0.horizontalEdges.equalTo(modalSheetView).inset(16)
             $0.bottom.equalTo(modalSheetView).inset(62)
         }
+        
+        stackTopToSheet?.deactivate()
+        stackTopToLabel?.activate()
     }
     
     // MARK: - Public Methods
     
-    public func setTitle(_ text: String) {
+    public func setTitle(_ text: String?) {
         modalLabel.text = text
+        modalLabel.isHidden = (text == nil)
+        
+        if text == nil {
+            stackTopToLabel?.deactivate()
+            stackTopToSheet?.activate()
+        } else {
+            stackTopToSheet?.deactivate()
+            stackTopToLabel?.activate()
+        }
     }
     
-    public func configure(title: String, items: [(String, UIImage?, () -> Void)]) {
-        modalLabel.text = title
+    public func configure(title: String?, items: [(String, UIImage?, () -> Void)]) {
+        setTitle(title)
         stackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
+        buttons.removeAll()
         
         items.forEach { (title, image, action) in
             let button = UIButton(type: .system)
@@ -108,8 +127,34 @@ final class Modal: UIView {
             button.contentHorizontalAlignment = .leading
             button.addAction(UIAction { _ in action() }, for: .touchUpInside)
             stackView.addArrangedSubview(button)
+            buttons.append(button)
         }
     }
+
+    public func applyStyle(to index: Int, titleColor: UIColor, font: UIFont = .suit(.body_sb_14)) {
+        guard buttons.indices.contains(index) else { return }
+        let button = buttons[index]
+        
+        // AttributedString → String 변환
+        let plainTitle: String
+        if let attrTitle = button.configuration?.attributedTitle {
+            plainTitle = String(attrTitle.characters)   // CharacterView → String
+        } else {
+            plainTitle = button.currentTitle ?? ""      // fallback
+        }
+        
+        var container = AttributeContainer()
+        container.font = font
+        container.foregroundColor = titleColor
+        
+        let attributed = AttributedString(plainTitle, attributes: container)
+        
+        var config = button.configuration ?? .plain()
+        config.attributedTitle = attributed
+        button.configuration = config
+    }
+
+
     
     // MARK: - Animation
     
@@ -132,6 +177,21 @@ final class Modal: UIView {
     }
 }
 
+extension UIButton {
+    func applyStyle(titleColor: UIColor, font: UIFont = .suit(.body_sb_14)) {
+        let title = self.currentTitle ?? ""
+        let attributed = NSAttributedString(
+            string: title,
+            attributes: [
+                .foregroundColor: titleColor,
+                .font: font
+            ]
+        )
+        self.setAttributedTitle(attributed, for: .normal)
+    }
+}
+
+
 // MARK: - Preview
 
 final class ModalPreviewViewController: UIViewController {
@@ -142,7 +202,7 @@ final class ModalPreviewViewController: UIViewController {
         super.viewDidLoad()
         
         modal.configure(
-            title: "이미지 선택",
+            title: nil,
             items: [
                 ("카메라로 사진 찍기", UIImage(resource: .icCamera24Ios), {
                     print("카메라 선택")
@@ -153,13 +213,14 @@ final class ModalPreviewViewController: UIViewController {
             ]
         )
         
+        modal.applyStyle(to: 1, titleColor: .orange)
+        
         view.addSubview(modal)
         modal.snp.makeConstraints { $0.edges.equalToSuperview() }
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        
         modal.showAnimation()
     }
 }
