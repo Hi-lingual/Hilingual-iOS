@@ -26,7 +26,7 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
             )
         }
         vc.onReportTapped = { [weak self] in
-            self?.openReportPage()
+            self?.showReportDialog()
         }
         vc.onRefresh = { [weak self] in
             self?.showToast(message: "피드의 일기를 모두 확인했어요.")
@@ -45,7 +45,7 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
             )
         }
         vc.onReportTapped = { [weak self] in
-            self?.openReportPage()
+            self?.showReportDialog()
         }
         vc.onRefresh = { [weak self] in
             self?.showToast(message: "피드의 일기를 모두 확인했어요.")
@@ -93,6 +93,27 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
             rightAction: { [weak self] in
                 self?.dialog.dismiss()
                 listVC.removeDiary(at: row)
+            }
+        )
+        dialog.isHidden = false
+        dialog.showAnimation()
+        view.bringSubviewToFront(dialog)
+    }
+    
+    // MARK: - Report
+    private func showReportDialog() {
+        dialog.configure(
+            style: .normal,
+            title: "게시글을 신고하시겠어요?",
+            content: "신고된 게시글은 확인 후\n서비스의 운영원칙에 따라 처리돼요.",
+            leftButtonTitle: "아니요",
+            rightButtonTitle: "신고하기",
+            leftAction: { [weak self] in
+                self?.dialog.dismiss()
+            },
+            rightAction: { [weak self] in
+                self?.dialog.dismiss()
+                self?.openReportPage()
             }
         )
         dialog.isHidden = false

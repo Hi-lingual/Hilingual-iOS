@@ -61,11 +61,7 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
         }
         
         sharedVC.onReportTapped = { [weak self] in
-            guard let self,
-                  let url = URL(string: "https://hilingual.notion.site/230829677ebf801c965be24b0ef444e9")
-            else { return }
-            let safariVC = SFSafariViewController(url: url)
-            self.present(safariVC, animated: true)
+            self?.showReportDialog()
         }
         
         userFeedProfileView.onBlockTapped = { [weak self] in
@@ -82,7 +78,6 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
         }
         
         bind()
-        
     }
     
     // MARK: - Navigation
@@ -129,6 +124,7 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
         input.reload.send(())
     }
     
+    // MARK: - Hide Dialog
     private func showHideDialog() {
         dialog.configure(
             style: .normal,
@@ -149,5 +145,34 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
         dialog.isHidden = false
         dialog.showAnimation()
         view.bringSubviewToFront(dialog)
+    }
+    
+    // MARK: - Report Dialog
+    private func showReportDialog() {
+        dialog.configure(
+            style: .normal,
+            title: "게시글을 신고하시겠어요?",
+            content: "신고된 게시글은 확인 후\n서비스의 운영원칙에 따라 처리돼요.",
+            leftButtonTitle: "아니요",
+            rightButtonTitle: "신고하기",
+            leftAction: { [weak self] in
+                self?.dialog.dismiss()
+            },
+            rightAction: { [weak self] in
+                self?.dialog.dismiss()
+                self?.openReportPage()
+            }
+        )
+        dialog.isHidden = false
+        dialog.showAnimation()
+        view.bringSubviewToFront(dialog)
+    }
+    
+    private func openReportPage() {
+        guard let url =
+                URL(string: "https://hilingual.notion.site/230829677ebf801c965be24b0ef444e9")
+        else { return }
+        let safariVC = SFSafariViewController(url: url)
+        present(safariVC, animated: true)
     }
 }

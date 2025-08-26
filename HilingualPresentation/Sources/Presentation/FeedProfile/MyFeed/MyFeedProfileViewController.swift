@@ -42,32 +42,28 @@ public final class MyFeedProfileViewController: BaseUIViewController<FeedProfile
     public override func viewDidLoad() {
         super.viewDidLoad()
         
-        // SegmentedControl 연결
         myFeedProfileView.configureSegmentedControl(
             parentVC: self,
             viewControllers: [sharedVC, likedVC],
             titles: ["공유한 일기", "공감한 일기"]
         )
         
-        // Dialog 초기화
         view.addSubview(dialog)
         dialog.isHidden = true
         dialog.snp.makeConstraints { $0.edges.equalToSuperview() }
         
-        // 공유 피드 이벤트
         sharedVC.onHideTapped = { [weak self] row in
             self?.showHideDialog(listVC: self?.sharedVC, row: row)
         }
         sharedVC.onReportTapped = { [weak self] in
-            self?.openReportPage()
+            self?.showReportDialog()
         }
         
-        // 공감 피드 이벤트
         likedVC.onHideTapped = { [weak self] row in
             self?.showHideDialog(listVC: self?.likedVC, row: row)
         }
         likedVC.onReportTapped = { [weak self] in
-            self?.openReportPage()
+            self?.showReportDialog()
         }
         
         bind()
@@ -106,7 +102,6 @@ public final class MyFeedProfileViewController: BaseUIViewController<FeedProfile
         input.reload.send(())
     }
 
-    
     // MARK: - Private
     private func showHideDialog(listVC: FeedProfileListViewController?, row: Int) {
         guard let listVC else { return }
@@ -128,6 +123,27 @@ public final class MyFeedProfileViewController: BaseUIViewController<FeedProfile
                 self.dialog.dismiss()
                 listVC.removeDiary(at: row)
                 self.pendingDeleteRow = nil
+            }
+        )
+        dialog.isHidden = false
+        dialog.showAnimation()
+        view.bringSubviewToFront(dialog)
+    }
+    
+    // MARK: - Report
+    private func showReportDialog() {
+        dialog.configure(
+            style: .normal,
+            title: "게시글을 신고하시겠어요?",
+            content: "신고된 게시글은 확인 후\n서비스의 운영원칙에 따라 처리돼요.",
+            leftButtonTitle: "아니요",
+            rightButtonTitle: "신고하기",
+            leftAction: { [weak self] in
+                self?.dialog.dismiss()
+            },
+            rightAction: { [weak self] in
+                self?.dialog.dismiss()
+                self?.openReportPage()
             }
         )
         dialog.isHidden = false
