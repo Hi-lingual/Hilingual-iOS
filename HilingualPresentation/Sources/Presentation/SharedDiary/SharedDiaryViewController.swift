@@ -61,7 +61,7 @@ public final class SharedDiaryViewController: BaseUIViewController<SharedDiaryVi
 
         sharedDiaryView.onLikeAction = { [weak self] isLiked in
             guard let self else { return }
-            // 서버에 공감하기 api 호출
+            self.likeToggleSubject.send((self.diaryId, isLiked))
         }
         
         viewDidLoadSubject.send(())
@@ -107,6 +107,8 @@ public final class SharedDiaryViewController: BaseUIViewController<SharedDiaryVi
     
     // MARK: - Binding
     
+    private let likeToggleSubject = PassthroughSubject<(Int, Bool), Never>()
+    
     public override func bind(viewModel: SharedDiaryViewModel) {
         super.bind(viewModel: viewModel)
         
@@ -118,13 +120,12 @@ public final class SharedDiaryViewController: BaseUIViewController<SharedDiaryVi
     
     private func makeInput() -> SharedDiaryViewModel.Input {
         return SharedDiaryViewModel.Input(
-            viewDidLoad: viewDidLoadSubject.eraseToAnyPublisher()
+            viewDidLoad: viewDidLoadSubject.eraseToAnyPublisher(),
+            likeTapped: likeToggleSubject.eraseToAnyPublisher()
             )
     }
     
     private func bindOutput(_ output: SharedDiaryViewModel.Output) {
-        print("듀...듀..")
-
         output.fetchDiaryResult
             .receive(on: RunLoop.main)
             .sink(
@@ -153,8 +154,6 @@ public final class SharedDiaryViewController: BaseUIViewController<SharedDiaryVi
             .store(in: &cancellables)
     }
 
-
-    
     // MARK: - Public Methods
     
     public override func navigationType() -> NavigationType? {

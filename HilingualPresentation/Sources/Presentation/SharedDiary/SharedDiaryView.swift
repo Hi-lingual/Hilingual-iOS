@@ -52,8 +52,6 @@ final class SharedDiaryView: BaseUIView {
     override func setUI() {
         addSubviews(profileView)
         
-//        profileView.configure(profileImageURL: "https://avatars.githubusercontent.com/u/42905243?v=4", nickname: "가나디", streak: 15, sharedDateMinutes: 127, isLiked: true, likeCount: 7)
-        
         profileView.onProfileTapped = { [weak self] in
             self?.onProfileAction?()
         }

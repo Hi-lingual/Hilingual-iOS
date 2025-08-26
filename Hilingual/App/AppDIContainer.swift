@@ -359,10 +359,14 @@ extension AppDIContainer {
     }
     
     private func makeSharedDiaryViewModel(diaryId: Int) -> SharedDiaryViewModel {
-        return SharedDiaryViewModel(diaryId: diaryId, sharedDiaryUseCase: makeSharedDiaryUseCase())
+        return SharedDiaryViewModel(diaryId: diaryId, sharedDiaryUseCase: makeSharedDiaryUseCase(), toggleLikeUseCase: makeToggleLikeUseCase())
     }
     
     func makeSharedDiaryViewController(diaryId: Int) -> SharedDiaryViewController {
         return SharedDiaryViewController(viewModel: makeSharedDiaryViewModel(diaryId: diaryId), diContainer: self, diaryId: diaryId)
+    }
+    
+    func makeToggleLikeUseCase() -> ToggleLikeUseCase {
+        return DefaultToggleLikeUseCase(repository: makeSharedDiaryRepository())
     }
 }
