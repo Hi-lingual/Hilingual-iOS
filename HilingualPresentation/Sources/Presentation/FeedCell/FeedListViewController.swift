@@ -16,6 +16,9 @@ public final class FeedListViewController: BaseUIViewController<FeedViewModel> {
     private let feedCellView = FeedCellView()
     private let input = FeedViewModel.Input()
     
+    var onHideTapped: (() -> Void)?
+    var onReportTapped: (() -> Void)?
+
     // MARK: - Lifecycle
     public override func loadView() {
         self.view = feedCellView
@@ -28,11 +31,12 @@ public final class FeedListViewController: BaseUIViewController<FeedViewModel> {
         
         feedCellView.addTableTapGesture(target: self, action: #selector(didTapTableView))
         
+        feedCellView.onHideTapped = { [weak self] in
+            self?.onHideTapped?()
+        }
+        
         feedCellView.onReportTapped = { [weak self] in
-            guard let url = URL(string: "https://hilingual.notion.site/230829677ebf801c965be24b0ef444e9"),
-                  let self else { return }
-            let safariVC = SFSafariViewController(url: url)
-            self.present(safariVC, animated: true)
+            self?.onReportTapped?()
         }
     }
 
@@ -52,9 +56,8 @@ public final class FeedListViewController: BaseUIViewController<FeedViewModel> {
             .store(in: &cancellables)
     }
     
+    // MARK: - Actions
     @objc private func didTapTableView() {
         feedCellView.closeAllMenus()
     }
 }
-
-

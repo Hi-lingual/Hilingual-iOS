@@ -7,6 +7,7 @@
 
 import UIKit
 import Foundation
+import SafariServices
 
 public final class MyFeedProfileViewController: BaseUIViewController<FeedProfileViewModel> {
 
@@ -14,6 +15,7 @@ public final class MyFeedProfileViewController: BaseUIViewController<FeedProfile
     private let myFeedProfileView = MyFeedProfileView()
     private let likedVC: FeedProfileListViewController
     private let sharedVC: FeedProfileListViewController
+    private let dialog = Dialog()
     
     // MARK: - Init
     public init(
@@ -31,24 +33,67 @@ public final class MyFeedProfileViewController: BaseUIViewController<FeedProfile
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
 
     // MARK: - Lifecycle
-    public override func setUI() {
+    public override func loadView() {
+        self.view = myFeedProfileView
+    }
+
+    public override func viewDidLoad() {
+        super.viewDidLoad()
+        
         myFeedProfileView.configureSegmentedControl(
             parentVC: self,
             viewControllers: [sharedVC, likedVC],
             titles: ["공유한 일기", "공감한 일기"]
         )
+        
+        view.addSubview(dialog)
+        dialog.isHidden = true
+        dialog.snp.makeConstraints { $0.edges.equalToSuperview() }
+        
+        sharedVC.onHideTapped = { [weak self] in
+            self?.showHideDialog()
+        }
+        sharedVC.onReportTapped = { [weak self] in
+            self?.openReportPage()
+        }
+        likedVC.onHideTapped = { [weak self] in
+            self?.showHideDialog()
+        }
+        likedVC.onReportTapped = { [weak self] in
+            self?.openReportPage()
+        }
     }
     
     public override func navigationType() -> NavigationType? {
         return .backOnly
     }
     
-    public override func loadView() {
-        self.view = myFeedProfileView
-    }
-    
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(false, animated: false)
+    }
+    
+    // MARK: - Private
+    private func showHideDialog() {
+        dialog.configure(
+            style: .normal,
+            title: "영어 일기를 비공개 하시겠어요?",
+            content: "비공개로 전환 시,\n해당 일기의 피드 활동 내역은 모두 사라져요.",
+            leftButtonTitle: "취소",
+            rightButtonTitle: "확인",
+            leftAction: { [weak self] in self?.dialog.dismiss() },
+            rightAction: { [weak self] in self?.dialog.dismiss() }
+        )
+        dialog.isHidden = false
+        dialog.showAnimation()
+        view.bringSubviewToFront(dialog)
+    }
+    
+    private func openReportPage() {
+        guard let url =
+                URL(string: "https://hilingual.notion.site/230829677ebf801c965be24b0ef444e9")
+        else { return }
+        let safariVC = SFSafariViewController(url: url)
+        present(safariVC, animated: true)
     }
 }

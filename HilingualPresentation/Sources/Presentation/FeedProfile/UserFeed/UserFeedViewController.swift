@@ -16,6 +16,7 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
     private let sharedVC: FeedProfileListViewController
     private let targetUserId: Int64
     private var isBlocked: Bool = false
+    private let dialog = Dialog()
     
     // MARK: - Init
     public init(
@@ -42,11 +43,27 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
     public override func viewDidLoad() {
         super.viewDidLoad()
         
-        // feedContainer에 VC 붙이기
         addChild(sharedVC)
         userFeedProfileView.feedContainer.addSubview(sharedVC.view)
         sharedVC.view.snp.makeConstraints { $0.edges.equalToSuperview() }
         sharedVC.didMove(toParent: self)
+        
+        view.addSubview(dialog)
+        dialog.isHidden = true
+        dialog.snp.makeConstraints { $0.edges.equalToSuperview() }
+        
+        sharedVC.onHideTapped = { [weak self] in
+            self?.showHideDialog()
+        }
+        
+        sharedVC.onReportTapped = { [weak self] in
+            guard let self,
+                  let url =
+                    URL(string: "https://hilingual.notion.site/230829677ebf801c965be24b0ef444e9")
+            else { return }
+            let safariVC = SFSafariViewController(url: url)
+            self.present(safariVC, animated: true)
+        }
         
         userFeedProfileView.onBlockTapped = { [weak self] in
             self?.userFeedProfileView.showBlockDialog()
@@ -59,13 +76,6 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
             self.userFeedProfileView.showBlockedView()
             self.isBlocked = true
             self.updateNavigation()
-        }
-        
-        userFeedProfileView.onReportTapped = { [weak self] in
-            guard let url = URL(string: "https://hilingual.notion.site/230829677ebf801c965be24b0ef444e9"),
-                  let self else { return }
-            let safariVC = SFSafariViewController(url: url)
-            self.present(safariVC, animated: true)
         }
     }
     
@@ -87,5 +97,21 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(false, animated: false)
+    }
+    
+    // MARK: - Dialog 띄우기
+    private func showHideDialog() {
+        dialog.configure(
+            style: .normal,
+            title: "영어 일기를 비공개 하시겠어요?",
+            content: "비공개로 전환 시,\n해당 일기의 피드 활동 내역은 모두 사라져요.",
+            leftButtonTitle: "취소",
+            rightButtonTitle: "확인",
+            leftAction: { [weak self] in self?.dialog.dismiss() },
+            rightAction: { [weak self] in self?.dialog.dismiss() }
+        )
+        dialog.isHidden = false
+        dialog.showAnimation()
+        view.bringSubviewToFront(dialog)
     }
 }

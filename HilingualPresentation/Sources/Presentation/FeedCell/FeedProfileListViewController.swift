@@ -16,7 +16,10 @@ public final class FeedProfileListViewController: BaseUIViewController<FeedProfi
     private let feedCellView = FeedCellView()
     private let input = FeedProfileViewModel.Input()
     private let type: FeedProfileListType
-
+    
+    var onHideTapped: (() -> Void)?
+    var onReportTapped: (() -> Void)?
+    
     // MARK: - Init
     public init(viewModel: FeedProfileViewModel,
                 diContainer: any ViewControllerFactory,
@@ -29,24 +32,22 @@ public final class FeedProfileListViewController: BaseUIViewController<FeedProfi
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
 
     // MARK: - Lifecycle
-    public override func loadView() {
-        self.view = feedCellView
-    }
-
     public override func viewDidLoad() {
         super.viewDidLoad()
         bindViewModel()
         input.reload.send(())
-        
+
+        view.addSubview(feedCellView)
+        feedCellView.snp.makeConstraints { $0.edges.equalToSuperview() }
+
         feedCellView.addTableTapGesture(target: self, action: #selector(didTapTableView))
-        
+
+        feedCellView.onHideTapped = { [weak self] in
+            self?.onHideTapped?()
+        }
+
         feedCellView.onReportTapped = { [weak self] in
-            guard let self,
-                  let url =
-                    URL(string: "https://hilingual.notion.site/230829677ebf801c965be24b0ef444e9")
-            else { return }
-            let safariVC = SFSafariViewController(url: url)
-            self.present(safariVC, animated: true)
+            self?.onReportTapped?()
         }
     }
 
@@ -65,7 +66,8 @@ public final class FeedProfileListViewController: BaseUIViewController<FeedProfi
             }
             .store(in: &cancellables)
     }
-    
+
+    // MARK: - Actions
     @objc private func didTapTableView() {
         feedCellView.closeAllMenus()
     }
