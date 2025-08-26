@@ -18,6 +18,7 @@ public final class SharedDiaryViewModel: BaseViewModel {
     struct Input {
         let viewDidLoad: AnyPublisher<Void, Never>
         let likeTapped: AnyPublisher<(Int,Bool), Never>
+        let publishTapped: AnyPublisher<(Int, Bool), Never>
     }
     
     // MARK: - Output
@@ -31,15 +32,17 @@ public final class SharedDiaryViewModel: BaseViewModel {
     
     private let sharedDiaryUseCase: SharedDiaryUseCase
     private let toggleLikeUseCase: ToggleLikeUseCase
+    private let publishDiaryUseCase: PublishDiaryUseCase
     
     private let sharedDiarySubject = PassthroughSubject<SharedDiaryEntity, Never>()
     private let errorSubject = PassthroughSubject<String, Never>()
     
     public init(diaryId: Int,
-                sharedDiaryUseCase: SharedDiaryUseCase, toggleLikeUseCase: ToggleLikeUseCase) {
+                sharedDiaryUseCase: SharedDiaryUseCase, toggleLikeUseCase: ToggleLikeUseCase, publishDiaryUseCase: PublishDiaryUseCase) {
         self.diaryId = diaryId
         self.sharedDiaryUseCase = sharedDiaryUseCase
         self.toggleLikeUseCase = toggleLikeUseCase
+        self.publishDiaryUseCase = publishDiaryUseCase
     }
     
     func transform(input: Input) -> Output {
@@ -67,6 +70,11 @@ public final class SharedDiaryViewModel: BaseViewModel {
                         self?.toggleLike(diaryId: diaryId, isLiked: isLiked)
                     }
                     .store(in: &cancellables)
+        input.publishTapped
+            .sink { [weak self] (diaryId, isPublished) in
+                self?.publishDiary(diaryId: diaryId, isPublished: isPublished)
+            }
+            .store(in: &cancellables)
         
         return Output(
             fetchDiaryResult: sharedDiarySubject.eraseToAnyPublisher(),
@@ -85,5 +93,18 @@ public final class SharedDiaryViewModel: BaseViewModel {
             })
             .store(in: &cancellables)
     }
+    
+    private func publishDiary(diaryId: Int, isPublished: Bool) {
+        publishDiaryUseCase.execute(diaryId: diaryId, isPublished: isPublished)
+            .sink(receiveCompletion: { [weak self] completion in
+                if case let .failure(error) = completion {
+                    self?.errorSubject.send("공개 상태 변경 실패: \(error.localizedDescription)")
+                }
+            }, receiveValue: { _ in
+                
+            })
+            .store(in: &cancellables)
+    }
+
 
 }

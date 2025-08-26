@@ -221,8 +221,22 @@ extension AppDIContainer {
 }
 
 extension AppDIContainer {
+    private func makePublishDiaryUseCase() -> PublishDiaryUseCase {
+        return DefaultPublishDiaryUseCase(repository: makePublishDiaryRepository())
+    }
+    
+    private func makePublishDiaryRepository() -> PublishDiaryRepository {
+        return DefaultPublishDiaryRepository(service: makePublishDiaryService())
+    }
+    
+    private func makePublishDiaryService() -> PublishDiaryService {
+        return MockPublishDiaryService()
+    }
+}
+
+extension AppDIContainer {
     private func makeDiaryDetailViewModel(diaryId: Int) -> DiaryDetailViewModel {
-        return DiaryDetailViewModel(diaryId: diaryId, deleteDiaryUseCase: makeDeleteDiaryUseCase())
+        return DiaryDetailViewModel(diaryId: diaryId, deleteDiaryUseCase: makeDeleteDiaryUseCase(), publishDiaryUseCase: makePublishDiaryUseCase())
     }
         
     private func makeFeedbackViewModel(diaryId: Int) -> FeedbackViewModel {
@@ -369,7 +383,7 @@ extension AppDIContainer {
     }
     
     private func makeSharedDiaryViewModel(diaryId: Int) -> SharedDiaryViewModel {
-        return SharedDiaryViewModel(diaryId: diaryId, sharedDiaryUseCase: makeSharedDiaryUseCase(), toggleLikeUseCase: makeToggleLikeUseCase())
+        return SharedDiaryViewModel(diaryId: diaryId, sharedDiaryUseCase: makeSharedDiaryUseCase(), toggleLikeUseCase: makeToggleLikeUseCase(), publishDiaryUseCase: makePublishDiaryUseCase())
     }
     
     func makeSharedDiaryViewController(diaryId: Int) -> SharedDiaryViewController {

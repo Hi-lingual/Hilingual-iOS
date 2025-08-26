@@ -108,6 +108,7 @@ public final class SharedDiaryViewController: BaseUIViewController<SharedDiaryVi
     // MARK: - Binding
     
     private let likeToggleSubject = PassthroughSubject<(Int, Bool), Never>()
+    private let publishToggleSubject = PassthroughSubject<(Int, Bool), Never>()
     
     public override func bind(viewModel: SharedDiaryViewModel) {
         super.bind(viewModel: viewModel)
@@ -121,7 +122,8 @@ public final class SharedDiaryViewController: BaseUIViewController<SharedDiaryVi
     private func makeInput() -> SharedDiaryViewModel.Input {
         return SharedDiaryViewModel.Input(
             viewDidLoad: viewDidLoadSubject.eraseToAnyPublisher(),
-            likeTapped: likeToggleSubject.eraseToAnyPublisher()
+            likeTapped: likeToggleSubject.eraseToAnyPublisher(),
+            publishTapped: publishToggleSubject.eraseToAnyPublisher(),
             )
     }
     
@@ -221,6 +223,8 @@ public final class SharedDiaryViewController: BaseUIViewController<SharedDiaryVi
             rightAction: { [weak self] in
                         guard let self else { return }
                         self.dialog.dismiss()
+                
+                self.publishToggleSubject.send((self.diaryId, false))
                         
                         if let nav = self.navigationController {
                             nav.popViewController(animated: true)

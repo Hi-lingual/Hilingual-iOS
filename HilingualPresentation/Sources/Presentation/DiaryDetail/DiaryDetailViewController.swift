@@ -18,6 +18,7 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
     var date: String = ""
     private var isPublished: Bool = true
     private let deleteTappedSubject = PassthroughSubject<Void, Never>()
+    private let publishTappedSubject = PassthroughSubject<Bool, Never>()
     
     private let diaryDetailView = DiaryDetailView()
     private var isHighlightingEnabled: Bool = true
@@ -147,7 +148,8 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
         super.bind(viewModel: viewModel)
         
         let input = DiaryDetailViewModel.Input(
-            deleteTapped: deleteTappedSubject.eraseToAnyPublisher()
+            deleteTapped: deleteTappedSubject.eraseToAnyPublisher(),
+            publishTapped: publishTappedSubject.eraseToAnyPublisher()
         )
         let output = viewModel.transform(input: input)
         
@@ -165,6 +167,26 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
                 }
             }
             .store(in: &cancellables)
+        output.publishResult
+            .receive(on: RunLoop.main)
+            .sink { [weak self] isPublished in
+                self?.isPublished = isPublished
+                self?.updateButtonTitle()
+                
+                let toast = ToastMessage()
+                self?.view.addSubview(toast)
+                if isPublished {
+                    toast.configure(type: .withButton, message: "일기가 게시되었어요!")
+                    toast.action = { [weak self] in
+                        let vc = self?.diContainer.makeSharedDiaryViewController(diaryId: self?.diaryId ?? 0)
+                        self?.navigationController?.pushViewController(vc!, animated: true)
+                    }
+                } else {
+                    toast.configure(type: .basic, message: "일기가 비공개 되었어요.")
+                }
+            }
+            .store(in: &cancellables)
+
         
         output.errorMessage
             .receive(on: RunLoop.main)
@@ -272,15 +294,7 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
             },
             rightAction: { [weak self] in
                 self?.dialog.dismiss()
-                self?.isPublished = true
-                self?.updateButtonTitle()
-                let toast = ToastMessage()
-                self?.view.addSubview(toast)
-                toast.configure(type: .withButton, message: "일기가 게시되었어요!")
-                toast.action = { [weak self] in
-                    let vc = self?.diContainer.makeSharedDiaryViewController(diaryId: self?.diaryId ?? 0)
-                    self?.navigationController?.pushViewController(vc!, animated: true)
-                }
+                self?.publishTappedSubject.send(true)
             }
         )
         dialog.showAnimation()
@@ -298,13 +312,7 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
             rightAction: { [weak self] in
                 guard let self else { return }
                 self.dialog.dismiss()
-                isPublished = false
-                updateButtonTitle()
-                
-                let toast = ToastMessage()
-                view.addSubview(toast)
-                toast.configure(type: .basic, message: "일기가 비공개 되었어요.")
-                
+                self.publishTappedSubject.send(false)
             }
         )
         dialog.showAnimation()
