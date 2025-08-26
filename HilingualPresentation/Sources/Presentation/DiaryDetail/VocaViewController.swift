@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 import Combine
 
@@ -14,6 +15,7 @@ public final class RecommendedExpressionViewController: BaseUIViewController<Rec
     // MARK: - Properties
     
     private let recommendedExpressionView = RecommendedExpressionView()
+    private let dialog = Dialog()
     private var pendingDate: String?
     
     // MARK: - LifeCycle
@@ -27,11 +29,13 @@ public final class RecommendedExpressionViewController: BaseUIViewController<Rec
     // MARK: Custom Method
     
     public override func setUI() {
-        view.addSubview(recommendedExpressionView)
+        view.addSubviews(recommendedExpressionView, dialog)
         view.backgroundColor = .gray100
+        view.bringSubviewToFront(dialog)
+        
         if let date = pendingDate {
-                recommendedExpressionView.setDate(date)
-            }
+            recommendedExpressionView.setDate(date)
+        }
     }
     
     public override func setLayout() {
@@ -71,10 +75,32 @@ public final class RecommendedExpressionViewController: BaseUIViewController<Rec
                 }
             }
             .receive(on: RunLoop.main)
-            .sink { [weak self] viewDataList in
-                self?.recommendedExpressionView.configure(dataList: viewDataList)
-            }
+            .sink(
+                receiveCompletion: { [weak self] completion in
+                    if case let .failure(error) = completion {
+                        // 에러 처리
+                        self?.showErrorDialog(message: error.localizedDescription)
+                    }
+                },
+                receiveValue: { [weak self] viewDataList in
+                    self?.recommendedExpressionView.configure(dataList: viewDataList)
+                }
+            )
             .store(in: &cancellables)
+    }
+    
+    private func showErrorDialog(message: String) {
+        dialog.configure(
+            style: .error,
+            image: UIImage(resource: .imgErrorIos),
+            title: "앗! 일시적인 오류가 발생했어요.",
+            rightButtonTitle: "확인",
+            rightAction: { [weak self] in
+                self?.navigationController?.popViewController(animated: true)
+            }
+        )
+        
+        dialog.showAnimation()
     }
     
     func scrollToTop() {
