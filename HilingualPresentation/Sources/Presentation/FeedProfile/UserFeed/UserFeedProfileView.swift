@@ -86,7 +86,6 @@ final class UserFeedProfileView: BaseUIView {
     
     // MARK: - Public
     
-    /// 프로필 데이터 반영
     func configureProfile(
         nickname: String,
         profileImageURL: String?,
