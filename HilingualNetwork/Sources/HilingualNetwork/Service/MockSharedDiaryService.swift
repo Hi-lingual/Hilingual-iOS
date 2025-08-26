@@ -17,7 +17,7 @@ public final class MockSharedDiaryService: SharedDiaryService {
     public init() {}
     
     private var currentIsLiked = false
-    private var currentLikeCount = 3   // ✅ 기본 좋아요 수 저장
+    private var currentLikeCount = 3 
     
     public func fetchSharedDiary(diaryId: Int) -> AnyPublisher<SharedDiaryResponseDTO, Error> {
         let response: SharedDiaryResponseDTO
@@ -34,7 +34,7 @@ public final class MockSharedDiaryService: SharedDiaryService {
                     ),
                     diary: .init(
                         sharedDate: 10,
-                        likeCount: currentLikeCount,   // ✅ 저장된 값 사용
+                        likeCount: currentLikeCount,
                         isLiked: currentIsLiked
                     )
                 ),
@@ -53,7 +53,7 @@ public final class MockSharedDiaryService: SharedDiaryService {
                     ),
                     diary: .init(
                         sharedDate: 120,
-                        likeCount: currentLikeCount,   // ✅ 동일하게 반영
+                        likeCount: currentLikeCount,
                         isLiked: currentIsLiked
                     )
                 ),
@@ -67,7 +67,6 @@ public final class MockSharedDiaryService: SharedDiaryService {
     }
 
     public func toggleLike(diaryId: Int, isLiked: Bool) -> AnyPublisher<Void, Error> {
-        // ✅ 상태 반영
         if isLiked && !currentIsLiked {
             currentLikeCount += 1
         } else if !isLiked && currentIsLiked {

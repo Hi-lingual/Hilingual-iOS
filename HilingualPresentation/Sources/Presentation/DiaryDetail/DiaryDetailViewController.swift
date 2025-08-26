@@ -187,7 +187,6 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
             }
             .store(in: &cancellables)
 
-        
         output.errorMessage
             .receive(on: RunLoop.main)
             .sink { [weak self] message in
