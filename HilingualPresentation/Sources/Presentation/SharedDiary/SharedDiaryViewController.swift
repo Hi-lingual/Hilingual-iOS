@@ -194,9 +194,7 @@ public final class SharedDiaryViewController: BaseUIViewController<SharedDiaryVi
                     }),
                     ("게시글 신고하기", UIImage(resource: .icReport24Ios), { [weak self] in
                         self?.modal.isHidden = true
-                        guard let url = URL(string: "https://hilingual.notion.site/230829677ebf801c965be24b0ef444e9") else { return }
-                        let safariVC = SFSafariViewController(url: url)
-                        self?.present(safariVC, animated: true)
+                        self?.showReportDialog()
                     })
                 ]
             }
@@ -221,23 +219,23 @@ public final class SharedDiaryViewController: BaseUIViewController<SharedDiaryVi
                 self?.dialog.dismiss()
             },
             rightAction: { [weak self] in
-                        guard let self else { return }
-                        self.dialog.dismiss()
+                guard let self else { return }
+                self.dialog.dismiss()
                 
                 self.publishToggleSubject.send((self.diaryId, false))
-                        
-                        if let nav = self.navigationController {
-                            nav.popViewController(animated: true)
-                            
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                                if let previousVC = nav.viewControllers.last {
-                                    let toast = ToastMessage()
-                                    previousVC.view.addSubview(toast)
-                                    toast.configure(type: .basic, message: "일기가 비공개 되었어요.")
-                                }
-                            }
+                
+                if let nav = self.navigationController {
+                    nav.popViewController(animated: true)
+                    
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        if let previousVC = nav.viewControllers.last {
+                            let toast = ToastMessage()
+                            previousVC.view.addSubview(toast)
+                            toast.configure(type: .basic, message: "일기가 비공개 되었어요.")
                         }
                     }
+                }
+            }
         )
         dialog.showAnimation()
     }
@@ -250,6 +248,24 @@ public final class SharedDiaryViewController: BaseUIViewController<SharedDiaryVi
             rightButtonTitle: "확인",
             rightAction: { [weak self] in
                 self?.navigationController?.popViewController(animated: true)
+            }
+        )
+        
+        dialog.showAnimation()
+    }
+    
+    private func showReportDialog() {
+        dialog.configure(
+            style: .normal,
+            image: UIImage(resource: .imgErrorIos),
+            title: "게시글을 신고하시겠어요?",
+            content: "신고된 게시글은 확인 후\n서비스의 운영원칙에 따라 처리돼요.",
+            leftButtonTitle: "아니요",
+            rightButtonTitle: "신고하기",
+            rightAction: { [weak self] in
+                guard let url = URL(string: "https://hilingual.notion.site/230829677ebf801c965be24b0ef444e9") else { return }
+                let safariVC = SFSafariViewController(url: url)
+                self?.present(safariVC, animated: true)
             }
         )
         
