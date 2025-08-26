@@ -6,19 +6,23 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     // MARK: - Properties
 
     private let homeView = HomeView()
+    let dialog = Dialog()
     private let input = HomeViewModel.Input()
-    private var didSendInitialMonth = false
 
     // MARK: - Life Cycle
 
     public override func setUI() {
         super.setUI()
-        view.addSubview(homeView)
+        view.addSubviews(homeView, dialog)
     }
 
     public override func setLayout() {
         homeView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
+        }
+        
+        dialog.snp.makeConstraints{
+            $0.edges.equalToSuperview()
         }
     }
     
@@ -122,6 +126,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                         self.homeView.selectedInfo.updateView(
                             for: date,
                             diaryId: diary?.diaryId,
+                            isPublished: diary?.isPublished,
                             remainingTime: 0,
                             topicData: nil,
                             diaryData: diary?.originalText,
@@ -137,6 +142,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                         self.homeView.selectedInfo.updateView(
                             for: date,
                             diaryId: nil,
+                            isPublished: nil,
                             remainingTime: topic?.remainingTime ?? 0,
                             topicData: topic.map { ($0.topicKor, $0.topicEn) },
                             diaryData: nil,
@@ -147,9 +153,9 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
             }
         }
     }
-
+    
     // MARK: - Action
-
+    
     public override func addTarget() {
         
         // 주제 카드 눌렀을 때, 일기 작성화면으로 이동
@@ -159,12 +165,12 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
             let topic = self.homeView.selectedInfo.topicData
             self.goToDiaryWritingView(topicData: topic, selectedDate: selectedDate)
         }
-
+        
         // 일기 프리뷰 눌렀을 때, 상세화면으로 이동
         homeView.selectedInfo.onDiaryPreviewTapped = { [weak self] in
             guard let self,
                   let date = self.homeView.calendarView.selectedDate else { return }
-
+            
             self.viewModel?.fetchDiary(for: date)
                 .receive(on: RunLoop.main)
                 .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] diary in
@@ -173,8 +179,106 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                 })
                 .store(in: &self.viewModel!.cancellables)
         }
+        
+        // 일기 더보기 버튼 눌렀을 때, 메뉴 토글
+        homeView.selectedInfo.onMoreButtonTapped = { [weak self] _ in
+            guard let self else { return }
+            self.homeView.selectedInfo.menu.isHidden.toggle()
+        }
+        
+        homeView.selectedInfo.onMenuAction = { [weak self] action in
+            guard let self else { return }
+            
+            switch action {
+            case .publish:
+                self.showDialog(for: .publish) { _ in }
+            case .unpublish:
+                self.showDialog(for: .unpublish) { _ in }
+            case .delete:
+                self.showDialog(for: .delete) { _ in }
+            }
+        }
     }
-
+    
+    private func showDialog(for action: MenuAction, completion: @escaping (Bool?) -> Void) {
+        guard let containerView = self.tabBarController?.view else { return }
+            
+            dialog.removeFromSuperview()
+            containerView.addSubview(dialog)
+            containerView.bringSubviewToFront(dialog)
+            
+            dialog.snp.remakeConstraints {
+                $0.edges.equalToSuperview()
+            }
+        
+        switch action {
+        case .publish:
+            dialog.configure(
+                style: .normal,
+                title: "영어 일기를 게시하시겠어요?",
+                content: "공유된 일기는 모든 유저에게 게시되며,\n피드에서 확인하실 수 있어요.",
+                leftButtonTitle: "아니요",
+                rightButtonTitle: "게시하기",
+                leftAction: { [weak dialog] in dialog?.dismiss() },
+                rightAction: { [weak self] in
+                    guard let self else { return }
+                    self.homeView.selectedInfo.updateDiaryState(isPublished: true)
+                    self.homeView.selectedInfo.updateMenuState(isPublished: true)
+                    self.dialog.dismiss()
+                    
+                    let toast = ToastMessage()
+                    toast.configure(type: .withButton, message: "일기가 게시되었어요!", actionTitle: "피드 보러가기")
+                    self.view.addSubview(toast)
+                    toast.action = { [weak self] in
+                        guard let self else { return }
+                        // TODO: 소은이 뷰로 전환
+                        let vc = diContainer.makeFeedbackViewController(diaryId: 123)
+                        self.navigationController?.pushViewController(vc, animated: true)
+                        completion(true)
+                    }
+                }
+            )
+        case .unpublish:
+            dialog.configure(
+                style: .normal,
+                title: "영어 일기를 비공개 하시겠어요?",
+                content: "비공개로 전환 시, 해당 일기의\n피드 활동 내역은 모두 사라져요.",
+                leftButtonTitle: "아니요",
+                rightButtonTitle: "비공개하기",
+                leftAction: { [weak dialog] in dialog?.dismiss() },
+                rightAction: {[weak self] in
+                    guard let self else { return }
+                    self.homeView.selectedInfo.updateDiaryState(isPublished: false)
+                    self.homeView.selectedInfo.updateMenuState(isPublished: false)
+                    self.dialog.dismiss()
+                    
+                    let toast = ToastMessage()
+                    toast.configure(type: .basic, message: "일기가 비공개 되었어요.")
+                    self.view.addSubview(toast)
+                    completion(true)
+                }
+            )
+        case .delete:
+            dialog.configure(
+                style: .normal,
+                title: "일기를 삭제하시겠어요?",
+                content: "작성한 일기를 삭제한 날짜에는\n다시 일기를 작성할 수 없어요.",
+                leftButtonTitle: "아니요",
+                rightButtonTitle: "삭제하기",
+                leftAction: { [weak dialog] in dialog?.dismiss() },
+                rightAction: { [weak self] in
+                    guard let self else { return }
+                    self.homeView.selectedInfo.updateView(for: self.homeView.calendarView.selectedDate ?? Date(), diaryId: nil, isPublished: nil, remainingTime: 0, topicData: nil, diaryData: nil, imageURL: nil)
+                    self.dialog.dismiss()
+                    completion(true)
+                    
+                    // TODO: 삭제 API 호출
+                }
+            )
+        }
+        dialog.showAnimation()
+    }
+    
     // MARK: - Navigation
 
     private func goToDiaryWritingView(topicData: (String, String)? = nil, selectedDate: Date? = nil) {
