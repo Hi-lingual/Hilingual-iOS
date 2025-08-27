@@ -20,7 +20,6 @@ public final class SharedDiaryViewController: BaseUIViewController<SharedDiaryVi
     
     private let viewDidLoadSubject = PassthroughSubject<Void, Never>()
 
-    
     // MARK: - UI Components
     
     private let dialog = Dialog()
@@ -247,6 +246,7 @@ public final class SharedDiaryViewController: BaseUIViewController<SharedDiaryVi
             title: "앗! 일시적인 오류가 발생했어요.",
             rightButtonTitle: "확인",
             rightAction: { [weak self] in
+                self?.dialog.dismiss()
                 self?.navigationController?.popViewController(animated: true)
             }
         )
@@ -262,7 +262,11 @@ public final class SharedDiaryViewController: BaseUIViewController<SharedDiaryVi
             content: "신고된 게시글은 확인 후\n서비스의 운영원칙에 따라 처리돼요.",
             leftButtonTitle: "아니요",
             rightButtonTitle: "신고하기",
+            leftAction: { [weak self] in
+                self?.dialog.dismiss()
+            },
             rightAction: { [weak self] in
+                self?.dialog.dismiss()
                 guard let url = URL(string: "https://hilingual.notion.site/230829677ebf801c965be24b0ef444e9") else { return }
                 let safariVC = SFSafariViewController(url: url)
                 self?.present(safariVC, animated: true)

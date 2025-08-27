@@ -105,6 +105,4 @@ public final class SharedDiaryViewModel: BaseViewModel {
             })
             .store(in: &cancellables)
     }
-
-
 }

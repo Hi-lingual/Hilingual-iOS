@@ -45,7 +45,6 @@ public final class DefaultSharedDiaryRepository: SharedDiaryRepository {
             .mapError { $0 as Error }
             .eraseToAnyPublisher()
     }
-
     
     public func toggleLike(diaryId: Int, isLiked: Bool) -> AnyPublisher<Void, Error> {
         return service.toggleLike(diaryId: diaryId, isLiked: isLiked)

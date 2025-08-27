@@ -154,8 +154,6 @@ final class Modal: UIView {
         button.configuration = config
     }
 
-
-    
     // MARK: - Animation
     
     public func showAnimation() {
@@ -190,7 +188,6 @@ extension UIButton {
         self.setAttributedTitle(attributed, for: .normal)
     }
 }
-
 
 // MARK: - Preview
 

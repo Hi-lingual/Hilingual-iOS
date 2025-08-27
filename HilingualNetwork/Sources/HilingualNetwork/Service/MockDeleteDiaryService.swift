@@ -11,7 +11,6 @@ public protocol DeleteDiaryService {
     func deleteDiary(diaryId: Int) -> AnyPublisher<DeleteDiaryResponseDTO, Error>
 }
 
-
 public final class MockDeleteDiaryService: DeleteDiaryService {
     public init() {}
         
