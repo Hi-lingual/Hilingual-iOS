@@ -37,9 +37,6 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
         super.init(viewModel: viewModel, diContainer: diContainer)
     }
     
-    @available(*, unavailable)
-    required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
-    
     // MARK: - Lifecycle
     
     public override func loadView() {
