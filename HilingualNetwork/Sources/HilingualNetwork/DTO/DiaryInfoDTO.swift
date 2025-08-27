@@ -12,5 +12,6 @@ public struct DiaryInfoDTO: Decodable {
         public let diaryId: Int
         public let imageUrl: String?
         public let originalText: String
+        public let isPublished: Bool
     }
 }
