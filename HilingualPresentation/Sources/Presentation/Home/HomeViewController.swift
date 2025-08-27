@@ -221,18 +221,17 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                 rightButtonTitle: "게시하기",
                 leftAction: { [weak dialog] in dialog?.dismiss() },
                 rightAction: { [weak self] in
-                    guard let self else { return }
-                    self.homeView.selectedInfo.updateDiaryState(isPublished: true)
-                    self.homeView.selectedInfo.updateMenuState(isPublished: true)
-                    self.dialog.dismiss()
+                    self?.homeView.selectedInfo.updateDiaryState(isPublished: true)
+                    self?.homeView.selectedInfo.updateMenuState(isPublished: true)
+                    self?.dialog.dismiss()
                     
                     let toast = ToastMessage()
                     toast.configure(type: .withButton, message: "일기가 게시되었어요!", actionTitle: "피드 보러가기")
-                    self.view.addSubview(toast)
+                    self?.view.addSubview(toast)
                     toast.action = { [weak self] in
                         guard let self else { return }
                         // TODO: 소은이 뷰로 전환
-                        let vc = diContainer.makeFeedbackViewController(diaryId: 123)
+                        let vc = self.diContainer.makeFeedbackViewController(diaryId: 123)
                         self.navigationController?.pushViewController(vc, animated: true)
                         completion(true)
                     }
@@ -268,7 +267,12 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                 leftAction: { [weak dialog] in dialog?.dismiss() },
                 rightAction: { [weak self] in
                     guard let self else { return }
-                    self.homeView.selectedInfo.updateView(for: self.homeView.calendarView.selectedDate ?? Date(), diaryId: nil, isPublished: nil, remainingTime: 0, topicData: nil, diaryData: nil, imageURL: nil)
+                    self.homeView.selectedInfo.updateView(for: self.homeView.calendarView.selectedDate ?? Date(),
+                                                          diaryId: nil, isPublished: nil,
+                                                          remainingTime: 0,
+                                                          topicData: nil,
+                                                          diaryData: nil,
+                                                          imageURL: nil)
                     self.dialog.dismiss()
                     completion(true)
                     
