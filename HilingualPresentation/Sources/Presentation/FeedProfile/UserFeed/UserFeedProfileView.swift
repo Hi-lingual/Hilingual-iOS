@@ -41,7 +41,6 @@ final class UserFeedProfileView: BaseUIView {
     
     private let modal: Modal = {
         let modal = Modal()
-        modal.isHidden = true
         return modal
     }()
     
@@ -152,7 +151,6 @@ final class UserFeedProfileView: BaseUIView {
     
     func dismissModal() {
         modal.isHidden = true
-        modal.removeFromSuperview()
     }
     
     func showBlockedView() {

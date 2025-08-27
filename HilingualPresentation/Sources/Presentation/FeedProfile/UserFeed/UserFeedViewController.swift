@@ -42,6 +42,11 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
     public override func loadView() {
         self.view = userFeedProfileView
     }
+
+    public override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(false, animated: false)
+    }
     
     public override func viewDidLoad() {
         super.viewDidLoad()
@@ -111,11 +116,6 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
     
     public override func menuButtonTapped() {
         userFeedProfileView.showModal()
-    }
-    
-    public override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        navigationController?.setNavigationBarHidden(false, animated: false)
     }
     
     // MARK: - Bind
