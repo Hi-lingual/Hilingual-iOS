@@ -8,10 +8,12 @@
 import Foundation
 
 public protocol ViewControllerFactory {
+    func makeSplashViewController() -> SplashViewController
     func makeTabBarViewController() -> TabBarViewController
     func makeLoginViewController() -> LoginViewController
     func makeOnboardingViewController() -> OnBoardingViewController
     func makeHomeViewController() -> HomeViewController
+    func makeMypageViewController() -> MypageViewController
     func makeLoadingViewController() -> LoadingViewController
     func makeWordBookViewController() -> WordBookViewController
     func makeDiaryDetailViewController(diaryId: Int) -> DiaryDetailViewController
@@ -32,4 +34,7 @@ public protocol ViewControllerFactory {
         type: FeedProfileListType,
         userId: Int64
     ) -> FeedProfileListViewController
+    func makeEditProfileViewController() -> EditProfileViewController
+    func makeBlockUserViewController() -> BlockUserViewController
+    func makeNotificationSettingViewController() -> NotificationSettingViewController
 }

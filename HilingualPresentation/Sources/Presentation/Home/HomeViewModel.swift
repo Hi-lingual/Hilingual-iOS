@@ -9,6 +9,10 @@ import Combine
 import Foundation
 import HilingualDomain
 
+enum MenuAction {
+    case publish, unpublish, delete
+}
+
 public final class HomeViewModel: BaseViewModel {
 
     // MARK: - Input

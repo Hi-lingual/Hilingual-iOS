@@ -58,7 +58,7 @@ public final class TabBarViewController: UITabBarController {
         )
 
         let myVC = makeTabItem(
-            viewController: PreparingViewController(),
+            viewController: factory.makeMypageViewController(),
             title: "마이",
             selectedImageName: "ic_my_black_24_ios",
             unselectedImageName: "ic_my_gray_24_ios"

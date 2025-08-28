@@ -30,6 +30,10 @@ final class AppDIContainer: ViewControllerFactory {
         return TabBarViewController(diContainer: self)
     }
 
+    public func makeSplashViewController() -> SplashViewController {
+        return SplashViewController(viewModel: makeSplashViewModel(), diContainer: self)
+    }
+
     public func makeHomeViewController() -> HomeViewController {
         return HomeViewController(viewModel: makeHomeViewModel(), diContainer: self)
     }
@@ -154,6 +158,22 @@ final class AppDIContainer: ViewControllerFactory {
             diContainer: self,
             type: type
         )
+=======
+
+    public func makeMypageViewController() -> MypageViewController {
+        return MypageViewController(viewModel: makeMypageViewModel(), diContainer: self)
+    }
+
+    public func makeEditProfileViewController() -> EditProfileViewController {
+        return EditProfileViewController(viewModel: makeHomeViewModel(), diContainer: self)
+    }
+
+    public func makeBlockUserViewController() -> BlockUserViewController {
+        return BlockUserViewController(viewModel: makeBlockUserViewModel(), diContainer: self)
+    }
+
+    public func makeNotificationSettingViewController() -> NotificationSettingViewController {
+        return NotificationSettingViewController(viewModel: makeNotificationViewModel(), diContainer: self)
     }
 }
 
@@ -165,13 +185,6 @@ extension AppDIContainer {
         return SplashViewModel(
             tokenStore: makeTokenStoreUseCase(),
             socialLoginUseCase: makeSocialLoginUseCase()
-        )
-    }
-
-    func makeSplashViewController() -> SplashViewController {
-        return SplashViewController(
-            viewModel: makeSplashViewModel(),
-            diContainer: self
         )
     }
 }
@@ -343,7 +356,8 @@ extension AppDIContainer {
 extension AppDIContainer {
 
     private func makeHomeService() -> HomeService {
-        return DefaultHomeService()
+//        return DefaultHomeService()
+        return MockHomeService()
     }
 
     private func makeHomeRepository() -> HomeRepository {
@@ -391,26 +405,81 @@ extension AppDIContainer {
     }
 }
 
+//MARK: - MypageDIContainer
+
+extension AppDIContainer {
+
+    private func makeMypageUseCase() -> MypageUseCase {
+        return DefaultMypageUseCase(authRepository: makeAuthRepository())
+    }
+
+    private func makeMypageViewModel() -> MypageViewModel {
+        return MypageViewModel(mypageUseCase: makeMypageUseCase())
+    }
+}
+
+//MARK: - BlockUserDIContainer
+
+extension AppDIContainer {
+
+    private func makeMockBlockUserService() -> BlockUserService {
+        //TODO: - mock 변경하기!
+        return MockBlockUserService()
+    }
+
+    private func makeBlockUserRepository() -> BlockUserRepository {
+        return DefaultBlockUserRepository(service: makeMockBlockUserService())
+    }
+    private func makeBlockUserUsecase() -> BlockUserUseCase {
+        return DefaultBlockUserUseCase(repository: makeBlockUserRepository())
+    }
+
+    private func makeBlockUserViewModel() -> BlockUserViewModel {
+        return BlockUserViewModel(blockUserUseCase: makeBlockUserUsecase())
+    }
+}
+
+// MARK: - NotificationDIContainer
+
+extension AppDIContainer {
+
+    private func makeNotificationSettingService() -> MockAlarmSettingService {
+        return MockAlarmSettingService()
+    }
+
+    private func makeNotificationRepository() -> AlarmSettingRepository {
+        return DefaultAlarmSettingRepository(service: makeNotificationSettingService())
+    }
+
+    private func makeNotificationUseCase() -> AlarmSettingUseCase {
+        return DefaultAlarmSettingUseCase(repository: makeNotificationRepository())
+    }
+
+    private func makeNotificationViewModel() -> NotificationSettingViewModel {
+        return NotificationSettingViewModel(useCase: makeNotificationUseCase())
+    }
+}
+
 // MARK: - FollowListDIContainer
 
 extension AppDIContainer {
-    
+
     private func makeFollowListService() -> MockFollowListService {
         return MockFollowListService() // TODO: 실제 API 서비스로 교체
     }
-    
+
     private func makeFollowListRepository() -> FollowListRepository {
         return DefaultFollowListRepository(service: makeFollowListService())
     }
-    
+
     private func makeFollowListUseCase() -> FollowListUseCase {
         return DefaultFollowListUseCase(repository: makeFollowListRepository())
     }
-    
+
     private func makeFollowListViewModel() -> FollowListViewModel {
         return FollowListViewModel(followListUseCase: makeFollowListUseCase())
     }
-    
+
     func makeFollowListViewController() -> FollowListViewController {
         let viewController = FollowListViewController(
             viewModel: makeFollowListViewModel(),
