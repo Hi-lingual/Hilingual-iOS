@@ -141,5 +141,4 @@ extension NotificationListViewController: UITableViewDelegate {
             DeeplinkManager.shared.handle(destination, from: nav, di: diContainer)
         }
     }
-
 }

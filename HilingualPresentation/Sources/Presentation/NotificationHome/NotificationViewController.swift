@@ -26,13 +26,11 @@ public final class NotificationViewController: BaseUIViewController<Notification
         return NotificationListViewController(viewModel: viewModel, diContainer: self.diContainer, type: .notice)
     }()
 
-
     private lazy var segmentedControl = SegmentedControl(
         viewControllers: [feedNotificationVC, noticeNotificationVC],
         titles: ["피드", "공지사항"],
         parentViewController: self
     )
-
 
     // MARK: - Init
 
