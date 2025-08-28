@@ -50,21 +50,21 @@ public final class TabBarViewController: UITabBarController {
             unselectedImageName: "ic_book_gray_24_ios"
         )
 
-        let communityVC = makeTabItem(
-            viewController: PreparingViewController(),
-            title: "커뮤니티",
+        let feedVC = makeTabItem(
+            viewController: factory.makeFeedViewController(),
+            title: "피드",
             selectedImageName: "ic_community_black_24_ios",
             unselectedImageName: "ic_community_gray_24_ios"
         )
 
         let myVC = makeTabItem(
-            viewController: PreparingViewController(),
+            viewController: factory.makeMypageViewController(),
             title: "마이",
             selectedImageName: "ic_my_black_24_ios",
             unselectedImageName: "ic_my_gray_24_ios"
         )
 
-        viewControllers = [homeVC, vocabVC, communityVC, myVC]
+        viewControllers = [homeVC, vocabVC, feedVC, myVC]
     }
 
     private func setupTabBarAppearance() {

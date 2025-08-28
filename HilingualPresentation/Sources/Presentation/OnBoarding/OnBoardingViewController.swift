@@ -11,30 +11,35 @@ import Combine
 public final class OnBoardingViewController: BaseUIViewController<OnBoardingViewModel> {
 
     // MARK: - Properties
-
+    
     private let onBoardingView = OnBoardingView()
     private let nicknameSubject = PassthroughSubject<String, Never>()
+    private let startTappedSubject = PassthroughSubject<Void, Never>()
+    private let agreementModal = AgreementModalView()
 
-    // MARK: - Custom Method
+    // MARK: - UI
 
     public override func setUI() {
-        view.addSubviews(onBoardingView)
+        view.addSubviews(onBoardingView, agreementModal)
     }
 
     public override func setLayout() {
-        onBoardingView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
-        }
+        onBoardingView.snp.makeConstraints { $0.edges.equalToSuperview() }
+    }
+
+    public override func viewDidLoad() {
+        super.viewDidLoad()
+
+        agreementModal.isHidden = true
+        agreementModal.snp.makeConstraints { $0.edges.equalToSuperview() }
     }
 
     // MARK: - Navigation
-
     public override func navigationType() -> NavigationType? {
-        return .titleOnly("프로필 작성")
+        .titleOnly("프로필 작성")
     }
 
     // MARK: - Bind
-
     public override func bind(viewModel: OnBoardingViewModel) {
         onBoardingView.nicknameTextField.textField.addTarget(
             self,
@@ -42,20 +47,19 @@ public final class OnBoardingViewController: BaseUIViewController<OnBoardingView
             for: .editingChanged
         )
 
-        let input = makeInput()
+        onBoardingView.startButton.addTarget(
+            self,
+            action: #selector(showAgreementModal),
+            for: .touchUpInside
+        )
+
+        let input = OnBoardingViewModel.Input(
+            nicknameChanged: nicknameSubject.eraseToAnyPublisher(),
+            startTapped: startTappedSubject.eraseToAnyPublisher()
+        )
+
         let output = viewModel.transform(input: input)
 
-        bindOutput(output)
-    }
-
-    private func makeInput() -> OnBoardingViewModel.Input {
-        return OnBoardingViewModel.Input(
-            nicknameChanged: nicknameSubject.eraseToAnyPublisher(),
-            startTapped: onBoardingView.startButton.publisher(for: .touchUpInside)
-        )
-    }
-
-    private func bindOutput(_ output: OnBoardingViewModel.Output) {
         output.nicknameState
             .receive(on: RunLoop.main)
             .sink { [weak self] state in
@@ -80,10 +84,19 @@ public final class OnBoardingViewController: BaseUIViewController<OnBoardingView
             .store(in: &cancellables)
     }
 
-    // MARK: - Action
+    // MARK: - Actions
 
     @objc
     private func nicknameDidChange() {
         nicknameSubject.send(onBoardingView.nicknameTextField.text)
+    }
+
+    @objc
+    private func showAgreementModal() {
+        agreementModal.onStart = { [weak self] in
+            self?.startTappedSubject.send()
+        }
+        agreementModal.isHidden = false
+        agreementModal.showAnimation()
     }
 }

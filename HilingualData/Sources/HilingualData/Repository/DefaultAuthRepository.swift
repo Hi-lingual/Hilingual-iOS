@@ -47,5 +47,13 @@ public final class DefaultAuthRepository: AuthRepository {
             }
             .eraseToAnyPublisher()
     }
+
+    public func logout() -> AnyPublisher<Void, Error> {
+        return Future<Void, Error> { [weak self] promise in
+            self?.tokenStore.clear()
+            promise(.success(()))
+        }
+        .eraseToAnyPublisher()
+    }
 }
 

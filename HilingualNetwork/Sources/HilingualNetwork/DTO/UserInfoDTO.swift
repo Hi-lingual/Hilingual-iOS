@@ -18,4 +18,5 @@ public struct UserInfoDataDTO: Decodable {
     public let profileImg: String
     public let totalDiaries: Int
     public let streak: Int
+    public let newAlarm: Bool
 }

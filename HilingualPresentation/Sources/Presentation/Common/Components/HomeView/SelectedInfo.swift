@@ -14,10 +14,15 @@ final class SelectedInfo: UIView {
         return cardTopicView.topicData
     }
 
+    private var currentDiaryId: Int?
+    private var currentIsPublished: Bool?
+    
     // MARK: - Callback
     
     var onDiaryPreviewTapped: (() -> Void)?
-
+    var onMoreButtonTapped: ((Bool?) -> Void)?
+    var onMenuAction: ((MenuAction) -> Void)?
+    
     // MARK: - UI Components
 
     internal let cardTopicView = CardTopicView()
@@ -85,12 +90,27 @@ final class SelectedInfo: UIView {
         return stack
     }()
 
+    private(set) var moreImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFit
+        imageView.image = UIImage(named: "ic_more_24_ios", in: .module, compatibleWith: nil)
+        imageView.isHidden = true
+        return imageView
+    }()
+    
+    private(set) var menu: ActionMenu = {
+        let menu = ActionMenu()
+        menu.isHidden = true
+        return menu
+    }()
+    
     // MARK: - Init
 
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
         setupLayout()
+        setDelegate()
     }
 
     required init?(coder: NSCoder) {
@@ -107,12 +127,13 @@ final class SelectedInfo: UIView {
             cardTopicView,
             cardPreview,
             emptyDiaryView,
-            diaryLockView
+            diaryLockView,
+            menu
         )
 
         selectedDayStack.addArrangedSubviews(selectedDayLabel, dot, notWrittenLabel)
         timeLeftStack.addArrangedSubviews(iconView, timeLeftLabel)
-        headerStack.addArrangedSubviews(selectedDayStack, spacer, timeLeftStack)
+        headerStack.addArrangedSubviews(selectedDayStack, spacer, timeLeftStack, moreImageView)
 
         spacer.setContentHuggingPriority(.defaultLow, for: .horizontal)
         spacer.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
@@ -124,6 +145,10 @@ final class SelectedInfo: UIView {
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(cardPreviewTapped))
         cardPreview.addGestureRecognizer(tapGesture)
         cardPreview.isUserInteractionEnabled = true
+        
+        let moreTapGesture = UITapGestureRecognizer(target: self, action: #selector(moreButtonTapped))
+        moreImageView.addGestureRecognizer(moreTapGesture)
+        moreImageView.isUserInteractionEnabled = true
     }
 
     private func setupLayout() {
@@ -141,30 +166,52 @@ final class SelectedInfo: UIView {
                 $0.bottom.equalToSuperview()
             }
         }
-    }
 
+        moreImageView.snp.makeConstraints {
+            $0.size.equalTo(20)
+        }
+        
+        menu.snp.makeConstraints {
+            $0.top.equalTo(moreImageView.snp.bottom).offset(4)
+            $0.trailing.equalTo(moreImageView.snp.trailing)
+            $0.height.equalTo(96)
+            $0.width.equalTo(182)
+        }
+    }
+    
+    private func setDelegate() {
+        menu.delegate = self
+        menu.isHidden = true
+    }
+    
     // MARK: - Public
 
     func updateView(
         for date: Date,
         diaryId: Int?,
+        isPublished: Bool? = nil,
         remainingTime: Int,
         topicData: (kor: String, en: String)? = nil,
         diaryData: String? = nil,
         imageURL: String? = nil
     ) {
-        [cardPreview, cardTopicView, emptyDiaryView, diaryLockView].forEach {
+        [cardPreview, cardTopicView, emptyDiaryView, diaryLockView, moreImageView].forEach {
             $0.isHidden = true
         }
         
         setSelectedDate(date)
-
+        currentDiaryId = diaryId
+        if let newIsPublished = isPublished {
+            currentIsPublished = newIsPublished
+        }
+        
         let today = Calendar.current.startOfDay(for: Date())
         let selectedDay = Calendar.current.startOfDay(for: date)
 
         iconView.isHidden = true
         timeLeftStack.isHidden = true
 
+        // 아직 작성할 수 없는 미래의 날짜를 클릭 했을 경우
         if selectedDay > today {
             notWrittenLabel.text = "작성불가"
             notWrittenLabel.textColor = .gray300
@@ -172,10 +219,12 @@ final class SelectedInfo: UIView {
             return
         }
 
+        // 일기가 있는 경우
         if let _ = diaryId {
-            notWrittenLabel.text = "작성완료"
-            notWrittenLabel.textColor = .hilingualBlue
-
+            moreImageView.isHidden = false
+            menu.isHidden = true
+            updateMenuState(isPublished: currentIsPublished)
+            
             cardPreview.isHidden = false
             if let imageURL, !imageURL.isEmpty {
                 cardPreview.configure(type: .textWithImage(text: diaryData ?? "", imageUrl: imageURL))
@@ -185,6 +234,7 @@ final class SelectedInfo: UIView {
             return
         }
 
+        // 48시간이 지난 날짜를 클릭했을 경우
         if remainingTime > 0, let topic = topicData {
             notWrittenLabel.text = "미작성"
             notWrittenLabel.textColor = .gray300
@@ -193,6 +243,7 @@ final class SelectedInfo: UIView {
             timeLeftLabel.attributedText = formatRemainingTime(remainingTime)
             iconView.isHidden = false
             timeLeftStack.isHidden = false
+            moreImageView.isHidden = true
             return
         }
 
@@ -210,6 +261,36 @@ final class SelectedInfo: UIView {
 
     // MARK: - Private
 
+    public func updateDiaryState(isPublished: Bool) {
+        currentIsPublished = isPublished
+        guard currentDiaryId != nil else { return }
+        
+        updateMenuState(isPublished: currentIsPublished)
+    }
+    
+    public func updateMenuState(isPublished: Bool?) {
+        if let isPublished = isPublished {
+            if isPublished { // 게시된 일기
+                notWrittenLabel.text = "게시된 일기"
+                notWrittenLabel.textColor = .hilingualBlue
+                menu.configure(items: [
+                    ("비공개하기", UIImage(named: "ic_hide_24_ios", in: .module, compatibleWith: nil), .gray700),
+                    ("삭제하기", UIImage(named: "ic_delete_24_ios", in: .module, compatibleWith: nil), .alertRed)
+                ])
+            } else { // 비공개 일기
+                notWrittenLabel.text = "비공개 일기"
+                notWrittenLabel.textColor = .gray400
+                menu.configure(items: [
+                    ("게시하기", UIImage(named: "ic_upload_24_ios", in: .module, compatibleWith: nil), .gray700),
+                    ("삭제하기", UIImage(named: "ic_delete_24_ios", in: .module, compatibleWith: nil), .alertRed)
+                ])
+            }
+        } else {
+            menu.isHidden = true
+            moreImageView.isHidden = true
+        }
+    }
+    
     private func formatRemainingTime(_ remainingTime: Int) -> NSAttributedString {
         let fullText: String
         let highlightText: String
@@ -232,7 +313,39 @@ final class SelectedInfo: UIView {
         )
         return attributed
     }
+    
     @objc private func cardPreviewTapped() {
         onDiaryPreviewTapped?()
+    }
+
+    // MARK: - Actions
+    
+    @objc private func moreButtonTapped() {
+        onMoreButtonTapped?(currentIsPublished)
+    }
+}
+
+// MARK: - Extensions
+
+extension SelectedInfo: ActionMenuDelegate {
+    func actionMenu(_ menu: ActionMenu, didSelectItemAt index: Int) {
+        menu.isHidden = true
+        guard currentDiaryId != nil else { return }
+
+        switch index {
+        case 0:
+            if currentIsPublished == true {
+                onMenuAction?(.unpublish)
+            } else {
+                onMenuAction?(.publish)
+            }
+        case 1:
+            onMenuAction?(.delete)
+        default: break
+        }
+    }
+    
+    private func showDialog(_ action: MenuAction) {
+        onMenuAction?(action)
     }
 }

@@ -15,17 +15,18 @@ public enum FollowListType {
     case following
 }
 
-public struct FollowUserModel {
+public struct FollowUserModel: UserDisplayable {
     let userId: Int
     let profileImg: String
     let nickname: String
-    let buttonState: FollowButton.FollowButtonState
+    let buttonState: FollowButtonState
 }
 
 public struct FollowListModel {
     var type: FollowListType
     var users: [FollowUserModel]
 }
+
 public final class FollowListViewModel: BaseViewModel {
     
     // MARK: - Published Properties
@@ -138,7 +139,7 @@ public final class FollowListViewModel: BaseViewModel {
     
     // Domain 모델을 UI 모델로 매핑
     private func mapToUserModel(from domainFollower: Follower, type: FollowListType) -> FollowUserModel {
-        let buttonState: FollowButton.FollowButtonState
+        let buttonState: FollowButtonState
         switch type {
         case .follower:
             buttonState = domainFollower.isFollowing ? .following : .mutualFollow
