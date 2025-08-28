@@ -539,6 +539,8 @@ extension AppDIContainer {
     
     func makeToggleLikeUseCase() -> ToggleLikeUseCase {
         return DefaultToggleLikeUseCase(repository: makeSharedDiaryRepository())
+    }
+}
 
 // MARK: - FeedSearchDIContainer
 
