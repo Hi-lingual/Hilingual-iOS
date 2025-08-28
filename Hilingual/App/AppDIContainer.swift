@@ -100,13 +100,23 @@ final class AppDIContainer: ViewControllerFactory {
     func makeLoadingViewController() -> HilingualPresentation.LoadingViewController {
         return LoadingViewController(viewModel: makeLoadingViewModel(), diContainer: self)
     }
+
     public func makeWordBookViewController() -> WordBookViewController {
         return WordBookViewController(viewModel: makeWordBookViewmodel(), diContainer: self)
     }
+
     public func makeVerificationCodeViewController() -> VerificationCodeViewController {
         return VerificationCodeViewController(viewModel: makeVerificationCodeViewModel(), diContainer: self)
     }
-    
+
+    public func makeNotificationViewController() -> NotificationViewController {
+        return NotificationViewController(viewModel: makeNotificationViewModel(), diContainer: self)
+    }
+
+    public func makeNotificationDetailViewController(notiId: Int) -> NotificationDetailViewController {
+        return NotificationDetailViewController(viewModel: makeNotificationDetailviewmodel(notiId: notiId), diContainer: self)
+    }
+
     public func makeFeedViewController() -> FeedViewController {
         return FeedViewController(
             viewModel: makeFeedViewModel(),
@@ -550,6 +560,34 @@ extension AppDIContainer {
             viewModel: FeedSearchViewModel(),
             diContainer: self
         )
+    }
+}
+
+// MARK: - NotificiatoinDIContainer
+
+extension AppDIContainer {
+    private func makeNotificationService() -> MockNotificationService {
+        return MockNotificationService()
+    }
+
+    private func makeNotificationRepository() -> NotificationRepository {
+        return DefaultNotificationRepository(service: makeNotificationService())
+    }
+
+    private func makeNotificationuseCase() -> NotificationUseCase {
+        return DefaultNotificationUseCase(repository: makeNotificationRepository())
+    }
+
+    private func makeNotificationViewModel() -> NotificationViewModel {
+        return NotificationViewModel(useCase: makeNotificationuseCase())
+    }
+}
+
+// MARK: - NotificationDetailDIContainer
+
+extension AppDIContainer {
+    private func makeNotificationDetailviewmodel(notiId: Int) -> NotificationDetailViewModel {
+        return NotificationDetailViewModel(notiId: notiId, useCase: makeNotificationuseCase())
     }
 }
 
