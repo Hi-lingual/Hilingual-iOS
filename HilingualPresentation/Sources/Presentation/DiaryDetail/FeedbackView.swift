@@ -184,7 +184,7 @@ final class FeedbackView: BaseUIView {
             originalText: data.originalText,
             highlightText: data.rewriteText,
             diffRanges: data.diffRanges,
-            isHighlightingEnabled: data.isHighlightingEnabled
+            isHighlightingEnabled: data.isHighlightingEnabled,
         )
     }
     
@@ -245,7 +245,8 @@ final class FeedbackView: BaseUIView {
             originalText: data.originalText,
             rewriteText: data.rewriteText,
             diffRanges: data.diffRanges,
-            isHighlightingEnabled: !data.isHighlightingEnabled
+            isHighlightingEnabled: !data.isHighlightingEnabled,
+            isPublished: data.isPublished
         )
         
         configureDiary(data: data)

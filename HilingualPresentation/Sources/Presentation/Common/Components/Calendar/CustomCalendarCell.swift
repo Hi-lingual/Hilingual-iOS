@@ -66,21 +66,21 @@ final class CustomCalendarCell: UICollectionViewCell {
         dayLabel.font = .suit(.body_sb_14)
 
         if isWithinMonth {
-            dayLabel.textColor = .black
+            dayLabel.textColor = .black // 기본 표시
         } else {
-            dayLabel.textColor = .gray200
+            dayLabel.textColor = .gray200 // 이번 달이 아닌 날짜 표시
         }
 
-        if isSelected {
+        if isSelected { // 현재 선택한 날 표시
             bubbleView.image = UIImage(named: "img_bubble_filled_ios", in: .module, compatibleWith: nil)
             dayLabel.textColor = .white
-        } else if isFilled {
+        } else if isFilled { // 작성한 날 표시
             bubbleView.image = UIImage(named: "img_bubble_written_ios", in: .module, compatibleWith: nil)
             dayLabel.textColor = .hilingualBlue
         } else {
             bubbleView.image = nil
         }
 
-        dotView.isHidden = !isToday
+        dotView.isHidden = !isToday // 오늘 날짜 표시
     }
 }

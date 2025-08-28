@@ -9,10 +9,12 @@ public struct DiaryInfoEntity {
     public let diaryId: Int
     public let imageUrl: String?
     public let originalText: String
+    public let isPublished: Bool
 
-    public init(diaryId: Int, imageUrl: String?, originalText: String) {
+    public init(diaryId: Int, imageUrl: String?, originalText: String, isPublished: Bool) {
         self.diaryId = diaryId
         self.imageUrl = imageUrl
         self.originalText = originalText
+        self.isPublished = isPublished
     }
 }

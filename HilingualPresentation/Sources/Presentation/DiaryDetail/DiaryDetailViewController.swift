@@ -7,6 +7,7 @@
 
 import Foundation
 import UIKit
+import Combine
 import SafariServices
 
 public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailViewModel> {
@@ -15,12 +16,16 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
     
     let diaryId: Int
     var date: String = ""
+    private var isPublished: Bool = true
+    private let deleteTappedSubject = PassthroughSubject<Void, Never>()
+    private let publishTappedSubject = PassthroughSubject<Bool, Never>()
     
     private let diaryDetailView = DiaryDetailView()
     private var isHighlightingEnabled: Bool = true
     private let dialog = Dialog()
     private let detailImage = DetailImageView(image: UIImage(resource: .imgLoadFailLargeIos))
     
+    private let spacer = UIView()
     private let bottomSafeAreaBackgroundView = UIView()
     
     let modal: Modal = {
@@ -29,10 +34,18 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
         return modal
     }()
     
+    private let button: CTAButton = {
+        let button = CTAButton(style: .TextButton("피드에 게시하기"), autoBackground: true)
+        button.isEnabled = true
+        return button
+    }()
+    
     private lazy var feedbackViewController = diContainer.makeFeedbackViewController(diaryId: diaryId)
     private lazy var recommendedExpressionViewController = diContainer.makeRecommendedExpressionViewController(diaryId: diaryId)
     
     private var segmentedControl: SegmentedControl!
+    
+    public var showsActionButton: Bool = true
     
     // MARK: - Init
     
@@ -51,6 +64,7 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
         super.viewDidLoad()
         
         hideKeyboardWhenTappedAround()
+        updateButtonTitle()
         
         segmentedControl = SegmentedControl(
             viewControllers: [feedbackViewController, recommendedExpressionViewController],
@@ -68,14 +82,29 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
         feedbackViewController.onDateLoaded = { [weak self] date in
             self?.recommendedExpressionViewController.setDate(date)
         }
+        
+        feedbackViewController.publishedInfoLoaded = { [weak self] isPublished in
+            self?.isPublished = isPublished
+            self?.updateButtonTitle()
+        }
+        
+        if showsActionButton {
+            button.addTarget(self, action: #selector(postButtonTapped), for: .touchUpInside)
+        }
     }
     
     // MARK: - Custom Method
     
     public override func setUI() {
-        view.addSubviews(diaryDetailView, modal, dialog, bottomSafeAreaBackgroundView)
+        if showsActionButton {
+            view.addSubviews(diaryDetailView, modal, dialog, spacer, bottomSafeAreaBackgroundView, button)
+            bottomSafeAreaBackgroundView.backgroundColor = .white
+        } else {
+            view.addSubviews(diaryDetailView, modal, dialog, bottomSafeAreaBackgroundView)
+            bottomSafeAreaBackgroundView.backgroundColor = .gray100
+        }
         view.bringSubviewToFront(modal)
-        bottomSafeAreaBackgroundView.backgroundColor = .gray100
+        view.bringSubviewToFront(dialog)
     }
     
     public override func setLayout() {
@@ -91,12 +120,81 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
             $0.edges.equalToSuperview()
         }
         
-        let bottomInset = UIApplication.shared.windows.first?.safeAreaInsets.bottom ?? 34
-        bottomSafeAreaBackgroundView.snp.makeConstraints {
-            $0.leading.trailing.bottom.equalToSuperview()
-            $0.height.equalTo(bottomInset)
+        if showsActionButton {
+            bottomSafeAreaBackgroundView.snp.makeConstraints {
+                $0.leading.trailing.bottom.equalToSuperview()
+                    $0.height.equalTo(120)
+            }
+            
+            button.snp.makeConstraints {
+                $0.horizontalEdges.equalToSuperview().inset(16)
+                $0.bottom.equalToSuperview().inset(50)
+            }
+            
+            diaryDetailView.snp.remakeConstraints {
+                $0.horizontalEdges.top.equalToSuperview()
+                $0.bottom.equalTo(spacer.snp.top)
+            }
+            
+            spacer.snp.makeConstraints {
+                $0.horizontalEdges.equalToSuperview()
+                $0.bottom.equalToSuperview()
+                $0.height.equalTo(110)
+            }
         }
     }
+    
+    public override func bind(viewModel: DiaryDetailViewModel) {
+        super.bind(viewModel: viewModel)
+        
+        let input = DiaryDetailViewModel.Input(
+            deleteTapped: deleteTappedSubject.eraseToAnyPublisher(),
+            publishTapped: publishTappedSubject.eraseToAnyPublisher()
+        )
+        let output = viewModel.transform(input: input)
+        
+        output.deleteResult
+            .receive(on: RunLoop.main)
+            .sink { [weak self] in
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    self?.navigationController?.popToRootViewController(animated: true)
+
+                    if let homeVC = self?.navigationController?.viewControllers.first {
+                        let toast = ToastMessage()
+                        homeVC.view.addSubview(toast)
+                        toast.configure(type: .basic, message: "삭제가 완료되었어요.")
+                    }
+                }
+            }
+            .store(in: &cancellables)
+        output.publishResult
+            .receive(on: RunLoop.main)
+            .sink { [weak self] isPublished in
+                self?.isPublished = isPublished
+                self?.updateButtonTitle()
+                
+                let toast = ToastMessage()
+                self?.view.addSubview(toast)
+                if isPublished {
+                    toast.configure(type: .withButton, message: "일기가 게시되었어요!")
+                    toast.action = { [weak self] in
+                        let vc = self?.diContainer.makeSharedDiaryViewController(diaryId: self?.diaryId ?? 0)
+                        self?.navigationController?.pushViewController(vc!, animated: true)
+                    }
+                } else {
+                    toast.configure(type: .basic, message: "일기가 비공개 되었어요.")
+                }
+            }
+            .store(in: &cancellables)
+
+        output.errorMessage
+            .receive(on: RunLoop.main)
+            .sink { [weak self] message in
+                self?.showErrorDialog(message: message)
+            }
+            .store(in: &cancellables)
+    }
+
     
     public override func navigationType() -> NavigationType? {
         return .backTitleMenu("일기장")
@@ -106,22 +204,41 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
         navigationController?.popToRootViewController(animated: true)
     }
     
+    @objc private func postButtonTapped() {
+        if isPublished {
+            showPrivateDialog()
+        } else {
+            showPostDialog()
+        }
+    }
+
     // MARK: - Actions
     
     public override func menuButtonTapped() {
         showModal()
     }
     
+    private func updateButtonTitle() {
+        let title = isPublished ? "비공개하기" : "피드에 게시하기"
+        button.setTitle(title, for: .normal)
+    }
+
     @objc private func showModal() {
         modal.configure(
-            title: "AI 피드백",
+            title: nil,
             items: [
-                ("신고하기", UIImage(resource: .icReport24Ios), { [weak self] in
+                ("삭제하기", UIImage(resource: .icDelete24Ios), { [weak self] in
                     self?.modal.isHidden = true
-                    self?.showDialog()
+                    self?.showDeleteDialog()
+                }),
+                ("AI 피드백 신고하기", UIImage(resource: .icReport24Ios), { [weak self] in
+                    self?.modal.isHidden = true
+                    self?.showReportDialog()
                 })
             ]
         )
+        
+        modal.applyStyle(to: 0, titleColor: .alertRed)
         modal.isHidden = false
         
         DispatchQueue.main.async { [weak self] in
@@ -129,7 +246,24 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
         }
     }
     
-    @objc private func showDialog() {
+    @objc private func showDeleteDialog() {
+        dialog.configure(
+            title: "일기를 삭제하시겠어요?",
+            content: "작성한 일기를 삭제한 날짜에는\n다시 일기를 작성할 수 없어요.",
+            leftButtonTitle: "아니요",
+            rightButtonTitle: "삭제하기",
+            leftAction: { [weak self] in
+                self?.dialog.dismiss()
+            },
+            rightAction: { [weak self] in
+                self?.dialog.dismiss()
+                self?.deleteTappedSubject.send(())
+            }
+        )
+        dialog.showAnimation()
+    }
+    
+    @objc private func showReportDialog() {
         dialog.configure(
             title: "AI 피드백을 신고하시겠어요?",
             content: "신고된 AI 피드백은 확인 후\n서비스의 운영원칙에 따라 처리됩니다.",
@@ -143,6 +277,54 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
                 guard let url = URL(string: "https://hilingual.notion.site/230829677ebf801c965be24b0ef444e9") else { return }
                 let safariVC = SFSafariViewController(url: url)
                 self?.present(safariVC, animated: true)
+            }
+        )
+        dialog.showAnimation()
+    }
+    
+    @objc private func showPostDialog() {
+        dialog.configure(
+            title: "일기를 게시하시겠어요?",
+            content: "공유된 일기는 모든 유저에게 게시되며,\n피드에서 확인하실 수 있어요.",
+            leftButtonTitle: "아니요",
+            rightButtonTitle: "게시하기",
+            leftAction: { [weak self] in
+                self?.dialog.dismiss()
+            },
+            rightAction: { [weak self] in
+                self?.dialog.dismiss()
+                self?.publishTappedSubject.send(true)
+            }
+        )
+        dialog.showAnimation()
+    }
+    
+    @objc private func showPrivateDialog() {
+        dialog.configure(
+            title: "영어 일기를 비공개 하시겠어요?",
+            content: "비공개로 전환 시,\n해당 일기의 피드 활동 내역은 모두 사라져요.",
+            leftButtonTitle: "아니요",
+            rightButtonTitle: "비공개하기",
+            leftAction: { [weak self] in
+                self?.dialog.dismiss()
+            },
+            rightAction: { [weak self] in
+                guard let self else { return }
+                self.dialog.dismiss()
+                self.publishTappedSubject.send(false)
+            }
+        )
+        dialog.showAnimation()
+    }
+    
+    private func showErrorDialog(message: String) {
+        dialog.configure(
+            style: .error,
+            image: UIImage(resource: .imgErrorIos),
+            title: "앗! 일시적인 오류가 발생했어요.",
+            rightButtonTitle: "확인",
+            rightAction: { [weak self] in
+                self?.navigationController?.popViewController(animated: true)
             }
         )
         

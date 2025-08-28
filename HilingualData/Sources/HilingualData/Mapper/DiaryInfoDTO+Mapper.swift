@@ -13,7 +13,8 @@ public enum DiaryInfoMapper {
         return DiaryInfoEntity(
             diaryId: dto.diaryId,
             imageUrl: dto.imageUrl,
-            originalText: dto.originalText
+            originalText: dto.originalText,
+            isPublished: dto.isPublished
         )
     }
 }

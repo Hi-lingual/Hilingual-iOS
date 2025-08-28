@@ -13,6 +13,7 @@ public struct DiaryDetailEntity {
     public let originalText: String
     public let rewriteText: String
     public let diffRanges: [DiffRange]
+    public let isPublished: Bool
     
     public struct DiffRange {
         public let start: Int
@@ -26,12 +27,13 @@ public struct DiaryDetailEntity {
         }
     }
     
-    public init(date: String, image: String, originalText: String, rewriteText: String, diffRanges: [DiffRange]) {
+    public init(date: String, image: String, originalText: String, rewriteText: String, diffRanges: [DiffRange], isPublished: Bool) {
         self.date = date
         self.image = image
         self.originalText = originalText
         self.rewriteText = rewriteText
         self.diffRanges = diffRanges
+        self.isPublished = isPublished
     }
     
     

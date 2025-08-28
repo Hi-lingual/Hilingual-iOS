@@ -20,7 +20,8 @@ public final class MockDiaryDetailUseCase: DiaryDetailUseCase {
             diffRanges: [
                 .init(start: 2, end: 6, correctedText: "go"),   // "goes" → "go"
                 .init(start: 39, end: 42, correctedText: "have") // "eat" → "have"
-            ]
+            ],
+            isPublished: false
         )
         return Just(dummyDetail)
             .setFailureType(to: Error.self)
