@@ -98,4 +98,18 @@ final class CTAButton: UIButton {
     private func updateBackgroundColor() {
         backgroundColor = isEnabled ? .hilingualBlack : .gray300
     }
+    
+    // MARK: - Public Methods
+    
+    override func setTitle(_ title: String?, for state: UIControl.State) {
+        guard let title else {
+            super.setTitle(nil, for: state)
+            return
+        }
+        super.setAttributedTitle(.suit(.body_sb_16, text: title), for: state)
+    }
+    
+    func updateText(_ text: String) {
+        setAttributedTitle(.suit(.body_sb_16, text: text), for: .normal)
+    }
 }

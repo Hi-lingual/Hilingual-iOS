@@ -25,6 +25,7 @@ public protocol ViewControllerFactory {
     ) -> DiaryWritingViewController
     func makeVerificationCodeViewController() -> VerificationCodeViewController
     func makeFollowListViewController() -> FollowListViewController
+    func makeSharedDiaryViewController(diaryId: Int) -> SharedDiaryViewController
     func makeFeedSearchViewController() -> FeedSearchViewController
     func makeFeedViewController() -> FeedViewController
     func makeFeedListViewController(type: FeedListType) -> FeedListViewController

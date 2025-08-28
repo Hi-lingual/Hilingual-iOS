@@ -298,12 +298,38 @@ extension AppDIContainer {
 // MARK: - DiaryDetailDIContainer
 
 extension AppDIContainer {
-    private func makeDiaryDetailViewModel(diaryId: Int) -> DiaryDetailViewModel {
-        return DiaryDetailViewModel(diaryId: diaryId)
+    private func makeDeleteDiaryUseCase() -> DeleteDiaryUseCase {
+        return DefaultDeleteDiaryUseCase(repository: makeDeleteDiaryRepository())
     }
     
-    // MARK: - diaryId 수정
+    private func makeDeleteDiaryRepository() -> DeleteDiaryRepository {
+        return DefaultDeleteDiaryRepository(service: makeDeleteDiaryService())
+    }
     
+    private func makeDeleteDiaryService() -> DeleteDiaryService {
+        return MockDeleteDiaryService()
+    }
+}
+
+extension AppDIContainer {
+    private func makePublishDiaryUseCase() -> PublishDiaryUseCase {
+        return DefaultPublishDiaryUseCase(repository: makePublishDiaryRepository())
+    }
+    
+    private func makePublishDiaryRepository() -> PublishDiaryRepository {
+        return DefaultPublishDiaryRepository(service: makePublishDiaryService())
+    }
+    
+    private func makePublishDiaryService() -> PublishDiaryService {
+        return MockPublishDiaryService()
+    }
+}
+
+extension AppDIContainer {
+    private func makeDiaryDetailViewModel(diaryId: Int) -> DiaryDetailViewModel {
+        return DiaryDetailViewModel(diaryId: diaryId, deleteDiaryUseCase: makeDeleteDiaryUseCase(), publishDiaryUseCase: makePublishDiaryUseCase())
+    }
+        
     private func makeFeedbackViewModel(diaryId: Int) -> FeedbackViewModel {
         return FeedbackViewModel(diaryId: diaryId, diaryDetailUseCase: makeDiaryDetailUseCase(), feedbackUseCase: makeFeedbackUseCase())
     }
@@ -319,9 +345,7 @@ extension AppDIContainer {
     private func makeFeedbackService() -> FeedbackService {
         return DefaultFeedbackService()
     }
-    
-    // MARK: - diaryId 수정
-    
+        
     private func makeRecommendedExpressionViewModel(diaryId: Int) -> RecommendedExpressionViewModel {
         return RecommendedExpressionViewModel(diaryId: diaryId, recommendedExpressionUseCase: makeRecommendedExpressionUseCase(), toggleBookmarkUseCase: makeToggleBookmarkUseCase())
     }
@@ -486,6 +510,35 @@ extension AppDIContainer {
             diContainer: self
         )
         return viewController
+    }
+}
+
+// MARK: - SharedDiaryDIContainer
+
+extension AppDIContainer {
+    
+    private func makeSharedDiaryService() -> MockSharedDiaryService {
+        return MockSharedDiaryService()
+    }
+    
+    private func makeSharedDiaryRepository() -> SharedDiaryRepository {
+        return DefaultSharedDiaryRepository(service: makeSharedDiaryService())
+    }
+    
+    private func makeSharedDiaryUseCase() -> SharedDiaryUseCase {
+        return DefaultSharedDiaryUseCase(repository: makeSharedDiaryRepository())
+    }
+    
+    private func makeSharedDiaryViewModel(diaryId: Int) -> SharedDiaryViewModel {
+        return SharedDiaryViewModel(diaryId: diaryId, sharedDiaryUseCase: makeSharedDiaryUseCase(), toggleLikeUseCase: makeToggleLikeUseCase(), publishDiaryUseCase: makePublishDiaryUseCase())
+    }
+    
+    func makeSharedDiaryViewController(diaryId: Int) -> SharedDiaryViewController {
+        return SharedDiaryViewController(viewModel: makeSharedDiaryViewModel(diaryId: diaryId), diContainer: self, diaryId: diaryId)
+    }
+    
+    func makeToggleLikeUseCase() -> ToggleLikeUseCase {
+        return DefaultToggleLikeUseCase(repository: makeSharedDiaryRepository())
     }
 }
 

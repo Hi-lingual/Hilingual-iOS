@@ -20,14 +20,12 @@ final class LikeCounterView: UIView {
     private(set) var isLiked: Bool = false {
         didSet {
             updateIcon()
-            onToggle?( isLiked)
         }
     }
     
     private(set) var likeCount: Int = 0 {
         didSet {
             updateCount()
-            onToggle?(isLiked)
         }
     }
     
@@ -117,6 +115,7 @@ final class LikeCounterView: UIView {
     @objc private func didTap() {
         isLiked.toggle()
         likeCount = max(0, likeCount + (isLiked ? 1 : -1))
+        onToggle?( isLiked)
     }
     
     func configure(likeCount: Int, isLiked: Bool) {
