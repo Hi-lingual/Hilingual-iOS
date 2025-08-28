@@ -57,6 +57,10 @@ final class CalendarView: UIView {
 
     private func setupUI() {
         backgroundColor = .white
+        
+        layer.cornerRadius = 12
+        layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
+        layer.masksToBounds = true
 
         addSubview(headerView)
         addSubview(weekStackView)
