@@ -106,6 +106,59 @@ final class AppDIContainer: ViewControllerFactory {
     public func makeVerificationCodeViewController() -> VerificationCodeViewController {
         return VerificationCodeViewController(viewModel: makeVerificationCodeViewModel(), diContainer: self)
     }
+    
+    public func makeFeedViewController() -> FeedViewController {
+        return FeedViewController(
+            viewModel: makeFeedViewModel(),
+            diContainer: self
+        )
+    }
+
+    public func makeFeedListViewController(type: FeedListType) -> FeedListViewController {
+        return FeedListViewController(
+            viewModel: makeFeedViewModel(type: type),
+            diContainer: self
+        )
+    }
+    
+    public func makeMyFeedProfileViewController() -> MyFeedProfileViewController {
+        let likedVC = makeFeedProfileListViewController(type: .liked, userId: 0)
+        let sharedVC = makeFeedProfileListViewController(type: .shared, userId: 0)
+        
+        return MyFeedProfileViewController(
+            viewModel: makeFeedProfileViewModel(type: .liked, targetUserId: 0),
+            diContainer: self,
+            likedVC: likedVC,
+            sharedVC: sharedVC
+        )
+    }
+
+    public func makeUserFeedProfileViewController(userId: Int64) -> UserFeedProfileViewController {
+        return UserFeedProfileViewController(
+            viewModel: makeFeedProfileViewModel(type: .shared, targetUserId: userId),
+            diContainer: self,
+            targetUserId: userId
+        )
+    }
+
+    public func makeFeedProfileListViewController(
+        type: FeedProfileListType,
+        userId: Int64
+    ) -> FeedProfileListViewController {
+        // Presentation → Domain 변환
+        let domainType: FeedProfileType = {
+            switch type {
+            case .liked: return .liked
+            case .shared: return .shared
+            }
+        }()
+
+        return FeedProfileListViewController(
+            viewModel: makeFeedProfileViewModel(type: domainType, targetUserId: userId),
+            diContainer: self,
+            type: type
+        )
+=======
 
     public func makeMypageViewController() -> MypageViewController {
         return MypageViewController(viewModel: makeMypageViewModel(), diContainer: self)
@@ -123,6 +176,7 @@ final class AppDIContainer: ViewControllerFactory {
         return NotificationSettingViewController(viewModel: makeNotificationViewModel(), diContainer: self)
     }
 }
+
 // MARK: - SplashDIContainer
 
 extension AppDIContainer {
@@ -443,5 +497,92 @@ extension AppDIContainer {
             viewModel: FeedSearchViewModel(),
             diContainer: self
         )
+    }
+}
+
+// MARK: - FeedDIContainer
+extension AppDIContainer {
+    
+    // ViewModel
+    /// FeedViewController용 ViewModel
+    private func makeFeedViewModel() -> FeedViewModel {
+        return FeedViewModel()
+    }
+    
+    /// FeedListViewController용 ViewModel
+    private func makeFeedViewModel(type: FeedListType) -> FeedViewModel {
+        return FeedViewModel(feedUseCase: makeFeedUseCase(), type: type)
+    }
+    
+    // UseCase
+    private func makeFeedUseCase() -> FeedUseCase {
+        DefaultFeedUseCase(repository: makeFeedRepository())
+    }
+    
+    // Repository
+    private func makeFeedRepository() -> FeedRepository {
+        return DefaultFeedRepository(service: makeFeedService())
+    }
+    
+    // Service
+    
+//    private func makeFeedService() -> FeedService {
+//        return DefaultFeedService()
+//    }
+    
+    private func makeFeedService() -> FeedService {
+        return MockFeedService()
+    }
+}
+
+
+// MARK: - FeedProfileDIContainer
+extension AppDIContainer {
+    
+    // FeedProfile (공유/공감)
+    private func makeFeedProfileViewModel(
+        type: FeedProfileType,
+        targetUserId: Int64
+    ) -> FeedProfileViewModel {
+        return FeedProfileViewModel(
+            feedUseCase: makeFeedProfileUseCase(),
+            profileInfoUseCase: makeFeedProfileInfoUseCase(),
+            type: type,
+            targetUserId: targetUserId
+        )
+    }
+    
+    private func makeFeedProfileUseCase() -> FeedProfileUseCase {
+        DefaultFeedProfileUseCase(repository: makeFeedProfileRepository())
+    }
+    
+    private func makeFeedProfileRepository() -> FeedProfileRepository {
+        DefaultFeedProfileRepository(service: makeFeedProfileService())
+    }
+    
+    //    private func makeFeedProfileService() -> FeedProfileService {
+    //        return DefaultFeedProfileService()
+    //    }
+
+    private func makeFeedProfileService() -> FeedProfileService {
+        return MockFeedProfileService()
+    }
+    
+    
+    // FeedProfileInfo (프로필 정보)
+    private func makeFeedProfileInfoUseCase() -> FeedProfileInfoUseCase {
+        DefaultFeedProfileInfoUseCase(repository: makeFeedProfileInfoRepository())
+    }
+    
+    private func makeFeedProfileInfoRepository() -> FeedProfileInfoRepository {
+        DefaultFeedProfileInfoRepository(service: makeFeedProfileInfoService())
+    }
+    
+//    private func makeFeedProfileInfoService() -> FeedProfileInfoService {
+//        return DefaultFeedProfileInfoService()
+//    }
+    
+    private func makeFeedProfileInfoService() -> FeedProfileInfoService {
+        MockFeedProfileInfoService(isMine: false)
     }
 }

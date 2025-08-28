@@ -49,6 +49,7 @@ final class FeedProfileView: UIView {
         let label = UILabel()
         label.font = .suit(.head_b_18)
         label.textColor = .black
+        label.textAlignment = .left
         return label
     }()
     
@@ -64,6 +65,7 @@ final class FeedProfileView: UIView {
         let label = UILabel()
         label.font = .suit(.body_b_14)
         label.textColor = .gray400
+        label.textAlignment = .left
         return label
     }()
 
@@ -72,6 +74,7 @@ final class FeedProfileView: UIView {
         label.font = .suit(.caption_r_14)
         label.textColor = .gray400
         label.text = "팔로워"
+        label.textAlignment = .left
         return label
     }()
 
@@ -85,6 +88,7 @@ final class FeedProfileView: UIView {
         let label = UILabel()
         label.font = .suit(.body_b_14)
         label.textColor = .gray400
+        label.textAlignment = .left
         return label
     }()
 
@@ -93,6 +97,7 @@ final class FeedProfileView: UIView {
         label.font = .suit(.caption_r_14)
         label.textColor = .gray400
         label.text = "팔로잉"
+        label.textAlignment = .left
         return label
     }()
 
@@ -114,6 +119,7 @@ final class FeedProfileView: UIView {
     private let streakLabel: UILabel = {
         let label = UILabel()
         label.font = .suit(.caption_r_14)
+        label.textAlignment = .left
         return label
     }()
 
@@ -177,16 +183,16 @@ final class FeedProfileView: UIView {
         streak: Int = 0
     ) {
         nameLabel.text = nickname
-
+        
         followerCountLabel.text = "\(follower)"
         followingCountLabel.text = "\(following)"
-
+        
         let streakText = streak > 0 ? "\(streak)일 연속 작성 중" : "0일 연속 작성 중"
         streakLabel.text = streakText
         streakLabel.textColor = streak > 0 ? .hilingualOrange : .gray400
-
+        
         if let urlString = profileImageURL,
-           !urlString.isEmpty,
+           !urlString.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
            let url = URL(string: urlString) {
             profileImageView.kf.setImage(with: url)
         } else {
