@@ -115,7 +115,8 @@ final class AppDIContainer: ViewControllerFactory {
 
     public func makeNotificationDetailViewController(notiId: Int) -> NotificationDetailViewController {
         return NotificationDetailViewController(viewModel: makeNotificationDetailviewmodel(notiId: notiId), diContainer: self)
-    
+    }
+
     public func makeFeedViewController() -> FeedViewController {
         return FeedViewController(
             viewModel: makeFeedViewModel(),
