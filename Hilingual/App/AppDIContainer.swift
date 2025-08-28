@@ -152,14 +152,14 @@ final class AppDIContainer: ViewControllerFactory {
             case .shared: return .shared
             }
         }()
-
+        
         return FeedProfileListViewController(
             viewModel: makeFeedProfileViewModel(type: domainType, targetUserId: userId),
             diContainer: self,
             type: type
         )
-=======
-
+    }
+    
     public func makeMypageViewController() -> MypageViewController {
         return MypageViewController(viewModel: makeMypageViewModel(), diContainer: self)
     }
