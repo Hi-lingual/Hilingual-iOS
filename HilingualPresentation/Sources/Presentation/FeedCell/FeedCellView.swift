@@ -67,7 +67,6 @@ final class FeedCellView: BaseUIView {
     
     // MARK: - Actions
     @objc private func handleTopRefresh() {
-        onRefresh?()
         tableView.refreshControl?.endRefreshing()
     }
 }
