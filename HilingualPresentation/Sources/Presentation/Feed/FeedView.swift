@@ -10,6 +10,10 @@ import SnapKit
 
 final class FeedView: BaseUIView {
 
+    // MARK: - CallBacks
+
+    var onProfileTapped: (() -> Void)?
+
     // MARK: - UI Components
 
     private let headerStack: UIStackView = {
@@ -50,6 +54,7 @@ final class FeedView: BaseUIView {
         imageView.clipsToBounds = true
         imageView.layer.borderWidth = 1
         imageView.layer.borderColor = UIColor.gray200.cgColor
+        imageView.isUserInteractionEnabled = true
         return imageView
     }()
 
@@ -65,6 +70,9 @@ final class FeedView: BaseUIView {
         searchStack.addArrangedSubviews(searchButton, profileImageView)
 
         toast.isHidden = true
+
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(didTapProfileImage))
+        profileImageView.addGestureRecognizer(tapGesture)
     }
 
     override func setLayout() {
@@ -139,5 +147,11 @@ final class FeedView: BaseUIView {
                 self.toast.isHidden = true
             })
         }
+    }
+
+    //MARK: - Actions
+
+    @objc private func didTapProfileImage() {
+        onProfileTapped?()
     }
 }

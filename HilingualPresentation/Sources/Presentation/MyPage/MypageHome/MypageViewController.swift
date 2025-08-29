@@ -48,10 +48,12 @@ public final class MypageViewController: BaseUIViewController<MypageViewModel> {
             switch menu {
             case .notification:
                 let vc = self.diContainer.makeNotificationSettingViewController()
+                vc.hidesBottomBarWhenPushed = true
                 self.navigationController?.pushViewController(vc, animated: true)
 
             case .blockedUsers:
                 let vc = self.diContainer.makeBlockUserViewController()
+                vc.hidesBottomBarWhenPushed = true
                 self.navigationController?.pushViewController(vc, animated: true)
 
             case .support:
