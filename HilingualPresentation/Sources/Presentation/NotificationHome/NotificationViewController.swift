@@ -46,6 +46,11 @@ public final class NotificationViewController: BaseUIViewController<Notification
         setLayout()
     }
 
+    public override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(false, animated: animated)
+    }
+
     // MARK: - Setup
 
     public override func setUI() {
