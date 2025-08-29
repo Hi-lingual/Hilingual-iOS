@@ -82,6 +82,7 @@ final class UserFeedProfileView: BaseUIView {
         button.snp.makeConstraints {
             $0.top.equalTo(myFeedView.snp.bottom).offset(20)
             $0.horizontalEdges.equalToSuperview().inset(16)
+            $0.height.equalTo(37)
         }
         
         feedContainer.snp.makeConstraints {
