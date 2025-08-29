@@ -18,11 +18,11 @@ public final class DeeplinkManager {
     public func handle(_ destination: DeeplinkDestination, from nav: UINavigationController, di: ViewControllerFactory) {
         switch destination {
         case .diaryDetail(let id):
-            let vc = di.makeDiaryDetailViewController(diaryId: id)
+            let vc = di.makeSharedDiaryViewController(diaryId: id)
             nav.pushViewController(vc, animated: true)
 
         case .userProfile(let userId):
-            let vc = di.makeOnboardingViewController()
+            let vc = di.makeUserFeedProfileViewController(userId: Int64(userId))
             nav.pushViewController(vc, animated: true)
         }
     }
