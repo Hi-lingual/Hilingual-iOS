@@ -41,6 +41,7 @@ final class UserFeedProfileView: BaseUIView {
     
     private let modal: Modal = {
         let modal = Modal()
+        modal.isHidden = true
         return modal
     }()
     
