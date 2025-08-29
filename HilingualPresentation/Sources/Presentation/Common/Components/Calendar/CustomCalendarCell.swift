@@ -74,6 +74,7 @@ final class CustomCalendarCell: UICollectionViewCell {
         if isSelected { // 현재 선택한 날 표시
             bubbleView.image = UIImage(named: "img_bubble_filled_ios", in: .module, compatibleWith: nil)
             dayLabel.textColor = .white
+            animateAppearance()
         } else if isFilled { // 작성한 날 표시
             bubbleView.image = UIImage(named: "img_bubble_written_ios", in: .module, compatibleWith: nil)
             dayLabel.textColor = .hilingualBlue
@@ -82,5 +83,23 @@ final class CustomCalendarCell: UICollectionViewCell {
         }
 
         dotView.isHidden = !isToday // 오늘 날짜 표시
+    }
+
+    private func animateAppearance() {
+        DispatchQueue.main.async {
+            self.bubbleView.transform = CGAffineTransform(scaleX: 0.4, y: 0.4)
+
+            UIView.animate(
+                withDuration: 0.25,
+                delay: 0,
+                usingSpringWithDamping: 0.45, 
+                initialSpringVelocity: 1.5,
+                options: [.curveEaseOut],
+                animations: {
+                    self.bubbleView.transform = .identity
+                },
+                completion: nil
+            )
+        }
     }
 }
