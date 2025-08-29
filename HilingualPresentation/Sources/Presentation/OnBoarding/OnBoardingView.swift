@@ -36,7 +36,7 @@ final class OnBoardingView: BaseUIView {
 
     let startButton: CTAButton = {
         //TODO: - 서버 연결이후 변경하기
-        CTAButton(style: .TextButton("시작하기"), autoBackground: false)
+        CTAButton(style: .TextButton("시작하기"), autoBackground: true)
     }()
 
     let nickNameLabel: UILabel = {

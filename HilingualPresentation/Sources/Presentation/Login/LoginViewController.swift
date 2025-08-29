@@ -91,8 +91,8 @@ public final class LoginViewController: BaseUIViewController<LoginViewModel> {
         output.navigateToOnboarding
             .sink { [weak self] in
                 guard let self else { return }
-                print("로그인 -> 온보딩")
-                let onboardingVC = self.diContainer.makeOnboardingViewController()
+                print("로그인 -> 온보딩(인증->닉네임)")
+                let onboardingVC = self.diContainer.makeVerificationCodeViewController()
                 changeRootVC(onboardingVC,animated: true)
             }
             .store(in: &cancellables)
