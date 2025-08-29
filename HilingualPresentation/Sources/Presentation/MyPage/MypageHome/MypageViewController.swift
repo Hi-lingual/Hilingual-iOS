@@ -41,6 +41,7 @@ public final class MypageViewController: BaseUIViewController<MypageViewModel> {
     public override func addTarget() {
         mypageView.logoutButton.addTarget(self, action: #selector(presentLogoutDialog), for: .touchUpInside)
         mypageView.editButton.addTarget(self, action: #selector(editButtonTapped), for: .touchUpInside)
+        mypageView.feedButton.addTarget(self, action: #selector(myFeedProfileButtonTapped), for: .touchUpInside)
 
         mypageView.onMenuTap = { [weak self] menu in
             guard let self else { return }
@@ -125,5 +126,12 @@ public final class MypageViewController: BaseUIViewController<MypageViewModel> {
         let editProfileVC = self.diContainer.makeEditProfileViewController()
         editProfileVC.hidesBottomBarWhenPushed = true
         navigationController?.pushViewController(editProfileVC, animated: true)
+    }
+
+    @objc
+    func myFeedProfileButtonTapped() {
+        let myFeedProfileVC = self.diContainer.makeMyFeedProfileViewController()
+        myFeedProfileVC.hidesBottomBarWhenPushed = true
+        navigationController?.pushViewController(myFeedProfileVC, animated: true)
     }
 }
