@@ -163,7 +163,6 @@ final class SelectedInfo: UIView {
             $0.snp.makeConstraints {
                 $0.top.equalTo(headerStack.snp.bottom).offset(16)
                 $0.horizontalEdges.equalToSuperview()
-                $0.bottom.equalToSuperview()
             }
         }
 

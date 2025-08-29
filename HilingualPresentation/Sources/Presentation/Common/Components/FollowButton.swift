@@ -35,7 +35,6 @@ final class FollowButton: UIButton {
         super.init(frame: frame)
         
         setStyle()
-        setLayout()
     }
     
     required init?(coder: NSCoder) {
@@ -77,12 +76,6 @@ final class FollowButton: UIButton {
             setTitleColor(.gray500, for: .normal)
             layer.borderWidth = 1
             layer.borderColor = UIColor.gray200.cgColor
-        }
-    }
-    
-    private func setLayout() {
-        snp.makeConstraints {
-            $0.height.equalTo(33)
         }
     }
     

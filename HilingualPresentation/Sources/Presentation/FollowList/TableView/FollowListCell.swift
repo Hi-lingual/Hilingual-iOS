@@ -97,6 +97,7 @@ final class FollowListCell: UITableViewCell {
         
         button.snp.makeConstraints {
             $0.width.equalTo(80)
+            $0.height.equalTo(33)
         }
     }
     
