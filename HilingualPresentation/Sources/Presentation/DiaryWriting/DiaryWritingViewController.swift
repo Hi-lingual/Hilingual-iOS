@@ -167,16 +167,14 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
                 self.diaryWritingView.tooltip.isHidden = isActive
             }
             .store(in: &cancellables)
-
-        viewModel?.$successDiaryId
-            .compactMap { $0 }
+        
+        viewModel?.successDiaryId
             .sink { [weak self] _ in
                 self?.notifyLoadingVC(.success(()))
             }
             .store(in: &cancellables)
-
-        viewModel?.$error
-            .compactMap { $0 }
+        
+        viewModel?.error
             .sink { [weak self] error in
                 self?.notifyLoadingVC(.failure(error))
             }

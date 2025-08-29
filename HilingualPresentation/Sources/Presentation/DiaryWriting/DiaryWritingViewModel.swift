@@ -18,9 +18,21 @@ public final class DiaryWritingViewModel: BaseViewModel {
     
     // MARK: - State
     
-    @Published public var isLoading: Bool = false
-    @Published public var error: Error?
-    @Published public var successDiaryId: Int?
+    private let isLoadingSubject = CurrentValueSubject<Bool, Never>(false)
+    private let errorSubject = PassthroughSubject<Error, Never>()
+    private let successDiaryIdSubject = PassthroughSubject<Int, Never>()
+    
+    public var isLoading: AnyPublisher<Bool, Never> {
+        isLoadingSubject.eraseToAnyPublisher()
+    }
+    
+    public var error: AnyPublisher<Error, Never> {
+        errorSubject.eraseToAnyPublisher()
+    }
+    
+    public var successDiaryId: AnyPublisher<Int, Never> {
+        successDiaryIdSubject.eraseToAnyPublisher()
+    }
     
     // MARK: - Init
     
@@ -51,23 +63,22 @@ public final class DiaryWritingViewModel: BaseViewModel {
     }
     
     public func postDiary(originalText: String, date: String, imageFile: Data?) {
-        isLoading = true
-        error = nil
+        isLoadingSubject.send(true)
         
         let entity = DiaryWritingEntity(originalText: originalText, date: date, imageFile: imageFile)
         
         diaryWritingUseCase.postDiaryWriting(entity)
             .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { [weak self] completion in
-                self?.isLoading = false
+                self?.isLoadingSubject.send(false)
                 switch completion {
                 case .finished:
                     break
                 case .failure(let err):
-                    self?.error = err
+                    self?.errorSubject.send(err)
                 }
             }, receiveValue: { [weak self] response in
-                self?.successDiaryId = response.diaryId
+                self?.successDiaryIdSubject.send(response.diaryId)
             })
             .store(in: &cancellables)
     }
