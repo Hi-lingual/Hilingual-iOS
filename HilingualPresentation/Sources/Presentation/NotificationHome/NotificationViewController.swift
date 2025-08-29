@@ -67,7 +67,7 @@ public final class NotificationViewController: BaseUIViewController<Notification
     // MARK: - Navigation
 
     public override func navigationType() -> NavigationType? {
-        return .backTitle("알림")
+        return .backTitleMenu(title: "알림")
     }
 
     @objc public override func backButtonTapped() {

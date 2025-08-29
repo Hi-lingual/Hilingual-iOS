@@ -99,7 +99,7 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
     // MARK: - Navigation
     
     public override func navigationType() -> NavigationType? {
-        return isBlocked ? .backOnly : .backTitleMenu("")
+        return isBlocked ? .backOnly : .backTitleMenu(title: "")
     }
     
     private func updateNavigation() {

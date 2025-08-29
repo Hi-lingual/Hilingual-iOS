@@ -197,7 +197,7 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
 
     
     public override func navigationType() -> NavigationType? {
-        return .backTitleMenu("일기장")
+        return .backTitleMenu(title: "일기장")
     }
     
     @objc public override func backButtonTapped() {

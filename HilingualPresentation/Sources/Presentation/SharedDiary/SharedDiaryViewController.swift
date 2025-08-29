@@ -158,7 +158,7 @@ public final class SharedDiaryViewController: BaseUIViewController<SharedDiaryVi
     // MARK: - Public Methods
     
     public override func navigationType() -> NavigationType? {
-        return .backTitleMenu("")
+        return .backTitleMenu(title: "")
     }
     
     @objc public override func backButtonTapped() {
