@@ -62,7 +62,11 @@ public final class MyFeedProfileViewController: BaseUIViewController<FeedProfile
         likedVC.onReportTapped = { [weak self] in
             self?.showReportDialog()
         }
-        
+
+        myFeedProfileView.setFollowSectionTappedAction { [weak self] in
+            self?.pushFollowListViewController()
+        }
+
         bind()
     }
     
@@ -154,5 +158,10 @@ public final class MyFeedProfileViewController: BaseUIViewController<FeedProfile
         else { return }
         let safariVC = SFSafariViewController(url: url)
         present(safariVC, animated: true)
+    }
+
+    private func pushFollowListViewController() {
+        let followVC = self.diContainer.makeFollowListViewController()
+        self.navigationController?.pushViewController(followVC, animated: true)
     }
 }

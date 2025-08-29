@@ -11,6 +11,10 @@ import Kingfisher
 
 final class FeedProfileView: UIView {
 
+    // MARK: - Callbacks
+
+    var onFollowSectionTapped: (() -> Void)?
+
     // MARK: - UI Components
 
     private let mainStackView: UIStackView = {
@@ -147,6 +151,10 @@ final class FeedProfileView: UIView {
 
         followStack.addArrangedSubviews(followerTitleLabel, followerCountLabel, followSpacer, followingTitleLabel, followingCountLabel)
 
+        let followTapGesture = UITapGestureRecognizer(target: self, action: #selector(followSectionTapped))
+        followStack.isUserInteractionEnabled = true
+        followStack.addGestureRecognizer(followTapGesture)
+
         streakStack.addArrangedSubviews(streakImageView, streakLabel)
     }
 
@@ -170,6 +178,12 @@ final class FeedProfileView: UIView {
         streakImageView.snp.makeConstraints {
             $0.size.equalTo(16)
         }
+    }
+
+    //MARK: - Action
+
+    @objc private func followSectionTapped() {
+        onFollowSectionTapped?()
     }
 
     // MARK: - Public
