@@ -11,10 +11,13 @@ import SnapKit
 final class FeedCellView: BaseUIView {
     
     // MARK: - Callbacks
+
     var onHideTapped: ((Int) -> Void)?
     var onReportTapped: (() -> Void)?
     var onRefresh: (() -> Void)?
-    
+    var onProfileTapped: ((Int) -> Void)?
+    var onDetailTapped: ((Int) -> Void)?
+
     // MARK: - Properties
     private var items: [FeedDiaryItem] = [] {
         didSet {
@@ -185,8 +188,22 @@ extension FeedCellView {
 }
 
 // MARK: - FeedDiaryCellDelegate
+
 extension FeedCellView: FeedDiaryCell.FeedDiaryCellDelegate {
+    func feedDiaryCellDidTapProfile(_ cell: FeedDiaryCell) {
+        if let row = tableView.indexPath(for: cell)?.row {
+            onProfileTapped?(row)
+        }
+    }
+
+    func feedDiaryCellDidTapDetail(_ cell: FeedDiaryCell) {
+        if let row = tableView.indexPath(for: cell)?.row {
+            onDetailTapped?(row)
+        }
+    }
+
     func feedDiaryCell(_ cell: FeedDiaryCell, didTapMoreButton isMine: Bool) { }
+
     func feedDiaryCell(_ cell: FeedDiaryCell, didTapMenuItemAt index: Int, isMine: Bool) {
         if isMine {
             if let row = tableView.indexPath(for: cell)?.row {

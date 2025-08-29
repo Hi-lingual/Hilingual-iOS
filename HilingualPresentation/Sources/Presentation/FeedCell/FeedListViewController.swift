@@ -45,6 +45,31 @@ public final class FeedListViewController: BaseUIViewController<FeedViewModel> {
         feedCellView.onRefresh = { [weak self] in
             self?.onRefresh?()
         }
+
+        feedCellView.onProfileTapped = { [weak self] row in
+            guard let self else { return }
+            let user = self.currentFeeds[row]
+
+            if user.isMine == true {
+                let myVC = self.diContainer.makeMyFeedProfileViewController()
+                myVC.hidesBottomBarWhenPushed = true
+                self.navigationController?.pushViewController(myVC, animated: true)
+            } else {
+                let vc = self.diContainer.makeUserFeedProfileViewController(userId: Int64(user.userID))
+                vc.hidesBottomBarWhenPushed = true
+                self.navigationController?.pushViewController(vc, animated: true)
+            }
+        }
+
+
+        feedCellView.onDetailTapped = { [weak self] row in
+            guard let self else { return }
+            let feed = self.currentFeeds[row]
+            let vc = self.diContainer.makeSharedDiaryViewController(diaryId: feed.id)
+            vc.hidesBottomBarWhenPushed = true
+            self.navigationController?.pushViewController(vc, animated: true)
+        }
+
     }
 
     // MARK: - Bindings

@@ -45,7 +45,12 @@ public final class SharedDiaryViewController: BaseUIViewController<SharedDiaryVi
     }
     
     // MARK: - LifeCycle
-    
+
+    public override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(false, animated: false)
+    }
+
     public override func viewDidLoad() {
         super.viewDidLoad()
 
