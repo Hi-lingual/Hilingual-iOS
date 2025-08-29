@@ -54,7 +54,7 @@ public final class SharedDiaryViewController: BaseUIViewController<SharedDiaryVi
         
         sharedDiaryView.onProfileAction = { [weak self] in
             guard let self else { return }
-            let vc = diContainer.makeDiaryDetailViewController(diaryId: diaryId)
+            let vc = diContainer.makeMyFeedProfileViewController()
             self.navigationController?.pushViewController(vc, animated: true)
         }
 
