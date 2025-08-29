@@ -26,18 +26,27 @@ public final class FeedSearchViewController: BaseUIViewController<FeedSearchView
     
     // MARK: - Life Cycle
     
+    public override init(viewModel: FeedSearchViewModel, diContainer: ViewControllerFactory) {
+        super.init(viewModel: viewModel, diContainer: diContainer)
+    }
+    
     public override func viewDidLoad() {
         super.viewDidLoad()
         
         setUI()
         setLayout()
         setDelegate()
-        bind(viewModel: FeedSearchViewModel())
+        bind()
     }
     
     public override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         searchBar.becomeFirstResponder()
+    }
+    
+    public override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        self.navigationController?.setNavigationBarHidden(false, animated: false)
     }
     
     // MARK: - Setup Methods
@@ -49,7 +58,6 @@ public final class FeedSearchViewController: BaseUIViewController<FeedSearchView
         feedSearchEmptyView.isHidden = true
         
         navigationItem.titleView = searchBar
-        searchBar.delegate = self
     }
     
     public override func setLayout() {
@@ -71,10 +79,10 @@ public final class FeedSearchViewController: BaseUIViewController<FeedSearchView
     
     // MARK: - Bind
     
-    public override func bind(viewModel: FeedSearchViewModel) {
-        let output = viewModel.transform()
-
-        output.searchState
+    private func bind() {
+        let output = viewModel?.transform()
+        
+        output?.searchState
             .receive(on: DispatchQueue.main)
             .sink { [weak self] state in
                 self?.updateUI(for: state)

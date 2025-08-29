@@ -49,11 +49,14 @@ public final class FeedSearchViewModel: BaseViewModel {
     // MARK: - Properties
     
     public var input = Input(searchTrigger: .init())
+    private let useCase: FeedSearchUseCase
     
     // MARK: - Init
     
-    public override init() {
+    public init(useCase: FeedSearchUseCase) {
+        self.useCase = useCase
         super.init()
+        
         setBinding()
     }
     
@@ -70,18 +73,29 @@ public final class FeedSearchViewModel: BaseViewModel {
     
     public func transform() -> Output {
         let searchStatePublisher = input.searchTrigger
-            .map { query -> SearchState in
-                guard !query.isEmpty else { return .enter }
+            .flatMap { [weak self] query -> AnyPublisher<SearchState, Never> in
+                guard let self = self, !query.isEmpty else {
+                    return Just(.enter).eraseToAnyPublisher()
+                }
 
-                let mockData: [FeedSearchUserModel] = [
-                    FeedSearchUserModel(userId: 1, profileImg: "https://example.com/image1.jpg", nickname: "하링이", isFollowing: false, isFollowed: true),
-                    FeedSearchUserModel(userId: 2, profileImg: "https://example.com/image2.jpg", nickname: "하이링구얼", isFollowing: true, isFollowed: true),
-                    FeedSearchUserModel(userId: 3, profileImg: "https://example.com/image3.jpg", nickname: "하이링궐", isFollowing: false, isFollowed: false),
-                    FeedSearchUserModel(userId: 4, profileImg: "https://example.com/image4.jpg", nickname: "하품그만해", isFollowing: true, isFollowed: false)
-                ]
-
-                let filtered = mockData.filter { $0.nickname.contains(query) }
-                return filtered.isEmpty ? .empty : .searchResult(filtered)
+                return self.useCase.search(keyword: query)
+                    .map { entities in
+                        entities.map { entity in
+                            FeedSearchUserModel(
+                                userId: entity.userId,
+                                profileImg: entity.profileImg,
+                                nickname: entity.nickname,
+                                isFollowing: entity.isFollowing,
+                                isFollowed: entity.isFollowed
+                            )
+                        }
+                    }
+                    .map { users in
+                        users.isEmpty ? .empty : .searchResult(users)
+                    }
+                    .catch { _ in Just(.empty) }
+                    .receive(on: DispatchQueue.main)
+                    .eraseToAnyPublisher()
             }
             .eraseToAnyPublisher()
 
