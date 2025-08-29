@@ -31,8 +31,16 @@ public final class FollowListViewModel: BaseViewModel {
     
     // MARK: - Published Properties
     
-    @Published public private(set) var followerList: [FollowUserModel] = []
-    @Published public private(set) var followingList: [FollowUserModel] = []
+    private let followerListSubject = CurrentValueSubject<[FollowUserModel], Never>([])
+    private let followingListSubject = CurrentValueSubject<[FollowUserModel], Never>([])
+    
+    public var followerListPublisher: AnyPublisher<[FollowUserModel], Never> {
+        followerListSubject.eraseToAnyPublisher()
+    }
+    
+    public var followingListPublisher: AnyPublisher<[FollowUserModel], Never> {
+        followingListSubject.eraseToAnyPublisher()
+    }
     
     // MARK: - Private Properties
     
@@ -56,14 +64,14 @@ public final class FollowListViewModel: BaseViewModel {
     }
     
     public struct Output {
-        let followerList: Published<[FollowUserModel]>.Publisher
-        let followingList: Published<[FollowUserModel]>.Publisher
+        let followerList: AnyPublisher<[FollowUserModel], Never>
+        let followingList: AnyPublisher<[FollowUserModel], Never>
     }
     
     public lazy var input = Input()
     public lazy var output = Output(
-        followerList: $followerList,
-        followingList: $followingList
+        followerList: followerListPublisher,
+        followingList: followingListPublisher
     )
     
     // MARK: - Bind Inputs
@@ -89,7 +97,8 @@ public final class FollowListViewModel: BaseViewModel {
             .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] followers in
                 guard let self = self else { return }
                 self.originalFollowers = followers
-                self.followerList = followers.map { self.mapToUserModel(from: $0, type: .follower) }
+                let userModels = followers.map { self.mapToUserModel(from: $0, type: .follower) }
+                self.followerListSubject.send(userModels)
             })
             .store(in: &cancellables)
     }
@@ -99,7 +108,8 @@ public final class FollowListViewModel: BaseViewModel {
             .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] following in
                 guard let self = self else { return }
                 self.originalFollowing = following
-                self.followingList = following.map { self.mapToUserModel(from: $0, type: .following) }
+                let userModels = following.map { self.mapToUserModel(from: $0, type: .following) }
+                self.followingListSubject.send(userModels)
             })
             .store(in: &cancellables)
     }
@@ -111,10 +121,10 @@ public final class FollowListViewModel: BaseViewModel {
             let updatedUser = toggleFollowState(for: originalFollowers[userIndex])
             originalFollowers[userIndex] = updatedUser
             
-            var updatedList = self.followerList
+            var updatedList = followerListSubject.value
             if let uiIndex = updatedList.firstIndex(where: { $0.userId == userId }) {
                 updatedList[uiIndex] = mapToUserModel(from: updatedUser, type: .follower)
-                self.followerList = updatedList
+                followerListSubject.send(updatedList)
             }
         }
         
@@ -122,10 +132,10 @@ public final class FollowListViewModel: BaseViewModel {
             let updatedUser = toggleFollowState(for: originalFollowing[userIndex])
             originalFollowing[userIndex] = updatedUser
             
-            var updatedList = self.followingList
+            var updatedList = followingListSubject.value
             if let uiIndex = updatedList.firstIndex(where: { $0.userId == userId }) {
                 updatedList[uiIndex] = mapToUserModel(from: updatedUser, type: .following)
-                self.followingList = updatedList
+                followingListSubject.send(updatedList)
             }
         }
     }
@@ -137,7 +147,6 @@ public final class FollowListViewModel: BaseViewModel {
         )
     }
     
-    // Domain 모델을 UI 모델로 매핑
     private func mapToUserModel(from domainFollower: Follower, type: FollowListType) -> FollowUserModel {
         let buttonState: FollowButtonState
         switch type {
