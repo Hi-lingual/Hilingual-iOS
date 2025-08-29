@@ -35,15 +35,12 @@ final class FeedView: BaseUIView {
         return stack
     }()
 
-    private let searchImageView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.contentMode = .scaleAspectFit
-        imageView.image = UIImage(
-            named: "ic_search_24_ios",
-            in: .module,
-            compatibleWith: nil
-        )
-        return imageView 
+    let searchButton: UIButton = {
+        let button = UIButton(type: .system)
+        let image = UIImage(named: "ic_search_24_ios", in: .module, compatibleWith: nil)
+        button.setImage(image, for: .normal)
+        button.contentMode = .scaleAspectFit
+        return button
     }()
 
     private let profileImageView: UIImageView = {
@@ -65,8 +62,8 @@ final class FeedView: BaseUIView {
     override func setUI() {
         addSubviews(headerStack, toast)
         headerStack.addArrangedSubviews(titleLabel, searchStack)
-        searchStack.addArrangedSubviews(searchImageView, profileImageView)
-        
+        searchStack.addArrangedSubviews(searchButton, profileImageView)
+
         toast.isHidden = true
     }
 
@@ -76,7 +73,7 @@ final class FeedView: BaseUIView {
             $0.horizontalEdges.equalToSuperview().inset(16)
         }
 
-        searchImageView.snp.makeConstraints {
+        searchButton.snp.makeConstraints {
             $0.size.equalTo(24)
         }
 

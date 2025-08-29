@@ -74,7 +74,19 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: false)
     }
-    
+
+    //MARK: - Action
+
+    public override func addTarget() {
+        feedView.searchButton.addTarget(self, action: #selector(didTapSearch), for: .touchUpInside)
+    }
+
+    @objc private func didTapSearch() {
+        let feedSearchVC = self.diContainer.makeFeedSearchViewController()
+        feedSearchVC.hidesBottomBarWhenPushed = true
+        navigationController?.pushViewController(feedSearchVC, animated: true)
+    }
+
     // MARK: - Public
     func showToast(message: String) {
         feedView.showToast(message: message)
