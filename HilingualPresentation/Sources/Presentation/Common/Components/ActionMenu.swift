@@ -88,9 +88,8 @@ final class ActionMenu: UIView {
             if index < items.count - 1 {
                 let divider = UIView()
                 divider.backgroundColor = .gray200
-                divider.snp.makeConstraints { $0.height.equalTo(1) }
-                
                 stackView.addArrangedSubview(divider)
+                divider.snp.makeConstraints { $0.height.equalTo(1) }
             }
         }
     }
