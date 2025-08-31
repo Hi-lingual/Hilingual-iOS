@@ -17,6 +17,8 @@ final class FeedDiaryCell: UITableViewCell {
     protocol FeedDiaryCellDelegate: AnyObject {
         func feedDiaryCell(_ cell: FeedDiaryCell, didTapMoreButton isMine: Bool)
         func feedDiaryCell(_ cell: FeedDiaryCell, didTapMenuItemAt index: Int, isMine: Bool)
+        func feedDiaryCellDidTapProfile(_ cell: FeedDiaryCell)
+        func feedDiaryCellDidTapDetail(_ cell: FeedDiaryCell)
     }
 
     // MARK: - Properties
@@ -183,6 +185,7 @@ final class FeedDiaryCell: UITableViewCell {
         menu.delegate = self
         setUI()
         setLayout()
+        setupGestureRecognizers()
         selectionStyle = .none
     }
 
@@ -355,6 +358,33 @@ final class FeedDiaryCell: UITableViewCell {
             menu.isHidden = true
         }
     }
+
+    @objc private func profileTapped() {
+        delegate?.feedDiaryCellDidTapProfile(self)
+    }
+
+    @objc private func detailTapped() {
+        delegate?.feedDiaryCellDidTapDetail(self)
+    }
+
+
+    //MARK: - Private Method
+
+    private func setupGestureRecognizers() {
+        profileImageView.isUserInteractionEnabled = true
+        nameLabel.isUserInteractionEnabled = true
+        detailStack.isUserInteractionEnabled = true
+
+        let profileTap = UITapGestureRecognizer(target: self, action: #selector(profileTapped))
+        profileImageView.addGestureRecognizer(profileTap)
+
+        let nameTap = UITapGestureRecognizer(target: self, action: #selector(profileTapped))
+        nameLabel.addGestureRecognizer(nameTap)
+
+        let detailTap = UITapGestureRecognizer(target: self, action: #selector(detailTapped))
+        detailStack.addGestureRecognizer(detailTap)
+    }
+
 }
 
 // MARK: - Extensions

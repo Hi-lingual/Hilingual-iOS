@@ -8,7 +8,8 @@
 import Foundation
 
 struct FeedDiaryItem {
-    let id: Int
+    let id: Int /// diaryID
+    let userID: Int 
     let nickname: String
     let profileImg: String?
     let isMine: Bool

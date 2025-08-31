@@ -38,6 +38,7 @@ public final class FeedSearchViewController: BaseUIViewController<FeedSearchView
     public override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         searchBar.becomeFirstResponder()
+        navigationController?.setNavigationBarHidden(false, animated: animated)
     }
     
     // MARK: - Setup Methods
@@ -167,6 +168,14 @@ extension FeedSearchViewController: UISearchBarDelegate {
 // MARK: - FollowListCellDelegate
 
 extension FeedSearchViewController: FollowListCellDelegate {
+    func profileTapped(cell: FollowListCell) {
+        guard let indexPath = tableView.indexPath(for: cell) else { return }
+        let user = userList[indexPath.row]
+
+        let userFeedVC = diContainer.makeUserFeedProfileViewController(userId: Int64(user.userId))
+        userFeedVC.hidesBottomBarWhenPushed = true
+        navigationController?.pushViewController(userFeedVC, animated: true)
+    }
     
     @MainActor
     func followButtonTapped(cell: FollowListCell) {

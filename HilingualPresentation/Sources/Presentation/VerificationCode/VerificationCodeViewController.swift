@@ -30,7 +30,7 @@ public final class VerificationCodeViewController: BaseUIViewController<Verifica
     // MARK: - Navigation
 
     public override func navigationType() -> NavigationType? {
-        .backTitleMenu("인증코드 입력")
+        .backTitle("인증 번호 입력")
     }
 
     // MARK: - Bind
@@ -73,7 +73,7 @@ public final class VerificationCodeViewController: BaseUIViewController<Verifica
             .sink { [weak self] in
                 guard let self else { return }
                 let onboardingVC = diContainer.makeOnboardingViewController()
-                self.navigationController?.pushViewController(onboardingVC, animated: true)
+                changeRootVC(onboardingVC)
             }
             .store(in: &cancellables)
 

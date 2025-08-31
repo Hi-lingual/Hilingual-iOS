@@ -185,6 +185,10 @@ final class AppDIContainer: ViewControllerFactory {
     public func makeNotificationSettingViewController() -> NotificationSettingViewController {
         return NotificationSettingViewController(viewModel: makeNotificationViewModel(), diContainer: self)
     }
+
+    public func makeFeedSearchViewController() -> FeedSearchViewController {
+        return FeedSearchViewController(viewModel: makeFeedSearchViewModel(), diContainer: self)
+    }
 }
 
 // MARK: - SplashDIContainer
@@ -555,11 +559,9 @@ extension AppDIContainer {
 // MARK: - FeedSearchDIContainer
 
 extension AppDIContainer {
-    func makeFeedSearchViewController() -> FeedSearchViewController {
-        return FeedSearchViewController(
-            viewModel: FeedSearchViewModel(),
-            diContainer: self
-        )
+
+    private func makeFeedSearchViewModel() -> FeedSearchViewModel {
+        return FeedSearchViewModel()
     }
 }
 

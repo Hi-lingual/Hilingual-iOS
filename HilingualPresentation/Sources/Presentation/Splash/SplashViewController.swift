@@ -54,9 +54,15 @@ public final class SplashViewController: BaseUIViewController<SplashViewModel> {
         output.navigateToOnboarding
             .sink { [weak self] in
                 guard let self else { return }
-                print("스플래시 -> 온보딩")
-                let vc = self.diContainer.makeOnboardingViewController()
-                changeRootVC(vc, animated: true)
+                print("스플래시 → 온보딩(로그인 → 인증코드)")
+
+                let loginVC = self.diContainer.makeLoginViewController()
+                let verificationVC = self.diContainer.makeVerificationCodeViewController()
+
+                let nav = UINavigationController()
+                nav.setViewControllers([loginVC, verificationVC], animated: false)
+
+                changeRootVC(nav, animated: true)
             }
             .store(in: &cancellables)
 
@@ -65,7 +71,8 @@ public final class SplashViewController: BaseUIViewController<SplashViewModel> {
                 guard let self else { return }
                 print("스플래시 -> 로그인")
                 let vc = self.diContainer.makeLoginViewController()
-                changeRootVC(vc, animated: true)
+                let nav = UINavigationController(rootViewController: vc)
+                changeRootVC(nav, animated: true)
             }
             .store(in: &cancellables)
     }

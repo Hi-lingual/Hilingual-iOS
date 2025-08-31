@@ -74,7 +74,29 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: false)
     }
-    
+
+    //MARK: - Action
+
+    public override func addTarget() {
+        feedView.searchButton.addTarget(self, action: #selector(didTapSearch), for: .touchUpInside)
+
+        feedView.onProfileTapped = { [weak self] in
+               self?.navigateToMyProfile()
+           }
+    }
+
+    @objc private func didTapSearch() {
+        let feedSearchVC = self.diContainer.makeFeedSearchViewController()
+        feedSearchVC.hidesBottomBarWhenPushed = true
+        navigationController?.pushViewController(feedSearchVC, animated: true)
+    }
+
+    private func navigateToMyProfile() {
+        let myProfileVC = diContainer.makeMyFeedProfileViewController()
+        myProfileVC.hidesBottomBarWhenPushed = true
+        navigationController?.pushViewController(myProfileVC, animated: true)
+    }
+
     // MARK: - Public
     func showToast(message: String) {
         feedView.showToast(message: message)

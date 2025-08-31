@@ -92,14 +92,18 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
             self.userFeedProfileView.restoreFeedView()
             self.updateNavigation()
         }
-        
+
+        userFeedProfileView.setFollowSectionTappedAction { [weak self] in
+            self?.pushFollowListViewController()
+        }
+
         bind()
     }
     
     // MARK: - Navigation
     
     public override func navigationType() -> NavigationType? {
-        return isBlocked ? .backOnly : .backTitleMenu("")
+        return isBlocked ? .backOnly : .backTitleMenu(title: "")
     }
     
     private func updateNavigation() {
@@ -214,5 +218,10 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
         else { return }
         let safariVC = SFSafariViewController(url: url)
         present(safariVC, animated: true)
+    }
+
+    private func pushFollowListViewController() {
+        let followVC = self.diContainer.makeFollowListViewController()
+        self.navigationController?.pushViewController(followVC, animated: true)
     }
 }

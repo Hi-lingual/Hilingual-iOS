@@ -45,7 +45,12 @@ public final class SharedDiaryViewController: BaseUIViewController<SharedDiaryVi
     }
     
     // MARK: - LifeCycle
-    
+
+    public override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(false, animated: false)
+    }
+
     public override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -54,7 +59,7 @@ public final class SharedDiaryViewController: BaseUIViewController<SharedDiaryVi
         
         sharedDiaryView.onProfileAction = { [weak self] in
             guard let self else { return }
-            let vc = diContainer.makeDiaryDetailViewController(diaryId: diaryId)
+            let vc = diContainer.makeMyFeedProfileViewController()
             self.navigationController?.pushViewController(vc, animated: true)
         }
 
@@ -158,7 +163,7 @@ public final class SharedDiaryViewController: BaseUIViewController<SharedDiaryVi
     // MARK: - Public Methods
     
     public override func navigationType() -> NavigationType? {
-        return .backTitleMenu("")
+        return .backTitleMenu(title: "")
     }
     
     @objc public override func backButtonTapped() {

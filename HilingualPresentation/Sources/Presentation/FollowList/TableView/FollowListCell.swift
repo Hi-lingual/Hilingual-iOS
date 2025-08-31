@@ -10,6 +10,7 @@ import UIKit
 @MainActor
 protocol FollowListCellDelegate: AnyObject {
     func followButtonTapped(cell: FollowListCell)
+    func profileTapped(cell: FollowListCell)
 }
 
 final class FollowListCell: UITableViewCell {
@@ -67,6 +68,7 @@ final class FollowListCell: UITableViewCell {
         setStyle()
         setUI()
         setLayout()
+        setGestureRecognizers()
         button.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
     }
     
@@ -100,7 +102,18 @@ final class FollowListCell: UITableViewCell {
             $0.height.equalTo(33)
         }
     }
-    
+
+    private func setGestureRecognizers() {
+        profileImg.isUserInteractionEnabled = true
+        nickname.isUserInteractionEnabled = true
+
+        let profileTap = UITapGestureRecognizer(target: self, action: #selector(profileTapped))
+        profileImg.addGestureRecognizer(profileTap)
+
+        let nameTap = UITapGestureRecognizer(target: self, action: #selector(profileTapped))
+        nickname.addGestureRecognizer(nameTap)
+    }
+
     // MARK: - Configure
     
     func configure(with user: UserDisplayable) {
@@ -116,6 +129,10 @@ final class FollowListCell: UITableViewCell {
     
     @objc private func buttonTapped() {
         delegate?.followButtonTapped(cell: self)
+    }
+
+    @objc private func profileTapped() {
+        delegate?.profileTapped(cell: self)
     }
 }
 

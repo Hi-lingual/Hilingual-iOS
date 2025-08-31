@@ -69,6 +69,14 @@ public final class BlockUserViewController: BaseUIViewController<BlockUserViewMo
     @objc private func refreshPulled() {
         refreshTriggeredSubject.send(())
     }
+
+    //MARK: - Private Method
+
+    private func navigateToUserProfile(userId: Int) {
+        let profileVC = diContainer.makeUserFeedProfileViewController(userId: Int64(userId))
+        navigationController?.pushViewController(profileVC, animated: true)
+    }
+
 }
 
 // MARK: - TableView Extension
@@ -92,6 +100,9 @@ extension BlockUserViewController: UITableViewDataSource, UITableViewDelegate {
         cell.configure(with: user)
         cell.onUnblockTapped = { [weak self] userId in
             self?.unblockTappedSubject.send(userId)
+        }
+        cell.onProfileTapped = { [weak self] userId in
+            self?.navigateToUserProfile(userId: userId)
         }
         return cell
     }

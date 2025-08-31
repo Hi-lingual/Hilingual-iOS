@@ -164,7 +164,11 @@ final class UserFeedProfileView: BaseUIView {
         feedContainer.isHidden = false
         blockedStack.isHidden = true
     }
-    
+
+    func setFollowSectionTappedAction(_ action: @escaping () -> Void) {
+        myFeedView.onFollowSectionTapped = action
+    }
+
     // MARK: - Private
     
     @objc private func buttonTapped() {

@@ -194,8 +194,11 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                 self.showDialog(for: .delete) { _ in }
             }
         }
+        homeView.profileView.alarmButton.addTarget(self, action: #selector(alarmButtonTapped), for: .touchUpInside)
     }
-    
+
+    //MARK: - Private Methods
+
     private func showDialog(for action: MenuAction, completion: @escaping (Bool?) -> Void) {
         guard let containerView = self.tabBarController?.view else { return }
 
@@ -273,7 +276,14 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         }
         dialog.showAnimation()
     }
-    
+
+    @objc private func alarmButtonTapped() {
+        let notificationVC = diContainer.makeNotificationViewController()
+        notificationVC.hidesBottomBarWhenPushed = true
+
+        navigationController?.pushViewController(notificationVC, animated: true)
+    }
+
     // MARK: - Navigation
 
     private func goToDiaryWritingView(topicData: (String, String)? = nil, selectedDate: Date? = nil) {

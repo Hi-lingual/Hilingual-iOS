@@ -15,7 +15,7 @@ public extension BaseUIViewController {
     enum NavigationType {
         case titleOnly(String)
         case backTitle(String)
-        case backTitleMenu(String)
+        case backTitleMenu(title: String, rightIconName: String? = nil)
         case backOnly
         case backSearchBar
     }
@@ -39,14 +39,14 @@ public extension BaseUIViewController {
             )
             navigationItem.rightBarButtonItem = nil
 
-        case .backTitleMenu(let title):
+        case .backTitleMenu(let title, let rightIconName):
             navigationItem.titleView = makeTitleLabel(title)
             navigationItem.leftBarButtonItem = makeBarButton(
                 imageName: "ic_arrow_left_b_24_ios",
                 action: #selector(backButtonTapped)
             )
             navigationItem.rightBarButtonItem = makeBarButton(
-                imageName: "ic_more_24_ios", 
+                imageName: rightIconName ?? "ic_more_24_ios",
                 action: #selector(menuButtonTapped)
             )
 
