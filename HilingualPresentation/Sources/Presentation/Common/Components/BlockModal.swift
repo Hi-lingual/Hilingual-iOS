@@ -35,7 +35,7 @@ final class BlockModal: UIView {
         label.font = .suit(.head_b_18)
         label.textColor = .black
         label.textAlignment = .left
-        label.text = "정말 차단하실건가요?"
+        label.text = "정말 차단하실 건가요?"
         return label
     }()
     
@@ -160,14 +160,13 @@ final class BlockModal: UIView {
     private func setupAction() {
         applyButton.addAction(UIAction { [weak self] _ in
             guard let self else { return }
-            self.onApplyTapped?()   // 👈 먼저 외부 콜백 실행
-            self.dismiss()          // 👈 그다음 닫기
+            self.onApplyTapped?()
+            self.dismiss()
         }, for: .touchUpInside)
     }
 
     // MARK: - Animation
     public func show(in parentView: UIView) {
-        // 혹시 다른 superview에 남아있을 경우 제거
         self.removeFromSuperview()
         
         parentView.addSubview(self)
@@ -175,17 +174,18 @@ final class BlockModal: UIView {
 
         layoutIfNeeded()
         modalSheetView.transform = CGAffineTransform(translationX: 0, y: modalSheetView.frame.height)
+        self.backgroundColor = .clear
 
-        UIView.animate(withDuration: 0.3) {
-            self.backgroundDimView.alpha = 1
+        UIView.animate(withDuration: 0.3, delay: 0, options: [.curveEaseOut]) {
             self.modalSheetView.transform = .identity
+            self.backgroundColor = UIColor.dim
         }
     }
 
     @objc public func dismiss() {
         UIView.animate(withDuration: 0.2, animations: {
             self.modalSheetView.transform = CGAffineTransform(translationX: 0, y: self.modalSheetView.frame.height)
-            self.backgroundDimView.alpha = 0
+            self.backgroundColor = UIColor.dim.withAlphaComponent(0)
         }, completion: { _ in
             self.removeFromSuperview()
         })

@@ -46,6 +46,9 @@ final class FeedCellView: BaseUIView {
         let refreshControl = UIRefreshControl()
         refreshControl.addTarget(self, action: #selector(handleTopRefresh), for: .valueChanged)
         tableView.refreshControl = refreshControl
+        
+        /// 테이블뷰 아래 32 여백 주기 위해
+        tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 32, right: 0)
 
         noFeedView.isHidden = true
     }
@@ -54,7 +57,7 @@ final class FeedCellView: BaseUIView {
         tableView.snp.makeConstraints {
             $0.top.equalToSuperview()
             $0.horizontalEdges.equalToSuperview()
-            $0.bottom.equalTo(safeAreaLayoutGuide).inset(32)
+            $0.bottom.equalToSuperview()
         }
 
         noFeedView.snp.makeConstraints {
@@ -67,7 +70,6 @@ final class FeedCellView: BaseUIView {
     
     // MARK: - Actions
     @objc private func handleTopRefresh() {
-        onRefresh?()
         tableView.refreshControl?.endRefreshing()
     }
 }

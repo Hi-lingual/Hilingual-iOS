@@ -302,7 +302,8 @@ final class FeedDiaryCell: UITableViewCell {
            let url = URL(string: urlString) {
             profileImageView.kf.setImage(
                 with: url,
-                placeholder: UIImage(named: "img_profile_normal_ios", in: .module, compatibleWith: nil)
+                placeholder: UIImage(named: "img_profile_normal_ios"),
+                    options: [.transition(.fade(0.2)), .cacheOriginalImage]
             )
         } else {
             profileImageView.image = UIImage(
@@ -317,7 +318,8 @@ final class FeedDiaryCell: UITableViewCell {
            let url = URL(string: urlString) {
             diaryImageView.kf.setImage(
                 with: url,
-                placeholder: UIImage(named: "img_load_fail_large_ios", in: .module, compatibleWith: nil)
+                placeholder: UIImage(named: "img_load_fail_large_ios"),
+                    options: [.transition(.fade(0.2)), .cacheOriginalImage]
             )
             diaryImageView.isHidden = false
         } else {

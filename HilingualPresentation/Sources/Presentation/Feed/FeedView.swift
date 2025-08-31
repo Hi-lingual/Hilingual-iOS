@@ -43,13 +43,13 @@ final class FeedView: BaseUIView {
             in: .module,
             compatibleWith: nil
         )
-        return imageView
+        return imageView 
     }()
 
     private let profileImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
-        imageView.layer.cornerRadius = 21
+        imageView.layer.cornerRadius = 18
         imageView.clipsToBounds = true
         imageView.layer.borderWidth = 1
         imageView.layer.borderColor = UIColor.gray200.cgColor
@@ -124,12 +124,6 @@ final class FeedView: BaseUIView {
     func showToast(message: String) {
         if toast.superview == nil {
             addSubview(toast)
-            toast.snp.makeConstraints {
-                $0.centerX.equalToSuperview()
-                $0.bottom.equalToSuperview().inset(82)
-                $0.horizontalEdges.equalToSuperview().inset(16)
-                $0.height.equalTo(52)
-            }
         }
         
         toast.configure(type: .basic, message: message)

@@ -62,10 +62,8 @@ final class CalendarView: UIView {
         layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         layer.masksToBounds = true
 
-        addSubview(headerView)
-        addSubview(weekStackView)
-        addSubview(scrollView)
-
+        addSubviews(headerView, weekStackView, scrollView)
+        
         ["일", "월", "화", "수", "목", "금", "토"].forEach { symbol in
             let label = UILabel()
             label.text = symbol
@@ -77,6 +75,8 @@ final class CalendarView: UIView {
 
         scrollView.isPagingEnabled = true
         scrollView.showsHorizontalScrollIndicator = false
+        scrollView.showsVerticalScrollIndicator = false
+        scrollView.alwaysBounceVertical = false
         scrollView.delegate = self
     }
 
