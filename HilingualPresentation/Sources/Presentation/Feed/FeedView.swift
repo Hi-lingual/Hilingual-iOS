@@ -43,7 +43,7 @@ final class FeedView: BaseUIView {
             in: .module,
             compatibleWith: nil
         )
-        return imageView
+        return imageView 
     }()
 
     private let profileImageView: UIImageView = {
