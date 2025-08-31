@@ -47,11 +47,12 @@ public final class FollowingListViewController: BaseUIViewController<FollowListV
     // MARK: - Bind
 
     private func bindViewModel() {
-        viewModel?.output.followingList
+        viewModel?.followingListPublisher
             .receive(on: DispatchQueue.main)
             .sink { [weak self] users in
                 let model = FollowListModel(type: .following, users: users)
                 self?.followListView.followListModel = model
+                self?.tableView.reloadData()
             }
             .store(in: &cancellables)
     }
@@ -62,7 +63,7 @@ public final class FollowingListViewController: BaseUIViewController<FollowListV
 extension FollowingListViewController: UITableViewDataSource {
 
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return viewModel?.followingList.count ?? 0
+        return followListView.followListModel.users.count
     }
 
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -70,11 +71,10 @@ extension FollowingListViewController: UITableViewDataSource {
             return UITableViewCell()
         }
 
-        if let user = viewModel?.followingList[indexPath.row] {
-            cell.nickname.text = user.nickname
-            cell.button.configure(state: user.buttonState)
-        }
+        let user = followListView.followListModel.users[indexPath.row]
 
+        cell.nickname.text = user.nickname
+        cell.button.configure(state: user.buttonState)
         cell.delegate = self
         return cell
     }
@@ -91,7 +91,6 @@ extension FollowingListViewController: UITableViewDelegate {
 // MARK: - FollowListCellDelegate
 
 extension FollowingListViewController: FollowListCellDelegate {
-
     func profileTapped(cell: FollowListCell) {
         guard let indexPath = tableView.indexPath(for: cell),
               let user = viewModel?.followingList[indexPath.row] else { return }
@@ -103,9 +102,8 @@ extension FollowingListViewController: FollowListCellDelegate {
 
     @MainActor
     func followButtonTapped(cell: FollowListCell) {
-        guard let indexPath = tableView.indexPath(for: cell),
-              let user = viewModel?.followingList[indexPath.row] else { return }
-
+        guard let indexPath = tableView.indexPath(for: cell) else { return }
+        let user = followListView.followListModel.users[indexPath.row]
         viewModel?.input.followButtonTapped.send(user.userId)
     }
 }
