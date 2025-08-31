@@ -94,8 +94,8 @@ extension FollowerListViewController: UITableViewDelegate {
 
 extension FollowerListViewController: FollowListCellDelegate {
     func profileTapped(cell: FollowListCell) {
-        guard let indexPath = tableView.indexPath(for: cell),
-              let user = viewModel?.followingList[indexPath.row] else { return }
+        guard let indexPath = tableView.indexPath(for: cell) else {return}
+        let user = followListView.followListModel.users[indexPath.row]
 
         let userFeedVC = diContainer.makeUserFeedProfileViewController(userId: Int64(user.userId))
         userFeedVC.hidesBottomBarWhenPushed = true
