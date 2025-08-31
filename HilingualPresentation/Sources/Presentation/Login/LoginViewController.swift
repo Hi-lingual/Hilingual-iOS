@@ -91,12 +91,11 @@ public final class LoginViewController: BaseUIViewController<LoginViewModel> {
         output.navigateToOnboarding
             .sink { [weak self] in
                 guard let self else { return }
-                print("로그인 -> 온보딩")
-                let onboardingVC = self.diContainer.makeOnboardingViewController()
-                changeRootVC(onboardingVC,animated: true)
+                print("로그인 -> 온보딩(인증->닉네임)")
+                let verificationVC = self.diContainer.makeVerificationCodeViewController()
+                self.navigationController?.pushViewController(verificationVC, animated: true)
             }
             .store(in: &cancellables)
-
 
         output.error
             .receive(on: RunLoop.main)

@@ -11,10 +11,13 @@ import SnapKit
 final class FeedCellView: BaseUIView {
     
     // MARK: - Callbacks
+
     var onHideTapped: ((Int) -> Void)?
     var onReportTapped: (() -> Void)?
     var onRefresh: (() -> Void)?
-    
+    var onProfileTapped: ((Int) -> Void)?
+    var onDetailTapped: ((Int) -> Void)?
+
     // MARK: - Properties
     private var items: [FeedDiaryItem] = [] {
         didSet {
@@ -46,6 +49,9 @@ final class FeedCellView: BaseUIView {
         let refreshControl = UIRefreshControl()
         refreshControl.addTarget(self, action: #selector(handleTopRefresh), for: .valueChanged)
         tableView.refreshControl = refreshControl
+        
+        /// 테이블뷰 아래 32 여백 주기 위해
+        tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 32, right: 0)
 
         noFeedView.isHidden = true
     }
@@ -54,7 +60,7 @@ final class FeedCellView: BaseUIView {
         tableView.snp.makeConstraints {
             $0.top.equalToSuperview()
             $0.horizontalEdges.equalToSuperview()
-            $0.bottom.equalTo(safeAreaLayoutGuide).inset(32)
+            $0.bottom.equalToSuperview()
         }
 
         noFeedView.snp.makeConstraints {
@@ -67,7 +73,6 @@ final class FeedCellView: BaseUIView {
     
     // MARK: - Actions
     @objc private func handleTopRefresh() {
-        onRefresh?()
         tableView.refreshControl?.endRefreshing()
     }
 }
@@ -183,8 +188,22 @@ extension FeedCellView {
 }
 
 // MARK: - FeedDiaryCellDelegate
+
 extension FeedCellView: FeedDiaryCell.FeedDiaryCellDelegate {
+    func feedDiaryCellDidTapProfile(_ cell: FeedDiaryCell) {
+        if let row = tableView.indexPath(for: cell)?.row {
+            onProfileTapped?(row)
+        }
+    }
+
+    func feedDiaryCellDidTapDetail(_ cell: FeedDiaryCell) {
+        if let row = tableView.indexPath(for: cell)?.row {
+            onDetailTapped?(row)
+        }
+    }
+
     func feedDiaryCell(_ cell: FeedDiaryCell, didTapMoreButton isMine: Bool) { }
+
     func feedDiaryCell(_ cell: FeedDiaryCell, didTapMenuItemAt index: Int, isMine: Bool) {
         if isMine {
             if let row = tableView.indexPath(for: cell)?.row {

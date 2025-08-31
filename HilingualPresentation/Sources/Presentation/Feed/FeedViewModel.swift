@@ -85,6 +85,7 @@ public final class FeedViewModel: BaseViewModel, BaseViewModelType {
                         let items = entities.map { e in
                             FeedDiaryItem(
                                 id: e.diary.diaryId,
+                                userID: e.profile.userId,
                                 nickname: e.profile.nickname,
                                 profileImg: e.profile.profileImg,
                                 isMine: e.profile.isMine,

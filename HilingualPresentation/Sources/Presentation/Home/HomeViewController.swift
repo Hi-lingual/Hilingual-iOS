@@ -13,16 +13,12 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
 
     public override func setUI() {
         super.setUI()
-        view.addSubviews(homeView, dialog)
+        view.addSubviews(homeView)
     }
 
     public override func setLayout() {
         homeView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
-        }
-        
-        dialog.snp.makeConstraints{
-            $0.edges.equalToSuperview()
         }
     }
     
@@ -198,19 +194,17 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                 self.showDialog(for: .delete) { _ in }
             }
         }
+        homeView.profileView.alarmButton.addTarget(self, action: #selector(alarmButtonTapped), for: .touchUpInside)
     }
-    
+
+    //MARK: - Private Methods
+
     private func showDialog(for action: MenuAction, completion: @escaping (Bool?) -> Void) {
         guard let containerView = self.tabBarController?.view else { return }
-            
-            dialog.removeFromSuperview()
-            containerView.addSubview(dialog)
-            containerView.bringSubviewToFront(dialog)
-            
-            dialog.snp.remakeConstraints {
-                $0.edges.equalToSuperview()
-            }
-        
+
+        containerView.addSubview(dialog)
+        dialog.snp.remakeConstraints { $0.edges.equalTo(containerView) }
+      
         switch action {
         case .publish:
             dialog.configure(
@@ -226,8 +220,8 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                     self?.dialog.dismiss()
                     
                     let toast = ToastMessage()
-                    toast.configure(type: .withButton, message: "일기가 게시되었어요!", actionTitle: "피드 보러가기")
                     self?.view.addSubview(toast)
+                    toast.configure(type: .withButton, message: "일기가 게시되었어요!", actionTitle: "피드 보러가기")
                     toast.action = { [weak self] in
                         guard let self else { return }
                         // TODO: 소은이 뷰로 전환
@@ -246,14 +240,13 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                 rightButtonTitle: "비공개하기",
                 leftAction: { [weak dialog] in dialog?.dismiss() },
                 rightAction: {[weak self] in
-                    guard let self else { return }
-                    self.homeView.selectedInfo.updateDiaryState(isPublished: false)
-                    self.homeView.selectedInfo.updateMenuState(isPublished: false)
-                    self.dialog.dismiss()
+                    self?.homeView.selectedInfo.updateDiaryState(isPublished: false)
+                    self?.homeView.selectedInfo.updateMenuState(isPublished: false)
+                    self?.dialog.dismiss()
                     
                     let toast = ToastMessage()
+                    self?.view.addSubview(toast)
                     toast.configure(type: .basic, message: "일기가 비공개 되었어요.")
-                    self.view.addSubview(toast)
                     completion(true)
                 }
             )
@@ -266,14 +259,15 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                 rightButtonTitle: "삭제하기",
                 leftAction: { [weak dialog] in dialog?.dismiss() },
                 rightAction: { [weak self] in
-                    guard let self else { return }
-                    self.homeView.selectedInfo.updateView(for: self.homeView.calendarView.selectedDate ?? Date(),
-                                                          diaryId: nil, isPublished: nil,
-                                                          remainingTime: 0,
-                                                          topicData: nil,
-                                                          diaryData: nil,
-                                                          imageURL: nil)
-                    self.dialog.dismiss()
+                    self?.homeView.selectedInfo.updateView(
+                        for: self?.homeView.calendarView.selectedDate ?? Date(),
+                        diaryId: nil, isPublished: nil,
+                        remainingTime: 0,
+                        topicData: nil,
+                        diaryData: nil,
+                        imageURL: nil
+                    )
+                    self?.dialog.dismiss()
                     completion(true)
                     
                     // TODO: 삭제 API 호출
@@ -282,7 +276,14 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         }
         dialog.showAnimation()
     }
-    
+
+    @objc private func alarmButtonTapped() {
+        let notificationVC = diContainer.makeNotificationViewController()
+        notificationVC.hidesBottomBarWhenPushed = true
+
+        navigationController?.pushViewController(notificationVC, animated: true)
+    }
+
     // MARK: - Navigation
 
     private func goToDiaryWritingView(topicData: (String, String)? = nil, selectedDate: Date? = nil) {

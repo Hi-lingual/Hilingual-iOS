@@ -14,13 +14,6 @@ final class MonthPickerModal: UIView {
 
     public var onDateSelected: ((Date) -> Void)?
 
-    private let backgroundDimView: UIView = {
-        let view = UIView()
-        view.backgroundColor = UIColor.dim
-        view.alpha = 0
-        return view
-    }()
-
     private let modalSheetView: UIView = {
         let view = UIView()
         view.backgroundColor = .white
@@ -59,17 +52,14 @@ final class MonthPickerModal: UIView {
     // MARK: - UI Setup
 
     private func setupUI() {
-        addSubview(backgroundDimView)
         addSubview(modalSheetView)
         modalSheetView.addSubviews(datePicker, applyButton)
 
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismiss))
-        backgroundDimView.addGestureRecognizer(tapGesture)
+        self.addGestureRecognizer(tapGesture)
     }
 
     private func setupLayout() {
-        backgroundDimView.snp.makeConstraints { $0.edges.equalToSuperview() }
-
         modalSheetView.snp.makeConstraints {
             $0.leading.trailing.bottom.equalToSuperview()
         }
@@ -83,7 +73,6 @@ final class MonthPickerModal: UIView {
             $0.top.equalTo(datePicker.snp.bottom).offset(16)
             $0.horizontalEdges.equalToSuperview().inset(16)
             $0.bottom.equalTo(self.safeAreaLayoutGuide).inset(16)
-            $0.height.equalTo(58)
         }
     }
 
@@ -103,17 +92,18 @@ final class MonthPickerModal: UIView {
 
         layoutIfNeeded()
         modalSheetView.transform = CGAffineTransform(translationX: 0, y: modalSheetView.frame.height)
+        self.backgroundColor = .clear
 
-        UIView.animate(withDuration: 0.3, animations: {
-            self.backgroundDimView.alpha = 1
+        UIView.animate(withDuration: 0.3, delay: 0, options: [.curveEaseOut]) {
             self.modalSheetView.transform = .identity
-        })
+            self.backgroundColor = UIColor.dim
+        }
     }
 
     @objc public func dismiss() {
         UIView.animate(withDuration: 0.2, animations: {
             self.modalSheetView.transform = CGAffineTransform(translationX: 0, y: self.modalSheetView.frame.height)
-            self.backgroundDimView.alpha = 0
+            self.backgroundColor = UIColor.dim.withAlphaComponent(0)
         }, completion: { _ in
             self.removeFromSuperview()
         })

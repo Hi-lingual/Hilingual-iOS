@@ -10,6 +10,10 @@ import SnapKit
 
 final class FeedView: BaseUIView {
 
+    // MARK: - CallBacks
+
+    var onProfileTapped: (() -> Void)?
+
     // MARK: - UI Components
 
     private let headerStack: UIStackView = {
@@ -35,24 +39,23 @@ final class FeedView: BaseUIView {
         return stack
     }()
 
-    private let searchImageView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.contentMode = .scaleAspectFit
-        imageView.image = UIImage(
-            named: "ic_search_24_ios",
-            in: .module,
-            compatibleWith: nil
-        )
-        return imageView
+    let searchButton: UIButton = {
+        let button = UIButton(type: .system)
+        let image = UIImage(named: "ic_search_24_ios", in: .module, compatibleWith: nil)
+        button.setImage(image, for: .normal)
+        button.tintColor = .gray400
+        button.contentMode = .scaleAspectFit
+        return button
     }()
 
     private let profileImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
-        imageView.layer.cornerRadius = 21
+        imageView.layer.cornerRadius = 18
         imageView.clipsToBounds = true
         imageView.layer.borderWidth = 1
         imageView.layer.borderColor = UIColor.gray200.cgColor
+        imageView.isUserInteractionEnabled = true
         return imageView
     }()
 
@@ -65,9 +68,12 @@ final class FeedView: BaseUIView {
     override func setUI() {
         addSubviews(headerStack, toast)
         headerStack.addArrangedSubviews(titleLabel, searchStack)
-        searchStack.addArrangedSubviews(searchImageView, profileImageView)
-        
+        searchStack.addArrangedSubviews(searchButton, profileImageView)
+
         toast.isHidden = true
+
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(didTapProfileImage))
+        profileImageView.addGestureRecognizer(tapGesture)
     }
 
     override func setLayout() {
@@ -76,7 +82,7 @@ final class FeedView: BaseUIView {
             $0.horizontalEdges.equalToSuperview().inset(16)
         }
 
-        searchImageView.snp.makeConstraints {
+        searchButton.snp.makeConstraints {
             $0.size.equalTo(24)
         }
 
@@ -124,12 +130,6 @@ final class FeedView: BaseUIView {
     func showToast(message: String) {
         if toast.superview == nil {
             addSubview(toast)
-            toast.snp.makeConstraints {
-                $0.centerX.equalToSuperview()
-                $0.bottom.equalToSuperview().inset(82)
-                $0.horizontalEdges.equalToSuperview().inset(16)
-                $0.height.equalTo(52)
-            }
         }
         
         toast.configure(type: .basic, message: message)
@@ -148,5 +148,11 @@ final class FeedView: BaseUIView {
                 self.toast.isHidden = true
             })
         }
+    }
+
+    //MARK: - Actions
+
+    @objc private func didTapProfileImage() {
+        onProfileTapped?()
     }
 }

@@ -46,6 +46,11 @@ public final class NotificationViewController: BaseUIViewController<Notification
         setLayout()
     }
 
+    public override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(false, animated: animated)
+    }
+
     // MARK: - Setup
 
     public override func setUI() {
@@ -62,10 +67,15 @@ public final class NotificationViewController: BaseUIViewController<Notification
     // MARK: - Navigation
 
     public override func navigationType() -> NavigationType? {
-        return .backTitle("알림")
+        return .backTitleMenu(title: "알림", rightIconName: "ic_setting_24_ios")
     }
 
     @objc public override func backButtonTapped() {
         navigationController?.popViewController(animated: true)
+    }
+
+    @objc public override func menuButtonTapped() {
+        let settingVC = diContainer.makeNotificationSettingViewController()
+        navigationController?.pushViewController(settingVC, animated: true)
     }
 }

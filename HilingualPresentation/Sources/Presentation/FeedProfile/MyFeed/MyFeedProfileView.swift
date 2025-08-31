@@ -9,7 +9,7 @@ import UIKit
 import SnapKit
 
 final class MyFeedProfileView: BaseUIView {
-    
+
     // MARK: - UI Components
     
     private let myFeedView = FeedProfileView()
@@ -64,5 +64,9 @@ final class MyFeedProfileView: BaseUIView {
             $0.horizontalEdges.equalToSuperview()
             $0.bottom.equalTo(safeAreaLayoutGuide)
         }
+    }
+
+    func setFollowSectionTappedAction(_ action: @escaping () -> Void) {
+        myFeedView.onFollowSectionTapped = action
     }
 }

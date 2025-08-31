@@ -82,6 +82,7 @@ public final class FeedProfileViewModel: BaseViewModel, BaseViewModelType {
                         entities.map { entity in
                             FeedDiaryItem(
                                 id: entity.diary.diaryId,
+                                userID: entity.profile.userId,
                                 nickname: entity.profile.nickname,
                                 profileImg: entity.profile.profileImg,
                                 isMine: entity.profile.isMine,

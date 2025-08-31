@@ -93,6 +93,15 @@ extension FollowerListViewController: UITableViewDelegate {
 // MARK: - FollowListCellDelegate
 
 extension FollowerListViewController: FollowListCellDelegate {
+    func profileTapped(cell: FollowListCell) {
+        guard let indexPath = tableView.indexPath(for: cell),
+              let user = viewModel?.followingList[indexPath.row] else { return }
+
+        let userFeedVC = diContainer.makeUserFeedProfileViewController(userId: Int64(user.userId))
+        userFeedVC.hidesBottomBarWhenPushed = true
+        navigationController?.pushViewController(userFeedVC, animated: true)
+    }
+    
     @MainActor
     func followButtonTapped(cell: FollowListCell) {
         guard let indexPath = tableView.indexPath(for: cell) else { return }
