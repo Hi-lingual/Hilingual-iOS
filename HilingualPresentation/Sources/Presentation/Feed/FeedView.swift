@@ -43,6 +43,7 @@ final class FeedView: BaseUIView {
         let button = UIButton(type: .system)
         let image = UIImage(named: "ic_search_24_ios", in: .module, compatibleWith: nil)
         button.setImage(image, for: .normal)
+        button.tintColor = .gray400
         button.contentMode = .scaleAspectFit
         return button
     }()
