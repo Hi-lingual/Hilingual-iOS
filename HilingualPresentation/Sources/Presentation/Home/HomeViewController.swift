@@ -253,7 +253,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         case .delete:
             dialog.configure(
                 style: .normal,
-                title: "일기를 삭제하시겠어요?",
+                title: "영어 일기를 삭제하시겠어요?",
                 content: "작성한 일기를 삭제한 날짜에는\n다시 일기를 작성할 수 없어요.",
                 leftButtonTitle: "아니요",
                 rightButtonTitle: "삭제하기",
