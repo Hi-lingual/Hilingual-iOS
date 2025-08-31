@@ -9,50 +9,49 @@ import UIKit
 import Combine
 
 public final class FollowingListViewController: BaseUIViewController<FollowListViewModel> {
-    
+
     private let followListView = FollowListView()
-    
+
     private var tableView: UITableView {
         return followListView.tableView
     }
-    
+
     // MARK: - Life Cycle
-    
+
     public override func loadView() {
         self.view = followListView
     }
-    
+
     public override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         setDelegate()
         bindViewModel()
     }
-    
+
     // MARK: - Setup Methods
-    
+
     private func setupUI() {
         view.addSubview(followListView)
     }
-    
+
     private func setupLayout() {
         followListView.snp.makeConstraints { $0.edges.equalToSuperview() }
     }
-    
+
     public override func setDelegate() {
         tableView.dataSource = self
         tableView.delegate = self
     }
-    
+
     // MARK: - Bind
-    
+
     private func bindViewModel() {
-        viewModel?.followingListPublisher
+        viewModel?.output.followingList
             .receive(on: DispatchQueue.main)
             .sink { [weak self] users in
                 let model = FollowListModel(type: .following, users: users)
                 self?.followListView.followListModel = model
-                self?.tableView.reloadData()
             }
             .store(in: &cancellables)
     }
@@ -61,20 +60,21 @@ public final class FollowingListViewController: BaseUIViewController<FollowListV
 // MARK: - UITableViewDataSource
 
 extension FollowingListViewController: UITableViewDataSource {
-    
+
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return followListView.followListModel.users.count
+        return viewModel?.followingList.count ?? 0
     }
-    
+
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: FollowListCell.identifier, for: indexPath) as? FollowListCell else {
             return UITableViewCell()
         }
-        
-        let user = followListView.followListModel.users[indexPath.row]
-        
-        cell.nickname.text = user.nickname
-        cell.button.configure(state: user.buttonState)
+
+        if let user = viewModel?.followingList[indexPath.row] {
+            cell.nickname.text = user.nickname
+            cell.button.configure(state: user.buttonState)
+        }
+
         cell.delegate = self
         return cell
     }
@@ -91,6 +91,7 @@ extension FollowingListViewController: UITableViewDelegate {
 // MARK: - FollowListCellDelegate
 
 extension FollowingListViewController: FollowListCellDelegate {
+
     func profileTapped(cell: FollowListCell) {
         guard let indexPath = tableView.indexPath(for: cell),
               let user = viewModel?.followingList[indexPath.row] else { return }
@@ -102,8 +103,9 @@ extension FollowingListViewController: FollowListCellDelegate {
 
     @MainActor
     func followButtonTapped(cell: FollowListCell) {
-        guard let indexPath = tableView.indexPath(for: cell) else { return }
-        let user = followListView.followListModel.users[indexPath.row]
+        guard let indexPath = tableView.indexPath(for: cell),
+              let user = viewModel?.followingList[indexPath.row] else { return }
+
         viewModel?.input.followButtonTapped.send(user.userId)
     }
 }
