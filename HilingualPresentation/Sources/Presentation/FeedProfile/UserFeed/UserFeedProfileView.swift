@@ -120,7 +120,7 @@ final class UserFeedProfileView: BaseUIView {
     
     func showModal() {
         modal.configure(
-            title: "",
+            title: nil,
             items: [
                 ("계정 차단하기",
                  UIImage(named: "ic_block_24_2_ios", in: .module, compatibleWith: nil),
