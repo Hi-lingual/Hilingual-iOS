@@ -9,43 +9,43 @@ import UIKit
 import Combine
 
 public final class FollowingListViewController: BaseUIViewController<FollowListViewModel> {
-    
+
     private let followListView = FollowListView()
-    
+
     private var tableView: UITableView {
         return followListView.tableView
     }
-    
+
     // MARK: - Life Cycle
-    
+
     public override func loadView() {
         self.view = followListView
     }
-    
+
     public override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         setDelegate()
         bindViewModel()
     }
-    
+
     // MARK: - Setup Methods
-    
+
     private func setupUI() {
         view.addSubview(followListView)
     }
-    
+
     private func setupLayout() {
         followListView.snp.makeConstraints { $0.edges.equalToSuperview() }
     }
-    
+
     public override func setDelegate() {
         tableView.dataSource = self
         tableView.delegate = self
     }
-    
+
     // MARK: - Bind
-    
+
     private func bindViewModel() {
         viewModel?.followingListPublisher
             .receive(on: DispatchQueue.main)
@@ -61,18 +61,18 @@ public final class FollowingListViewController: BaseUIViewController<FollowListV
 // MARK: - UITableViewDataSource
 
 extension FollowingListViewController: UITableViewDataSource {
-    
+
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return followListView.followListModel.users.count
     }
-    
+
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: FollowListCell.identifier, for: indexPath) as? FollowListCell else {
             return UITableViewCell()
         }
-        
+
         let user = followListView.followListModel.users[indexPath.row]
-        
+
         cell.nickname.text = user.nickname
         cell.button.configure(state: user.buttonState)
         cell.delegate = self
@@ -92,8 +92,8 @@ extension FollowingListViewController: UITableViewDelegate {
 
 extension FollowingListViewController: FollowListCellDelegate {
     func profileTapped(cell: FollowListCell) {
-        guard let indexPath = tableView.indexPath(for: cell),
-              let user = viewModel?.followingList[indexPath.row] else { return }
+        guard let indexPath = tableView.indexPath(for: cell) else { return }
+        let user = followListView.followListModel.users[indexPath.row]
 
         let userFeedVC = diContainer.makeUserFeedProfileViewController(userId: Int64(user.userId))
         userFeedVC.hidesBottomBarWhenPushed = true
