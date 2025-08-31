@@ -14,7 +14,20 @@ public final class LoadingViewModel: BaseViewModel {
     // MARK: - Dependencies
 
     private let diaryWritingUseCase: DiaryWritingUseCase
-    @Published public var diaryId: Int? = nil
+    
+    // MARK: - Properties
+    
+    private let stateSubject = CurrentValueSubject<State, Never>(.loading)
+    private let diaryIdSubject = CurrentValueSubject<Int?, Never>(nil)
+    public let feedbackCompletedSubject = PassthroughSubject<Result<Void, Error>, Never>()
+    
+    public var statePublisher: AnyPublisher<State, Never> { stateSubject.eraseToAnyPublisher() }
+    public var diaryIdPublisher: AnyPublisher<Int?, Never> { diaryIdSubject.eraseToAnyPublisher() }
+    
+    private var diaryEntity: DiaryWritingEntity?
+    private var startTime: Date?
+    private var errorCount = 0
+    private let maxErrorCount = 2
 
     // MARK: - Init
 
@@ -30,21 +43,7 @@ public final class LoadingViewModel: BaseViewModel {
         case success
         case error
     }
-
-    // MARK: - Properties
-
-    private let stateSubject = CurrentValueSubject<State, Never>(.loading)
-    public var statePublisher: AnyPublisher<State, Never> {
-        stateSubject.eraseToAnyPublisher()
-    }
-
-    private var startTime: Date?
-    private var errorCount = 0
-    private let maxErrorCount = 2
-    private var diaryEntity: DiaryWritingEntity?
-
-    public let feedbackCompletedSubject = PassthroughSubject<Result<Void, Error>, Never>()
-
+    
     // MARK: - Input / Output
 
     public struct Input {
@@ -88,25 +87,20 @@ public final class LoadingViewModel: BaseViewModel {
 
     @MainActor
     private func retryFeedback() {
-        guard let entity = diaryEntity else {
-            print("❌ diaryEntity가 nil입니다. API 호출 불가")
-            return
-        }
-        print("📡 다시 요청 - API 호출 시작")
+        guard let entity = diaryEntity else { return }
         postDiary(entity: entity)
     }
 
     @MainActor
     private func startLoadingState() {
-        print("🔄 Loading 상태 진입")
-        stateSubject.send(.loading)
         startTime = Date()
+        stateSubject.send(.loading)
     }
 
     @MainActor
     private func postDiary(entity: DiaryWritingEntity) {
         startLoadingState()
-
+        
         diaryWritingUseCase.postDiaryWriting(entity)
             .sink { [weak self] completion in
                 guard let self = self else { return }
@@ -117,9 +111,7 @@ public final class LoadingViewModel: BaseViewModel {
                 }
             } receiveValue: { [weak self] response in
                 guard let self = self else { return }
-
-                self.diaryId = response.diaryId
-
+                self.diaryIdSubject.send(response.diaryId)
                 Task { @MainActor in
                     await self.handleFeedbackCompleted(success: true)
                 }
@@ -130,11 +122,10 @@ public final class LoadingViewModel: BaseViewModel {
     @MainActor
     private func handleFeedbackCompleted(success: Bool) async {
         guard let startTime = startTime else { return }
-
         let elapsed = Date().timeIntervalSince(startTime)
         let delay = max(3 - elapsed, 0)
         try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
-
+        
         if success {
             errorCount = 0
             stateSubject.send(.success)

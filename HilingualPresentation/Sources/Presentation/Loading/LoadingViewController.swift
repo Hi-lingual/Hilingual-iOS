@@ -13,8 +13,7 @@ public final class LoadingViewController: BaseUIViewController<LoadingViewModel>
     // MARK: - Properties
 
     private let loadingView = LoadingView()
-    public var onRetryTapped: (() -> Void)?
-
+    
     private let retryTappedSubject = PassthroughSubject<Void, Never>()
     private let closeTappedSubject = PassthroughSubject<Void, Never>()
 
@@ -73,69 +72,63 @@ public final class LoadingViewController: BaseUIViewController<LoadingViewModel>
             retryButtonTapped()
         }
     }
-
+    
     @objc private func retryButtonTapped() {
         retryTappedSubject.send()
     }
-
+    
     @objc private func closeButtonTapped() {
         closeTappedSubject.send()
     }
-
+    
     // MARK: - Bind
-
+    
     public override func bind(viewModel: LoadingViewModel) {
         super.bind(viewModel: viewModel)
-
+        
         let input = LoadingViewModel.Input(
             startLoading: Just(()).eraseToAnyPublisher(),
             retryTapped: retryTappedSubject.eraseToAnyPublisher(),
             closeTapped: closeTappedSubject.eraseToAnyPublisher()
         )
-
+        
         let output = viewModel.transform(input: input)
-
-        output.goToHome
-            .receive(on: RunLoop.main)
-            .sink { [weak self] in self?.goToHomeView() }
-            .store(in: &cancellables)
-
+        
         output.state
             .receive(on: RunLoop.main)
             .sink { [weak self] state in
                 guard let self = self else { return }
-
                 let viewState: LoadingView.State
                 switch state {
-                case .loading:
-                    print("🌀 상태: 로딩 중")
-                    viewState = .loading
-                case .success:
-                    print("✅ 상태: 성공")
-                    viewState = .success
-                case .error:
-                    print("❌ 상태: 에러")
-                    viewState = .error
+                case .loading: viewState = .loading
+                case .success: viewState = .success
+                case .error: viewState = .error
                 }
-
                 self.loadingView.configure(for: viewState)
             }
+            .store(in: &cancellables)
+        
+        output.goToHome
+            .receive(on: RunLoop.main)
+            .sink { [weak self] in self?.goToHomeView() }
             .store(in: &cancellables)
     }
 
     // MARK: - Navigation
-
+    
     private func goToNextView() {
-        guard let diaryId = viewModel?.diaryId else {
-            assertionFailure("❌ diaryId가 nil입니다. DiaryDetail로 이동 불가")
-            return
-        }
-
-        let detailVC = diContainer.makeDiaryDetailViewController(diaryId: diaryId)
-        detailVC.hidesBottomBarWhenPushed = true
-        navigationController?.pushViewController(detailVC, animated: true)
+        viewModel?.diaryIdPublisher
+            .compactMap { $0 }
+            .first()
+            .sink { [weak self] diaryId in
+                guard let self = self else { return }
+                let detailVC = self.diContainer.makeDiaryDetailViewController(diaryId: diaryId)
+                detailVC.hidesBottomBarWhenPushed = true
+                self.navigationController?.pushViewController(detailVC, animated: true)
+            }
+            .store(in: &cancellables)
     }
-
+    
     private func goToHomeView() {
         navigationController?.popToRootViewController(animated: true)
     }

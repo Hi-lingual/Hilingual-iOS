@@ -559,9 +559,24 @@ extension AppDIContainer {
 // MARK: - FeedSearchDIContainer
 
 extension AppDIContainer {
+    func makeFeedSearchViewController() -> FeedSearchViewController {
+        return FeedSearchViewController(viewModel: makeFeedSearchViewModel(), diContainer: self)
+    }
+    
+    private func makeFeedSearchService() -> MockFeedSearchService {
+        return MockFeedSearchService()
+    }
+
+    private func makeFeedSearchRepository() -> FeedSearchRepository {
+        return DefaultFeedSearchRepository(service: makeFeedSearchService())
+    }
+
+    private func makeFeedSearchUseCase() -> FeedSearchUseCase {
+        return DefaultFeedSearchUseCase(repository: makeFeedSearchRepository())
+    }
 
     private func makeFeedSearchViewModel() -> FeedSearchViewModel {
-        return FeedSearchViewModel()
+        return FeedSearchViewModel(useCase: makeFeedSearchUseCase())
     }
 }
 
