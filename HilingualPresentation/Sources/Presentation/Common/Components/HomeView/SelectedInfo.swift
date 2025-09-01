@@ -258,6 +258,22 @@ final class SelectedInfo: UIView {
         formatter.dateFormat = "M월 d일 EEEE"
         selectedDayLabel.text = formatter.string(from: date)
     }
+    
+    func resetView() {
+        selectedDayLabel.text = ""
+        [cardTopicView, cardPreview, emptyDiaryView, diaryLockView].forEach {
+            $0.isHidden = true
+        }
+        
+        menu.isHidden = true
+        moreImageView.isHidden = true
+        
+        iconView.isHidden = true
+        timeLeftStack.isHidden = true
+        
+        currentDiaryId = nil
+        currentIsPublished = nil
+    }
 
     // MARK: - Private
 

@@ -59,6 +59,8 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         // 월이 변경되면 1일로 이동 + ViewModel에 전달
         homeView.onMonthChanged = { [weak self] year, month in
             guard let self else { return }
+            
+            self.homeView.selectedInfo.resetView()
 
             var components = DateComponents()
             components.year = year
@@ -69,6 +71,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
 
             // 해당 월 1일로 이동
             self.homeView.calendarView.select(date: firstDayOfMonth)
+            self.homeView.calendarView.onDateSelected?(firstDayOfMonth)
 
             // ViewModel에 새로운 월 정보 전달
             self.input.monthChange.send((year, month))
