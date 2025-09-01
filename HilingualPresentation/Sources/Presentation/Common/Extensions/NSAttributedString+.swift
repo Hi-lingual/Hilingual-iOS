@@ -10,7 +10,9 @@ import UIKit
 
 extension NSAttributedString {
 
-    static func suit(_ style: UIFont.SuitStyle, text: String) -> NSAttributedString {
+    static func suit(_ style: UIFont.SuitStyle,
+                     text: String,
+                     lineBreakMode: NSLineBreakMode = .byTruncatingTail) -> NSAttributedString {
         let font = UIFont.suit(style)
 
         let targets: Set<UIFont.SuitStyle> = [.body_sb_16, .body_m_16, .body_r_16]
@@ -24,7 +26,7 @@ extension NSAttributedString {
         let paragraph = NSMutableParagraphStyle()
         paragraph.minimumLineHeight = lineHeight
         paragraph.maximumLineHeight = lineHeight
-        paragraph.lineBreakMode = .byWordWrapping
+        paragraph.lineBreakMode = lineBreakMode
 
         let baseline = (lineHeight - font.lineHeight) / 2
 
