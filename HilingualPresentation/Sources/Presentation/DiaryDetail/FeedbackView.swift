@@ -148,25 +148,23 @@ final class FeedbackView: BaseUIView {
             $0.height.equalTo(28)
             $0.width.equalTo(52)
         }
-        
-        headerStackView.snp.makeConstraints {
-            $0.top.equalToSuperview().inset(18)
-            $0.leading.trailing.equalToSuperview().inset(16)
-        }
+
+        contentView.layoutMargins = UIEdgeInsets(top: 18, left: 16, bottom: 0, right: 16)
+        contentView.isLayoutMarginsRelativeArrangement = true
         
         diaryTextView.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview().inset(16)
         }
-        
+
         feedbackStackView.snp.makeConstraints {
-            $0.top.equalTo(diaryTextView.snp.bottom)
             $0.leading.trailing.equalToSuperview().inset(16)
         }
         
         feedbackLabel.snp.makeConstraints {
-            $0.top.equalTo(diaryTextView.snp.bottom).offset(40)
             $0.leading.trailing.equalToSuperview()
         }
+        
+        contentView.setCustomSpacing(40, after: diaryTextView)
     }
     
     func scrollToTop() {
