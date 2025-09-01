@@ -47,7 +47,6 @@ public final class FeedSearchViewController: BaseUIViewController<FeedSearchView
     
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        self.navigationController?.setNavigationBarHidden(false, animated: false)
     }
     
     // MARK: - Setup Methods
