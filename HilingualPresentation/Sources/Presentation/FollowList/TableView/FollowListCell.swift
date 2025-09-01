@@ -79,6 +79,7 @@ final class FollowListCell: UITableViewCell {
     // MARK: - Setup Methods
     
     private func setStyle() {
+        selectionStyle = .none
         backgroundColor = .white
         button.configure(state: .following)
     }
