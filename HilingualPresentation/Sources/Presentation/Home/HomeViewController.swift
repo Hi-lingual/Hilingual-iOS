@@ -152,6 +152,9 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                     .store(in: &self.viewModel!.cancellables)
             }
         }
+        
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(selectedInfoTapped))
+        homeView.selectedInfo.addGestureRecognizer(tapGesture)
     }
     
     // MARK: - Action
@@ -335,6 +338,26 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         notificationVC.hidesBottomBarWhenPushed = true
 
         navigationController?.pushViewController(notificationVC, animated: true)
+    }
+    
+    @objc private func selectedInfoTapped() {
+        guard let selectedDate = homeView.calendarView.selectedDate else { return }
+        
+        if !homeView.selectedInfo.menu.isHidden { return }
+        
+        let isDiaryDate = homeView.calendarView.filledDates.contains {
+            Calendar.current.isDate($0, inSameDayAs: selectedDate)
+        }
+        
+        guard isDiaryDate else { return }
+        
+        viewModel?.fetchDiary(for: selectedDate)
+            .receive(on: RunLoop.main)
+            .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] diary in
+                guard let self, let diary else { return }
+                self.goToDiaryDetailView(diaryId: diary.diaryId)
+            })
+            .store(in: &viewModel!.cancellables)
     }
 
     // MARK: - Navigation
