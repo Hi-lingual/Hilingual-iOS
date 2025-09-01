@@ -55,7 +55,6 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
 
         feedCellView.tableView.delegate = self
         feedCellView.tableView.dataSource = feedCellView
-//        feedCellView.tableView.contentInset.top = 133
 
         feedCellView.addTableTapGesture(target: self, action: #selector(didTapTableView))
 
@@ -68,7 +67,7 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
         }
     }
 
-    // MARK: - Bindings
+    // MARK: - Bind
     private func bindViewModel() {
         let output = viewModel?.transform(input: input)
 

@@ -66,23 +66,22 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
         dialog.isHidden = true
         dialog.snp.makeConstraints { $0.edges.equalToSuperview() }
         
-        sharedVC.onHideTapped = { [weak self] row in
-            self?.pendingDeleteRow = row
-            self?.showHideDialog()
-        }
-        
+        /// 게시글 신고하기
         sharedVC.onReportTapped = { [weak self] in
             self?.showReportDialog()
         }
         
+        /// 유저 차단 모달 띄우기
         userFeedProfileView.onBlockTapped = { [weak self] in
             self?.userFeedProfileView.showBlockDialog()
         }
         
+        /// 유저 신고하기
         userFeedProfileView.onReportTapped = { [weak self] in
             self?.showAccountReportDialog()
         }
         
+        /// 유저 차단 모달 클릭 시, 차단 로직
         userFeedProfileView.onBlockConfirmTapped = { [weak self] in
             guard let self else { return }
             self.userFeedProfileView.dismissBlockDialog()
@@ -92,6 +91,7 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
             self.updateNavigation()
         }
         
+        /// 유저 차단해제하기
         userFeedProfileView.onUnblockTapped = { [weak self] in
             guard let self else { return }
             self.isBlocked = false
@@ -153,6 +153,8 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
         input.reload.send(())
     }
         
+    // MARK: - Private Methods
+
     private func showHideDialog() {
         dialog.configure(
             style: .normal,

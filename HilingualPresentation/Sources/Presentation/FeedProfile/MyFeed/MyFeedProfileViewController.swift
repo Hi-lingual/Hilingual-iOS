@@ -13,6 +13,7 @@ import Combine
 public final class MyFeedProfileViewController: BaseUIViewController<FeedProfileViewModel> {
 
     // MARK: - Properties
+    
     private let myFeedProfileView = MyFeedProfileView()
     private let likedVC: FeedProfileViewController
     private let sharedVC: FeedProfileViewController
@@ -20,6 +21,7 @@ public final class MyFeedProfileViewController: BaseUIViewController<FeedProfile
     private var pendingDeleteRow: (listVC: FeedProfileViewController, row: Int)?
 
     // MARK: - Init
+    
     public init(
         viewModel: FeedProfileViewModel,
         diContainer: any ViewControllerFactory,
@@ -32,6 +34,7 @@ public final class MyFeedProfileViewController: BaseUIViewController<FeedProfile
     }
 
     // MARK: - Lifecycle
+    
     public override func loadView() {
         self.view = myFeedProfileView
     }
@@ -49,16 +52,22 @@ public final class MyFeedProfileViewController: BaseUIViewController<FeedProfile
         dialog.isHidden = true
         dialog.snp.makeConstraints { $0.edges.equalToSuperview() }
         
+        /// 공유 - 게시글 비공개하기
         sharedVC.onHideTapped = { [weak self] row in
             self?.showHideDialog(listVC: self?.sharedVC, row: row)
         }
+        
+        /// 공유 - 게시글 신고하기
         sharedVC.onReportTapped = { [weak self] in
             self?.showReportDialog()
         }
         
+        /// 공감 - 게시글 비공개하기
         likedVC.onHideTapped = { [weak self] row in
             self?.showHideDialog(listVC: self?.likedVC, row: row)
         }
+        
+        /// 공감 - 게시글 신고하기
         likedVC.onReportTapped = { [weak self] in
             self?.showReportDialog()
         }
@@ -80,6 +89,7 @@ public final class MyFeedProfileViewController: BaseUIViewController<FeedProfile
     }
     
     // MARK: - Bind
+    
     private func bind() {
         let input = FeedProfileViewModel.Input()
         guard let viewModel else { return }
@@ -103,7 +113,8 @@ public final class MyFeedProfileViewController: BaseUIViewController<FeedProfile
         input.reload.send(())
     }
 
-    // MARK: - Private
+    // MARK: - Private Methods
+    
     private func showHideDialog(listVC: FeedProfileViewController?, row: Int) {
         guard let listVC else { return }
         pendingDeleteRow = (listVC, row)
@@ -131,7 +142,6 @@ public final class MyFeedProfileViewController: BaseUIViewController<FeedProfile
         view.bringSubviewToFront(dialog)
     }
     
-    // MARK: - Report
     private func showReportDialog() {
         dialog.configure(
             style: .normal,
