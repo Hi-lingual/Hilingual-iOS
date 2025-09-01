@@ -12,8 +12,9 @@ final class UserFeedProfileView: BaseUIView {
     
     // MARK: - UI Components
     
-    private let myFeedView = FeedProfileView()
+    private let myFeedView = FeedUserProfile()
     private(set) var button = FollowButton()
+    private var feedTopConstraint: Constraint?
     let feedContainer = UIView()
     
     private let blockedStack: UIStackView = {
@@ -87,7 +88,8 @@ final class UserFeedProfileView: BaseUIView {
         }
         
         feedContainer.snp.makeConstraints {
-            $0.edges.equalToSuperview()
+            feedTopConstraint = $0.top.equalTo(safeAreaLayoutGuide).offset(133).constraint
+            $0.left.right.bottom.equalToSuperview()
         }
         
         blockedStack.snp.makeConstraints {
@@ -131,6 +133,11 @@ final class UserFeedProfileView: BaseUIView {
         
         myFeedView.transform = CGAffineTransform(translationX: 0, y: translationY)
         button.transform = CGAffineTransform(translationX: 0, y: translationY)
+    }
+    
+    func updateFeedContainer(offsetY: CGFloat) {
+        let newOffset = max(133 - offsetY, 0)
+        feedTopConstraint?.update(offset: newOffset)
     }
     
     func showModal() {

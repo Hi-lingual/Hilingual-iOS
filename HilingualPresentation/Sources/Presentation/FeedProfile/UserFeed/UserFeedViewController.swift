@@ -15,7 +15,7 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
     // MARK: - Properties
     
     private let userFeedProfileView = UserFeedProfileView()
-    private let sharedVC: FeedProfileListViewController
+    private let sharedVC: FeedProfileViewController
     private let targetUserId: Int64
     private var isBlocked: Bool = false
     private let dialog = Dialog()
@@ -57,7 +57,9 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
         sharedVC.didMove(toParent: self)
         
         sharedVC.onScroll = { [weak self] offsetY in
-            self?.userFeedProfileView.updateHeader(offsetY: offsetY)
+            guard let self else { return }
+            self.userFeedProfileView.updateHeader(offsetY: offsetY)
+            self.userFeedProfileView.updateFeedContainer(offsetY: offsetY)
         }
         
         view.addSubview(dialog)
