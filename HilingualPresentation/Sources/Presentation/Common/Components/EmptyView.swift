@@ -16,6 +16,7 @@ final class EmptyView: UIView {
         label.font = .suit(.head_m_18)
         label.textColor = .gray500
         label.textAlignment = .center
+        label.numberOfLines = 2
         return label
     }()
 
