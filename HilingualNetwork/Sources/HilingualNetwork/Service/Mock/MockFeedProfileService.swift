@@ -32,8 +32,8 @@ public final class MockFeedProfileService: FeedProfileService {
                 code: 20000,
                 data: SharedFeedDataDTO(
                     profile: SharedProfileDTO(profileImg: "https://i.namu.wiki/i/ox5e5MMg8cRJiIm65Tm7DhzLAw5Kjz8n-96WESaHdpWm59PhwQJo0gi8pdMWW1cKONtAlitKsLWNrvnPNlHxlQ.webp", nickname: "타인프로필임"),
-                    diaryList: sampleSharedItemsForOther()
-//                    diaryList: []
+//                    diaryList: sampleSharedItemsForOther()
+                    diaryList: []
 
                 ),
                 message: "공유된 일기를 조회했습니다."

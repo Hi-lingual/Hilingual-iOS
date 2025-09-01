@@ -14,17 +14,17 @@ public final class MyFeedProfileViewController: BaseUIViewController<FeedProfile
 
     // MARK: - Properties
     private let myFeedProfileView = MyFeedProfileView()
-    private let likedVC: FeedProfileListViewController
-    private let sharedVC: FeedProfileListViewController
+    private let likedVC: FeedProfileViewController
+    private let sharedVC: FeedProfileViewController
     private let dialog = Dialog()
-    private var pendingDeleteRow: (listVC: FeedProfileListViewController, row: Int)?
+    private var pendingDeleteRow: (listVC: FeedProfileViewController, row: Int)?
 
     // MARK: - Init
     public init(
         viewModel: FeedProfileViewModel,
         diContainer: any ViewControllerFactory,
-        likedVC: FeedProfileListViewController,
-        sharedVC: FeedProfileListViewController
+        likedVC: FeedProfileViewController,
+        sharedVC: FeedProfileViewController
     ) {
         self.likedVC = likedVC
         self.sharedVC = sharedVC
@@ -104,7 +104,7 @@ public final class MyFeedProfileViewController: BaseUIViewController<FeedProfile
     }
 
     // MARK: - Private
-    private func showHideDialog(listVC: FeedProfileListViewController?, row: Int) {
+    private func showHideDialog(listVC: FeedProfileViewController?, row: Int) {
         guard let listVC else { return }
         pendingDeleteRow = (listVC, row)
         

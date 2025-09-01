@@ -10,14 +10,26 @@ import Foundation
 import Combine
 import SafariServices
 
-public final class FeedProfileListViewController: BaseUIViewController<FeedProfileViewModel> {
+public enum FeedProfileListType {
+    case liked
+    case shared
+
+    public var emptyMessage: String {
+        switch self {
+        case .liked:  return "아직 공감한 일기가 없어요."
+        case .shared: return "아직 공유한 일기가 없어요."
+        }
+    }
+}
+
+public final class FeedProfileViewController: BaseUIViewController<FeedProfileViewModel> {
     
     // MARK: - Properties
-    private let feedCellView = FeedCellView()
+    private let feedCellView = FeedList()
     private let input = FeedProfileViewModel.Input()
     private let type: FeedProfileListType
     
-    private var currentFeeds: [FeedDiaryItem] = []
+    private var currentFeeds: [FeedModel] = []
     
     var onHideTapped: ((Int) -> Void)?
     var onReportTapped: (() -> Void)?
@@ -43,7 +55,7 @@ public final class FeedProfileListViewController: BaseUIViewController<FeedProfi
 
         feedCellView.tableView.delegate = self
         feedCellView.tableView.dataSource = feedCellView
-        feedCellView.tableView.contentInset.top = 133
+//        feedCellView.tableView.contentInset.top = 133
 
         feedCellView.addTableTapGesture(target: self, action: #selector(didTapTableView))
 
@@ -92,7 +104,7 @@ public final class FeedProfileListViewController: BaseUIViewController<FeedProfi
 }
 
 // MARK: - UITableViewDelegate
-extension FeedProfileListViewController: UITableViewDelegate {
+extension FeedProfileViewController: UITableViewDelegate {
     public func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let adjustedOffset = scrollView.contentOffset.y + scrollView.adjustedContentInset.top
         onScroll?(adjustedOffset)

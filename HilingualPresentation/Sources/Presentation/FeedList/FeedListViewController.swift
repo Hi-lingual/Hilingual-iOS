@@ -13,14 +13,14 @@ import SafariServices
 public final class FeedListViewController: BaseUIViewController<FeedViewModel> {
 
     // MARK: - Properties
-    private let feedCellView = FeedCellView()
+    private let feedCellView = FeedList()
     private let input = FeedViewModel.Input()
     
     var onHideTapped: ((Int) -> Void)?
     var onReportTapped: (() -> Void)?
     var onRefresh: (() -> Void)?
 
-    private var currentFeeds: [FeedDiaryItem] = []
+    private var currentFeeds: [FeedModel] = []
 
     // MARK: - Lifecycle
     public override func loadView() {
@@ -65,7 +65,7 @@ public final class FeedListViewController: BaseUIViewController<FeedViewModel> {
         feedCellView.onDetailTapped = { [weak self] row in
             guard let self else { return }
             let feed = self.currentFeeds[row]
-            let vc = self.diContainer.makeSharedDiaryViewController(diaryId: feed.id)
+            let vc = self.diContainer.makeSharedDiaryViewController(diaryId: feed.diaryID)
             vc.hidesBottomBarWhenPushed = true
             self.navigationController?.pushViewController(vc, animated: true)
         }

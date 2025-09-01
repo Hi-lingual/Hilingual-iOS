@@ -12,7 +12,7 @@ final class MyFeedProfileView: BaseUIView {
 
     // MARK: - UI Components
     
-    private let myFeedView = FeedProfileView()
+    private let myFeedView = FeedUserProfile()
     private var segmentedControl: SegmentedControl?
     
     // MARK: - Setup

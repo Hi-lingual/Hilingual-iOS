@@ -36,7 +36,7 @@ public protocol ViewControllerFactory {
     func makeFeedProfileListViewController(
         type: FeedProfileListType,
         userId: Int64
-    ) -> FeedProfileListViewController
+    ) -> FeedProfileViewController
     func makeEditProfileViewController() -> EditProfileViewController
     func makeBlockUserViewController() -> BlockUserViewController
     func makeNotificationSettingViewController() -> NotificationSettingViewController
