@@ -22,6 +22,8 @@ public final class FeedProfileListViewController: BaseUIViewController<FeedProfi
     var onHideTapped: ((Int) -> Void)?
     var onReportTapped: (() -> Void)?
     
+    public var onScroll: ((CGFloat) -> Void)?
+    
     // MARK: - Init
     public init(viewModel: FeedProfileViewModel,
                 diContainer: any ViewControllerFactory,
@@ -38,6 +40,10 @@ public final class FeedProfileListViewController: BaseUIViewController<FeedProfi
 
         view.addSubview(feedCellView)
         feedCellView.snp.makeConstraints { $0.edges.equalToSuperview() }
+
+        feedCellView.tableView.delegate = self
+        feedCellView.tableView.dataSource = feedCellView
+        feedCellView.tableView.contentInset.top = 133
 
         feedCellView.addTableTapGesture(target: self, action: #selector(didTapTableView))
 
@@ -82,5 +88,13 @@ public final class FeedProfileListViewController: BaseUIViewController<FeedProfi
     // MARK: - Actions
     @objc private func didTapTableView() {
         feedCellView.closeAllMenus()
+    }
+}
+
+// MARK: - UITableViewDelegate
+extension FeedProfileListViewController: UITableViewDelegate {
+    public func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let adjustedOffset = scrollView.contentOffset.y + scrollView.adjustedContentInset.top
+        onScroll?(adjustedOffset)
     }
 }

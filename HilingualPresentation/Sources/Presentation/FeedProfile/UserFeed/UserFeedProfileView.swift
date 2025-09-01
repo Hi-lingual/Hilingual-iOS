@@ -87,8 +87,7 @@ final class UserFeedProfileView: BaseUIView {
         }
         
         feedContainer.snp.makeConstraints {
-            $0.top.equalTo(button.snp.bottom)
-            $0.horizontalEdges.bottom.equalToSuperview()
+            $0.edges.equalToSuperview()
         }
         
         blockedStack.snp.makeConstraints {
@@ -97,6 +96,9 @@ final class UserFeedProfileView: BaseUIView {
         }
         
         modal.snp.makeConstraints { $0.edges.equalToSuperview() }
+        
+        bringSubviewToFront(myFeedView)
+        bringSubviewToFront(button)
     }
     
     // MARK: - Public
@@ -116,6 +118,19 @@ final class UserFeedProfileView: BaseUIView {
             streak: streak
         )
         titleLabel.text = "\(nickname)님의 글을 확인할 수 없어요."
+    }
+    
+    func updateHeader(offsetY: CGFloat) {
+        let progress = min(max(offsetY / 60, 0), 1)
+        
+        let alpha = 1 - progress
+        let translationY = -progress * 40
+        
+        myFeedView.alpha = alpha
+        button.alpha = alpha
+        
+        myFeedView.transform = CGAffineTransform(translationX: 0, y: translationY)
+        button.transform = CGAffineTransform(translationX: 0, y: translationY)
     }
     
     func showModal() {

@@ -56,6 +56,10 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
         sharedVC.view.snp.makeConstraints { $0.edges.equalToSuperview() }
         sharedVC.didMove(toParent: self)
         
+        sharedVC.onScroll = { [weak self] offsetY in
+            self?.userFeedProfileView.updateHeader(offsetY: offsetY)
+        }
+        
         view.addSubview(dialog)
         dialog.isHidden = true
         dialog.snp.makeConstraints { $0.edges.equalToSuperview() }
