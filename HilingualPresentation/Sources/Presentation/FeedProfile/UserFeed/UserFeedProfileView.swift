@@ -12,7 +12,7 @@ final class UserFeedProfileView: BaseUIView {
     
     // MARK: - UI Components
     
-    private let myFeedView = FeedUserProfile()
+    private let userFeedView = FeedUserProfile()
     private(set) var button = FollowButton()
     private var feedTopConstraint: Constraint?
     let feedContainer = UIView()
@@ -67,7 +67,7 @@ final class UserFeedProfileView: BaseUIView {
     // MARK: - Setup
     
     override func setUI() {
-        addSubviews(myFeedView, button, feedContainer, blockedStack, modal)
+        addSubviews(userFeedView, button, feedContainer, blockedStack, modal)
         blockedStack.isHidden = true
         blockedStack.addArrangedSubviews(titleLabel, subTitleLabel)
         button.configure(state: .follow)
@@ -76,13 +76,13 @@ final class UserFeedProfileView: BaseUIView {
     }
     
     override func setLayout() {
-        myFeedView.snp.makeConstraints {
+        userFeedView.snp.makeConstraints {
             $0.top.equalTo(safeAreaLayoutGuide).offset(8)
             $0.horizontalEdges.equalToSuperview().inset(16)
         }
         
         button.snp.makeConstraints {
-            $0.top.equalTo(myFeedView.snp.bottom).offset(20)
+            $0.top.equalTo(userFeedView.snp.bottom).offset(20)
             $0.horizontalEdges.equalToSuperview().inset(16)
             $0.height.equalTo(37)
         }
@@ -99,7 +99,7 @@ final class UserFeedProfileView: BaseUIView {
         
         modal.snp.makeConstraints { $0.edges.equalToSuperview() }
         
-        bringSubviewToFront(myFeedView)
+        bringSubviewToFront(userFeedView)
         bringSubviewToFront(button)
     }
     
@@ -112,7 +112,7 @@ final class UserFeedProfileView: BaseUIView {
         following: Int,
         streak: Int
     ) {
-        myFeedView.configure(
+        userFeedView.configure(
             nickname: nickname,
             profileImageURL: profileImageURL,
             follower: follower,
@@ -128,10 +128,10 @@ final class UserFeedProfileView: BaseUIView {
         let alpha = 1 - progress
         let translationY = -progress * 40
         
-        myFeedView.alpha = alpha
+        userFeedView.alpha = alpha
         button.alpha = alpha
         
-        myFeedView.transform = CGAffineTransform(translationX: 0, y: translationY)
+        userFeedView.transform = CGAffineTransform(translationX: 0, y: translationY)
         button.transform = CGAffineTransform(translationX: 0, y: translationY)
     }
     
@@ -188,7 +188,7 @@ final class UserFeedProfileView: BaseUIView {
     }
 
     func setFollowSectionTappedAction(_ action: @escaping () -> Void) {
-        myFeedView.onFollowSectionTapped = action
+        userFeedView.onFollowSectionTapped = action
     }
 
     // MARK: - Private
