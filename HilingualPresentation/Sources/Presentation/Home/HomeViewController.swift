@@ -206,6 +206,10 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
             }
         }
         homeView.profileView.alarmButton.addTarget(self, action: #selector(alarmButtonTapped), for: .touchUpInside)
+        
+        let profileTapGesture = UITapGestureRecognizer(target: self, action: #selector(profileImageTapped))
+        homeView.profileView.profileImageView.isUserInteractionEnabled = true
+        homeView.profileView.profileImageView.addGestureRecognizer(profileTapGesture)
     }
     
     //MARK: - Private Methods
@@ -359,11 +363,14 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
             })
             .store(in: &viewModel!.cancellables)
     }
+    
+    @objc private func profileImageTapped() {
+        goToMyFeedProefileView()
+    }
 
     // MARK: - Navigation
 
     private func goToDiaryWritingView(topicData: (String, String)? = nil, selectedDate: Date? = nil) {
-        navigationController?.setNavigationBarHidden(false, animated: false)
         let diaryWritingVC = diContainer.makeDiaryWritingViewController(
             topicData: topicData,
             selectedDate: selectedDate ?? Date()
@@ -373,9 +380,14 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     }
 
     private func goToDiaryDetailView(diaryId: Int) {
-        navigationController?.setNavigationBarHidden(false, animated: false)
         let detailVC = diContainer.makeDiaryDetailViewController(diaryId: diaryId)
         detailVC.hidesBottomBarWhenPushed = true
         navigationController?.pushViewController(detailVC, animated: true)
+    }
+    
+    private func goToMyFeedProefileView() {
+        let myFeedProfileVC = diContainer.makeMyFeedProfileViewController()
+        myFeedProfileVC.hidesBottomBarWhenPushed = true
+        navigationController?.pushViewController(myFeedProfileVC, animated: true)
     }
 }

@@ -37,7 +37,10 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
         visionKitManager.delegate = self
     }
     
-    // MARK: - Init
+    public override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(false, animated: false)
+    }
 
     public init(
         viewModel: DiaryWritingViewModel,
