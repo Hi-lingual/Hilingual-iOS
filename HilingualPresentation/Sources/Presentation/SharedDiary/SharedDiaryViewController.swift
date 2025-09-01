@@ -230,13 +230,10 @@ public final class SharedDiaryViewController: BaseUIViewController<SharedDiaryVi
                 
                 if let nav = self.navigationController {
                     nav.popViewController(animated: true)
-                    
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                        if let previousVC = nav.viewControllers.last {
-                            let toast = ToastMessage()
-                            previousVC.view.addSubview(toast)
-                            toast.configure(type: .basic, message: "일기가 비공개 되었어요.")
-                        }
+                    if let previousVC = nav.viewControllers.last {
+                        let toast = ToastMessage()
+                        previousVC.view.addSubview(toast)
+                        toast.configure(type: .basic, message: "일기가 비공개 되었어요.")
                     }
                 }
             }
