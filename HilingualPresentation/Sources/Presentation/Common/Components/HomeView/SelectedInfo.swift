@@ -16,6 +16,7 @@ final class SelectedInfo: UIView {
 
     private var currentDiaryId: Int?
     private var currentIsPublished: Bool?
+    private var overlayView: UIControl?
     
     // MARK: - Callback
     
@@ -320,7 +321,12 @@ final class SelectedInfo: UIView {
     // MARK: - Actions
     
     @objc private func moreButtonTapped() {
-        onMoreButtonTapped?(currentIsPublished)
+        if menu.isHidden {
+            onMoreButtonTapped?(currentIsPublished)
+            menu.isHidden = false
+        } else {
+            menu.isHidden = true
+        }
     }
 }
 

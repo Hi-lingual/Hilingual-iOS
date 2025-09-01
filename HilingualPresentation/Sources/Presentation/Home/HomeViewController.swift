@@ -5,6 +5,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
 
     // MARK: - Properties
 
+    private var overlayView: UIControl?
     private let homeView = HomeView()
     let dialog = Dialog()
     private let input = HomeViewModel.Input()
@@ -179,7 +180,11 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         // 일기 더보기 버튼 눌렀을 때, 메뉴 토글
         homeView.selectedInfo.onMoreButtonTapped = { [weak self] _ in
             guard let self else { return }
-            self.homeView.selectedInfo.menu.isHidden.toggle()
+            if self.homeView.selectedInfo.menu.isHidden {
+                self.showOverlay()
+            } else {
+                self.dismissMenu()
+            }
         }
         
         homeView.selectedInfo.onMenuAction = { [weak self] action in
@@ -196,9 +201,35 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         }
         homeView.profileView.alarmButton.addTarget(self, action: #selector(alarmButtonTapped), for: .touchUpInside)
     }
-
+    
     //MARK: - Private Methods
+    
+    private func showOverlay() {
+        guard let containerView = tabBarController?.view ?? view else { return }
 
+        let overlay = UIControl()
+        overlay.backgroundColor = .clear
+        overlay.addTarget(self, action: #selector(dismissMenu), for: .touchUpInside)
+        containerView.addSubview(overlay)
+        overlay.snp.makeConstraints { $0.edges.equalToSuperview() }
+        overlayView = overlay
+
+        if homeView.selectedInfo.menu.superview != nil {
+            homeView.selectedInfo.menu.removeFromSuperview()
+        }
+        containerView.addSubview(homeView.selectedInfo.menu)
+
+        homeView.selectedInfo.menu.snp.remakeConstraints {
+            $0.top.equalTo(homeView.selectedInfo.moreImageView.snp.bottom).offset(4)
+            $0.trailing.equalTo(homeView.selectedInfo.moreImageView.snp.trailing)
+            $0.height.equalTo(96)
+            $0.width.equalTo(182)
+        }
+
+        homeView.selectedInfo.menu.isHidden = false
+        containerView.bringSubviewToFront(homeView.selectedInfo.menu)
+    }
+    
     private func showDialog(for action: MenuAction, completion: @escaping (Bool?) -> Void) {
         guard let containerView = self.tabBarController?.view else { return }
 
@@ -275,6 +306,12 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
             )
         }
         dialog.showAnimation()
+    }
+    
+    @objc private func dismissMenu() {
+        homeView.selectedInfo.menu.isHidden = true
+        overlayView?.removeFromSuperview()
+        overlayView = nil
     }
 
     @objc private func alarmButtonTapped() {
