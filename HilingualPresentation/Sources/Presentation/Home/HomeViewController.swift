@@ -152,9 +152,6 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                     .store(in: &self.viewModel!.cancellables)
             }
         }
-        
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(selectedInfoTapped))
-        homeView.selectedInfo.addGestureRecognizer(tapGesture)
     }
     
     // MARK: - Action
