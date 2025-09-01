@@ -25,7 +25,7 @@ public final class SearchBar: UISearchBar {
     
     private func setStyle() {
         self.searchBarStyle = .minimal
-        self.searchTextField.backgroundColor = .white
+        self.searchTextField.backgroundColor = .gray100
         self.searchTextField.layer.cornerRadius = 8
         self.searchTextField.clipsToBounds = true
         self.setImage(UIImage(named: "ic_search_20_ios", in: .module, compatibleWith: nil), for: .search, state: .normal)
