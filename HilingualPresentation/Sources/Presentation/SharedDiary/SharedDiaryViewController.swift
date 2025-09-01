@@ -114,6 +114,7 @@ public final class SharedDiaryViewController: BaseUIViewController<SharedDiaryVi
     
     private let likeToggleSubject = PassthroughSubject<(Int, Bool), Never>()
     private let publishToggleSubject = PassthroughSubject<(Int, Bool), Never>()
+    private let blockUserSubject = PassthroughSubject<Int64, Never>()
     
     public override func bind(viewModel: SharedDiaryViewModel) {
         super.bind(viewModel: viewModel)
@@ -129,6 +130,7 @@ public final class SharedDiaryViewController: BaseUIViewController<SharedDiaryVi
             viewDidLoad: viewDidLoadSubject.eraseToAnyPublisher(),
             likeTapped: likeToggleSubject.eraseToAnyPublisher(),
             publishTapped: publishToggleSubject.eraseToAnyPublisher(),
+            blockTapped: blockUserSubject.eraseToAnyPublisher()
             )
     }
     
@@ -215,8 +217,8 @@ public final class SharedDiaryViewController: BaseUIViewController<SharedDiaryVi
         view.addSubview(blockModal)
         blockModal.show(in: view)
         blockModal.onApplyTapped = { [weak self] in
-            guard let self else { return }
-            guard let userId = self.userId else { return }
+            guard let self, let userId = self.userId else { return }
+            self.blockUserSubject.send(userId)
             let vc = diContainer.makeUserFeedProfileViewController(userId: userId)
             self.navigationController?.pushViewController(vc, animated: true)
         }
