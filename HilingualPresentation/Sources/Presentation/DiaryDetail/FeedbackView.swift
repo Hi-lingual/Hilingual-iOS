@@ -141,7 +141,7 @@ final class FeedbackView: BaseUIView {
             $0.width.equalToSuperview()
         }
         
-        contentView.setCustomSpacing(6, after: headerStackView)
+        contentView.setCustomSpacing(12, after: headerStackView)
         headerStackView.setCustomSpacing(4, after: AILabel)
         
         controlSwitch.snp.makeConstraints {

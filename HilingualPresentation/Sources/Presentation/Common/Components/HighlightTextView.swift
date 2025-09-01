@@ -56,6 +56,8 @@ final class HighlightTextView: BaseUIView {
     override func setUI() {
         addSubviews(diaryImageView, textView, textCountLabel)
         textView.isUserInteractionEnabled = false
+        textView.textContainerInset = .zero
+        textView.textContainer.lineFragmentPadding = 0
         self.backgroundColor = .white
         self.layer.cornerRadius = 12
         diaryImageView.isUserInteractionEnabled = true
