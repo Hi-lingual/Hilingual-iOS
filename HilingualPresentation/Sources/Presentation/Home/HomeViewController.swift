@@ -195,11 +195,11 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
             
             switch action {
             case .publish:
-                self.showDialog(for: .publish) { _ in }
+                self.showDialog(for: .publish, selectedDate: self.homeView.calendarView.selectedDate ?? Date()) { _ in }
             case .unpublish:
-                self.showDialog(for: .unpublish) { _ in }
+                self.showDialog(for: .unpublish, selectedDate: self.homeView.calendarView.selectedDate ?? Date()) { _ in }
             case .delete:
-                self.showDialog(for: .delete) { _ in }
+                self.showDialog(for: .delete, selectedDate: self.homeView.calendarView.selectedDate ?? Date()) { _ in }
             }
         }
         homeView.profileView.alarmButton.addTarget(self, action: #selector(alarmButtonTapped), for: .touchUpInside)
@@ -233,7 +233,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         containerView.bringSubviewToFront(homeView.selectedInfo.menu)
     }
     
-    private func showDialog(for action: MenuAction, completion: @escaping (Bool?) -> Void) {
+    private func showDialog(for action: MenuAction, selectedDate: Date, completion: @escaping (Bool?) -> Void) {
         guard let containerView = self.tabBarController?.view else { return }
 
         containerView.addSubview(dialog)
@@ -249,20 +249,33 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                 rightButtonTitle: "게시하기",
                 leftAction: { [weak dialog] in dialog?.dismiss() },
                 rightAction: { [weak self] in
-                    self?.homeView.selectedInfo.updateDiaryState(isPublished: true)
-                    self?.homeView.selectedInfo.updateMenuState(isPublished: true)
-                    self?.dialog.dismiss()
+                    guard let self else { return }
                     
-                    let toast = ToastMessage()
-                    self?.view.addSubview(toast)
-                    toast.configure(type: .withButton, message: "일기가 게시되었어요!", actionTitle: "피드 보러가기")
-                    toast.action = { [weak self] in
-                        guard let self else { return }
-                        // TODO: 소은이 뷰로 전환
-                        let vc = self.diContainer.makeFeedbackViewController(diaryId: 123)
-                        self.navigationController?.pushViewController(vc, animated: true)
-                        completion(true)
-                    }
+                    self.viewModel?.fetchDiary(for: selectedDate)
+                        .receive(on: RunLoop.main)
+                        .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] diary in
+                            guard let self, let diary else { return }
+                            
+                            self.homeView.selectedInfo.updateDiaryState(isPublished: true)
+                            self.homeView.selectedInfo.updateMenuState(isPublished: true)
+                            self.dialog.dismiss()
+                            
+                            let toast = ToastMessage()
+                            self.view.addSubview(toast)
+                            toast.configure(
+                                type: .withButton,
+                                message: "일기가 게시되었어요!",
+                                actionTitle: "피드 보러가기"
+                            )
+                            
+                            toast.action = { [weak self] in
+                                guard let self else { return }
+                                let vc = self.diContainer.makeSharedDiaryViewController(diaryId: diary.diaryId)
+                                self.navigationController?.pushViewController(vc, animated: true)
+                                completion(true)
+                            }
+                        })
+                        .store(in: &self.viewModel!.cancellables)
                 }
             )
         case .unpublish:
