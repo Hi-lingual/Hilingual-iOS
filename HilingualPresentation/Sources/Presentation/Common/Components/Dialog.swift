@@ -83,7 +83,7 @@ final class Dialog: UIView {
         let stackView = UIStackView()
         stackView.axis = .horizontal
         stackView.distribution = .equalSpacing
-        stackView.spacing = 12
+        stackView.spacing = 13
         return stackView
     }()
     
@@ -164,12 +164,12 @@ final class Dialog: UIView {
             
             leftButton.snp.makeConstraints {
                 $0.height.equalTo(48)
-                $0.width.equalTo(143)
+                $0.width.equalTo(141)
             }
             
             rightButton.snp.makeConstraints {
                 $0.height.equalTo(48)
-                $0.width.equalTo(143)
+                $0.width.equalTo(141)
             }
             
         case .error:
