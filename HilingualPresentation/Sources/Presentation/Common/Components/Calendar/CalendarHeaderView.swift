@@ -166,4 +166,8 @@ final class CalendarHeaderView: UIView {
         formatter.dateFormat = "yyyy년 M월"
         return formatter.string(from: date)
     }
+    
+    override var intrinsicContentSize: CGSize {
+        return CGSize(width: UIView.noIntrinsicMetric, height: 28)
+    }
 }

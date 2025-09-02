@@ -84,7 +84,6 @@ final class CalendarView: UIView {
         headerView.snp.makeConstraints {
             $0.top.equalToSuperview().offset(16)
             $0.horizontalEdges.equalToSuperview()
-            $0.height.equalTo(28)
         }
         
         weekStackView.snp.makeConstraints {
@@ -94,7 +93,7 @@ final class CalendarView: UIView {
 
         scrollView.snp.makeConstraints {
             $0.top.equalTo(weekStackView.snp.bottom).offset(8)
-            $0.leading.trailing.bottom.equalToSuperview()
+            $0.leading.trailing.equalToSuperview()
             scrollViewHeightConstraint = $0.height.equalTo(0).constraint
         }
     }
@@ -227,7 +226,8 @@ extension CalendarView: UIScrollViewDelegate {
         configureCalendars(for: currentDate)
         headerView.setCurrentDate(currentDate)
 
-        let firstDayOfMonth = Calendar.current.date(from: Calendar.current.dateComponents([.year, .month], from: currentDate))!
+        let firstDayOfMonth = Calendar.current.date(
+            from: Calendar.current.dateComponents([.year, .month], from: currentDate))!
         calendarViews[1].setSelectedDate(firstDayOfMonth)
         onDateSelected?(firstDayOfMonth)
 
@@ -236,5 +236,4 @@ extension CalendarView: UIScrollViewDelegate {
 
         onMonthChanged?(currentDate)
     }
-
 }
