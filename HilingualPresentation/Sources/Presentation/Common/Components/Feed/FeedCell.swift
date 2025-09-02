@@ -123,6 +123,7 @@ final class FeedCell: UITableViewCell {
         let label = UILabel()
         label.attributedText = .suit(.body_r_16, text: "")
         label.textColor = .black
+        label.lineBreakMode = .byTruncatingTail
         label.numberOfLines = 5
         label.textAlignment = .left
         return label
