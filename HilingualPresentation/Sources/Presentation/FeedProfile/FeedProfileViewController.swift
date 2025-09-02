@@ -25,6 +25,7 @@ public enum FeedProfileListType {
 public final class FeedProfileViewController: BaseUIViewController<FeedProfileViewModel> {
     
     // MARK: - Properties
+    
     private let feedCellView = FeedList()
     private let input = FeedProfileViewModel.Input()
     private let type: FeedProfileListType
@@ -37,6 +38,7 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
     public var onScroll: ((CGFloat) -> Void)?
     
     // MARK: - Init
+    
     public init(viewModel: FeedProfileViewModel,
                 diContainer: any ViewControllerFactory,
                 type: FeedProfileListType) {
@@ -45,6 +47,7 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
     }
 
     // MARK: - Lifecycle
+    
     public override func viewDidLoad() {
         super.viewDidLoad()
         bindViewModel()
@@ -66,8 +69,14 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
             self?.onReportTapped?()
         }
     }
+    
+    public override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        footerForStickyHeader()
+    }
 
     // MARK: - Bind
+    
     private func bindViewModel() {
         let output = viewModel?.transform(input: input)
 
@@ -81,11 +90,13 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
                     emptyMessage: type.emptyMessage,
                     type: type
                 )
+                self.footerForStickyHeader()
             }
             .store(in: &cancellables)
     }
 
-    // MARK: - Public API
+    // MARK: - Public Methods
+    
     public func removeDiary(at row: Int) {
         guard row < currentFeeds.count else { return }
         currentFeeds.remove(at: row)
@@ -94,15 +105,34 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
             emptyMessage: type.emptyMessage,
             type: type
         )
+        footerForStickyHeader()
     }
 
     // MARK: - Actions
+    
     @objc private func didTapTableView() {
         feedCellView.closeAllMenus()
+    }
+    
+    // MARK: - Private Method
+
+    private func footerForStickyHeader() {
+        let tableView = feedCellView.tableView
+        let contentHeight = tableView.contentSize.height
+        
+        if contentHeight <= 750 {
+            let footerHeight: CGFloat = 120
+            let footer = UIView()
+            footer.frame.size.height = footerHeight
+            tableView.tableFooterView = footer
+        } else {
+            tableView.tableFooterView = nil
+        }
     }
 }
 
 // MARK: - UITableViewDelegate
+
 extension FeedProfileViewController: UITableViewDelegate {
     public func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let adjustedOffset = scrollView.contentOffset.y + scrollView.adjustedContentInset.top
