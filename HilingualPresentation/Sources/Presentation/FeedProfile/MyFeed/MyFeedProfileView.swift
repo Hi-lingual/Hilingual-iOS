@@ -9,11 +9,12 @@ import UIKit
 import SnapKit
 
 final class MyFeedProfileView: BaseUIView {
-
+    
     // MARK: - UI Components
     
     private let myFeedView = FeedUserProfile()
     private var segmentedControl: SegmentedControl?
+    private var segmentedTopConstraint: Constraint?
     
     // MARK: - Setup
     
@@ -28,7 +29,7 @@ final class MyFeedProfileView: BaseUIView {
         }
     }
     
-    // MARK: - Public Method
+    // MARK: - Public Methods
     
     func configureProfile(
         nickname: String,
@@ -60,7 +61,7 @@ final class MyFeedProfileView: BaseUIView {
         addSubview(control)
 
         control.snp.makeConstraints {
-            $0.top.equalTo(myFeedView.snp.bottom).offset(20)
+            segmentedTopConstraint = $0.top.equalTo(myFeedView.snp.bottom).offset(20).constraint
             $0.horizontalEdges.equalToSuperview()
             $0.bottom.equalTo(safeAreaLayoutGuide)
         }
@@ -68,5 +69,16 @@ final class MyFeedProfileView: BaseUIView {
 
     func setFollowSectionTappedAction(_ action: @escaping () -> Void) {
         myFeedView.onFollowSectionTapped = action
+    }
+    
+    func updateHeader(offsetY: CGFloat) {
+        guard let segmentedTopConstraint else { return }
+        
+        let progress = min(max(offsetY / 84, 0), 1)
+        myFeedView.alpha = 1 - progress
+        myFeedView.transform = CGAffineTransform(translationX: 0, y: -progress * 40)
+        
+        let newOffset = max(20 - offsetY, -84)
+        segmentedTopConstraint.update(offset: newOffset)
     }
 }

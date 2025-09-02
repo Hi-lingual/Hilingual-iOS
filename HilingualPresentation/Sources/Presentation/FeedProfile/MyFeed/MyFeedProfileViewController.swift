@@ -52,6 +52,14 @@ public final class MyFeedProfileViewController: BaseUIViewController<FeedProfile
         dialog.isHidden = true
         dialog.snp.makeConstraints { $0.edges.equalToSuperview() }
         
+        sharedVC.onScroll = { [weak self] offsetY in
+            self?.myFeedProfileView.updateHeader(offsetY: offsetY)
+        }
+
+        likedVC.onScroll = { [weak self] offsetY in
+            self?.myFeedProfileView.updateHeader(offsetY: offsetY)
+        }
+        
         /// 공유 - 게시글 비공개하기
         sharedVC.onHideTapped = { [weak self] row in
             self?.showHideDialog(listVC: self?.sharedVC, row: row)
@@ -80,7 +88,7 @@ public final class MyFeedProfileViewController: BaseUIViewController<FeedProfile
     }
     
     public override func navigationType() -> NavigationType? {
-        return .backOnly
+        return .backTitle("피드")
     }
     
     public override func viewWillAppear(_ animated: Bool) {
