@@ -24,7 +24,7 @@ final class CardPreview: UIView {
         label.font = .suit(.body_m_16)
         label.textColor = .black
         label.numberOfLines = 3
-        label.lineBreakMode = .byTruncatingHead
+        label.lineBreakMode = .byTruncatingTail
         return label
     }()
 
