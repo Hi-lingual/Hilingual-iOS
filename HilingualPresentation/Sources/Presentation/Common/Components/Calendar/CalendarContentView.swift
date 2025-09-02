@@ -39,6 +39,7 @@ final class CalendarContentView: UICollectionView {
         let flowLayout = UICollectionViewFlowLayout()
         flowLayout.minimumInteritemSpacing = 0
         flowLayout.minimumLineSpacing = 14
+        flowLayout.estimatedItemSize = .zero
         super.init(frame: .zero, collectionViewLayout: flowLayout)
 
         isScrollEnabled = false
@@ -57,8 +58,10 @@ final class CalendarContentView: UICollectionView {
     func reload(for date: Date) {
         currentDate = date
         generateDays()
-        reloadData()
-        invalidateIntrinsicContentSize()
+        DispatchQueue.main.async {
+            self.reloadData()
+            self.invalidateIntrinsicContentSize()
+        }
     }
 
     func setSelectedDate(_ date: Date) {
@@ -108,6 +111,7 @@ final class CalendarContentView: UICollectionView {
 
     private func updateItemSize() {
         let width = bounds.width / 7
+        guard width > 0 else { return }
         (collectionViewLayout as? UICollectionViewFlowLayout)?.itemSize = CGSize(width: width, height: 34)
     }
 
@@ -131,13 +135,16 @@ final class CalendarContentView: UICollectionView {
 
 extension CalendarContentView: UICollectionViewDataSource, UICollectionViewDelegate {
 
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int)
+    -> Int {
         return days.count
     }
 
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CustomCalendarCell", for: indexPath) as! CustomCalendarCell
-
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath)
+    -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(
+            withReuseIdentifier: "CustomCalendarCell", for: indexPath
+        ) as! CustomCalendarCell
         let date = days[indexPath.item]
         let day = calendar.component(.day, from: date)
         let isToday = calendar.isDateInToday(date)

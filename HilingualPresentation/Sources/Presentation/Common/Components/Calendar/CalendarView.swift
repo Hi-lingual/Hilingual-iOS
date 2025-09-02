@@ -82,13 +82,14 @@ final class CalendarView: UIView {
 
     private func setupLayout() {
         headerView.snp.makeConstraints {
-            $0.top.leading.trailing.equalToSuperview()
+            $0.top.equalToSuperview().offset(16)
+            $0.horizontalEdges.equalToSuperview()
+            $0.height.equalTo(28)
         }
-
+        
         weekStackView.snp.makeConstraints {
-            $0.top.equalTo(headerView.snp.bottom)
+            $0.top.equalTo(headerView.snp.bottom).offset(12)
             $0.leading.trailing.equalToSuperview()
-            $0.height.equalTo(20)
         }
 
         scrollView.snp.makeConstraints {
@@ -194,6 +195,16 @@ final class CalendarView: UIView {
         layoutIfNeeded()
         let contentHeight = calendarViews[1].intrinsicContentSize.height
         scrollViewHeightConstraint?.update(offset: contentHeight)
+        invalidateIntrinsicContentSize()
+    }
+    
+    override var intrinsicContentSize: CGSize {
+        let headerHeight: CGFloat = 28
+        let weekHeight: CGFloat = 20
+        let spacing: CGFloat = 16 + 12 + 8
+        let contentHeight = calendarViews[1].intrinsicContentSize.height
+        return CGSize(width: UIView.noIntrinsicMetric,
+                      height: headerHeight + weekHeight + spacing + contentHeight)
     }
 }
 

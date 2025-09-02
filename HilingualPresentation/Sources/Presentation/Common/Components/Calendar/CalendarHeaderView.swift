@@ -61,8 +61,17 @@ final class CalendarHeaderView: UIView {
     private let buttonStack: UIStackView = {
         let stack = UIStackView()
         stack.axis = .horizontal
-        stack.spacing = 8
+        stack.spacing = 12
         stack.alignment = .center
+        return stack
+    }()
+    
+    private let datePickerStack: UIStackView = {
+        let stack = UIStackView()
+        stack.axis = .horizontal
+        stack.spacing = 4
+        stack.alignment = .center
+        stack.isUserInteractionEnabled = false
         return stack
     }()
 
@@ -86,34 +95,27 @@ final class CalendarHeaderView: UIView {
 
         backgroundColor = .clear
 
-        let stack = UIStackView(arrangedSubviews: [textLabel, iconView])
-        stack.axis = .horizontal
-        stack.spacing = 4
-        stack.alignment = .center
-        stack.isUserInteractionEnabled = false
+        monthButton.addSubview(datePickerStack)
 
-        monthButton.addSubview(stack)
-        stack.snp.makeConstraints {
-            $0.edges.equalToSuperview()
-        }
-
-        buttonStack.addArrangedSubview(previousButton)
-        buttonStack.addArrangedSubview(nextButton)
+        buttonStack.addArrangedSubviews(previousButton, nextButton)
+        datePickerStack.addArrangedSubviews(textLabel, iconView)
 
         addSubviews(monthButton, buttonStack)
     }
 
     private func setupLayout() {
         monthButton.snp.makeConstraints {
-            $0.top.equalTo(safeAreaLayoutGuide).inset(16)
+            $0.top.equalToSuperview()
             $0.leading.equalToSuperview().inset(16)
-            $0.bottom.equalToSuperview().inset(12)
+        }
+
+        datePickerStack.snp.makeConstraints {
+            $0.edges.equalToSuperview()
         }
 
         buttonStack.snp.makeConstraints {
-            $0.top.equalTo(safeAreaLayoutGuide).inset(16)
+            $0.centerY.equalTo(monthButton)
             $0.trailing.equalToSuperview().inset(16)
-            $0.bottom.equalToSuperview().inset(12)
         }
     }
 
