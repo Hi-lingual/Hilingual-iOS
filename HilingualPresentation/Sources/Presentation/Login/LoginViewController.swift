@@ -93,7 +93,8 @@ public final class LoginViewController: BaseUIViewController<LoginViewModel> {
                 guard let self else { return }
                 print("로그인 -> 온보딩(인증->닉네임)")
                 let verificationVC = self.diContainer.makeVerificationCodeViewController()
-                self.navigationController?.pushViewController(verificationVC, animated: true)
+//                self.navigationController?.pushViewController(verificationVC, animated: true)
+                changeRootVC(verificationVC)
             }
             .store(in: &cancellables)
 

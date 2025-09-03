@@ -20,6 +20,7 @@ public final class VerificationCodeViewController: BaseUIViewController<Verifica
 
     public override func setUI() {
         view.addSubviews(verificationCodeView, dialog)
+        verificationCodeView.codeView.becomeFirstResponder()
     }
 
     public override func setLayout() {

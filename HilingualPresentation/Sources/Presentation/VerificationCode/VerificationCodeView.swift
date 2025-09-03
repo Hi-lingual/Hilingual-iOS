@@ -18,6 +18,15 @@ final class VerificationCodeView: BaseUIView {
         return view
     }()
 
+    let titleLabel: UILabel = {
+        let label = UILabel()
+        label.text = "프로필 작성"
+        label.font = .suit(.head_b_18)
+        label.textColor = .black
+        label.textAlignment = .center
+        return label
+    }()
+
     private let infoContainer: UIView = {
         let view = UIView()
         view.backgroundColor = .gray100
@@ -75,7 +84,8 @@ final class VerificationCodeView: BaseUIView {
 
     // MARK: - Methods
     override func setUI() {
-        addSubviews(codeView,
+        addSubviews(titleLabel,
+                    codeView,
                     infoContainer,
                     notReceivedButton,
                     submitButton)
@@ -86,8 +96,13 @@ final class VerificationCodeView: BaseUIView {
     }
 
     override func setLayout() {
+        titleLabel.snp.makeConstraints {
+               $0.top.equalTo(safeAreaLayoutGuide.snp.top).offset(12)
+               $0.centerX.equalToSuperview()
+           }
+
         codeView.snp.makeConstraints {
-            $0.top.equalTo(safeAreaLayoutGuide).offset(32)
+            $0.top.equalTo(titleLabel.snp.bottom).offset(32)
             $0.leading.trailing.equalToSuperview().inset(16)
             $0.height.greaterThanOrEqualTo(52)
         }
