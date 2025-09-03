@@ -120,17 +120,10 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
         let tableView = feedCellView.tableView
         let contentHeight = tableView.contentSize.height
         
-        let screenHeight = UIScreen.main.bounds.height
-        let topInset = tableView.adjustedContentInset.top
-        let bottomInset = tableView.adjustedContentInset.bottom
-        
-        let visibleHeight = screenHeight - topInset - bottomInset
-        
-        if contentHeight < visibleHeight {
-            let footerHeight: CGFloat = 160
+        if contentHeight <= 750 {
+            let footerHeight: CGFloat = 120
             let footer = UIView()
             footer.frame.size.height = footerHeight
-            footer.backgroundColor = .clear
             tableView.tableFooterView = footer
         } else {
             tableView.tableFooterView = nil
