@@ -219,7 +219,7 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
     }
     
     private func updateButtonTitle() {
-        let title = isPublished ? "비공개하기" : "피드에 게시하기"
+        let title = isPublished ? "비공개하기" : "게시하기"
         button.setTitle(title, for: .normal)
     }
 
@@ -266,9 +266,9 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
     @objc private func showReportDialog() {
         dialog.configure(
             title: "AI 피드백을 신고하시겠어요?",
-            content: "신고된 AI 피드백은 확인 후\n서비스의 운영원칙에 따라 처리됩니다.",
-            leftButtonTitle: "취소",
-            rightButtonTitle: "네, 신고할게요",
+            content: "신고된 AI 피드백은 확인 후\n서비스의 운영원칙에 따라 처리돼요.",
+            leftButtonTitle: "아니요",
+            rightButtonTitle: "신고하기",
             leftAction: { [weak self] in
                 self?.dialog.dismiss()
             },
@@ -284,7 +284,7 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
     
     @objc private func showPostDialog() {
         dialog.configure(
-            title: "일기를 게시하시겠어요?",
+            title: "영어 일기를 게시하시겠어요?",
             content: "공유된 일기는 모든 유저에게 게시되며,\n피드에서 확인하실 수 있어요.",
             leftButtonTitle: "아니요",
             rightButtonTitle: "게시하기",

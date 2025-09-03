@@ -51,16 +51,14 @@ final class RecommendedExpressionView: BaseUIView {
         scrollView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
+        
         contentView.snp.makeConstraints {
             $0.edges.equalTo(scrollView.contentLayoutGuide)
             $0.width.equalTo(scrollView.frameLayoutGuide).offset(-16)
-
         }
-
-        dateLabel.snp.makeConstraints {
-            $0.top.equalToSuperview().inset(24)
-            $0.leading.equalToSuperview().inset(16)
-        }
+        
+        contentView.isLayoutMarginsRelativeArrangement = true
+        contentView.layoutMargins = UIEdgeInsets(top: 24, left: 16, bottom: 0, right: 16)
 
         bottomSpacingView.snp.makeConstraints {
             $0.height.equalTo(16)
