@@ -195,21 +195,28 @@ final class VerificationCodeInputView: BaseUIView, UIKeyInput, UITextInputTraits
     }
 
     private func updateBox(_ label: UILabel, at index: Int, chars: [Character]) {
-        if case .error = currentState {
-            label.text = (index < chars.count) ? String(chars[index]) : ""
-            return
-        }
-
         if index < chars.count {
             label.text = String(chars[index])
-            label.backgroundColor = .white
-            label.layer.borderColor = UIColor.black.cgColor
-            label.layer.borderWidth = 1
         } else {
             label.text = ""
-            label.backgroundColor = .gray100
-            label.layer.borderColor = UIColor.gray100.cgColor
-            label.layer.borderWidth = 1
+        }
+
+        switch currentState {
+        case .error:
+            label.backgroundColor = .white
+            label.layer.borderColor = UIColor.alertRed.cgColor
+            label.textColor = .alertRed
+
+        case .normal:
+            if index < chars.count {
+                label.backgroundColor = .white
+                label.layer.borderColor = UIColor.black.cgColor
+                label.textColor = .black
+            } else {
+                label.backgroundColor = .gray100
+                label.layer.borderColor = UIColor.gray100.cgColor
+                label.textColor = .label  
+            }
         }
     }
 
