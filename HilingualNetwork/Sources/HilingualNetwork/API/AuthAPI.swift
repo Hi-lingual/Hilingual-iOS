@@ -8,7 +8,7 @@
 import Moya
 
 public enum AuthAPI {
-    case socialLogin(provider: String, providerToken: String)
+    case socialLogin(body: AuthLoginRequestDTO, providerToken: String)
     case refreshToken(refreshToken: String)
 }
 
@@ -28,8 +28,8 @@ extension AuthAPI: NoAuthorizeTargetType {
 
     public var task: Task {
         switch self {
-        case let .socialLogin(provider, _):
-            return .requestJSONEncodable(["provider": provider])
+        case let .socialLogin(body, _):
+            return .requestJSONEncodable(body)
         case .refreshToken:
             return .requestPlain
         }
@@ -37,10 +37,10 @@ extension AuthAPI: NoAuthorizeTargetType {
 
     public var headers: [String: String]? {
         switch self {
-        case let .socialLogin(_, token):
+        case let .socialLogin(_, providerToken):
             return [
                 "Content-Type": "application/json",
-                "Provider-Token": token
+                "Provider-Token": providerToken
             ]
         case let .refreshToken(refreshToken):
             return [

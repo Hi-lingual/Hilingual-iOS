@@ -15,7 +15,7 @@ extension LoginResponseDTO {
         return LoginResponseEntity(
             accessToken: self.accessToken,
             refreshToken: self.refreshToken,
-            isProfileCompleted: self.isProfileCompleted
+            isProfileCompleted: self.registerStatus
         )
     }
 }
