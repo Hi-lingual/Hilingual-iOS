@@ -30,7 +30,7 @@ public final class VerificationCodeViewController: BaseUIViewController<Verifica
     // MARK: - Navigation
 
     public override func navigationType() -> NavigationType? {
-        .backTitle("인증 번호 입력")
+        .titleOnly("인증 번호 입력")
     }
 
     // MARK: - Bind
