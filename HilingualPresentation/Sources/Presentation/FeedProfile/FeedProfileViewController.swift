@@ -45,26 +45,26 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
         self.type = type
         super.init(viewModel: viewModel, diContainer: diContainer)
     }
-
+    
     // MARK: - Lifecycle
     
     public override func viewDidLoad() {
         super.viewDidLoad()
         bindViewModel()
         input.reload.send(())
-
+        
         view.addSubview(feedCellView)
         feedCellView.snp.makeConstraints { $0.edges.equalToSuperview() }
-
+        
         feedCellView.tableView.delegate = self
         feedCellView.tableView.dataSource = feedCellView
-
+        
         feedCellView.addTableTapGesture(target: self, action: #selector(didTapTableView))
-
+        
         feedCellView.onHideTapped = { [weak self] row in
             self?.onHideTapped?(row)
         }
-
+        
         feedCellView.onReportTapped = { [weak self] in
             self?.onReportTapped?()
         }
@@ -74,12 +74,12 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
         super.viewDidLayoutSubviews()
         footerForStickyHeader()
     }
-
+    
     // MARK: - Bind
     
     private func bindViewModel() {
         let output = viewModel?.transform(input: input)
-
+        
         output?.feeds
             .receive(on: RunLoop.main)
             .sink { [weak self] feeds in
@@ -94,7 +94,7 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
             }
             .store(in: &cancellables)
     }
-
+    
     // MARK: - Public Methods
     
     public func removeDiary(at row: Int) {
@@ -107,7 +107,7 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
         )
         footerForStickyHeader()
     }
-
+    
     // MARK: - Actions
     
     @objc private func didTapTableView() {
@@ -115,15 +115,22 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
     }
     
     // MARK: - Private Method
-
+    
     private func footerForStickyHeader() {
         let tableView = feedCellView.tableView
         let contentHeight = tableView.contentSize.height
         
-        if contentHeight <= 750 {
+        let screenHeight = UIScreen.main.bounds.height
+        let topInset = tableView.adjustedContentInset.top
+        let bottomInset = tableView.adjustedContentInset.bottom
+        
+        let visibleHeight = screenHeight - topInset - bottomInset
+        
+        if contentHeight < visibleHeight {
             let footerHeight: CGFloat = 120
             let footer = UIView()
             footer.frame.size.height = footerHeight
+            footer.backgroundColor = .clear
             tableView.tableFooterView = footer
         } else {
             tableView.tableFooterView = nil
