@@ -82,18 +82,18 @@ final class CalendarView: UIView {
 
     private func setupLayout() {
         headerView.snp.makeConstraints {
-            $0.top.leading.trailing.equalToSuperview()
+            $0.top.equalToSuperview().offset(16)
+            $0.horizontalEdges.equalToSuperview()
         }
-
+        
         weekStackView.snp.makeConstraints {
-            $0.top.equalTo(headerView.snp.bottom)
+            $0.top.equalTo(headerView.snp.bottom).offset(12)
             $0.leading.trailing.equalToSuperview()
-            $0.height.equalTo(20)
         }
 
         scrollView.snp.makeConstraints {
             $0.top.equalTo(weekStackView.snp.bottom).offset(8)
-            $0.leading.trailing.bottom.equalToSuperview()
+            $0.leading.trailing.equalToSuperview()
             scrollViewHeightConstraint = $0.height.equalTo(0).constraint
         }
     }
@@ -194,6 +194,16 @@ final class CalendarView: UIView {
         layoutIfNeeded()
         let contentHeight = calendarViews[1].intrinsicContentSize.height
         scrollViewHeightConstraint?.update(offset: contentHeight)
+        invalidateIntrinsicContentSize()
+    }
+    
+    override var intrinsicContentSize: CGSize {
+        let headerHeight: CGFloat = 28
+        let weekHeight: CGFloat = 20
+        let spacing: CGFloat = 16 + 12 + 8
+        let contentHeight = calendarViews[1].intrinsicContentSize.height
+        return CGSize(width: UIView.noIntrinsicMetric,
+                      height: headerHeight + weekHeight + spacing + contentHeight)
     }
 }
 
@@ -216,7 +226,8 @@ extension CalendarView: UIScrollViewDelegate {
         configureCalendars(for: currentDate)
         headerView.setCurrentDate(currentDate)
 
-        let firstDayOfMonth = Calendar.current.date(from: Calendar.current.dateComponents([.year, .month], from: currentDate))!
+        let firstDayOfMonth = Calendar.current.date(
+            from: Calendar.current.dateComponents([.year, .month], from: currentDate))!
         calendarViews[1].setSelectedDate(firstDayOfMonth)
         onDateSelected?(firstDayOfMonth)
 
@@ -225,5 +236,4 @@ extension CalendarView: UIScrollViewDelegate {
 
         onMonthChanged?(currentDate)
     }
-
 }
