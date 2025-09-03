@@ -5,6 +5,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
 
     // MARK: - Properties
 
+    private var overlayView: UIControl?
     private let homeView = HomeView()
     let dialog = Dialog()
     private let input = HomeViewModel.Input()
@@ -58,6 +59,8 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         // 월이 변경되면 1일로 이동 + ViewModel에 전달
         homeView.onMonthChanged = { [weak self] year, month in
             guard let self else { return }
+            
+            self.homeView.selectedInfo.resetView()
 
             var components = DateComponents()
             components.year = year
@@ -68,6 +71,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
 
             // 해당 월 1일로 이동
             self.homeView.calendarView.select(date: firstDayOfMonth)
+            self.homeView.calendarView.onDateSelected?(firstDayOfMonth)
 
             // ViewModel에 새로운 월 정보 전달
             self.input.monthChange.send((year, month))
@@ -179,7 +183,11 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         // 일기 더보기 버튼 눌렀을 때, 메뉴 토글
         homeView.selectedInfo.onMoreButtonTapped = { [weak self] _ in
             guard let self else { return }
-            self.homeView.selectedInfo.menu.isHidden.toggle()
+            if self.homeView.selectedInfo.menu.isHidden {
+                self.showOverlay()
+            } else {
+                self.dismissMenu()
+            }
         }
         
         homeView.selectedInfo.onMenuAction = { [weak self] action in
@@ -187,19 +195,49 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
             
             switch action {
             case .publish:
-                self.showDialog(for: .publish) { _ in }
+                self.showDialog(for: .publish, selectedDate: self.homeView.calendarView.selectedDate ?? Date()) { _ in }
             case .unpublish:
-                self.showDialog(for: .unpublish) { _ in }
+                self.showDialog(for: .unpublish, selectedDate: self.homeView.calendarView.selectedDate ?? Date()) { _ in }
             case .delete:
-                self.showDialog(for: .delete) { _ in }
+                self.showDialog(for: .delete, selectedDate: self.homeView.calendarView.selectedDate ?? Date()) { _ in }
             }
         }
         homeView.profileView.alarmButton.addTarget(self, action: #selector(alarmButtonTapped), for: .touchUpInside)
+        
+        let profileTapGesture = UITapGestureRecognizer(target: self, action: #selector(profileImageTapped))
+        homeView.profileView.profileImageView.isUserInteractionEnabled = true
+        homeView.profileView.profileImageView.addGestureRecognizer(profileTapGesture)
     }
-
+    
     //MARK: - Private Methods
+    
+    private func showOverlay() {
+        guard let containerView = tabBarController?.view ?? view else { return }
 
-    private func showDialog(for action: MenuAction, completion: @escaping (Bool?) -> Void) {
+        let overlay = UIControl()
+        overlay.backgroundColor = .clear
+        overlay.addTarget(self, action: #selector(dismissMenu), for: .touchUpInside)
+        containerView.addSubview(overlay)
+        overlay.snp.makeConstraints { $0.edges.equalToSuperview() }
+        overlayView = overlay
+
+        if homeView.selectedInfo.menu.superview != nil {
+            homeView.selectedInfo.menu.removeFromSuperview()
+        }
+        containerView.addSubview(homeView.selectedInfo.menu)
+
+        homeView.selectedInfo.menu.snp.remakeConstraints {
+            $0.top.equalTo(homeView.selectedInfo.moreImageView.snp.bottom).offset(4)
+            $0.trailing.equalTo(homeView.selectedInfo.moreImageView.snp.trailing)
+            $0.height.equalTo(96)
+            $0.width.equalTo(182)
+        }
+
+        homeView.selectedInfo.menu.isHidden = false
+        containerView.bringSubviewToFront(homeView.selectedInfo.menu)
+    }
+    
+    private func showDialog(for action: MenuAction, selectedDate: Date, completion: @escaping (Bool?) -> Void) {
         guard let containerView = self.tabBarController?.view else { return }
 
         containerView.addSubview(dialog)
@@ -215,20 +253,33 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                 rightButtonTitle: "게시하기",
                 leftAction: { [weak dialog] in dialog?.dismiss() },
                 rightAction: { [weak self] in
-                    self?.homeView.selectedInfo.updateDiaryState(isPublished: true)
-                    self?.homeView.selectedInfo.updateMenuState(isPublished: true)
-                    self?.dialog.dismiss()
+                    guard let self else { return }
                     
-                    let toast = ToastMessage()
-                    self?.view.addSubview(toast)
-                    toast.configure(type: .withButton, message: "일기가 게시되었어요!", actionTitle: "피드 보러가기")
-                    toast.action = { [weak self] in
-                        guard let self else { return }
-                        // TODO: 소은이 뷰로 전환
-                        let vc = self.diContainer.makeFeedbackViewController(diaryId: 123)
-                        self.navigationController?.pushViewController(vc, animated: true)
-                        completion(true)
-                    }
+                    self.viewModel?.fetchDiary(for: selectedDate)
+                        .receive(on: RunLoop.main)
+                        .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] diary in
+                            guard let self, let diary else { return }
+                            
+                            self.homeView.selectedInfo.updateDiaryState(isPublished: true)
+                            self.homeView.selectedInfo.updateMenuState(isPublished: true)
+                            self.dialog.dismiss()
+                            
+                            let toast = ToastMessage()
+                            self.view.addSubview(toast)
+                            toast.configure(
+                                type: .withButton,
+                                message: "일기가 게시되었어요!",
+                                actionTitle: "피드 보러가기"
+                            )
+                            
+                            toast.action = { [weak self] in
+                                guard let self else { return }
+                                let vc = self.diContainer.makeSharedDiaryViewController(diaryId: diary.diaryId)
+                                self.navigationController?.pushViewController(vc, animated: true)
+                                completion(true)
+                            }
+                        })
+                        .store(in: &self.viewModel!.cancellables)
                 }
             )
         case .unpublish:
@@ -253,7 +304,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         case .delete:
             dialog.configure(
                 style: .normal,
-                title: "일기를 삭제하시겠어요?",
+                title: "영어 일기를 삭제하시겠어요?",
                 content: "작성한 일기를 삭제한 날짜에는\n다시 일기를 작성할 수 없어요.",
                 leftButtonTitle: "아니요",
                 rightButtonTitle: "삭제하기",
@@ -276,6 +327,12 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         }
         dialog.showAnimation()
     }
+    
+    @objc private func dismissMenu() {
+        homeView.selectedInfo.menu.isHidden = true
+        overlayView?.removeFromSuperview()
+        overlayView = nil
+    }
 
     @objc private func alarmButtonTapped() {
         let notificationVC = diContainer.makeNotificationViewController()
@@ -283,11 +340,34 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
 
         navigationController?.pushViewController(notificationVC, animated: true)
     }
+    
+    @objc private func selectedInfoTapped() {
+        guard let selectedDate = homeView.calendarView.selectedDate else { return }
+        
+        if !homeView.selectedInfo.menu.isHidden { return }
+        
+        let isDiaryDate = homeView.calendarView.filledDates.contains {
+            Calendar.current.isDate($0, inSameDayAs: selectedDate)
+        }
+        
+        guard isDiaryDate else { return }
+        
+        viewModel?.fetchDiary(for: selectedDate)
+            .receive(on: RunLoop.main)
+            .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] diary in
+                guard let self, let diary else { return }
+                self.goToDiaryDetailView(diaryId: diary.diaryId)
+            })
+            .store(in: &viewModel!.cancellables)
+    }
+    
+    @objc private func profileImageTapped() {
+        goToMyFeedProefileView()
+    }
 
     // MARK: - Navigation
 
     private func goToDiaryWritingView(topicData: (String, String)? = nil, selectedDate: Date? = nil) {
-        navigationController?.setNavigationBarHidden(false, animated: false)
         let diaryWritingVC = diContainer.makeDiaryWritingViewController(
             topicData: topicData,
             selectedDate: selectedDate ?? Date()
@@ -297,9 +377,14 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     }
 
     private func goToDiaryDetailView(diaryId: Int) {
-        navigationController?.setNavigationBarHidden(false, animated: false)
         let detailVC = diContainer.makeDiaryDetailViewController(diaryId: diaryId)
         detailVC.hidesBottomBarWhenPushed = true
         navigationController?.pushViewController(detailVC, animated: true)
+    }
+    
+    private func goToMyFeedProefileView() {
+        let myFeedProfileVC = diContainer.makeMyFeedProfileViewController()
+        myFeedProfileVC.hidesBottomBarWhenPushed = true
+        navigationController?.pushViewController(myFeedProfileVC, animated: true)
     }
 }

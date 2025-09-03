@@ -18,9 +18,11 @@ public struct FeedSearchUserModel: UserDisplayable {
     public var isFollowed: Bool
     public var buttonState: FollowButtonState {
         if isFollowing && isFollowed {
-            return .mutualFollow
-        } else if isFollowing {
             return .following
+        } else if isFollowing && !isFollowed {
+            return .following
+        } else if !isFollowing && isFollowed {
+            return .mutualFollow
         } else {
             return .follow
         }

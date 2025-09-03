@@ -98,29 +98,37 @@ final class ActionMenu: UIView {
     // MARK: - Private Methods
     
     private func createMenuRow(title: String, icon: UIImage?, titleColor: UIColor = .gray700) -> UIView {
-        
-        let titleStackView = UIStackView()
-        titleStackView.axis = .horizontal
-        titleStackView.alignment = .center
-        titleStackView.spacing = 8
-        titleStackView.layoutMargins = UIEdgeInsets(top: 12, left: 12, bottom: 12, right: 12)
-        titleStackView.isLayoutMarginsRelativeArrangement = true
-        
+
+        let container = UIView()
+
+        let stackView = UIStackView()
+        stackView.axis = .horizontal
+        stackView.spacing = 8
+        stackView.alignment = .center
+
         let iconView = UIImageView(image: icon)
         iconView.contentMode = .scaleAspectFit
         iconView.tintColor = .gray400
-        iconView.snp.makeConstraints { $0.size.equalTo(24) }
-        
+        iconView.setContentHuggingPriority(.required, for: .horizontal)
+        iconView.setContentCompressionResistancePriority(.required, for: .horizontal)
+        iconView.snp.makeConstraints { make in
+            make.width.height.lessThanOrEqualTo(24)
+        }
+
         let titleLabel = UILabel()
         titleLabel.text = title
         titleLabel.font = .suit(.body_sb_14)
         titleLabel.textColor = titleColor
-        
-        titleStackView.addArrangedSubviews(iconView, titleLabel)
-        
-        return titleStackView
-    }
 
+        stackView.addArrangedSubviews(iconView, titleLabel)
+
+        container.addSubview(stackView)
+        stackView.snp.makeConstraints {
+            $0.edges.equalToSuperview().inset(12)
+        }
+
+        return container
+    }
     
     @objc private func menuTapped(_ sender: UITapGestureRecognizer) {
         guard let index = sender.view?.tag else { return }

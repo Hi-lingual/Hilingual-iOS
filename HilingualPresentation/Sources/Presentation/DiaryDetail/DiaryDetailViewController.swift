@@ -93,6 +93,10 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
         }
     }
     
+    public override func viewWillAppear(_ animated: Bool) {
+        navigationController?.setNavigationBarHidden(false, animated: false)
+    }
+    
     // MARK: - Custom Method
     
     public override func setUI() {

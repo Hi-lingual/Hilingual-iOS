@@ -18,7 +18,7 @@ final class ProfileView: UIView {
         return label
     }()
     
-    private let profileImageView: UIImageView = {
+    private(set) var profileImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
         imageView.layer.cornerRadius = 23

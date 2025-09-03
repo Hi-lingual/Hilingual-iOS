@@ -16,6 +16,7 @@ final class SelectedInfo: UIView {
 
     private var currentDiaryId: Int?
     private var currentIsPublished: Bool?
+    private var overlayView: UIControl?
     
     // MARK: - Callback
     
@@ -159,11 +160,18 @@ final class SelectedInfo: UIView {
             $0.horizontalEdges.equalToSuperview().inset(16)
         }
 
-        [cardTopicView, cardPreview, emptyDiaryView, diaryLockView].forEach {
+        [cardTopicView, emptyDiaryView, diaryLockView].forEach {
             $0.snp.makeConstraints {
                 $0.top.equalTo(headerStack.snp.bottom).offset(16)
                 $0.horizontalEdges.equalToSuperview()
+                $0.bottom.equalToSuperview()
             }
+        }
+        
+        cardPreview.snp.makeConstraints {
+            $0.top.equalTo(headerStack.snp.bottom).offset(16)
+            $0.horizontalEdges.equalToSuperview()
+            $0.height.equalTo(74)
         }
 
         moreImageView.snp.makeConstraints {
@@ -257,6 +265,22 @@ final class SelectedInfo: UIView {
         formatter.dateFormat = "M월 d일 EEEE"
         selectedDayLabel.text = formatter.string(from: date)
     }
+    
+    func resetView() {
+        selectedDayLabel.text = ""
+        [cardTopicView, cardPreview, emptyDiaryView, diaryLockView].forEach {
+            $0.isHidden = true
+        }
+        
+        menu.isHidden = true
+        moreImageView.isHidden = true
+        
+        iconView.isHidden = true
+        timeLeftStack.isHidden = true
+        
+        currentDiaryId = nil
+        currentIsPublished = nil
+    }
 
     // MARK: - Private
 
@@ -320,7 +344,12 @@ final class SelectedInfo: UIView {
     // MARK: - Actions
     
     @objc private func moreButtonTapped() {
-        onMoreButtonTapped?(currentIsPublished)
+        if menu.isHidden {
+            onMoreButtonTapped?(currentIsPublished)
+            menu.isHidden = false
+        } else {
+            menu.isHidden = true
+        }
     }
 }
 

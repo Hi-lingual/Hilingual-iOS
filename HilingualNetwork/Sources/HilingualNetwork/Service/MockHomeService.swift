@@ -72,7 +72,7 @@ public final class MockHomeService: HomeService {
         let mockDiary = DiaryInfoDTO.DiaryDataDTO(
             diaryId: 1,
             imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS7zO8uMM-dPCiPPzr0p_K0Z16GAUy26wPhNQ&s",
-            originalText: "Today was such a meaningful day. I went to the park...",
+            originalText: "Today was the most stressful day in 2025 for me. It was the team building day at SOPT. I dreaded this day was because I didn't know what to expect. The process was complicated and the group(?) was 공개 in that day, so",
             isPublished: false
         )
         let mock = DiaryInfoDTO(data: mockDiary)
