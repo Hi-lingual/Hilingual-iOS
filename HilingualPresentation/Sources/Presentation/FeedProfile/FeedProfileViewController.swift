@@ -127,7 +127,7 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
         let visibleHeight = screenHeight - topInset - bottomInset
         
         if contentHeight < visibleHeight {
-            let footerHeight: CGFloat = 120
+            let footerHeight: CGFloat = 160
             let footer = UIView()
             footer.frame.size.height = footerHeight
             footer.backgroundColor = .clear
