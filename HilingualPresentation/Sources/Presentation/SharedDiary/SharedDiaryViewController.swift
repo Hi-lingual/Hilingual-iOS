@@ -17,6 +17,7 @@ public final class SharedDiaryViewController: BaseUIViewController<SharedDiaryVi
     
     private var isMine: Bool = true
     private let diaryId: Int
+    private var userId: Int64?
     
     private let viewDidLoadSubject = PassthroughSubject<Void, Never>()
 
@@ -113,6 +114,7 @@ public final class SharedDiaryViewController: BaseUIViewController<SharedDiaryVi
     
     private let likeToggleSubject = PassthroughSubject<(Int, Bool), Never>()
     private let publishToggleSubject = PassthroughSubject<(Int, Bool), Never>()
+    private let blockUserSubject = PassthroughSubject<Int64, Never>()
     
     public override func bind(viewModel: SharedDiaryViewModel) {
         super.bind(viewModel: viewModel)
@@ -128,6 +130,7 @@ public final class SharedDiaryViewController: BaseUIViewController<SharedDiaryVi
             viewDidLoad: viewDidLoadSubject.eraseToAnyPublisher(),
             likeTapped: likeToggleSubject.eraseToAnyPublisher(),
             publishTapped: publishToggleSubject.eraseToAnyPublisher(),
+            blockTapped: blockUserSubject.eraseToAnyPublisher()
             )
     }
     
@@ -143,7 +146,6 @@ public final class SharedDiaryViewController: BaseUIViewController<SharedDiaryVi
                 receiveValue: { [weak self] entity in
                     guard let self else { return }
                     
-                    // 바로 View에 바인딩
                     self.sharedDiaryView.configure(
                         profileImgURL: entity.profile.profileImg,
                         nickname: entity.profile.nickname,
@@ -154,8 +156,8 @@ public final class SharedDiaryViewController: BaseUIViewController<SharedDiaryVi
                     )
                     
                     self.isMine = entity.isMine
+                    self.userId = Int64(entity.profile.userId)
                 }
-
             )
             .store(in: &cancellables)
     }
@@ -174,9 +176,7 @@ public final class SharedDiaryViewController: BaseUIViewController<SharedDiaryVi
         showModal()
     }
     
-    
     // MARK: - Actions
-    // TODO: - 차단하기 modal 연결
     
     @objc private func showModal() {
             let items: [(String, UIImage?, () -> Void)]
@@ -185,7 +185,6 @@ public final class SharedDiaryViewController: BaseUIViewController<SharedDiaryVi
                     items = [
                         ("비공개하기", UIImage(resource: .icHide24Ios), { [weak self] in
                             guard let self else { return }
-                            // TODO: 서버에 비공개 전환 API 호출
                             self.modal.isHidden = true
                             showPrivateDialog()
                         })
@@ -194,7 +193,7 @@ public final class SharedDiaryViewController: BaseUIViewController<SharedDiaryVi
                 items = [
                     ("계정 차단하기", UIImage(resource: .icBlockGray24Ios), { [weak self] in
                         self?.modal.isHidden = true
-                        // TODO: 서버 차단 API 호출
+                        self?.showBlockModal()
                     }),
                     ("게시글 신고하기", UIImage(resource: .icReport24Ios), { [weak self] in
                         self?.modal.isHidden = true
@@ -213,6 +212,18 @@ public final class SharedDiaryViewController: BaseUIViewController<SharedDiaryVi
             }
         }
     
+    @objc private func showBlockModal() {
+        let blockModal = BlockModal()
+        view.addSubview(blockModal)
+        blockModal.show(in: view)
+        blockModal.onApplyTapped = { [weak self] in
+            guard let self, let userId = self.userId else { return }
+            self.blockUserSubject.send(userId)
+            let vc = diContainer.makeUserFeedProfileViewController(userId: userId)
+            self.navigationController?.pushViewController(vc, animated: true)
+        }
+    }
+    
     @objc private func showPrivateDialog() {
         dialog.configure(
             title: "영어 일기를 비공개 하시겠어요?",
@@ -225,18 +236,14 @@ public final class SharedDiaryViewController: BaseUIViewController<SharedDiaryVi
             rightAction: { [weak self] in
                 guard let self else { return }
                 self.dialog.dismiss()
-                
                 self.publishToggleSubject.send((self.diaryId, false))
                 
                 if let nav = self.navigationController {
                     nav.popViewController(animated: true)
-                    
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                        if let previousVC = nav.viewControllers.last {
-                            let toast = ToastMessage()
-                            previousVC.view.addSubview(toast)
-                            toast.configure(type: .basic, message: "일기가 비공개 되었어요.")
-                        }
+                    if let previousVC = nav.viewControllers.last {
+                        let toast = ToastMessage()
+                        previousVC.view.addSubview(toast)
+                        toast.configure(type: .basic, message: "일기가 비공개 되었어요.")
                     }
                 }
             }
@@ -255,7 +262,6 @@ public final class SharedDiaryViewController: BaseUIViewController<SharedDiaryVi
                 self?.navigationController?.popViewController(animated: true)
             }
         )
-        
         dialog.showAnimation()
     }
     
@@ -277,7 +283,6 @@ public final class SharedDiaryViewController: BaseUIViewController<SharedDiaryVi
                 self?.present(safariVC, animated: true)
             }
         )
-        
         dialog.showAnimation()
     }
 }
