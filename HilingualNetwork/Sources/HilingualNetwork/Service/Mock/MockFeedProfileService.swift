@@ -22,8 +22,8 @@ public final class MockFeedProfileService: FeedProfileService {
                 code: 20000,
                 data: SharedFeedDataDTO(
                     profile: SharedProfileDTO(profileImg: "https://image.aladin.co.kr/Tobe/Thumbs/7AS4S2/Y3S223/638799314905503647_0.png?RS=600&FI=100", nickname: "내 프로필임"),
-                    diaryList: []
-//                    diaryList: sampleSharedItemsForMe()
+//                    diaryList: []
+                    diaryList: sampleSharedItemsForMe()
                 ),
                 message: "공유된 일기를 조회했습니다."
             )
@@ -58,7 +58,8 @@ public final class MockFeedProfileService: FeedProfileService {
             dto = LikedFeedResponseDTO(
                 code: 20000,
                 data: LikedFeedDataDTO(
-                    diaryList: sampleLikedItemsForMe()),
+                    diaryList: []),
+//                    diaryList: sampleLikedItemsForMe()),
                 message: "공유된 일기를 조회했습니다."
             )
         default: // 데이터 없음

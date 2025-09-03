@@ -17,24 +17,26 @@ public enum FeedListType {
 public final class FeedViewModel: BaseViewModel, BaseViewModelType {
 
     // MARK: - Input/Output
+    
     public struct Input {
-        /// 당겨서 새로고침 / 초기 로드 트리거
         let reload = PassthroughSubject<Void, Never>()
     }
 
     public struct Output {
-        let feeds: AnyPublisher<[FeedDiaryItem], Never>
+        let feeds: AnyPublisher<[FeedModel], Never>
         let haveFollowing: AnyPublisher<Bool?, Never>
         let isLoading: AnyPublisher<Bool, Never>
         let errorMessage: AnyPublisher<String?, Never>
     }
 
     // MARK: - Dependencies
+    
     private let feedUseCase: FeedUseCase
     private let type: FeedListType?
 
     // MARK: - State
-    private let feedsSubject = CurrentValueSubject<[FeedDiaryItem], Never>([])
+    
+    private let feedsSubject = CurrentValueSubject<[FeedModel], Never>([])
     private let haveFollowingSubject = CurrentValueSubject<Bool?, Never>(nil)
     private let isLoadingSubject = CurrentValueSubject<Bool, Never>(false)
     private let errorSubject = CurrentValueSubject<String?, Never>(nil)
@@ -57,7 +59,6 @@ public final class FeedViewModel: BaseViewModel, BaseViewModelType {
     // MARK: - Transform
     public func transform(input: Input) -> Output {
         guard let type else {
-            // TODO: 프로필 로직 구현
             return Output(
                 feeds: feedsSubject.eraseToAnyPublisher(),
                 haveFollowing: haveFollowingSubject.eraseToAnyPublisher(),
@@ -73,7 +74,7 @@ public final class FeedViewModel: BaseViewModel, BaseViewModelType {
         .eraseToAnyPublisher()
 
         trigger
-            .flatMap { [weak self] _ -> AnyPublisher<[FeedDiaryItem], Never> in
+            .flatMap { [weak self] _ -> AnyPublisher<[FeedModel], Never> in
                 guard let self else { return Just([]).eraseToAnyPublisher() }
                 self.isLoadingSubject.send(true)
                 self.errorSubject.send(nil)
@@ -81,10 +82,10 @@ public final class FeedViewModel: BaseViewModel, BaseViewModelType {
                 let useCaseType: FeedType = (type == .recommended) ? .recommended : .following
 
                 return self.feedUseCase.execute(type: useCaseType)
-                    .map { (entities, haveFollowing) -> [FeedDiaryItem] in
+                    .map { (entities, haveFollowing) -> [FeedModel] in
                         let items = entities.map { e in
-                            FeedDiaryItem(
-                                id: e.diary.diaryId,
+                            FeedModel(
+                                diaryID: e.diary.diaryId,
                                 userID: e.profile.userId,
                                 nickname: e.profile.nickname,
                                 profileImg: e.profile.profileImg,
@@ -98,7 +99,6 @@ public final class FeedViewModel: BaseViewModel, BaseViewModelType {
                             )
                         }
 
-                        /// 팔로잉일 경우만 haveFollowing 값을 전달
                         if type == .following {
                             self.haveFollowingSubject.send(haveFollowing ?? false)
                         } else {
@@ -112,7 +112,7 @@ public final class FeedViewModel: BaseViewModel, BaseViewModelType {
                     })
                     .catch { [weak self] error in
                         self?.errorSubject.send(error.localizedDescription)
-                        return Just<[FeedDiaryItem]>([])
+                        return Just<[FeedModel]>([])
                     }
                     .eraseToAnyPublisher()
             }

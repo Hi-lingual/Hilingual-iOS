@@ -78,15 +78,15 @@ public final class MockFeedService: FeedService {
     private func sampleItemsForRecommended() -> [FeedItemDTO] {
         [
             .init(
-                profile: .init(userId: 21,  isMine: true, profileImg: "https://image.aladin.co.kr/Tobe/Thumbs/7AS4S2/Y3S223/638799314905503647_0.png?RS=600&FI=100", nickname: "밍",     streak: 3),
+                profile: .init(userId: 0,  isMine: true, profileImg: "https://image.aladin.co.kr/Tobe/Thumbs/7AS4S2/Y3S223/638799314905503647_0.png?RS=600&FI=100", nickname: "밍",     streak: 3),
                 diary:   .init(diaryId: 1,  sharedDate: 2500, likeCount: 6, isLiked: true,  diaryImg: "https://t1.daumcdn.net/gift/pagebuilder/image/page/30364/20250604_VCAWA.jpeg", originalText: "Had a presentation today and it was a disaster. My voice was shaking, my slides didn’t work properly, and I forgot what I wanted to say. So 답답하다. I know I should’ve practiced more, but still. Hate days like this.")
             ),
             .init(
-                profile: .init(userId: 12,  isMine: false, profileImg: "https://i.namu.wiki/i/ox5e5MMg8cRJiIm65Tm7DhzLAw5Kjz8n-96WESaHdpWm59PhwQJo0gi8pdMWW1cKONtAlitKsLWNrvnPNlHxlQ.webp", nickname: "짝나귀여워", streak: 3),
+                profile: .init(userId: 1,  isMine: false, profileImg: "https://i.namu.wiki/i/ox5e5MMg8cRJiIm65Tm7DhzLAw5Kjz8n-96WESaHdpWm59PhwQJo0gi8pdMWW1cKONtAlitKsLWNrvnPNlHxlQ.webp", nickname: "짝나귀여워", streak: 3),
                 diary:   .init(diaryId: 23, sharedDate: 2500, likeCount: 6, isLiked: false, diaryImg: nil,                         originalText: "Had a presentation today and it was a disaster. My voice was...")
             ),
             .init(
-                profile: .init(userId: 126, isMine: false, profileImg: "https://image.aladin.co.kr/Tobe/Thumbs/7AS4S2/Y3S223/638799314905503647_0.png?RS=600&FI=100", nickname: "큰나귀여워", streak: 3),
+                profile: .init(userId: 1, isMine: false, profileImg: "https://image.aladin.co.kr/Tobe/Thumbs/7AS4S2/Y3S223/638799314905503647_0.png?RS=600&FI=100", nickname: "큰나귀여워", streak: 3),
                 diary:   .init(diaryId: 41, sharedDate: 2500, likeCount: 6, isLiked: true,  diaryImg: "https://t1.daumcdn.net/gift/pagebuilder/image/page/30364/20250604_VCAWA.jpeg", originalText: "Had a presentation today and it was a disaster. My voice was shaking, my slides didn’t work properly, and I forgot what I wanted to say. So 답답하다. I know I should’ve practiced more, but still. Hate days like this.")
             )
         ]

@@ -12,6 +12,7 @@ import SafariServices
 public final class FeedViewController: BaseUIViewController<FeedViewModel> {
 
     // MARK: - Properties
+    
     private let feedView = FeedView()
     private let dialog = Dialog()
 
@@ -54,6 +55,7 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
     }()
 
     // MARK: - Lifecycle
+    
     public override func setUI() {
         feedView.configureSegmentedControl(
             parentVC: self,
@@ -97,7 +99,7 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
         navigationController?.pushViewController(myProfileVC, animated: true)
     }
 
-    // MARK: - Public
+    // MARK: - Public Methods
     func showToast(message: String) {
         feedView.showToast(message: message)
     }
@@ -122,7 +124,6 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
         view.bringSubviewToFront(dialog)
     }
     
-    // MARK: - Report
     private func showReportDialog() {
         dialog.configure(
             style: .normal,

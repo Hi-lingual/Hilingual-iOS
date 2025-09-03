@@ -1,5 +1,5 @@
 //
-//  FeedProfileView.swift
+//  FeedUserProfile.swift
 //  HilingualPresentation
 //
 //  Created by 조영서 on 8/15/25.
@@ -9,7 +9,7 @@ import UIKit
 import SnapKit
 import Kingfisher
 
-final class FeedProfileView: UIView {
+final class FeedUserProfile: UIView {
 
     // MARK: - Callbacks
 

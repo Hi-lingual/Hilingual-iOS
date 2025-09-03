@@ -13,12 +13,11 @@ public final class FeedProfileViewModel: BaseViewModel, BaseViewModelType {
     
     // MARK: - Input/Output
     public struct Input {
-        /// 당겨서 새로고침 / 초기 로드 트리거
         let reload = PassthroughSubject<Void, Never>()
     }
     
     public struct Output {
-        let feeds: AnyPublisher<[FeedDiaryItem], Never>
+        let feeds: AnyPublisher<[FeedModel], Never>
         let profile: AnyPublisher<FeedProfileInfoEntity?, Never>
         let isLoading: AnyPublisher<Bool, Never>
         let errorMessage: AnyPublisher<String?, Never>
@@ -32,7 +31,7 @@ public final class FeedProfileViewModel: BaseViewModel, BaseViewModelType {
     private let targetUserId: Int64
     
     // MARK: - State
-    private let feedsSubject = CurrentValueSubject<[FeedDiaryItem], Never>([])
+    private let feedsSubject = CurrentValueSubject<[FeedModel], Never>([])
     private let profileSubject = CurrentValueSubject<FeedProfileInfoEntity?, Never>(nil)
     private let isEmptySubject = CurrentValueSubject<Bool, Never>(false)
     private let isLoadingSubject = CurrentValueSubject<Bool, Never>(false)
@@ -72,16 +71,16 @@ public final class FeedProfileViewModel: BaseViewModel, BaseViewModelType {
             .store(in: &cancellables)
         
         trigger
-            .flatMap { [weak self] _ -> AnyPublisher<[FeedDiaryItem], Never> in
+            .flatMap { [weak self] _ -> AnyPublisher<[FeedModel], Never> in
                 guard let self else { return Just([]).eraseToAnyPublisher() }
                 self.isLoadingSubject.send(true)
                 self.errorSubject.send(nil)
                 
                 return self.feedUseCase.execute(type: self.type, targetUserId: self.targetUserId)
-                    .map { (entities, _) -> [FeedDiaryItem] in
+                    .map { (entities, _) -> [FeedModel] in
                         entities.map { entity in
-                            FeedDiaryItem(
-                                id: entity.diary.diaryId,
+                            FeedModel(
+                                diaryID: entity.diary.diaryId,
                                 userID: entity.profile.userId,
                                 nickname: entity.profile.nickname,
                                 profileImg: entity.profile.profileImg,
@@ -100,7 +99,7 @@ public final class FeedProfileViewModel: BaseViewModel, BaseViewModelType {
                     })
                     .catch { [weak self] error in
                         self?.errorSubject.send(error.localizedDescription)
-                        return Just<[FeedDiaryItem]>([])
+                        return Just<[FeedModel]>([])
                     }
                     .eraseToAnyPublisher()
             }

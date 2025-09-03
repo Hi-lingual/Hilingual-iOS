@@ -15,7 +15,7 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
     // MARK: - Properties
     
     private let userFeedProfileView = UserFeedProfileView()
-    private let sharedVC: FeedProfileListViewController
+    private let sharedVC: FeedProfileViewController
     private let targetUserId: Int64
     private var isBlocked: Bool = false
     private let dialog = Dialog()
@@ -56,27 +56,32 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
         sharedVC.view.snp.makeConstraints { $0.edges.equalToSuperview() }
         sharedVC.didMove(toParent: self)
         
+        sharedVC.onScroll = { [weak self] offsetY in
+            guard let self else { return }
+            self.userFeedProfileView.updateHeader(offsetY: offsetY)
+            self.userFeedProfileView.updateFeedContainer(offsetY: offsetY)
+        }
+        
         view.addSubview(dialog)
         dialog.isHidden = true
         dialog.snp.makeConstraints { $0.edges.equalToSuperview() }
         
-        sharedVC.onHideTapped = { [weak self] row in
-            self?.pendingDeleteRow = row
-            self?.showHideDialog()
-        }
-        
+        /// 게시글 신고하기
         sharedVC.onReportTapped = { [weak self] in
             self?.showReportDialog()
         }
         
+        /// 유저 차단 모달 띄우기
         userFeedProfileView.onBlockTapped = { [weak self] in
             self?.userFeedProfileView.showBlockDialog()
         }
         
+        /// 유저 신고하기
         userFeedProfileView.onReportTapped = { [weak self] in
             self?.showAccountReportDialog()
         }
         
+        /// 유저 차단 모달 클릭 시, 차단 로직
         userFeedProfileView.onBlockConfirmTapped = { [weak self] in
             guard let self else { return }
             self.userFeedProfileView.dismissBlockDialog()
@@ -86,6 +91,7 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
             self.updateNavigation()
         }
         
+        /// 유저 차단해제하기
         userFeedProfileView.onUnblockTapped = { [weak self] in
             guard let self else { return }
             self.isBlocked = false
@@ -103,7 +109,7 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
     // MARK: - Navigation
     
     public override func navigationType() -> NavigationType? {
-        return isBlocked ? .backOnly : .backTitleMenu(title: "")
+        return isBlocked ? .backTitle("피드") : .backTitleMenu(title: "피드")
     }
     
     private func updateNavigation() {
@@ -147,6 +153,8 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
         input.reload.send(())
     }
         
+    // MARK: - Private Methods
+
     private func showHideDialog() {
         dialog.configure(
             style: .normal,

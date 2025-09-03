@@ -12,8 +12,9 @@ final class UserFeedProfileView: BaseUIView {
     
     // MARK: - UI Components
     
-    private let myFeedView = FeedProfileView()
+    private let userFeedView = FeedUserProfile()
     private(set) var button = FollowButton()
+    private var feedTopConstraint: Constraint?
     let feedContainer = UIView()
     
     private let blockedStack: UIStackView = {
@@ -66,7 +67,7 @@ final class UserFeedProfileView: BaseUIView {
     // MARK: - Setup
     
     override func setUI() {
-        addSubviews(myFeedView, button, feedContainer, blockedStack, modal)
+        addSubviews(userFeedView, button, feedContainer, blockedStack, modal)
         blockedStack.isHidden = true
         blockedStack.addArrangedSubviews(titleLabel, subTitleLabel)
         button.configure(state: .follow)
@@ -75,20 +76,20 @@ final class UserFeedProfileView: BaseUIView {
     }
     
     override func setLayout() {
-        myFeedView.snp.makeConstraints {
+        userFeedView.snp.makeConstraints {
             $0.top.equalTo(safeAreaLayoutGuide).offset(8)
             $0.horizontalEdges.equalToSuperview().inset(16)
         }
         
         button.snp.makeConstraints {
-            $0.top.equalTo(myFeedView.snp.bottom).offset(20)
+            $0.top.equalTo(userFeedView.snp.bottom).offset(20)
             $0.horizontalEdges.equalToSuperview().inset(16)
             $0.height.equalTo(37)
         }
         
         feedContainer.snp.makeConstraints {
-            $0.top.equalTo(button.snp.bottom)
-            $0.horizontalEdges.bottom.equalToSuperview()
+            feedTopConstraint = $0.top.equalTo(safeAreaLayoutGuide).offset(133).constraint
+            $0.left.right.bottom.equalToSuperview()
         }
         
         blockedStack.snp.makeConstraints {
@@ -97,6 +98,9 @@ final class UserFeedProfileView: BaseUIView {
         }
         
         modal.snp.makeConstraints { $0.edges.equalToSuperview() }
+        
+        bringSubviewToFront(userFeedView)
+        bringSubviewToFront(button)
     }
     
     // MARK: - Public
@@ -108,7 +112,7 @@ final class UserFeedProfileView: BaseUIView {
         following: Int,
         streak: Int
     ) {
-        myFeedView.configure(
+        userFeedView.configure(
             nickname: nickname,
             profileImageURL: profileImageURL,
             follower: follower,
@@ -116,6 +120,24 @@ final class UserFeedProfileView: BaseUIView {
             streak: streak
         )
         titleLabel.text = "\(nickname)님의 글을 확인할 수 없어요."
+    }
+    
+    func updateHeader(offsetY: CGFloat) {
+        let progress = min(max(offsetY / 60, 0), 1)
+        
+        let alpha = 1 - progress
+        let translationY = -progress * 40
+        
+        userFeedView.alpha = alpha
+        button.alpha = alpha
+        
+        userFeedView.transform = CGAffineTransform(translationX: 0, y: translationY)
+        button.transform = CGAffineTransform(translationX: 0, y: translationY)
+    }
+    
+    func updateFeedContainer(offsetY: CGFloat) {
+        let newOffset = max(133 - offsetY, 0)
+        feedTopConstraint?.update(offset: newOffset)
     }
     
     func showModal() {
@@ -166,7 +188,7 @@ final class UserFeedProfileView: BaseUIView {
     }
 
     func setFollowSectionTappedAction(_ action: @escaping () -> Void) {
-        myFeedView.onFollowSectionTapped = action
+        userFeedView.onFollowSectionTapped = action
     }
 
     // MARK: - Private

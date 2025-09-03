@@ -1,5 +1,5 @@
 //
-//  FeedDiaryCell.swift
+//  FeedCell.swift
 //  HilingualPresentation
 //
 //  Created by 조영서 on 8/15/25.
@@ -9,23 +9,23 @@ import UIKit
 import SnapKit
 import Kingfisher
 
-final class FeedDiaryCell: UITableViewCell {
+final class FeedCell: UITableViewCell {
     
     // MARK: - Delegate
     
     @MainActor
-    protocol FeedDiaryCellDelegate: AnyObject {
-        func feedDiaryCell(_ cell: FeedDiaryCell, didTapMoreButton isMine: Bool)
-        func feedDiaryCell(_ cell: FeedDiaryCell, didTapMenuItemAt index: Int, isMine: Bool)
-        func feedDiaryCellDidTapProfile(_ cell: FeedDiaryCell)
-        func feedDiaryCellDidTapDetail(_ cell: FeedDiaryCell)
+    protocol FeedCellDelegate: AnyObject {
+        func feedCell(_ cell: FeedCell, didTapMoreButton isMine: Bool)
+        func feedCell(_ cell: FeedCell, didTapMenuItemAt index: Int, isMine: Bool)
+        func feedCellDidTapProfile(_ cell: FeedCell)
+        func feedCellDidTapDetail(_ cell: FeedCell)
     }
 
     // MARK: - Properties
     
-    static let reuseIdentifier = "FeedDiaryCell"
+    static let reuseIdentifier = "FeedCell"
     
-    weak var delegate: FeedDiaryCellDelegate?
+    weak var delegate: FeedCellDelegate?
     private var isMine: Bool = false
 
     // MARK: - UI Components
@@ -123,6 +123,7 @@ final class FeedDiaryCell: UITableViewCell {
         let label = UILabel()
         label.attributedText = .suit(.body_r_16, text: "")
         label.textColor = .black
+        label.lineBreakMode = .byTruncatingTail
         label.numberOfLines = 5
         label.textAlignment = .left
         return label
@@ -350,7 +351,7 @@ final class FeedDiaryCell: UITableViewCell {
 
     @objc private func moreButtonTapped() {
         menu.isHidden.toggle()
-        delegate?.feedDiaryCell(self, didTapMoreButton: isMine)
+        delegate?.feedCell(self, didTapMoreButton: isMine)
     }
     
     func closeMenuIfNeeded() {
@@ -360,11 +361,11 @@ final class FeedDiaryCell: UITableViewCell {
     }
 
     @objc private func profileTapped() {
-        delegate?.feedDiaryCellDidTapProfile(self)
+        delegate?.feedCellDidTapProfile(self)
     }
 
     @objc private func detailTapped() {
-        delegate?.feedDiaryCellDidTapDetail(self)
+        delegate?.feedCellDidTapDetail(self)
     }
 
 
@@ -389,9 +390,9 @@ final class FeedDiaryCell: UITableViewCell {
 
 // MARK: - Extensions
 
-extension FeedDiaryCell: ActionMenuDelegate {
+extension FeedCell: ActionMenuDelegate {
     func actionMenu(_ menu: ActionMenu, didSelectItemAt index: Int) {
         menu.isHidden = true
-        delegate?.feedDiaryCell(self, didTapMenuItemAt: index, isMine: isMine)
+        delegate?.feedCell(self, didTapMenuItemAt: index, isMine: isMine)
     }
 }

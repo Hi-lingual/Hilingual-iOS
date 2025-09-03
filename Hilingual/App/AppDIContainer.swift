@@ -154,7 +154,7 @@ final class AppDIContainer: ViewControllerFactory {
     public func makeFeedProfileListViewController(
         type: FeedProfileListType,
         userId: Int64
-    ) -> FeedProfileListViewController {
+    ) -> FeedProfileViewController {
         // Presentation → Domain 변환
         let domainType: FeedProfileType = {
             switch type {
@@ -163,7 +163,7 @@ final class AppDIContainer: ViewControllerFactory {
             }
         }()
         
-        return FeedProfileListViewController(
+        return FeedProfileViewController(
             viewModel: makeFeedProfileViewModel(type: domainType, targetUserId: userId),
             diContainer: self,
             type: type
