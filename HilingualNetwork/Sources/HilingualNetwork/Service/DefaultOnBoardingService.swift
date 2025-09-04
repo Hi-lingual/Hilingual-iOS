@@ -34,17 +34,9 @@ public final class DefaultOnBoardingService: BaseService<OnBoardingAPI>, OnBoard
     }
 
     public func checkNicknameDuplication(nickname: String) -> AnyPublisher<Bool, Error> {
-        #if DEBUG
-        // 디버그 모드에서는 닉네임이 "샤갈"일 경우 false 반환하도록 테스트 대비
-        let isAvailable = (nickname.lowercased() != "샤갈")
-        return Just(isAvailable)
-            .setFailureType(to: Error.self)
-            .eraseToAnyPublisher()
-        #else
         return request(.checkNickname(nickname: nickname), as: OnBoardingResponseDTO.self)
             .map { $0.data.isAvailable }
             .mapError { $0 as Error }
             .eraseToAnyPublisher()
-        #endif
     }
 }

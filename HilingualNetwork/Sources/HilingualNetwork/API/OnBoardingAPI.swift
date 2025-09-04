@@ -22,7 +22,7 @@ extension OnBoardingAPI: TargetType {
     public var path: String {
         switch self {
         case .checkNickname, .setProfile:
-            return "/users/profile"
+            return "/users/profile/check"
         }
     }
 
