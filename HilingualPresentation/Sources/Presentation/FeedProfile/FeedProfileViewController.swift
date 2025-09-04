@@ -58,6 +58,7 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
         
         feedCellView.tableView.delegate = self
         feedCellView.tableView.dataSource = feedCellView
+        feedCellView.tableView.alwaysBounceVertical = false
         
         feedCellView.addTableTapGesture(target: self, action: #selector(didTapTableView))
         
@@ -119,13 +120,18 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
     private func footerForStickyHeader() {
         let tableView = feedCellView.tableView
         let contentHeight = tableView.contentSize.height
+        let safeAreaHeight = view.safeAreaLayoutGuide.layoutFrame.height
         
-        if contentHeight <= 750 {
-            let footerHeight: CGFloat = 120
+        if contentHeight > safeAreaHeight - 195 {
             let footer = UIView()
-            footer.frame.size.height = footerHeight
+            footer.frame.size.height = 110
             tableView.tableFooterView = footer
-        } else {
+        }
+        else if
+            contentHeight > safeAreaHeight - 100 {
+            tableView.tableFooterView = nil
+        }
+        else {
             tableView.tableFooterView = nil
         }
     }
