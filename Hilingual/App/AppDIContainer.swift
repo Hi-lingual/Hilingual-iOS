@@ -627,13 +627,13 @@ extension AppDIContainer {
     
     // Service
     
-//    private func makeFeedService() -> FeedService {
-//        return DefaultFeedService()
-//    }
-    
     private func makeFeedService() -> FeedService {
-        return MockFeedService()
+        return DefaultFeedService()
     }
+    
+//    private func makeFeedService() -> FeedService {
+//        return MockFeedService()
+//    }
 }
 
 
@@ -661,15 +661,14 @@ extension AppDIContainer {
         DefaultFeedProfileRepository(service: makeFeedProfileService())
     }
     
-    //    private func makeFeedProfileService() -> FeedProfileService {
-    //        return DefaultFeedProfileService()
-    //    }
-
     private func makeFeedProfileService() -> FeedProfileService {
-        return MockFeedProfileService()
+        return DefaultFeedProfileService()
     }
-    
-    
+
+//    private func makeFeedProfileService() -> FeedProfileService {
+//        return MockFeedProfileService()
+//    }
+        
     // FeedProfileInfo (프로필 정보)
     private func makeFeedProfileInfoUseCase() -> FeedProfileInfoUseCase {
         DefaultFeedProfileInfoUseCase(repository: makeFeedProfileInfoRepository())
@@ -679,12 +678,8 @@ extension AppDIContainer {
         DefaultFeedProfileInfoRepository(service: makeFeedProfileInfoService())
     }
     
-//    private func makeFeedProfileInfoService() -> FeedProfileInfoService {
-//        return DefaultFeedProfileInfoService()
-//    }
-    
     private func makeFeedProfileInfoService() -> FeedProfileInfoService {
-        MockFeedProfileInfoService(isMine: false)
+        return DefaultFeedProfileInfoService()
     }
 
     //MARK: - UploadImageDIContainer
@@ -700,4 +695,8 @@ extension AppDIContainer {
     private func makeUploadImageService() -> PresignedURLService {
         DefaultPresignedURLService()
     }
+    
+//    private func makeFeedProfileInfoService() -> FeedProfileInfoService {
+//        MockFeedProfileInfoService(isMine: false)
+//    }
 }
