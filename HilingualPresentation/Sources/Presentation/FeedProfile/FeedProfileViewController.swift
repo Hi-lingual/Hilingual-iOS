@@ -31,6 +31,7 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
     private let type: FeedProfileListType
     
     private var currentFeeds: [FeedModel] = []
+    private var isFooterApplied = false
     
     var onHideTapped: ((Int) -> Void)?
     var onReportTapped: (() -> Void)?
@@ -58,6 +59,7 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
         
         feedCellView.tableView.delegate = self
         feedCellView.tableView.dataSource = feedCellView
+        
         feedCellView.tableView.alwaysBounceVertical = false
         
         feedCellView.addTableTapGesture(target: self, action: #selector(didTapTableView))
@@ -69,11 +71,6 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
         feedCellView.onReportTapped = { [weak self] in
             self?.onReportTapped?()
         }
-    }
-    
-    public override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        footerForStickyHeader()
     }
     
     // MARK: - Bind
@@ -91,7 +88,10 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
                     emptyMessage: type.emptyMessage,
                     type: type
                 )
-                self.footerForStickyHeader()
+                
+                DispatchQueue.main.async {
+                    self.footerForStickyHeader()
+                }
             }
             .store(in: &cancellables)
     }
@@ -106,7 +106,10 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
             emptyMessage: type.emptyMessage,
             type: type
         )
-        footerForStickyHeader()
+        
+        DispatchQueue.main.async {
+            self.footerForStickyHeader()
+        }
     }
     
     // MARK: - Actions
@@ -118,22 +121,35 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
     // MARK: - Private Method
     
     private func footerForStickyHeader() {
-        let tableView = feedCellView.tableView
-        let contentHeight = tableView.contentSize.height
-        let safeAreaHeight = view.safeAreaLayoutGuide.layoutFrame.height
+        guard !isFooterApplied else { return }
         
-        if contentHeight > safeAreaHeight - 195 {
+        let tableView = feedCellView.tableView
+        tableView.layoutIfNeeded()
+        let contentHeight = tableView.contentSize.height
+        
+        guard let window = UIApplication.shared.connectedScenes
+            .compactMap({ $0 as? UIWindowScene })
+            .first?.windows.first
+        else { return }
+        
+        let screenHeight = UIScreen.main.bounds.height
+        let topInset = window.safeAreaInsets.top
+        let bottomInset = window.safeAreaInsets.bottom
+        let fixedSafeAreaHeight = screenHeight - topInset - bottomInset
+                
+        if contentHeight > fixedSafeAreaHeight - 100 {
+            tableView.tableFooterView = nil
+        }
+        else if contentHeight > fixedSafeAreaHeight - 195 {
             let footer = UIView()
+            footer.backgroundColor = .red
             footer.frame.size.height = 110
             tableView.tableFooterView = footer
-        }
-        else if
-            contentHeight > safeAreaHeight - 100 {
-            tableView.tableFooterView = nil
         }
         else {
             tableView.tableFooterView = nil
         }
+        isFooterApplied = true
     }
 }
 
