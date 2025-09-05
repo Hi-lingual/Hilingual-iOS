@@ -23,5 +23,22 @@ public struct NicknameAvailabilityDTO: Decodable {
 
 public struct RegisterProfileRequestDTO: Encodable {
     public let nickname: String
-    public let profileImg: String
+    public let adAlarmAgree: Bool
+    public let image: ImageFile
+
+    public struct ImageFile: Encodable {
+        public let fileKey: String
+        public let purpose: String 
+
+        public init(fileKey: String, purpose: String = "PROFILE_UPLOAD") {
+            self.fileKey = fileKey
+            self.purpose = purpose
+        }
+    }
+
+    public init(nickname: String, adAlarmAgree: Bool, fileKey: String) {
+        self.nickname = nickname
+        self.adAlarmAgree = adAlarmAgree
+        self.image = ImageFile(fileKey: fileKey)
+    }
 }

@@ -23,7 +23,11 @@ public final class DefaultOnBoardingRepository: OnBoardingRepository {
     }
 
     public func registerProfile(profile: ProfileEntity) -> AnyPublisher<Void, Error> {
-          return service.registerProfile(nickname: profile.nickname, profileImg: profile.profileImg)
-      }
+        return service.registerProfile(
+            nickname: profile.nickname,
+            adAlarmAgree: profile.adAlarmAgree,
+            fileKey: profile.fileKey
+        )
+    }
 }
 

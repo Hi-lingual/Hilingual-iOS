@@ -14,7 +14,7 @@ public final class OnBoardingViewController: BaseUIViewController<OnBoardingView
     
     private let onBoardingView = OnBoardingView()
     private let nicknameSubject = PassthroughSubject<String, Never>()
-    private let startTappedSubject = PassthroughSubject<Void, Never>()
+    private let startTappedSubject = PassthroughSubject<Bool, Never>()
     private let agreementModal = AgreementModalView()
 
     // MARK: - UI
@@ -94,7 +94,9 @@ public final class OnBoardingViewController: BaseUIViewController<OnBoardingView
     @objc
     private func showAgreementModal() {
         agreementModal.onStart = { [weak self] in
-            self?.startTappedSubject.send()
+            guard let self else { return }
+            let adAgree = self.agreementModal.isAdAgreeSelected
+            self.startTappedSubject.send(adAgree)
         }
         agreementModal.isHidden = false
         agreementModal.showAnimation()

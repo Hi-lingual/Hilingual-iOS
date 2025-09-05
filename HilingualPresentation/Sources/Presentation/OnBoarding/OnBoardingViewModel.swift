@@ -15,7 +15,7 @@ public final class OnBoardingViewModel: BaseViewModel {
 
     public struct Input {
         let nicknameChanged: AnyPublisher<String, Never>
-        let startTapped: AnyPublisher<Void, Never>
+        let startTapped: AnyPublisher<Bool, Never>
     }
 
     public struct Output {
@@ -98,13 +98,19 @@ public final class OnBoardingViewModel: BaseViewModel {
             }
 
         input.startTapped
-            .flatMap { [weak self] _ -> AnyPublisher<Void, Never> in
+            .flatMap { [weak self] adAgree -> AnyPublisher<Void, Never> in
                 guard let self else { return Empty().eraseToAnyPublisher() }
-                return self.useCase.registerProfile(nickname: self.latestValidNickname,
-                                                    profileImg: "https://default.image.url/profile.png")
+
+                //TODO: - 실제 filekey로 변경
+                let fileKey = "users/123/images/profile/tmp/2025-08-13/7d7a...c.jpg"
+
+                return self.useCase.registerProfile(
+                    nickname: self.latestValidNickname,
+                    adAlarmAgree: adAgree,
+                    fileKey: fileKey
+                )
                 .handleEvents(receiveOutput: { [weak self] in
                     UserDefaults.standard.set(true, forKey: "isProfileCompleted")
-                    print("[OnBoardingVM] 프로필 등록 완료 → isProfileCompleted = true 저장")
                     self?.navigateToHomeSubject.send()
                 })
                 .catch { _ in Empty() }

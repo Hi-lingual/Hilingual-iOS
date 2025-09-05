@@ -7,10 +7,12 @@
 
 public struct ProfileEntity {
     public let nickname: String
-    public let profileImg: String
+    public let adAlarmAgree: Bool
+    public let fileKey: String
 
-    public init(nickname: String, profileImg: String) {
+    public init(nickname: String, adAlarmAgree: Bool, fileKey: String) {
         self.nickname = nickname
-        self.profileImg = profileImg
+        self.adAlarmAgree = adAlarmAgree
+        self.fileKey = fileKey
     }
 }
