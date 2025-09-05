@@ -20,13 +20,13 @@ extension HomeAPI: BaseTargetType {
     public var path: String {
         switch self {
         case .getUserInfo:
-            return "/users/info"
+            return "/users/home/info"
         case .getMonthInfo:
-            return "/calendar/month"
+            return "/home/calendar/month"
         case let .getDiaryInfo(date):
-            return "/calendar/\(date)"
+            return "/home/calendar/\(date)"
         case let .getTopic(date):
-            return "/calendar/\(date)/topic"
+            return "/home/calendar/\(date)/topic"
         }
     }
 
