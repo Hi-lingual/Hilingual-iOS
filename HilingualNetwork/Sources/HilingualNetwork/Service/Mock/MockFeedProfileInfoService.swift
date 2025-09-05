@@ -23,7 +23,6 @@ public final class MockFeedProfileInfoService: FeedProfileInfoService {
             dto = FeedProfileInfoResponseDTO(
                 code: 20000,
                 data: FeedProfileInfoDTO(
-                    userId: 1,
                     isMine: true,
                     profileImg: "https://image.aladin.co.kr/Tobe/Thumbs/7AS4S2/Y3S223/638799314905503647_0.png?RS=600&FI=100",
                     nickname: "영돌",
@@ -40,7 +39,6 @@ public final class MockFeedProfileInfoService: FeedProfileInfoService {
             dto = FeedProfileInfoResponseDTO(
                 code: 20000,
                 data: FeedProfileInfoDTO(
-                    userId: 16,
                     isMine: false,
                     profileImg: " ",
                     nickname: "타인프로필링",

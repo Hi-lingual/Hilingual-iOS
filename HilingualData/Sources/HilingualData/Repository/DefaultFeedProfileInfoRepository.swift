@@ -21,7 +21,6 @@ public final class DefaultFeedProfileInfoRepository: FeedProfileInfoRepository {
         service.fetchProfileInfo(targetUserId: targetUserId)
             .map { dto in
                 FeedProfileInfoEntity(
-                    userId: dto.data.userId,
                     isMine: dto.data.isMine,
                     profileImg: dto.data.profileImg,
                     nickname: dto.data.nickname,

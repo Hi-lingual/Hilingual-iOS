@@ -14,7 +14,6 @@ public struct FeedProfileInfoResponseDTO: Decodable {
 }
 
 public struct FeedProfileInfoDTO: Decodable {
-    public let userId: Int
     public let isMine: Bool
     public let profileImg: String
     public let nickname: String
