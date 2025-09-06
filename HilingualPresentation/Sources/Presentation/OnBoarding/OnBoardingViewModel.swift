@@ -15,7 +15,7 @@ public final class OnBoardingViewModel: BaseViewModel {
 
     public struct Input {
         let nicknameChanged: AnyPublisher<String, Never>
-        let startTapped: AnyPublisher<Void, Never>
+        let startTapped: AnyPublisher<Bool, Never>
     }
 
     public struct Output {
@@ -27,13 +27,17 @@ public final class OnBoardingViewModel: BaseViewModel {
     // MARK: - Private
 
     private let useCase: OnBoardingUseCase
+    private let uploadImageUseCase: UploadImageUseCase
     private let navigateToHomeSubject = PassthroughSubject<Void, Never>()
     private var latestValidNickname: String = ""
+    public var selectedImageData: Data?
+    private var latestFileKey: String = ""
 
     // MARK: - Init
 
-    public init(useCase: OnBoardingUseCase) {
+    public init(useCase: OnBoardingUseCase, uploadImageUseCase: UploadImageUseCase) {
         self.useCase = useCase
+        self.uploadImageUseCase = uploadImageUseCase
     }
 
     // MARK: - Transform
@@ -98,17 +102,42 @@ public final class OnBoardingViewModel: BaseViewModel {
             }
 
         input.startTapped
-            .flatMap { [weak self] _ -> AnyPublisher<Void, Never> in
+            .flatMap { [weak self] adAgree -> AnyPublisher<Void, Never> in
                 guard let self else { return Empty().eraseToAnyPublisher() }
-                return self.useCase.registerProfile(nickname: self.latestValidNickname,
-                                                    profileImg: "https://default.image.url/profile.png")
-                .handleEvents(receiveOutput: { [weak self] in
-                    UserDefaults.standard.set(true, forKey: "isProfileCompleted")
-                    print("[OnBoardingVM] 프로필 등록 완료 → isProfileCompleted = true 저장")
-                    self?.navigateToHomeSubject.send()
-                })
-                .catch { _ in Empty() }
-                .eraseToAnyPublisher()
+
+                let imageData = self.selectedImageData
+                let contentType = "image/jpeg"
+
+                // 이미지가 있는 경우 → PresignedURL 후 업로드
+                if let data = imageData {
+                    return self.uploadImageUseCase
+                        .execute(data: data, contentType: contentType, purpose: "PROFILE_UPLOAD")
+                        .flatMap { fileKey in
+                            self.useCase.registerProfile(
+                                nickname: self.latestValidNickname,
+                                adAlarmAgree: adAgree,
+                                fileKey: fileKey
+                            )
+                        }
+                        .handleEvents(receiveOutput: { [weak self] in
+                            UserDefaults.standard.set(true, forKey: "isProfileCompleted")
+                            self?.navigateToHomeSubject.send()
+                        })
+                        .catch { _ in Empty() }
+                        .eraseToAnyPublisher()
+                } else {
+                    return self.useCase.registerProfile(
+                        nickname: self.latestValidNickname,
+                        adAlarmAgree: adAgree,
+                        fileKey: nil
+                    )
+                    .handleEvents(receiveOutput: { [weak self] in
+                        UserDefaults.standard.set(true, forKey: "isProfileCompleted")
+                        self?.navigateToHomeSubject.send()
+                    })
+                    .catch { _ in Empty() }
+                    .eraseToAnyPublisher()
+                }
             }
             .sink { _ in }
             .store(in: &cancellables)

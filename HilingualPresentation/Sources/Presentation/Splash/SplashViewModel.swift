@@ -93,13 +93,13 @@ public final class SplashViewModel: BaseViewModel {
                         refreshToken: response.refreshToken
                     )
 
-                    #if DEBUG
-                    let isProfileCompleted = true
-                    print("[SplashVM] ⚙️ DEBUG 모드라서 → isProfileCompleted 강제 true임 ㅋㅋ")
-                    #else
+//                    #if DEBUG
+//                    let isProfileCompleted = true
+//                    print("[SplashVM] ⚙️ DEBUG 모드라서 → isProfileCompleted 강제 true임 ㅋㅋ")
+//                    #else
                     let isProfileCompleted = UserDefaults.standard.bool(forKey: "isProfileCompleted")
                     print("[SplashVM] 로컬 프로필 완료 여부: \(isProfileCompleted)")
-                    #endif
+//                    #endif
 
                     if isProfileCompleted {
                         print("[SplashVM] 홈 화면 이동")
