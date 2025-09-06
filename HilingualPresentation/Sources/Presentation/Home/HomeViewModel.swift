@@ -73,4 +73,16 @@ public final class HomeViewModel: BaseViewModel {
     public func fetchUserInfo() -> AnyPublisher<UserInfoEntity, Error> {
         return useCase.fetchUserInfo()
     }
+    
+    public func publishDiary(diaryId: Int) -> AnyPublisher<Void, Error> {
+        return useCase.publishDiary(diaryId: diaryId)
+    }
+    
+    public func unpublishDiary(diaryId: Int) -> AnyPublisher<Void, Error> {
+        return useCase.unpublishDiary(diaryId: diaryId)
+    }
+    
+    public func deleteDiary(diaryId: Int) -> AnyPublisher<Void, Error> {
+        return useCase.deleteDiary(diaryId: diaryId)
+    }
 }

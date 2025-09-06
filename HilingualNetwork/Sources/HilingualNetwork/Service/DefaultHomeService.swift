@@ -15,10 +15,12 @@ public protocol HomeService {
     func fetchMonthInfo(year: Int, month: Int) -> AnyPublisher<MonthInfoDTO, Error>
     func fetchDiaryInfo(date: String) -> AnyPublisher<DiaryInfoDTO, Error>
     func fetchTopic(date: String) -> AnyPublisher<TopicDTO, Error>
+    func publishDiary(diaryId: Int) -> AnyPublisher<Void, Error>
+    func unpublishDiary(diaryId: Int) -> AnyPublisher<Void, Error>
+    func deleteDiary(diaryId: Int) -> AnyPublisher<Void, Error>
 }
 
 public final class DefaultHomeService: BaseService<HomeAPI>, HomeService {
-    
     public func fetchUserInfo() -> AnyPublisher<UserInfoDTO, Error> {
         return request(.getUserInfo, as: UserInfoDTO.self)
             .mapError { $0 as Error }
@@ -39,6 +41,24 @@ public final class DefaultHomeService: BaseService<HomeAPI>, HomeService {
 
     public func fetchTopic(date: String) -> AnyPublisher<TopicDTO, Error> {
         return request(.getTopic(date: date), as: TopicDTO.self)
+            .mapError { $0 as Error }
+            .eraseToAnyPublisher()
+    }
+    
+    public func publishDiary(diaryId: Int) -> AnyPublisher<Void, Error> {
+        return requestPlain(.publishDiary(diaryId: diaryId))
+            .mapError { $0 as Error }
+            .eraseToAnyPublisher()
+    }
+    
+    public func unpublishDiary(diaryId: Int) -> AnyPublisher<Void, Error> {
+        return requestPlain(.unpublishDiary(diaryId: diaryId))
+            .mapError { $0 as Error }
+            .eraseToAnyPublisher()
+    }
+    
+    public func deleteDiary(diaryId: Int) -> AnyPublisher<Void, Error> {
+        return requestPlain(.deleteDiary(diaryId: diaryId))
             .mapError { $0 as Error }
             .eraseToAnyPublisher()
     }

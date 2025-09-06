@@ -81,7 +81,6 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                     diaryData: nil,
                     imageURL: nil
                 )
-                print("DEBUG: selected is future -> show lock view for \(requestedDate)")
                 return
             }
             
@@ -98,10 +97,6 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                     .sink(receiveCompletion: { completion in
                     }, receiveValue: { [weak self] diary in
                         guard let self else { return }
-                        guard Calendar.current.isDate(self.homeView.calendarView.selectedDate ?? Date(), inSameDayAs: requestedDate) else {
-                            print("DEBUG: stale diary response ignored for \(requestedDate)")
-                            return
-                        }
                         self.homeView.selectedInfo.updateView(
                             for: requestedDate,
                             diaryId: diary?.diaryId,
@@ -118,11 +113,6 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                     .sink(receiveCompletion: { completion in
                     }, receiveValue: { [weak self] topic in
                         guard let self else { return }
-                        guard Calendar.current.isDate(self.homeView.calendarView.selectedDate ?? Date(), inSameDayAs: requestedDate) else {
-                            print("DEBUG: stale topic response ignored for \(requestedDate)")
-                            return
-                        }
-                        
                         let remaining = max(0, topic?.remainingTime ?? 0)
                         self.homeView.selectedInfo.updateView(
                             for: requestedDate,
@@ -223,18 +213,18 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
             }
         }
         
-        homeView.selectedInfo.onMenuAction = { [weak self] action in
+        homeView.selectedInfo.onMenuAction = { [weak self] action, diaryId in
             guard let self else { return }
-            
             switch action {
             case .publish:
-                self.showDialog(for: .publish, selectedDate: self.homeView.calendarView.selectedDate ?? Date()) { _ in }
+                self.showDialog(for: .publish, diaryId: diaryId)
             case .unpublish:
-                self.showDialog(for: .unpublish, selectedDate: self.homeView.calendarView.selectedDate ?? Date()) { _ in }
+                self.showDialog(for: .unpublish, diaryId: diaryId)
             case .delete:
-                self.showDialog(for: .delete, selectedDate: self.homeView.calendarView.selectedDate ?? Date()) { _ in }
+                self.showDialog(for: .delete, diaryId: diaryId)
             }
         }
+        
         homeView.profileView.alarmButton.addTarget(self, action: #selector(alarmButtonTapped), for: .touchUpInside)
         
         let profileTapGesture = UITapGestureRecognizer(target: self, action: #selector(profileImageTapped))
@@ -270,11 +260,13 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         containerView.bringSubviewToFront(homeView.selectedInfo.menu)
     }
     
-    private func showDialog(for action: MenuAction, selectedDate: Date, completion: @escaping (Bool?) -> Void) {
+    private func showDialog(for action: MenuAction, diaryId: Int) {
         guard let containerView = self.tabBarController?.view else { return }
         
         containerView.addSubview(dialog)
         dialog.snp.remakeConstraints { $0.edges.equalTo(containerView) }
+        
+        let selectedDate = self.homeView.calendarView.selectedDate ?? Date()
         
         switch action {
         case .publish:
@@ -288,11 +280,14 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                 rightAction: { [weak self] in
                     guard let self else { return }
                     
-                    self.viewModel?.fetchDiary(for: selectedDate)
+                    self.viewModel?.publishDiary(diaryId: diaryId)
                         .receive(on: RunLoop.main)
-                        .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] diary in
-                            guard let self, let diary else { return }
-                            
+                        .sink(receiveCompletion: { completion in
+                            if case .failure = completion {
+                                print("🚨 게시하기 API 호출 실패")
+                            }
+                        }, receiveValue: { [weak self] _ in
+                            guard let self else { return }
                             self.homeView.selectedInfo.updateDiaryState(isPublished: true)
                             self.homeView.selectedInfo.updateMenuState(isPublished: true)
                             self.dialog.dismiss()
@@ -307,9 +302,8 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                             
                             toast.action = { [weak self] in
                                 guard let self else { return }
-                                let vc = self.diContainer.makeSharedDiaryViewController(diaryId: diary.diaryId)
+                                let vc = self.diContainer.makeSharedDiaryViewController(diaryId: diaryId)
                                 self.navigationController?.pushViewController(vc, animated: true)
-                                completion(true)
                             }
                         })
                         .store(in: &self.viewModel!.cancellables)
@@ -323,15 +317,26 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                 leftButtonTitle: "아니요",
                 rightButtonTitle: "비공개하기",
                 leftAction: { [weak dialog] in dialog?.dismiss() },
-                rightAction: {[weak self] in
-                    self?.homeView.selectedInfo.updateDiaryState(isPublished: false)
-                    self?.homeView.selectedInfo.updateMenuState(isPublished: false)
-                    self?.dialog.dismiss()
+                rightAction: { [weak self] in
+                    guard let self else { return }
                     
-                    let toast = ToastMessage()
-                    self?.view.addSubview(toast)
-                    toast.configure(type: .basic, message: "일기가 비공개 되었어요.")
-                    completion(true)
+                    self.viewModel?.unpublishDiary(diaryId: diaryId)
+                        .receive(on: RunLoop.main)
+                        .sink(receiveCompletion: { completion in
+                            if case .failure = completion {
+                                print("🚨 비공개하기 API 호출 실패")
+                            }
+                        }, receiveValue: { [weak self] _ in
+                            guard let self else { return }
+                            self.homeView.selectedInfo.updateDiaryState(isPublished: false)
+                            self.homeView.selectedInfo.updateMenuState(isPublished: false)
+                            self.dialog.dismiss()
+                            
+                            let toast = ToastMessage()
+                            self.view.addSubview(toast)
+                            toast.configure(type: .basic, message: "일기가 비공개 되었어요.")
+                        })
+                        .store(in: &self.viewModel!.cancellables)
                 }
             )
         case .delete:
@@ -343,18 +348,33 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                 rightButtonTitle: "삭제하기",
                 leftAction: { [weak dialog] in dialog?.dismiss() },
                 rightAction: { [weak self] in
-                    self?.homeView.selectedInfo.updateView(
-                        for: self?.homeView.calendarView.selectedDate ?? Date(),
-                        diaryId: nil, isPublished: nil,
-                        remainingTime: 0,
-                        topicData: nil,
-                        diaryData: nil,
-                        imageURL: nil
-                    )
-                    self?.dialog.dismiss()
-                    completion(true)
+                    guard let self else { return }
                     
-                    // TODO: 삭제 API 호출
+                    self.viewModel?.deleteDiary(diaryId: diaryId)
+                        .receive(on: RunLoop.main)
+                        .sink(receiveCompletion: { completion in
+                            if case .failure = completion {
+                                print("🚨 삭제하기 API 호출 실패")
+                            }
+                        }, receiveValue: { [weak self] _ in
+                            guard let self else { return }
+                            self.homeView.selectedInfo.updateView(
+                                for: selectedDate,
+                                diaryId: nil,
+                                isPublished: nil,
+                                remainingTime: 0,
+                                topicData: nil,
+                                diaryData: nil,
+                                imageURL: nil
+                            )
+                            self.dialog.dismiss()
+
+                            let calendar = Calendar.current
+                            let year = calendar.component(.year, from: selectedDate)
+                            let month = calendar.component(.month, from: selectedDate)
+                            self.input.monthChange.send((year, month))
+                        })
+                        .store(in: &self.viewModel!.cancellables)
                 }
             )
         }

@@ -14,7 +14,7 @@ final class SelectedInfo: UIView {
         return cardTopicView.topicData
     }
 
-    private var currentDiaryId: Int?
+    public var currentDiaryId: Int?
     private var currentIsPublished: Bool?
     private var overlayView: UIControl?
     
@@ -22,7 +22,7 @@ final class SelectedInfo: UIView {
     
     var onDiaryPreviewTapped: (() -> Void)?
     var onMoreButtonTapped: ((Bool?) -> Void)?
-    var onMenuAction: ((MenuAction) -> Void)?
+    var onMenuAction: ((MenuAction, Int) -> Void)?
     
     // MARK: - UI Components
 
@@ -369,22 +369,18 @@ final class SelectedInfo: UIView {
 extension SelectedInfo: ActionMenuDelegate {
     func actionMenu(_ menu: ActionMenu, didSelectItemAt index: Int) {
         menu.isHidden = true
-        guard currentDiaryId != nil else { return }
+        guard let diaryId = currentDiaryId else { return }
 
         switch index {
         case 0:
             if currentIsPublished == true {
-                onMenuAction?(.unpublish)
+                onMenuAction?(.unpublish, diaryId)
             } else {
-                onMenuAction?(.publish)
+                onMenuAction?(.publish, diaryId)
             }
         case 1:
-            onMenuAction?(.delete)
+            onMenuAction?(.delete, diaryId)
         default: break
         }
-    }
-    
-    private func showDialog(_ action: MenuAction) {
-        onMenuAction?(action)
     }
 }

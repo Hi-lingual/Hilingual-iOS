@@ -13,4 +13,7 @@ public protocol HomeRepository {
     func fetchMonthInfo(year: Int, month: Int) -> AnyPublisher<MonthInfoEntity, Error>
     func fetchDiaryInfo(for date: String) -> AnyPublisher<DiaryInfoEntity?, Error>
     func fetchTopic(for date: String) -> AnyPublisher<TopicEntity?, Error>
+    func publishDiary(diaryId: Int) -> AnyPublisher<Void, Error>
+    func unpublishDiary(diaryId: Int) -> AnyPublisher<Void, Error>
+    func deleteDiary(diaryId: Int) -> AnyPublisher<Void, Error>
 }
