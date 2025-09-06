@@ -15,7 +15,7 @@ public protocol BlockUserService {
 }
 
 //TODO: - mock으로 바꿔야함
-public final class MockBlockUserService: BaseService<MyPageAPI>, BlockUserService {
+public final class MockBlockUserService: BaseService<BlockUserAPI>, BlockUserService {
 
     private var mockDTOs: [BlockedUserDTO] = BlockedUserListResponseDTO.sampleData.blockList
 
@@ -37,11 +37,8 @@ public final class MockBlockUserService: BaseService<MyPageAPI>, BlockUserServic
     }
 
     public func blockUser(id: Int) -> AnyPublisher<Void, Error> {
-        let newMock = BlockedUserDTO(userId: id, profileImg: "", nickname: "새 유저 \(id)")
-        mockDTOs.append(newMock)
-        return Just(())
-            .delay(for: .milliseconds(200), scheduler: RunLoop.main)
-            .setFailureType(to: Error.self)
+        return requestPlain(.blockUser(userId: id))
+            .mapError { $0 as Error }
             .eraseToAnyPublisher()
     }
 }
