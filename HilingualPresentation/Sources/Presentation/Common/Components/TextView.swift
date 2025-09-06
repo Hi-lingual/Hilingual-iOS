@@ -92,8 +92,8 @@ final class TextView: UIView {
         }
         
         placeholderLabel.snp.makeConstraints {
-            $0.top.equalToSuperview().offset(12)
-            $0.leading.equalToSuperview().offset(12)
+            $0.top.equalToSuperview().offset(18)
+            $0.leading.equalToSuperview().offset(18)
         }
         
         countLabel.snp.makeConstraints {
