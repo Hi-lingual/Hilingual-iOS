@@ -9,13 +9,13 @@ import Foundation
 import Combine
 
 public protocol FeedSearchService {
-    func search(keyword: String) -> AnyPublisher<BaseAPIResponse<UserListDataDTO>, Error>
+    func search(keyword: String) -> AnyPublisher<BaseAPIResponse<FeedSearchResponseDTO>, Error>
 }
 
 public final class MockFeedSearchService: FeedSearchService {
     public init() {}
     
-    public func search(keyword: String) -> AnyPublisher<BaseAPIResponse<UserListDataDTO>, Error> {
+    public func search(keyword: String) -> AnyPublisher<BaseAPIResponse<FeedSearchResponseDTO>, Error> {
         return Deferred { [keyword] in
             let allUsers = [
                 UserDTO(userId: 1, profileImg: "https://example.com/profile1.jpg", nickname: "하링이", isFollowing: true, isFollowed: false),
@@ -27,7 +27,7 @@ public final class MockFeedSearchService: FeedSearchService {
             ]
             
             let filteredUsers = allUsers.filter { $0.nickname.contains(keyword) }
-            let mockData = UserListDataDTO(userList: filteredUsers)
+            let mockData = FeedSearchResponseDTO(userList: filteredUsers)
             let response = BaseAPIResponse(code: 20000, data: mockData, message: "사용자 검색 결과입니다.")
             
             return Just(response)
