@@ -10,19 +10,20 @@ import Moya
 
 public enum OnBoardingAPI {
     case checkNickname(nickname: String)
-    case setProfile(nickname: String, profileImg: String) 
+    case registerProfile(requestDTO: RegisterProfileRequestDTO)
 }
 
 extension OnBoardingAPI: TargetType {
-
     public var baseURL: URL {
         return NetworkEnvironment.shared.baseURL
     }
 
     public var path: String {
         switch self {
-        case .checkNickname, .setProfile:
+        case .checkNickname:
             return "/users/profile/check"
+        case .registerProfile:
+            return "/users/profile"
         }
     }
 
@@ -30,7 +31,7 @@ extension OnBoardingAPI: TargetType {
         switch self {
         case .checkNickname:
             return .get
-        case .setProfile:
+        case .registerProfile:
             return .post
         }
     }
@@ -43,28 +44,20 @@ extension OnBoardingAPI: TargetType {
                 encoding: URLEncoding.default
             )
 
-        case .setProfile(let nickname, let profileImg):
-            return .requestParameters(
-                parameters: [
-                    "nickname": nickname,
-                    "profileImg": profileImg
-                ],
-                encoding: JSONEncoding.default
-            )
+        case .registerProfile(let requestDTO):
+            return .requestJSONEncodable(requestDTO)
         }
     }
 
     public var headers: [String: String]? {
+        var headers = ["Content-Type": "application/json"]
         switch self {
-        case .checkNickname:
-            return ["Content-Type": "application/json"]
-
-        case .setProfile:
-            return [
-                "Content-Type": "application/json",
-                "Authorization": "Bearer \(UserDefaultHandler.accessToken)"
-            ]
+        case .registerProfile:
+            headers["Authorization"] = "Bearer \(UserDefaultHandler.accessToken)"
+        default:
+            break
         }
+        return headers
     }
 
     public var sampleData: Data {

@@ -13,6 +13,10 @@ final class AgreementModalView: UIView {
     // MARK: - Public
     var onStart: (() -> Void)?
 
+    public var isAdAgreeSelected: Bool {
+        return marketingAgree.isChecked
+    }
+
     // MARK: - UI Components
 
     private let dimmedBackgroundView = UIView()

@@ -12,25 +12,22 @@ import Combine
 
 public protocol OnBoardingService {
     func checkNicknameDuplication(nickname: String) -> AnyPublisher<Bool, Error>
-    func registerProfile(nickname: String, profileImg: String) -> AnyPublisher<Void, Error>
+    func registerProfile(nickname: String, adAlarmAgree: Bool, fileKey: String?) -> AnyPublisher<Void, Error>
 }
 
 public final class DefaultOnBoardingService: BaseService<OnBoardingAPI>, OnBoardingService {
-
-    public func registerProfile(nickname: String, profileImg: String) -> AnyPublisher<Void, Error> {
-        #if DEBUG
-        // 디버그 모드에서는 성공 응답만 리턴하도록 했음
-        return Just(())
-            .setFailureType(to: Error.self)
+    public func registerProfile(nickname: String, adAlarmAgree: Bool, fileKey: String?) -> AnyPublisher<Void, Error> {
+//        #if DEBUG
+//        return Just(())
+//            .setFailureType(to: Error.self)
+//            .eraseToAnyPublisher()
+//        #else
+        let dto = RegisterProfileRequestDTO(nickname: nickname, adAlarmAgree: adAlarmAgree, fileKey: fileKey)
+        return requestPlain(.registerProfile(requestDTO: dto))
+            .map { _ in () }
+            .mapError { $0 as Error }
             .eraseToAnyPublisher()
-        #else
-        return requestPlain(
-            .setProfile(nickname: nickname, profileImg: profileImg)
-        )
-        .map { _ in () }
-        .mapError { $0 as Error }
-        .eraseToAnyPublisher()
-        #endif
+//        #endif
     }
 
     public func checkNicknameDuplication(nickname: String) -> AnyPublisher<Bool, Error> {

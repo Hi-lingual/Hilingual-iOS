@@ -284,7 +284,7 @@ extension AppDIContainer {
     }
 
     private func makeOnBoardingViewModel() -> OnBoardingViewModel {
-        OnBoardingViewModel(useCase: makeOnBoardingUseCase())
+        OnBoardingViewModel(useCase: makeOnBoardingUseCase(), uploadImageUseCase: makeUploadImageUseCase())
     }
 }
 
@@ -689,5 +689,19 @@ extension AppDIContainer {
     
     private func makeFeedProfileInfoService() -> FeedProfileInfoService {
         MockFeedProfileInfoService(isMine: false)
+    }
+
+    //MARK: - UploadImageDIContainer
+
+    private func makeUploadImageUseCase() -> UploadImageUseCase {
+        DefaultUploadImageUseCase(repository: makeUploadImageRepository())
+    }
+
+    private func makeUploadImageRepository() -> DefaultPresignedImageUploadRepository {
+        DefaultPresignedImageUploadRepository(service: makeUploadImageService())
+    }
+
+    private func makeUploadImageService() -> PresignedURLService {
+        DefaultPresignedURLService()
     }
 }

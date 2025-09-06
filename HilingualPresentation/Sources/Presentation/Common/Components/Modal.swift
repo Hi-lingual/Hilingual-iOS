@@ -165,7 +165,7 @@ final class Modal: UIView {
         }
     }
     
-    @objc private func dismissModal() {
+    @objc public func dismissModal() {
         UIView.animate(withDuration: 0.2, animations: {
             self.modalSheetView.transform = CGAffineTransform(translationX: 0, y: self.modalSheetView.frame.height)
             self.backgroundColor = UIColor.dim.withAlphaComponent(0)
