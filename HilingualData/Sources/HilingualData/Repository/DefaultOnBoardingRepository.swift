@@ -26,7 +26,7 @@ public final class DefaultOnBoardingRepository: OnBoardingRepository {
         return service.registerProfile(
             nickname: profile.nickname,
             adAlarmAgree: profile.adAlarmAgree,
-            fileKey: profile.fileKey
+            fileKey: profile.image?.fileKey
         )
     }
 }
