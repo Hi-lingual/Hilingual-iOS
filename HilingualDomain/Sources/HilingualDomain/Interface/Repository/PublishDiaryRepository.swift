@@ -8,5 +8,6 @@
 import Combine
 
 public protocol PublishDiaryRepository {
-    func publishDiary(diaryId: Int, isPublished: Bool) -> AnyPublisher<Void, Error>
+    func publishDiary(diaryId: Int) -> AnyPublisher<Void, Error>
+    func unpublishDiary(diaryId: Int) -> AnyPublisher<Void, Error>
 }

@@ -11,14 +11,20 @@ import HilingualNetwork
 import HilingualDomain
 
 public final class DefaultPublishDiaryRepository: PublishDiaryRepository {
-    private let service: PublishDiaryService
-    
-    public init(service: PublishDiaryService) {
+    private let service: DiaryControlService
+
+    public init(service: DiaryControlService) {
         self.service = service
     }
     
-    public func publishDiary(diaryId: Int, isPublished: Bool) -> AnyPublisher<Void, Error> {
-        return service.publishDiary(diaryId: diaryId, isPublished: isPublished)
+    public func publishDiary(diaryId: Int) -> AnyPublisher<Void, Error> {
+        return service.publishDiary(diaryId: diaryId)
+            .map { _ in () }
+            .eraseToAnyPublisher()
+    }
+    
+    public func unpublishDiary(diaryId: Int) -> AnyPublisher<Void, Error> {
+        return service.unpublishDiary(diaryId: diaryId)
             .map { _ in () }
             .eraseToAnyPublisher()
     }
