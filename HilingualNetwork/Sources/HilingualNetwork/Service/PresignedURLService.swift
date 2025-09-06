@@ -15,16 +15,13 @@ public protocol PresignedURLService {
 }
 
 public final class DefaultPresignedURLService: BaseService<PresignedURLAPI>, PresignedURLService {
-
     public func requestPresignedURL(contentType: String, purpose: String) -> AnyPublisher<(fileKey: String, uploadUrl: String), Error> {
-        return request(
-            .getPresignedURL(contentType: contentType, purpose: purpose),
-            as: PresignedURLResponseDTO.self
-        )
-        .tryMap { dto in
-            return (dto.data.fileKey, dto.data.uploadUrl)
-        }
-        .eraseToAnyPublisher()
+        let requestDTO = PresignedURLRequestDTO(contentType: contentType, purpose: purpose)
+
+        return request(.getPresignedURL(request: requestDTO), as: PresignedURLResponseDTO.self)
+            .map { ($0.data.fileKey, $0.data.uploadUrl) }
+            .mapError { $0 as Error }
+            .eraseToAnyPublisher()
     }
 
     public func uploadImageToS3(imageData: Data, uploadUrl: String, contentType: String) -> AnyPublisher<Void, Error> {

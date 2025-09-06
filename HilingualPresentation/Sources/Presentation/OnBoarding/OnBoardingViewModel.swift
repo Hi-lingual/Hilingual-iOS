@@ -27,13 +27,17 @@ public final class OnBoardingViewModel: BaseViewModel {
     // MARK: - Private
 
     private let useCase: OnBoardingUseCase
+    private let uploadImageUseCase: UploadImageUseCase
     private let navigateToHomeSubject = PassthroughSubject<Void, Never>()
     private var latestValidNickname: String = ""
+    public var selectedImageData: Data?
+    private var latestFileKey: String = ""
 
     // MARK: - Init
 
-    public init(useCase: OnBoardingUseCase) {
+    public init(useCase: OnBoardingUseCase, uploadImageUseCase: UploadImageUseCase) {
         self.useCase = useCase
+        self.uploadImageUseCase = uploadImageUseCase
     }
 
     // MARK: - Transform
@@ -101,23 +105,43 @@ public final class OnBoardingViewModel: BaseViewModel {
             .flatMap { [weak self] adAgree -> AnyPublisher<Void, Never> in
                 guard let self else { return Empty().eraseToAnyPublisher() }
 
-                //TODO: - 실제 filekey로 변경
-                let fileKey = "users/123/images/profile/tmp/2025-08-13/7d7a...c.jpg"
+                let imageData = self.selectedImageData
+                let contentType = "image/jpeg"
 
-                return self.useCase.registerProfile(
-                    nickname: self.latestValidNickname,
-                    adAlarmAgree: adAgree,
-                    fileKey: fileKey
-                )
-                .handleEvents(receiveOutput: { [weak self] in
-                    UserDefaults.standard.set(true, forKey: "isProfileCompleted")
-                    self?.navigateToHomeSubject.send()
-                })
-                .catch { _ in Empty() }
-                .eraseToAnyPublisher()
+                if let data = imageData {
+                    return self.uploadImageUseCase
+                        .execute(data: data, contentType: contentType, purpose: "PROFILE_UPLOAD")
+                        .flatMap { fileKey in
+                            self.useCase.registerProfile(
+                                nickname: self.latestValidNickname,
+                                adAlarmAgree: adAgree,
+                                fileKey: fileKey
+                            )
+                        }
+                        .handleEvents(receiveOutput: { [weak self] in
+                            UserDefaults.standard.set(true, forKey: "isProfileCompleted")
+                            self?.navigateToHomeSubject.send()
+                        })
+                        .catch { _ in Empty() }
+                        .eraseToAnyPublisher()
+                } else {
+                    let defaultFileKey = ""
+                    return self.useCase.registerProfile(
+                        nickname: self.latestValidNickname,
+                        adAlarmAgree: adAgree,
+                        fileKey: defaultFileKey
+                    )
+                    .handleEvents(receiveOutput: { [weak self] in
+                        UserDefaults.standard.set(true, forKey: "isProfileCompleted")
+                        self?.navigateToHomeSubject.send()
+                    })
+                    .catch { _ in Empty() }
+                    .eraseToAnyPublisher()
+                }
             }
             .sink { _ in }
             .store(in: &cancellables)
+
 
         return Output(
             nicknameState: nicknameState.eraseToAnyPublisher(),

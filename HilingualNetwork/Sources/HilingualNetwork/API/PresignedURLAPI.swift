@@ -10,8 +10,7 @@ import Foundation
 import Moya
 
 public enum PresignedURLAPI {
-    case getPresignedURL(contentType: String, purpose: String)
-    /// "image/jpeg", "PROFILE_UPLOAD"
+    case getPresignedURL(request: PresignedURLRequestDTO)
 }
 
 extension PresignedURLAPI: TargetType {
@@ -20,7 +19,7 @@ extension PresignedURLAPI: TargetType {
     }
 
     public var path: String {
-        return "/files/presigned-url"
+        return "/presigned-urls"
     }
 
     public var method: Moya.Method {
@@ -28,15 +27,11 @@ extension PresignedURLAPI: TargetType {
     }
 
     public var task: Task {
-        switch self {
-        case .getPresignedURL(let contentType, let purpose):
-            let params: [String: String] = [
-                "contentType": contentType,
-                "purpose": purpose
-            ]
-            return .requestParameters(parameters: params, encoding: JSONEncoding.default)
-        }
-    }
+           switch self {
+           case .getPresignedURL(let request):
+               return .requestJSONEncodable(request)
+           }
+       }
 
     public var headers: [String: String]? {
         return [

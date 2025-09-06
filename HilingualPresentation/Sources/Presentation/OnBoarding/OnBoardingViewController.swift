@@ -89,7 +89,7 @@ public final class OnBoardingViewController: BaseUIViewController<OnBoardingView
     private func bindModalCallbacks() {
         onBoardingView.onSelectDefaultImage = { [weak self] in
             self?.onBoardingView.profileImageView.profileImageView.image = UIImage(named: "img_profile_normal_ios")
-//            self?.viewModel?.selectedImageData = nil
+            self?.viewModel?.selectedImageData = nil
         }
 
         onBoardingView.onSelectFromGallery = { [weak self] in
@@ -147,7 +147,7 @@ extension OnBoardingViewController: PHPickerViewControllerDelegate {
                 self.onBoardingView.profileImageView.profileImageView.image = image
 
                 if let data = image.jpegData(compressionQuality: 0.9) {
-//                    self.viewModel?.selectedImageData = data
+                    self.viewModel?.selectedImageData = data
                 }
             }
         }
