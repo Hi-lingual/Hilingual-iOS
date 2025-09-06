@@ -29,10 +29,8 @@ public final class MockBlockUserService: BaseService<BlockUserAPI>, BlockUserSer
     }
 
     public func unblockUser(id: Int) -> AnyPublisher<Void, Error> {
-        mockDTOs.removeAll { $0.userId == id }
-        return Just(())
-            .delay(for: .milliseconds(200), scheduler: RunLoop.main)
-            .setFailureType(to: Error.self)
+        return requestPlain(.unblockUser(userId: id))
+            .mapError { $0 as Error }
             .eraseToAnyPublisher()
     }
 
