@@ -395,7 +395,6 @@ extension AppDIContainer {
 
     private func makeHomeService() -> HomeService {
         return DefaultHomeService()
-//        return MockHomeService()
     }
 
     private func makeHomeRepository() -> HomeRepository {
