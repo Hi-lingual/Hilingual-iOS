@@ -1,22 +1,24 @@
 import Foundation
+import Combine
 import UIKit
 
 public final class HomeViewController: BaseUIViewController<HomeViewModel> {
-
+    
     // MARK: - Properties
-
+    
     private var overlayView: UIControl?
     private let homeView = HomeView()
     let dialog = Dialog()
     private let input = HomeViewModel.Input()
-
+    private var currentDateRequestCancellable: AnyCancellable?
+    
     // MARK: - Life Cycle
-
+    
     public override func setUI() {
         super.setUI()
         view.addSubviews(homeView)
     }
-
+    
     public override func setLayout() {
         homeView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
@@ -26,14 +28,14 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: false)
-
+        
         // 월 정보 다시 요청 (최초에도!)
         let selectedDate = homeView.calendarView.selectedDate ?? Date()
         let calendar = Calendar.current
         let year = calendar.component(.year, from: selectedDate)
         let month = calendar.component(.month, from: selectedDate)
         input.monthChange.send((year, month))
-
+        
         // 사용자 정보도 다시 요청
         viewModel?.fetchUserInfo()
             .receive(on: RunLoop.main)
@@ -47,38 +49,114 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
             })
             .store(in: &viewModel!.cancellables)
     }
-
+    
     // MARK: - Bind
-
+    
     public override func bind(viewModel: HomeViewModel) {
         let today = Date()
         homeView.calendarView.selectedDate = today
         homeView.calendarView.reload(for: today)
         homeView.selectedInfo.setSelectedDate(today)
-
-        // 월이 변경되면 1일로 이동 + ViewModel에 전달
-        homeView.onMonthChanged = { [weak self] year, month in
+        
+        homeView.calendarView.onDateSelected = { [weak self] date in
             guard let self else { return }
             
+            // UI 즉시 초기화해서 겹치는 것을 방지
+            let requestedDate = date
+            self.homeView.selectedInfo.setSelectedDate(requestedDate)
             self.homeView.selectedInfo.resetView()
-
-            var components = DateComponents()
-            components.year = year
-            components.month = month
-            components.day = 1
-
-            guard let firstDayOfMonth = Calendar.current.date(from: components) else { return }
-
-            // 해당 월 1일로 이동
-            self.homeView.calendarView.select(date: firstDayOfMonth)
-            self.homeView.calendarView.onDateSelected?(firstDayOfMonth)
-
-            // ViewModel에 새로운 월 정보 전달
-            self.input.monthChange.send((year, month))
+            
+            let today = Calendar.current.startOfDay(for: Date())
+            let selectedDay = Calendar.current.startOfDay(for: requestedDate)
+            
+            // 1) 미래 날짜면 바로 Lock 상태로 보여주고 네트워크 호출하지 않음
+            if selectedDay > today {
+                self.currentDateRequestCancellable?.cancel()
+                self.homeView.selectedInfo.updateView(
+                    for: requestedDate,
+                    diaryId: nil,
+                    isPublished: nil,
+                    remainingTime: 0,
+                    topicData: nil,
+                    diaryData: nil,
+                    imageURL: nil
+                )
+                print("DEBUG: selected is future -> show lock view for \(requestedDate)")
+                return
+            }
+            
+            // 2) 미래가 아니면 네트워크 처리 (기존 요청 취소)
+            self.currentDateRequestCancellable?.cancel()
+            
+            let isDiaryDate = self.homeView.calendarView.filledDates.contains {
+                Calendar.current.isDate($0, inSameDayAs: requestedDate)
+            }
+            
+            if isDiaryDate {
+                self.currentDateRequestCancellable = self.viewModel?.fetchDiary(for: requestedDate)
+                    .receive(on: RunLoop.main)
+                    .sink(receiveCompletion: { completion in
+                    }, receiveValue: { [weak self] diary in
+                        guard let self else { return }
+                        guard Calendar.current.isDate(self.homeView.calendarView.selectedDate ?? Date(), inSameDayAs: requestedDate) else {
+                            print("DEBUG: stale diary response ignored for \(requestedDate)")
+                            return
+                        }
+                        self.homeView.selectedInfo.updateView(
+                            for: requestedDate,
+                            diaryId: diary?.diaryId,
+                            isPublished: diary?.isPublished,
+                            remainingTime: 0,
+                            topicData: nil,
+                            diaryData: diary?.originalText,
+                            imageURL: diary?.imageUrl
+                        )
+                    })
+            } else {
+                self.currentDateRequestCancellable = self.viewModel?.fetchTopic(for: requestedDate)
+                    .receive(on: RunLoop.main)
+                    .sink(receiveCompletion: { completion in
+                    }, receiveValue: { [weak self] topic in
+                        guard let self else { return }
+                        guard Calendar.current.isDate(self.homeView.calendarView.selectedDate ?? Date(), inSameDayAs: requestedDate) else {
+                            print("DEBUG: stale topic response ignored for \(requestedDate)")
+                            return
+                        }
+                        
+                        let remaining = max(0, topic?.remainingTime ?? 0)
+                        self.homeView.selectedInfo.updateView(
+                            for: requestedDate,
+                            diaryId: nil,
+                            isPublished: nil,
+                            remainingTime: remaining,
+                            topicData: topic.map { ($0.topicKor, $0.topicEn) },
+                            diaryData: nil,
+                            imageURL: nil
+                        )
+                    })
+            }
         }
-
+        
+        homeView.onMonthChanged = { [weak self] year, month in
+            guard self != nil else { return }
+            let calendar = Calendar.current
+            let today = Date()
+            
+            let todayYear = calendar.component(.year, from: today)
+            let todayMonth = calendar.component(.month, from: today)
+            
+            let selectedDate: Date
+            if year == todayYear && month == todayMonth {
+                selectedDate = today
+            } else {
+                selectedDate = calendar.date(from: DateComponents(year: year, month: month, day: 1))!
+            }
+            
+            self?.homeView.calendarView.select(date: selectedDate)
+        }
+        
         let output = viewModel.transform(input: input)
-
+        
         // 사용자 정보 바인딩
         output.userInfo
             .receive(on: RunLoop.main)
@@ -95,63 +173,18 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                 )
             })
             .store(in: &viewModel.cancellables)
-
+        
         // filledDates를 calendarView에 반영 + 선택한 날짜 일기/주제 보여줌
         output.filledDates
             .receive(on: RunLoop.main)
             .sink { [weak self] dates in
                 guard let self else { return }
                 self.homeView.calendarView.filledDates = dates
-
+                
                 let selected = self.homeView.calendarView.selectedDate ?? Date()
                 self.homeView.calendarView.onDateSelected?(selected)
             }
             .store(in: &viewModel.cancellables)
-
-        // 날짜 선택 시, 일기 존재 여부에 따라 fetchDiary 또는 fetchTopic
-        homeView.calendarView.onDateSelected = { [weak self] date in
-            guard let self else { return }
-
-            self.homeView.selectedInfo.setSelectedDate(date)
-
-            let isDiaryDate = self.homeView.calendarView.filledDates.contains {
-                Calendar.current.isDate($0, inSameDayAs: date)
-            }
-
-            if isDiaryDate {
-                self.viewModel?.fetchDiary(for: date)
-                    .receive(on: RunLoop.main)
-                    .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] diary in
-                        guard let self else { return }
-                        self.homeView.selectedInfo.updateView(
-                            for: date,
-                            diaryId: diary?.diaryId,
-                            isPublished: diary?.isPublished,
-                            remainingTime: 0,
-                            topicData: nil,
-                            diaryData: diary?.originalText,
-                            imageURL: diary?.imageUrl
-                        )
-                    })
-                    .store(in: &self.viewModel!.cancellables)
-            } else {
-                self.viewModel?.fetchTopic(for: date)
-                    .receive(on: RunLoop.main)
-                    .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] topic in
-                        guard let self else { return }
-                        self.homeView.selectedInfo.updateView(
-                            for: date,
-                            diaryId: nil,
-                            isPublished: nil,
-                            remainingTime: topic?.remainingTime ?? 0,
-                            topicData: topic.map { ($0.topicKor, $0.topicEn) },
-                            diaryData: nil,
-                            imageURL: nil
-                        )
-                    })
-                    .store(in: &self.viewModel!.cancellables)
-            }
-        }
     }
     
     // MARK: - Action
@@ -213,36 +246,36 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     
     private func showOverlay() {
         guard let containerView = tabBarController?.view ?? view else { return }
-
+        
         let overlay = UIControl()
         overlay.backgroundColor = .clear
         overlay.addTarget(self, action: #selector(dismissMenu), for: .touchUpInside)
         containerView.addSubview(overlay)
         overlay.snp.makeConstraints { $0.edges.equalToSuperview() }
         overlayView = overlay
-
+        
         if homeView.selectedInfo.menu.superview != nil {
             homeView.selectedInfo.menu.removeFromSuperview()
         }
         containerView.addSubview(homeView.selectedInfo.menu)
-
+        
         homeView.selectedInfo.menu.snp.remakeConstraints {
             $0.top.equalTo(homeView.selectedInfo.moreImageView.snp.bottom).offset(4)
             $0.trailing.equalTo(homeView.selectedInfo.moreImageView.snp.trailing)
             $0.height.equalTo(96)
             $0.width.equalTo(182)
         }
-
+        
         homeView.selectedInfo.menu.isHidden = false
         containerView.bringSubviewToFront(homeView.selectedInfo.menu)
     }
     
     private func showDialog(for action: MenuAction, selectedDate: Date, completion: @escaping (Bool?) -> Void) {
         guard let containerView = self.tabBarController?.view else { return }
-
+        
         containerView.addSubview(dialog)
         dialog.snp.remakeConstraints { $0.edges.equalTo(containerView) }
-      
+        
         switch action {
         case .publish:
             dialog.configure(
@@ -333,11 +366,11 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         overlayView?.removeFromSuperview()
         overlayView = nil
     }
-
+    
     @objc private func alarmButtonTapped() {
         let notificationVC = diContainer.makeNotificationViewController()
         notificationVC.hidesBottomBarWhenPushed = true
-
+        
         navigationController?.pushViewController(notificationVC, animated: true)
     }
     
@@ -364,9 +397,9 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     @objc private func profileImageTapped() {
         goToMyFeedProefileView()
     }
-
+    
     // MARK: - Navigation
-
+    
     private func goToDiaryWritingView(topicData: (String, String)? = nil, selectedDate: Date? = nil) {
         let diaryWritingVC = diContainer.makeDiaryWritingViewController(
             topicData: topicData,
@@ -375,7 +408,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         diaryWritingVC.hidesBottomBarWhenPushed = true
         navigationController?.pushViewController(diaryWritingVC, animated: true)
     }
-
+    
     private func goToDiaryDetailView(diaryId: Int) {
         let detailVC = diContainer.makeDiaryDetailViewController(diaryId: diaryId)
         detailVC.hidesBottomBarWhenPushed = true

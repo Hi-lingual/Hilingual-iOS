@@ -202,7 +202,7 @@ final class SelectedInfo: UIView {
         diaryData: String? = nil,
         imageURL: String? = nil
     ) {
-        [cardPreview, cardTopicView, emptyDiaryView, diaryLockView, moreImageView].forEach {
+        [cardPreview, cardTopicView, emptyDiaryView, diaryLockView, moreImageView, dot, notWrittenLabel, iconView, timeLeftStack].forEach {
             $0.isHidden = true
         }
         
@@ -215,18 +215,22 @@ final class SelectedInfo: UIView {
         let today = Calendar.current.startOfDay(for: Date())
         let selectedDay = Calendar.current.startOfDay(for: date)
 
-        iconView.isHidden = true
-        timeLeftStack.isHidden = true
-
-        // 아직 작성할 수 없는 미래의 날짜를 클릭 했을 경우
+        // 1. 미래 날짜 → 작성 불가
         if selectedDay > today {
+            dot.isHidden = false
+            notWrittenLabel.isHidden = false
             notWrittenLabel.text = "작성불가"
             notWrittenLabel.textColor = .gray300
+            
             diaryLockView.isHidden = false
+            emptyDiaryView.isHidden = true
+            cardTopicView.isHidden = true
+            timeLeftStack.isHidden = true
+            iconView.isHidden = true
             return
         }
 
-        // 일기가 있는 경우
+        // 2. 일기가 있는 경우 → cardPreview 표시
         if let _ = diaryId {
             moreImageView.isHidden = false
             menu.isHidden = true
@@ -240,20 +244,27 @@ final class SelectedInfo: UIView {
             }
             return
         }
-
-        // 48시간이 지난 날짜를 클릭했을 경우
+        
+        // 2. 남은 시간 있을 때 → 작성 가능
         if remainingTime > 0, let topic = topicData {
+            dot.isHidden = false
+            notWrittenLabel.isHidden = false
             notWrittenLabel.text = "미작성"
             notWrittenLabel.textColor = .gray300
+
+            emptyDiaryView.isHidden = true
             cardTopicView.isHidden = false
             cardTopicView.configure(kor: topic.kor, en: topic.en)
             timeLeftLabel.attributedText = formatRemainingTime(remainingTime)
+
             iconView.isHidden = false
             timeLeftStack.isHidden = false
             moreImageView.isHidden = true
             return
         }
 
+        dot.isHidden = false
+        notWrittenLabel.isHidden = false
         notWrittenLabel.text = "미작성"
         notWrittenLabel.textColor = .gray300
         emptyDiaryView.isHidden = false
@@ -268,7 +279,7 @@ final class SelectedInfo: UIView {
     
     func resetView() {
         selectedDayLabel.text = ""
-        [cardTopicView, cardPreview, emptyDiaryView, diaryLockView].forEach {
+        [cardTopicView, cardPreview, emptyDiaryView, diaryLockView, dot, notWrittenLabel].forEach {
             $0.isHidden = true
         }
         
