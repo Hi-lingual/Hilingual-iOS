@@ -9,7 +9,7 @@
 import HilingualDomain
 import HilingualNetwork
 
-extension AlarmSettingDTO {
+extension NotificationSettingsResponseDTO {
     func toEntity() -> AlarmSettingEntity {
         return AlarmSettingEntity(
             isMarketingAlarmOn: marketing,
