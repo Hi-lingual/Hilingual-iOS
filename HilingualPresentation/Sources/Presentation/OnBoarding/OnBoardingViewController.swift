@@ -88,7 +88,7 @@ public final class OnBoardingViewController: BaseUIViewController<OnBoardingView
 
     private func bindModalCallbacks() {
         onBoardingView.onSelectDefaultImage = { [weak self] in
-            self?.onBoardingView.profileImageView.profileImageView.image = UIImage(named: "img_profile_normal_ios")
+            self?.onBoardingView.profileImageView.profileImageView.image = UIImage(named: "img_profile_normal_ios", in: .module, compatibleWith: nil)
             self?.viewModel?.selectedImageData = nil
         }
 

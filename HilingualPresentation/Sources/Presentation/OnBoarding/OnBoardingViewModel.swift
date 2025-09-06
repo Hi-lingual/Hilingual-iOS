@@ -108,6 +108,7 @@ public final class OnBoardingViewModel: BaseViewModel {
                 let imageData = self.selectedImageData
                 let contentType = "image/jpeg"
 
+                // 이미지가 있는 경우 → PresignedURL 후 업로드
                 if let data = imageData {
                     return self.uploadImageUseCase
                         .execute(data: data, contentType: contentType, purpose: "PROFILE_UPLOAD")
@@ -125,11 +126,10 @@ public final class OnBoardingViewModel: BaseViewModel {
                         .catch { _ in Empty() }
                         .eraseToAnyPublisher()
                 } else {
-                    let defaultFileKey = ""
                     return self.useCase.registerProfile(
                         nickname: self.latestValidNickname,
                         adAlarmAgree: adAgree,
-                        fileKey: defaultFileKey
+                        fileKey: nil
                     )
                     .handleEvents(receiveOutput: { [weak self] in
                         UserDefaults.standard.set(true, forKey: "isProfileCompleted")
@@ -141,7 +141,6 @@ public final class OnBoardingViewModel: BaseViewModel {
             }
             .sink { _ in }
             .store(in: &cancellables)
-
 
         return Output(
             nicknameState: nicknameState.eraseToAnyPublisher(),

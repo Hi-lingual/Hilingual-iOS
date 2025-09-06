@@ -12,11 +12,11 @@ import Combine
 
 public protocol OnBoardingService {
     func checkNicknameDuplication(nickname: String) -> AnyPublisher<Bool, Error>
-    func registerProfile(nickname: String, adAlarmAgree: Bool, fileKey: String) -> AnyPublisher<Void, Error>
+    func registerProfile(nickname: String, adAlarmAgree: Bool, fileKey: String?) -> AnyPublisher<Void, Error>
 }
 
 public final class DefaultOnBoardingService: BaseService<OnBoardingAPI>, OnBoardingService {
-    public func registerProfile(nickname: String, adAlarmAgree: Bool, fileKey: String) -> AnyPublisher<Void, Error> {
+    public func registerProfile(nickname: String, adAlarmAgree: Bool, fileKey: String?) -> AnyPublisher<Void, Error> {
 //        #if DEBUG
 //        return Just(())
 //            .setFailureType(to: Error.self)
