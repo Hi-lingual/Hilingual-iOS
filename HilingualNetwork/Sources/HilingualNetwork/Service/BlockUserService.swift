@@ -14,15 +14,17 @@ public protocol BlockUserService {
     func blockUser(id: Int) -> AnyPublisher<Void, Error>
 }
 
-public final class MockBlockUserService: BlockUserService {
+//TODO: - mock으로 바꿔야함
+public final class MockBlockUserService: BaseService<MyPageAPI>, BlockUserService {
 
     private var mockDTOs: [BlockedUserDTO] = BlockedUserListResponseDTO.sampleData.blockList
 
     public init() {}
 
     public func fetchBlockedUsers() -> AnyPublisher<BlockedUserListResponseDTO, Error> {
-        return Just(BlockedUserListResponseDTO.sampleData)
-            .setFailureType(to: Error.self)
+        return request(.fetchBlockUserList, as: BaseAPIResponse<BlockedUserListResponseDTO>.self)
+            .map { $0.data }
+            .mapError { $0 as Error }
             .eraseToAnyPublisher()
     }
 
