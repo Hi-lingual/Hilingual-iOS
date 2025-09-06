@@ -12,9 +12,9 @@ import HilingualNetwork
 
 public final class DefaultSharedDiaryRepository: SharedDiaryRepository {
     
-    private var service: MockSharedDiaryService
+    private var service: SharedDiaryService
     
-    public init(service: MockSharedDiaryService) {
+    public init(service: SharedDiaryService) {
         self.service = service
     }
     

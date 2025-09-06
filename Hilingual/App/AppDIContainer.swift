@@ -527,8 +527,8 @@ extension AppDIContainer {
 
 extension AppDIContainer {
     
-    private func makeSharedDiaryService() -> MockSharedDiaryService {
-        return MockSharedDiaryService()
+    private func makeSharedDiaryService() -> SharedDiaryService {
+        return DefaultSharedDiaryService()
     }
     
     private func makeSharedDiaryRepository() -> SharedDiaryRepository {
