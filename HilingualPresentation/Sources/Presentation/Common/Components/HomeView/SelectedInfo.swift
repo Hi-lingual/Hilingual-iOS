@@ -191,6 +191,13 @@ final class SelectedInfo: UIView {
         menu.isHidden = true
     }
     
+    private func setNotWrittenState(_ text: String, color: UIColor = .gray300) {
+        dot.isHidden = false
+        notWrittenLabel.isHidden = false
+        notWrittenLabel.text = text
+        notWrittenLabel.textColor = color
+    }
+    
     // MARK: - Public
 
     func updateView(
@@ -217,26 +224,20 @@ final class SelectedInfo: UIView {
 
         // 1. 미래 날짜 → 작성 불가
         if selectedDay > today {
-            dot.isHidden = false
-            notWrittenLabel.isHidden = false
-            notWrittenLabel.text = "작성불가"
-            notWrittenLabel.textColor = .gray300
-            
+            setNotWrittenState("작성불가")
             diaryLockView.isHidden = false
-            emptyDiaryView.isHidden = true
-            cardTopicView.isHidden = true
-            timeLeftStack.isHidden = true
-            iconView.isHidden = true
             return
         }
 
         // 2. 일기가 있는 경우 → cardPreview 표시
         if let _ = diaryId {
+            dot.isHidden = false
+            notWrittenLabel.isHidden = false
             moreImageView.isHidden = false
             menu.isHidden = true
             updateMenuState(isPublished: currentIsPublished)
-            
             cardPreview.isHidden = false
+            
             if let imageURL, !imageURL.isEmpty {
                 cardPreview.configure(type: .textWithImage(text: diaryData ?? "", imageUrl: imageURL))
             } else {
@@ -245,29 +246,23 @@ final class SelectedInfo: UIView {
             return
         }
         
-        // 2. 남은 시간 있을 때 → 작성 가능
+        // 3. 남은 시간 있을 때 → 작성 가능
         if remainingTime > 0, let topic = topicData {
-            dot.isHidden = false
-            notWrittenLabel.isHidden = false
-            notWrittenLabel.text = "미작성"
-            notWrittenLabel.textColor = .gray300
-
-            emptyDiaryView.isHidden = true
+            setNotWrittenState("미작성")
             cardTopicView.isHidden = false
             cardTopicView.configure(kor: topic.kor, en: topic.en)
             timeLeftLabel.attributedText = formatRemainingTime(remainingTime)
 
             iconView.isHidden = false
             timeLeftStack.isHidden = false
-            moreImageView.isHidden = true
             return
         }
-
-        dot.isHidden = false
-        notWrittenLabel.isHidden = false
-        notWrittenLabel.text = "미작성"
-        notWrittenLabel.textColor = .gray300
-        emptyDiaryView.isHidden = false
+        
+        // 4. 과거 날짜이고 일기가 없는 경우 → 작성 불가
+        if selectedDay < today && diaryId == nil {
+            setNotWrittenState("미작성")
+            emptyDiaryView.isHidden = false
+        }
     }
 
     func setSelectedDate(_ date: Date) {
@@ -277,28 +272,10 @@ final class SelectedInfo: UIView {
         selectedDayLabel.text = formatter.string(from: date)
     }
     
-    func resetView() {
-        selectedDayLabel.text = ""
-        [cardTopicView, cardPreview, emptyDiaryView, diaryLockView, dot, notWrittenLabel].forEach {
-            $0.isHidden = true
-        }
-        
-        menu.isHidden = true
-        moreImageView.isHidden = true
-        
-        iconView.isHidden = true
-        timeLeftStack.isHidden = true
-        
-        currentDiaryId = nil
-        currentIsPublished = nil
-    }
-
     // MARK: - Private
 
     public func updateDiaryState(isPublished: Bool) {
         currentIsPublished = isPublished
-        guard currentDiaryId != nil else { return }
-        
         updateMenuState(isPublished: currentIsPublished)
     }
     

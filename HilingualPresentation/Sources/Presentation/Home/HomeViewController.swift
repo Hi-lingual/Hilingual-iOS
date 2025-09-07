@@ -64,7 +64,6 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
             // UI 즉시 초기화해서 겹치는 것을 방지
             let requestedDate = date
             self.homeView.selectedInfo.setSelectedDate(requestedDate)
-            self.homeView.selectedInfo.resetView()
             
             let today = Calendar.current.startOfDay(for: Date())
             let selectedDay = Calendar.current.startOfDay(for: requestedDate)
@@ -358,6 +357,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                             }
                         }, receiveValue: { [weak self] _ in
                             guard let self else { return }
+                            let selectedDate = self.homeView.calendarView.selectedDate ?? Date()
                             self.homeView.selectedInfo.updateView(
                                 for: selectedDate,
                                 diaryId: nil,
