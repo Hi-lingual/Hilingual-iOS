@@ -70,6 +70,10 @@ public final class HomeViewModel: BaseViewModel {
         return useCase.fetchTopic(for: dateString)
     }
     
+    public func fetchMonthInfo(year: Int, month: Int) -> AnyPublisher<MonthInfoEntity, Error> {
+        return useCase.fetchMonthInfo(year: year, month: month)
+    }
+    
     public func fetchUserInfo() -> AnyPublisher<UserInfoEntity, Error> {
         return useCase.fetchUserInfo()
     }
