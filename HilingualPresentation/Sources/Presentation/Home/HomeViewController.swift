@@ -357,22 +357,30 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                             }
                         }, receiveValue: { [weak self] _ in
                             guard let self else { return }
+                            
+                            // 1. 사용자 정보 다시 요청
+                            self.viewModel?.fetchUserInfo()
+                                .receive(on: RunLoop.main)
+                                .sink(receiveCompletion: { _ in }, receiveValue: { entity in
+                                    self.homeView.profileView.updateView(
+                                        nickname: entity.nickname,
+                                        profileImageURL: entity.profileImg,
+                                        totalDiaries: entity.totalDiaries,
+                                        streak: entity.streak
+                                    )
+                                })
+                                .store(in: &self.viewModel!.cancellables)
+                            
+                            // 2. 캘린더 및 선택 정보 업데이트
                             let selectedDate = self.homeView.calendarView.selectedDate ?? Date()
-                            self.homeView.selectedInfo.updateView(
-                                for: selectedDate,
-                                diaryId: nil,
-                                isPublished: nil,
-                                remainingTime: 0,
-                                topicData: nil,
-                                diaryData: nil,
-                                imageURL: nil
-                            )
-                            self.dialog.dismiss()
-
                             let calendar = Calendar.current
                             let year = calendar.component(.year, from: selectedDate)
                             let month = calendar.component(.month, from: selectedDate)
                             self.input.monthChange.send((year, month))
+                            
+                            // TODO: SelectedInfo 업데이트
+                            
+                            self.dialog.dismiss()
                         })
                         .store(in: &self.viewModel!.cancellables)
                 }

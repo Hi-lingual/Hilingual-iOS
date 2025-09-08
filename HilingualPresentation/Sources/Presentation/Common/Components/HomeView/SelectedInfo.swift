@@ -221,16 +221,15 @@ final class SelectedInfo: UIView {
         
         let today = Calendar.current.startOfDay(for: Date())
         let selectedDay = Calendar.current.startOfDay(for: date)
-
-        // 1. 미래 날짜 → 작성 불가
+        
+        // 1. 미래인 경우
         if selectedDay > today {
             setNotWrittenState("작성불가")
             diaryLockView.isHidden = false
-            return
         }
-
-        // 2. 일기가 있는 경우 → cardPreview 표시
-        if let _ = diaryId {
+        
+        // 2. 일기가 있는 경우
+        else if let _ = diaryId {
             dot.isHidden = false
             notWrittenLabel.isHidden = false
             moreImageView.isHidden = false
@@ -243,11 +242,10 @@ final class SelectedInfo: UIView {
             } else {
                 cardPreview.configure(type: .textOnly(text: diaryData ?? ""))
             }
-            return
         }
         
-        // 3. 남은 시간 있을 때 → 작성 가능
-        if remainingTime > 0, let topic = topicData {
+        // 3. 남은 시간이 있고 주제가 있는 경우
+        else if remainingTime > 0, let topic = topicData {
             setNotWrittenState("미작성")
             cardTopicView.isHidden = false
             cardTopicView.configure(kor: topic.kor, en: topic.en)
@@ -255,11 +253,10 @@ final class SelectedInfo: UIView {
 
             iconView.isHidden = false
             timeLeftStack.isHidden = false
-            return
         }
         
-        // 4. 과거 날짜이고 일기가 없는 경우 → 작성 불가
-        if selectedDay < today && diaryId == nil {
+        // 4. 그 외의 모든 경우 (과거 날짜이거나 오늘 날짜인데 일기가 없고 주제도 없는 경우)
+        else {
             setNotWrittenState("미작성")
             emptyDiaryView.isHidden = false
         }
