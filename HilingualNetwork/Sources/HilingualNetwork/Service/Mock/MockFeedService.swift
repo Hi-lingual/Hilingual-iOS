@@ -13,8 +13,8 @@ public final class MockFeedService: FeedService {
 
     public init() {}
 
-    public func fetchRecommendedFeed() -> AnyPublisher<RecommendedFeedResponseDTO, Error> {
-        let dto = RecommendedFeedResponseDTO(
+    public func fetchRecommendFeed() -> AnyPublisher<RecommendFeedResponseDTO, Error> {
+        let dto = RecommendFeedResponseDTO(
             code: 20000,
             data: FeedListDTO(diaryList: sampleItemsForRecommended()),
             message: "추천 일기를 조회했습니다."

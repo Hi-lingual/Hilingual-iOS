@@ -67,11 +67,7 @@ public final class FeedViewModel: BaseViewModel, BaseViewModelType {
             )
         }
 
-        let trigger = Publishers.Merge(
-            viewDidLoad.eraseToAnyPublisher(),
-            input.reload.eraseToAnyPublisher()
-        )
-        .eraseToAnyPublisher()
+        let trigger = Publishers.Merge(viewDidLoad, input.reload.eraseToAnyPublisher())
 
         trigger
             .flatMap { [weak self] _ -> AnyPublisher<[FeedModel], Never> in
@@ -79,7 +75,7 @@ public final class FeedViewModel: BaseViewModel, BaseViewModelType {
                 self.isLoadingSubject.send(true)
                 self.errorSubject.send(nil)
 
-                let useCaseType: FeedType = (type == .recommended) ? .recommended : .following
+                let useCaseType: FeedType = (type == .recommended) ? .recommend : .following
 
                 return self.feedUseCase.execute(type: useCaseType)
                     .map { (entities, haveFollowing) -> [FeedModel] in
@@ -138,3 +134,4 @@ private final class DummyFeedUseCase: FeedUseCase {
             .eraseToAnyPublisher()
     }
 }
+

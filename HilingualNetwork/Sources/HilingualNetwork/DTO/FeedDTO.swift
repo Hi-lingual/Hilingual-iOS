@@ -14,7 +14,7 @@ public struct FeedListDTO: Decodable {
 }
 
 // 추천 피드
-public struct RecommendedFeedResponseDTO: Decodable {
+public struct RecommendFeedResponseDTO: Decodable {
     public let code: Int
     public let data: FeedListDTO
     public let message: String
@@ -34,7 +34,7 @@ public struct FeedItemDTO: Decodable {
     public struct ProfileDTO: Decodable {
         public let userId: Int
         public let isMine: Bool
-        public let profileImg: String
+        public let profileImg: String?
         public let nickname: String
         public let streak: Int
     }

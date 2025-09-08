@@ -19,8 +19,8 @@ public final class DefaultFeedRepository: FeedRepository {
 
     public func fetch(type: FeedType) -> AnyPublisher<([FeedEntity], Bool?), Error> {
         switch type {
-        case .recommended:
-            return service.fetchRecommendedFeed()
+        case .recommend:
+            return service.fetchRecommendFeed()
                 .map { dto in
                     let entities = dto.data.diaryList.map { item in
                         FeedEntity(

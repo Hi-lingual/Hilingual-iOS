@@ -20,13 +20,13 @@ public struct FeedEntity {
 public struct FeedProfile {
     public let userId: Int
     public let isMine: Bool
-    public let profileImg: String
+    public let profileImg: String?
     public let nickname: String
     public let streak: Int?
 
     public init(userId: Int,
                 isMine: Bool,
-                profileImg: String,
+                profileImg: String?,
                 nickname: String,
                 streak: Int?)
     {

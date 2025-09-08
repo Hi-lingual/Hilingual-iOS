@@ -75,6 +75,9 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: false)
+
+        recommendFeedVC.refresh()
+        followingFeedVC.refresh()
     }
 
     //MARK: - Action
@@ -100,6 +103,7 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
     }
 
     // MARK: - Public Methods
+    
     func showToast(message: String) {
         feedView.showToast(message: message)
     }
