@@ -560,8 +560,8 @@ extension AppDIContainer {
 
 extension AppDIContainer {
     
-    private func makeFeedSearchService() -> MockFeedSearchService {
-        return MockFeedSearchService()
+    private func makeFeedSearchService() -> FeedSearchService {
+        return DefaultFeedSearchService()
     }
 
     private func makeFeedSearchRepository() -> FeedSearchRepository {

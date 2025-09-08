@@ -19,8 +19,8 @@ public final class DefaultFeedSearchRepository: FeedSearchRepository {
     
     public func search(keyword: String) -> AnyPublisher<[FeedSearchEntity], Error> {
         return service.search(keyword: keyword)
-            .map { responseDTO in
-                return responseDTO.data.userList.map { $0.toEntity() }
+            .map { responseWrapper in
+                return responseWrapper.data.userList.map { $0.toEntity() }
             }
             .eraseToAnyPublisher()
     }
