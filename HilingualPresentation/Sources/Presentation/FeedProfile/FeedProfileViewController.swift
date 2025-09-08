@@ -57,6 +57,11 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
         view.addSubview(feedCellView)
         feedCellView.snp.makeConstraints { $0.edges.equalToSuperview() }
         
+        //위로 끌어당겼을 때 새로고침 추가
+        let refreshControl = UIRefreshControl()
+        refreshControl.addTarget(self, action: #selector(didTopScrollRefresh), for: .valueChanged)
+        feedCellView.tableView.refreshControl = refreshControl
+        
         feedCellView.tableView.delegate = self
         feedCellView.tableView.dataSource = feedCellView
         
@@ -116,6 +121,11 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
     
     @objc private func didTapTableView() {
         feedCellView.closeAllMenus()
+    }
+    
+    @objc private func didTopScrollRefresh() {
+        self.input.reload.send(())
+        feedCellView.tableView.refreshControl?.endRefreshing()
     }
     
     // MARK: - Private Method

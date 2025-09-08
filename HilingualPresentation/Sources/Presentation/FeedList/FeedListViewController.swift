@@ -34,6 +34,11 @@ public final class FeedListViewController: BaseUIViewController<FeedViewModel> {
         bindViewModel()
         input.reload.send(())
         
+        //위로 끌어당겼을 때 새로고침 추가
+        let refreshControl = UIRefreshControl()
+        refreshControl.addTarget(self, action: #selector(didTopScrollRefresh), for: .valueChanged)
+        feedCellView.tableView.refreshControl = refreshControl
+
         feedCellView.addTableTapGesture(target: self, action: #selector(didTapTableView))
         
         feedCellView.onHideTapped = { [weak self] row in
@@ -96,6 +101,11 @@ public final class FeedListViewController: BaseUIViewController<FeedViewModel> {
     
     @objc private func didTapTableView() {
         feedCellView.closeAllMenus()
+    }
+    
+    @objc private func didTopScrollRefresh() {
+        self.input.reload.send(())
+        feedCellView.tableView.refreshControl?.endRefreshing()
     }
     
     // MARK: - Public
