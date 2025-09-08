@@ -22,8 +22,6 @@ public final class RecommendedExpressionViewController: BaseUIViewController<Rec
     
     public override func viewDidLoad() {
         super.viewDidLoad()
-        guard let viewModel = self.viewModel else { return }
-            bind(viewModel: viewModel)
     }
     
     // MARK: Custom Method
