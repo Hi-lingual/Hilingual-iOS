@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct UserListDataDTO: Decodable {
+public struct FeedSearchResponseDTO: Decodable {
     public let userList: [UserDTO]
 }
 
