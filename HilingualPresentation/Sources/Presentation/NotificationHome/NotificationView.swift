@@ -11,7 +11,7 @@ final class NotificationView: BaseUIView {
 
     // MARK: - Properties
 
-    var notificationListModel: NotificationListModel = NotificationListModel(type: .feed, items: []) {
+    var notificationListModel: NotificationListModel = NotificationListModel(type: .feed(""), items: []) {
         didSet { updateView() }
     }
 

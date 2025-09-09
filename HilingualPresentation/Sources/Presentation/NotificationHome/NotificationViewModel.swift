@@ -46,8 +46,7 @@ public final class NotificationViewModel: BaseViewModel {
                 guard let self else { return Empty().eraseToAnyPublisher() }
 
                 return self.useCase.markNotificationAsRead(notiId: id)
-                    .handleEvents(receiveOutput: {
-                    }, receiveCompletion: { completion in
+                    .handleEvents(receiveCompletion: { completion in
                         if case .failure(let error) = completion {
                             print("알림 읽음 처리 실패: \(error)")
                         }
@@ -64,16 +63,7 @@ public final class NotificationViewModel: BaseViewModel {
 
                 return self.useCase.fetchFeedNotifications()
                     .map { entities in
-                        entities.map {
-                            NotificationModel(
-                                id: $0.id,
-                                type: .feed,
-                                title: $0.title,
-                                isRead: $0.isRead,
-                                publishedAt: $0.publishedAt,
-                                targetId: $0.targetId
-                            )
-                        }
+                        entities.compactMap { self.toModel(from: $0) }
                     }
                     .catch { _ in Just([]) }
                     .handleEvents(receiveOutput: { [weak self] models in
@@ -90,16 +80,7 @@ public final class NotificationViewModel: BaseViewModel {
 
                 return self.useCase.fetchNoticeNotifications()
                     .map { entities in
-                        entities.map {
-                            NotificationModel(
-                                id: $0.id,
-                                type: .notice,
-                                title: $0.title,
-                                isRead: $0.isRead,
-                                publishedAt: $0.publishedAt,
-                                targetId: nil
-                            )
-                        }
+                        entities.compactMap { self.toModel(from: $0) }
                     }
                     .catch { _ in Just([]) }
                     .handleEvents(receiveOutput: { [weak self] models in
@@ -113,6 +94,29 @@ public final class NotificationViewModel: BaseViewModel {
         return Output(
             generalNotifications: generalSubject.eraseToAnyPublisher(),
             noticeNotifications: noticeSubject.eraseToAnyPublisher()
+        )
+    }
+
+    // MARK: - Private Helper
+
+    private func toModel(from entity: NotificationEntity) -> NotificationModel? {
+        let type: NotificationType
+
+        switch entity.type {
+        case .general(let rawType):
+            type = .feed(rawType)
+
+        case .notice(let rawType):
+            type = .notice(rawType)
+        }
+
+        return NotificationModel(
+            id: entity.id,
+            type: type,
+            title: entity.title,
+            isRead: entity.isRead,
+            publishedAt: entity.publishedAt,
+            targetId: entity.targetId
         )
     }
 }
