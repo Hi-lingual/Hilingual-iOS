@@ -30,7 +30,7 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
     private let input = FeedProfileViewModel.Input()
     private let type: FeedProfileListType
     
-    private var currentFeeds: [FeedModel] = []
+    private(set) var currentFeeds: [FeedModel] = []
     private var isFooterApplied = false
     
     var onHideTapped: ((Int) -> Void)?

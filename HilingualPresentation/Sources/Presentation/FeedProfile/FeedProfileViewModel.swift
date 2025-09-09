@@ -19,6 +19,7 @@ public final class FeedProfileViewModel: BaseViewModel, BaseViewModelType {
         let unfollow = PassthroughSubject<Void, Never>()
         let block = PassthroughSubject<Void, Never>()
         let unblock = PassthroughSubject<Void, Never>()
+        let unpublish = PassthroughSubject<Int, Never>()
     }
     
     public struct Output {
@@ -28,6 +29,7 @@ public final class FeedProfileViewModel: BaseViewModel, BaseViewModelType {
         let errorMessage: AnyPublisher<String?, Never>
         let isEmpty: AnyPublisher<Bool, Never>
         let buttonState: AnyPublisher<FollowButtonState?, Never>
+        let publishResult: AnyPublisher<Bool, Never>
     }
     
     // MARK: - Dependencies
@@ -37,6 +39,7 @@ public final class FeedProfileViewModel: BaseViewModel, BaseViewModelType {
 //    private let followUseCase: FollowUseCase
 //    private let unfollowUseCase: UnfollowUseCase
 //    private let blockUserUseCase: BlockUserUseCase
+    private let publishDiaryUseCase: PublishDiaryUseCase
     private let type: FeedProfileType
     private let targetUserId: Int64
     
@@ -48,23 +51,20 @@ public final class FeedProfileViewModel: BaseViewModel, BaseViewModelType {
     private let isLoadingSubject = CurrentValueSubject<Bool, Never>(false)
     private let errorSubject = CurrentValueSubject<String?, Never>(nil)
     private let buttonStateSubject = CurrentValueSubject<FollowButtonState?, Never>(nil)
+    private let publishSubject = PassthroughSubject<Bool, Never>()
     
     // MARK: - Init
     
     public init(
         feedUseCase: FeedProfileUseCase,
         profileInfoUseCase: FeedProfileInfoUseCase,
-//        followUseCase: FollowUseCase,
-//        unfollowUseCase: UnfollowUseCase,
-//        blockUserUseCase: BlockUserUseCase,
+        publishDiaryUseCase: PublishDiaryUseCase,
         type: FeedProfileType,
         targetUserId: Int64 = 0
     ) {
         self.feedUseCase = feedUseCase
         self.profileInfoUseCase = profileInfoUseCase
-//        self.followUseCase = followUseCase
-//        self.unfollowUseCase = unfollowUseCase
-//        self.blockUserUseCase = blockUserUseCase
+        self.publishDiaryUseCase = publishDiaryUseCase
         self.type = type
         self.targetUserId = targetUserId
         super.init()
@@ -137,6 +137,12 @@ public final class FeedProfileViewModel: BaseViewModel, BaseViewModelType {
             }
             .store(in: &cancellables)
         
+        input.unpublish
+            .sink { [weak self] diaryId in
+                self?.unpublishDiary(diaryId: diaryId)
+            }
+            .store(in: &cancellables)
+        
         // 팔로우 등록
 //        input.follow
 //            .flatMap { [weak self] _ -> AnyPublisher<Void, Never> in
@@ -199,7 +205,8 @@ public final class FeedProfileViewModel: BaseViewModel, BaseViewModelType {
             isLoading: isLoadingSubject.eraseToAnyPublisher(),
             errorMessage: errorSubject.eraseToAnyPublisher(),
             isEmpty: isEmptySubject.eraseToAnyPublisher(),
-            buttonState: buttonStateSubject.eraseToAnyPublisher()
+            buttonState: buttonStateSubject.eraseToAnyPublisher(),
+            publishResult: publishSubject.eraseToAnyPublisher()
         )
     }
     
@@ -231,5 +238,17 @@ public final class FeedProfileViewModel: BaseViewModel, BaseViewModelType {
         if isFollowing { return .following }
         if isFollowed { return .mutualFollow }
         return .follow
+    }
+    
+    private func unpublishDiary(diaryId: Int) {
+        publishDiaryUseCase.unpublishDiary(diaryId: diaryId)
+            .sink(receiveCompletion: { [weak self] completion in
+                if case let .failure(error) = completion {
+                    self?.errorSubject.send("공개 상태 변경 실패: \(error.localizedDescription)")
+                }
+            }, receiveValue: { [weak self] _ in
+                self?.publishSubject.send(false)
+            })
+            .store(in: &cancellables)
     }
 }

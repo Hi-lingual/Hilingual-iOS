@@ -21,7 +21,7 @@ public final class FeedListViewController: BaseUIViewController<FeedViewModel> {
     var onReportTapped: (() -> Void)?
     var onRefresh: (() -> Void)?
 
-    private var currentFeeds: [FeedModel] = []
+    private(set) var currentFeeds: [FeedModel] = []
 
     // MARK: - Lifecycle
     

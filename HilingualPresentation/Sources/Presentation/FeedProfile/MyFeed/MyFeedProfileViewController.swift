@@ -14,6 +14,7 @@ public final class MyFeedProfileViewController: BaseUIViewController<FeedProfile
 
     // MARK: - Properties
     
+    private let input = FeedProfileViewModel.Input()
     private let myFeedProfileView = MyFeedProfileView()
     private let likedVC: FeedProfileViewController
     private let sharedVC: FeedProfileViewController
@@ -41,6 +42,10 @@ public final class MyFeedProfileViewController: BaseUIViewController<FeedProfile
 
     public override func viewDidLoad() {
         super.viewDidLoad()
+        
+        if let viewModel = viewModel {
+            _ = viewModel.transform(input: input)
+        }
         
         myFeedProfileView.configureSegmentedControl(
             parentVC: self,
@@ -147,11 +152,11 @@ public final class MyFeedProfileViewController: BaseUIViewController<FeedProfile
                 self?.pendingDeleteRow = nil
             },
             rightAction: { [weak self] in
-                guard let self,
-                      let (listVC, row) = self.pendingDeleteRow else { return }
+                guard let self else { return }
                 self.dialog.dismiss()
+                let diaryId = listVC.currentFeeds[row].diaryID
                 listVC.removeDiary(at: row)
-                self.pendingDeleteRow = nil
+                self.input.unpublish.send(diaryId)
             }
         )
         dialog.isHidden = false

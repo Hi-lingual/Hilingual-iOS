@@ -13,6 +13,7 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
 
     // MARK: - Properties
     
+    private let input = FeedViewModel.Input()
     private let feedView = FeedView()
     private let dialog = Dialog()
 
@@ -79,6 +80,14 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
         recommendFeedVC.refresh()
         followingFeedVC.refresh()
     }
+    
+    public override func viewDidLoad() {
+        super.viewDidLoad()
+
+        if let viewModel = viewModel {
+            _ = viewModel.transform(input: input)
+        }
+    }
 
     //MARK: - Action
 
@@ -128,8 +137,11 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
                 self?.dialog.dismiss()
             },
             rightAction: { [weak self] in
-                self?.dialog.dismiss()
+                guard let self else { return }
+                self.dialog.dismiss()
+                let diaryId = listVC.currentFeeds[row].diaryID
                 listVC.removeDiary(at: row)
+                self.input.unpublish.send(diaryId)
             }
         )
         dialog.isHidden = false

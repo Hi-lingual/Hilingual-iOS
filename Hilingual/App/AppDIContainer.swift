@@ -607,12 +607,20 @@ extension AppDIContainer {
     // ViewModel
     /// FeedViewController용 ViewModel
     private func makeFeedViewModel() -> FeedViewModel {
-        return FeedViewModel()
+        return FeedViewModel(
+            feedUseCase: makeFeedUseCase(),
+            publishDiaryUseCase: makePublishDiaryUseCase(),
+            type: nil
+        )
     }
     
     /// FeedListViewController용 ViewModel
     private func makeFeedViewModel(type: FeedListType) -> FeedViewModel {
-        return FeedViewModel(feedUseCase: makeFeedUseCase(), type: type)
+        return FeedViewModel(
+            feedUseCase: makeFeedUseCase(),
+            publishDiaryUseCase: makePublishDiaryUseCase(),
+            type: type
+        )
     }
     
     // UseCase
@@ -648,6 +656,7 @@ extension AppDIContainer {
         return FeedProfileViewModel(
             feedUseCase: makeFeedProfileUseCase(),
             profileInfoUseCase: makeFeedProfileInfoUseCase(),
+            publishDiaryUseCase: makePublishDiaryUseCase(),
             type: type,
             targetUserId: targetUserId
         )
