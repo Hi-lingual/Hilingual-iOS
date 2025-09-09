@@ -179,7 +179,9 @@ public final class MyFeedProfileViewController: BaseUIViewController<FeedProfile
     }
 
     private func pushFollowListViewController() {
-        let followVC = self.diContainer.makeFollowListViewController()
+        guard let viewModel = self.viewModel else { return }
+        
+        let followVC = self.diContainer.makeFollowListViewController(targetUserId: Int(viewModel.targetUserId))
         self.navigationController?.pushViewController(followVC, animated: true)
     }
 }
