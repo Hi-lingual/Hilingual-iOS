@@ -84,7 +84,6 @@ public final class FeedSearchViewController: BaseUIViewController<FeedSearchView
         
         // 검색 결과
         output?.searchState
-            .receive(on: DispatchQueue.main)
             .sink { [weak self] state in
                 self?.updateUI(for: state)
             }
@@ -92,7 +91,6 @@ public final class FeedSearchViewController: BaseUIViewController<FeedSearchView
         
         // 팔로우 액션 결과
         output?.followAction
-            .receive(on: DispatchQueue.main)
             .sink { [weak self] result in
                 guard let self = self else { return }
                 if let index = self.userList.firstIndex(where: { $0.userId == result.userId }) {
