@@ -85,6 +85,20 @@ public final class RecommendedExpressionViewController: BaseUIViewController<Rec
                 }
             )
             .store(in: &cancellables)
+        
+        output.errorMessage
+            .receive(on: RunLoop.main)
+            .sink { [weak self] message in
+                guard let self else { return }
+                let toast = ToastMessage()
+                self.view.addSubview(toast)
+                toast.configure(type: .withButton, message: "단어장이 모두 찼어요!", actionTitle: "비우러가기")
+                toast.action = { [weak self] in
+//                    let vc = self?.diContainer.makeTabBarViewController()
+                    self?.navigationController?.popToRootViewController(animated: true)
+                }
+            }
+            .store(in: &cancellables)
     }
     
     private func showErrorDialog(message: String) {
