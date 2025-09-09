@@ -33,7 +33,7 @@ final class AgreementModalView: UIView {
     private let allAgree = AgreementRow(title: "전체 동의", isBold: true)
     private let serviceAgree = AgreementRow(title: "하이링구얼 서비스 이용약관 동의 (필수)")
     private let privacyAgree = AgreementRow(title: "개인정보 수집 및 이용 동의 (필수)")
-    private let marketingAgree = AgreementRow(title: "광고성 정보 수신 동의 (선택)")
+    private let marketingAgree = AgreementRow(title: "앱 내 광고성 정보 수신 동의 (선택)")
 
     override init(frame: CGRect) {
         super.init(frame: frame)

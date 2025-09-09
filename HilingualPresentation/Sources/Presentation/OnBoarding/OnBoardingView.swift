@@ -35,7 +35,8 @@ final class OnBoardingView: BaseUIView {
     let profileImageView = EditableProfileImageView()
 
     let startButton: CTAButton = {
-        CTAButton(style: .TextButton("시작하기"), autoBackground: true)
+        //TODO: - 서버 연결이후 변경하기
+        CTAButton(style: .TextButton("가입하기"), autoBackground: true)
     }()
 
     let nickNameLabel: UILabel = {
