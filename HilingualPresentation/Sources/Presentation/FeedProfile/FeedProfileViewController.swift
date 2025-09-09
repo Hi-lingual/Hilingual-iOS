@@ -117,6 +117,10 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
         }
     }
     
+    public func refresh() {
+        input.reload.send(())
+    }
+    
     // MARK: - Actions
     
     @objc private func didTapTableView() {

@@ -48,6 +48,15 @@ public final class MyFeedProfileViewController: BaseUIViewController<FeedProfile
             titles: ["공유한 일기", "공감한 일기"]
         )
         
+        myFeedProfileView.onSegmentChanged = { [weak self] index in
+                guard let self else { return }
+                if index == 0 {
+                    self.sharedVC.refresh()
+                } else {
+                    self.likedVC.refresh()
+                }
+            }
+        
         view.addSubview(dialog)
         dialog.isHidden = true
         dialog.snp.makeConstraints { $0.edges.equalToSuperview() }
