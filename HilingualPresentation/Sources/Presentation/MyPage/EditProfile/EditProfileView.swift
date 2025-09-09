@@ -101,3 +101,11 @@ final class EditProfileView: BaseUIView {
         }
     }
 }
+
+extension EditProfileView {
+    public func configure(profileImageURL: String?, nickname: String, provider: String) {
+        profileImageView.setImage(urlString: profileImageURL)
+        nicknameRow.setValue(value: nickname)
+        socialRow.setValue(value: provider)
+    }
+}
