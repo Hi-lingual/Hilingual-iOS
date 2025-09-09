@@ -22,6 +22,8 @@ public final class EditProfileViewController: BaseUIViewController<EditProfileVi
         return config
     }()
 
+    private let withdrawTappedSubject = PassthroughSubject<Void, Never>()
+
     // MARK: - Life Cycle
 
     public override func viewWillAppear(_ animated: Bool) {
@@ -31,7 +33,7 @@ public final class EditProfileViewController: BaseUIViewController<EditProfileVi
 
     public override func setUI() {
         super.setUI()
-        view.addSubviews(editProfileView)
+        view.addSubview(editProfileView)
     }
 
     public override func setLayout() {
@@ -42,27 +44,22 @@ public final class EditProfileViewController: BaseUIViewController<EditProfileVi
         return .backTitle("내 정보 수정")
     }
 
-    public override func addTarget() {
-        editProfileView.profileImageView.editButton.addTarget(self, action: #selector(profileTapped), for: .touchUpInside)
-
-        editProfileView.onSelectDefaultImage = { [weak self] in
-            let defaultImage = UIImage(named: "img_profile_normal_ios", in: .module, compatibleWith: nil)
-            self?.editProfileView.profileImageView.profileImageView.image = defaultImage
-
-            if let data = defaultImage?.jpegData(compressionQuality: 0.9) {
-                self?.viewModel?.uploadProfileImage(data: data)
-            }
-        }
-
-        editProfileView.onSelectGallery = { [weak self] in
-            self?.presentImagePicker()
-        }
-    }
-
     // MARK: - Bind
 
     public override func bind(viewModel: EditProfileViewModel) {
-        let output = viewModel.transform(input: .init())
+        let output = viewModel.transform(
+            input: .init(withdrawTapped: withdrawTappedSubject.eraseToAnyPublisher())
+        )
+
+        output.withdrawSuccess
+            .receive(on: RunLoop.main)
+            .sink { [weak self] in
+                guard let self else { return }
+                let onboardingVC = self.diContainer.makeSplashViewController()
+                changeRootVC(onboardingVC,animated: true)
+            }
+            .store(in: &cancellables)
+
 
         output.userProfilePublisher
             .receive(on: RunLoop.main)
@@ -79,18 +76,38 @@ public final class EditProfileViewController: BaseUIViewController<EditProfileVi
         output.profileImageUploadSuccess
             .receive(on: RunLoop.main)
             .sink { [weak self] in
-                // TODO: 성공 토스트 등 보여주기
-                print("✅ 프로필 이미지 업로드 성공")
+                print("프로필 이미지 업로드 성공")
             }
             .store(in: &cancellables)
 
         output.profileImageUploadError
             .receive(on: RunLoop.main)
             .sink { error in
-                // TODO: 에러 모달 표시 등
-                print("❌ 프로필 이미지 업로드 실패: \(error)")
+                // TODO: 실패 시 Alert 처리 등
+                print("프로필 이미지 업로드 실패: \(error)")
             }
             .store(in: &cancellables)
+    }
+
+    // MARK: - Target
+
+    public override func addTarget() {
+        editProfileView.profileImageView.editButton.addTarget(self, action: #selector(profileTapped), for: .touchUpInside)
+        editProfileView.withdrawButton.addTarget(self, action: #selector(withdrawTapped), for: .touchUpInside)
+
+        editProfileView.onSelectDefaultImage = { [weak self] in
+            guard let self else { return }
+            let defaultImage = UIImage(named: "img_profile_normal_ios", in: .module, compatibleWith: nil)
+            self.editProfileView.profileImageView.profileImageView.image = defaultImage
+
+            if let data = defaultImage?.jpegData(compressionQuality: 0.9) {
+                self.viewModel?.uploadProfileImage(data: data)
+            }
+        }
+
+        editProfileView.onSelectGallery = { [weak self] in
+            self?.presentImagePicker()
+        }
     }
 
     // MARK: - Actions
@@ -98,6 +115,33 @@ public final class EditProfileViewController: BaseUIViewController<EditProfileVi
     @objc private func profileTapped() {
         editProfileView.modal.isHidden = false
         editProfileView.modal.showAnimation()
+    }
+
+    @objc private func withdrawTapped() {
+        let dialog = Dialog()
+        guard let window = UIApplication.shared.windows.first else { return }
+
+        dialog.configure(
+            style: .normal,
+            title: "정말 계정을 삭제하시겠어요?",
+            content: "회원 탈퇴 시 작성한 일기를 비롯한 계정 정보는 \n영원히 삭제돼요. 정말 삭제를 원하시나요?",
+            leftButtonTitle: "아니요",
+            rightButtonTitle: "삭제하기",
+            leftAction: {
+                dialog.dismiss()
+            },
+            rightAction: { [weak self] in
+                dialog.dismiss()
+                self?.withdrawTappedSubject.send(())
+            }
+        )
+
+        window.addSubview(dialog)
+        dialog.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
+
+        dialog.showAnimation()
     }
 
     private func presentImagePicker() {

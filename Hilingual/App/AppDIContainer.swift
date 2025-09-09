@@ -723,7 +723,7 @@ extension AppDIContainer {
     }
 
     private func makeEditProfileViewModel() -> EditProfileViewModel {
-        return EditProfileViewModel(fetchUserProfileUseCase: makefetchUserProfileUseCase(), uploadImageUseCase: makeUploadImageUseCase())
+        return EditProfileViewModel(fetchUserProfileUseCase: makefetchUserProfileUseCase(), uploadImageUseCase: makeUploadImageUseCase(), mypageUseCase: makeMypageUseCase())
     }
 
 }

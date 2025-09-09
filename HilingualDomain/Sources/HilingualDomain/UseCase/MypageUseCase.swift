@@ -10,6 +10,7 @@ import Combine
 
 public protocol MypageUseCase {
     func logout() -> AnyPublisher<Void, Error>
+    func withdraw() -> AnyPublisher<Void, Error>
 }
 
 public final class DefaultMypageUseCase: MypageUseCase {
@@ -22,5 +23,9 @@ public final class DefaultMypageUseCase: MypageUseCase {
 
     public func logout() -> AnyPublisher<Void, Error> {
         return authRepository.logout()
+    }
+
+    public func withdraw() -> AnyPublisher<Void, Error> {
+           return authRepository.withdraw()
     }
 }

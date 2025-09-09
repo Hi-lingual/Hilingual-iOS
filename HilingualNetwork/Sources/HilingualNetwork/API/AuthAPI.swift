@@ -10,6 +10,7 @@ import Moya
 public enum AuthAPI {
     case socialLogin(body: AuthLoginRequestDTO, providerToken: String)
     case refreshToken(refreshToken: String)
+    case withdraw
 }
 
 extension AuthAPI: NoAuthorizeTargetType {
@@ -19,11 +20,20 @@ extension AuthAPI: NoAuthorizeTargetType {
             return "/auth/login"
         case .refreshToken:
             return "/users/reissue"
+        case .withdraw:
+            return "/auth/leave"
         }
     }
 
     public var method: Moya.Method {
-        return .post
+        switch self {
+        case .socialLogin:
+            return .post
+        case .refreshToken:
+            return .post
+        case .withdraw:
+            return .post
+        }
     }
 
     public var task: Task {
@@ -31,6 +41,8 @@ extension AuthAPI: NoAuthorizeTargetType {
         case let .socialLogin(body, _):
             return .requestJSONEncodable(body)
         case .refreshToken:
+            return .requestPlain
+        case .withdraw:
             return .requestPlain
         }
     }
@@ -46,6 +58,11 @@ extension AuthAPI: NoAuthorizeTargetType {
             return [
                 "Content-Type": "application/json",
                 "Authorization": "Bearer \(refreshToken)"
+            ]
+        case .withdraw:
+            return [
+                "Content-Type": "application/json",
+                "Authorization": "Bearer \(UserDefaultHandler.accessToken)"
             ]
         }
     }
