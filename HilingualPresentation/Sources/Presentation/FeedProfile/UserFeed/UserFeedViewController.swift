@@ -117,9 +117,9 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
         userFeedProfileView.onFollowTapped = { [weak self] state in
             guard let self else { return }
             switch state {
-            case .follow:
+            case .follow, .mutualFollow:
                 self.input.follow.send(())
-            case .following, .mutualFollow:
+            case .following:
                 self.input.unfollow.send(())
             default:
                 break

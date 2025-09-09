@@ -173,10 +173,11 @@ public final class FeedProfileViewModel: BaseViewModel, BaseViewModelType {
             }
             .sink { [weak self] _ in
                 self?.buttonStateSubject.send(.following)
+                self?.reloadProfile()
             }
             .store(in: &cancellables)
-        
-        // 팔로우 해제하기
+
+        // 언팔로우하기
         input.unfollow
             .flatMap { [weak self] _ -> AnyPublisher<Bool, Never> in
                 guard let self else { return Empty().eraseToAnyPublisher() }
@@ -187,10 +188,8 @@ public final class FeedProfileViewModel: BaseViewModel, BaseViewModelType {
                     }
                     .eraseToAnyPublisher()
             }
-            .sink { [weak self] success in
-                if success {
-                    self?.reloadProfile()
-                }
+            .sink { [weak self] _ in
+                self?.reloadProfile()
             }
             .store(in: &cancellables)
         
