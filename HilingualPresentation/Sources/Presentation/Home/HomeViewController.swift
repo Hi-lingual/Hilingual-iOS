@@ -5,7 +5,6 @@ import UIKit
 public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     
     // MARK: - Properties
-    private var isPostDeletionState: Bool = false
     
     private var overlayView: UIControl?
     private let homeView = HomeView()
@@ -62,9 +61,15 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         homeView.calendarView.onDateSelected = { [weak self] date in
             guard let self else { return }
             
-            if self.isPostDeletionState {
-                self.isPostDeletionState = false
-                let requestedDate = date
+            let requestedDate = date
+            let today = Calendar.current.startOfDay(for: Date())
+            let selectedDay = Calendar.current.startOfDay(for: requestedDate)
+            
+            self.homeView.selectedInfo.setSelectedDate(requestedDate)
+            self.homeView.selectedInfo.currentDiaryId = nil
+            
+            if selectedDay > today {
+                self.currentDateRequestCancellable?.cancel()
                 self.homeView.selectedInfo.updateView(
                     for: requestedDate,
                     diaryId: nil,
@@ -76,13 +81,6 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                 )
                 return
             }
-            
-            let requestedDate = date
-            let today = Calendar.current.startOfDay(for: Date())
-            let selectedDay = Calendar.current.startOfDay(for: requestedDate)
-            
-            self.homeView.selectedInfo.setSelectedDate(requestedDate)
-            self.homeView.selectedInfo.currentDiaryId = nil
             
             // 1) 미래 날짜면 바로 Lock 상태로 보여주고 네트워크 호출하지 않음
             if selectedDay > today {
