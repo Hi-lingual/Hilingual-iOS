@@ -175,7 +175,7 @@ final class AppDIContainer: ViewControllerFactory {
     }
 
     public func makeEditProfileViewController() -> EditProfileViewController {
-        return EditProfileViewController(viewModel: makeHomeViewModel(), diContainer: self)
+        return EditProfileViewController(viewModel: makeEditProfileViewModel(), diContainer: self)
     }
 
     public func makeBlockUserViewController() -> BlockUserViewController {
@@ -707,8 +707,23 @@ extension AppDIContainer {
     private func makeUploadImageService() -> PresignedURLService {
         DefaultPresignedURLService()
     }
-    
-//    private func makeFeedProfileInfoService() -> FeedProfileInfoService {
-//        MockFeedProfileInfoService(isMine: false)
-//    }
+
+    //MARK: - EditProfileDIContainer
+
+    private func makefetchUserProfileUseCase() -> FetchUserProfileUseCase {
+        return DefaultFetchUserProfileUseCase(repository: makeUserProfileRepository())
+    }
+
+    private func makeUserProfileRepository() -> UserProfileRepository {
+        return DefaultUserProfileRepository(service: makeUserProfileService())
+    }
+
+    private func makeUserProfileService() -> UserProfileService {
+        return DefaultUserProfileService()
+    }
+
+    private func makeEditProfileViewModel() -> EditProfileViewModel {
+        return EditProfileViewModel(fetchUserProfileUseCase: makefetchUserProfileUseCase())
+    }
+
 }

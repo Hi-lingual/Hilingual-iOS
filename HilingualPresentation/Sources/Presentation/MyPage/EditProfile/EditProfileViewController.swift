@@ -9,7 +9,7 @@ import Combine
 import Foundation
 import UIKit
 
-public final class EditProfileViewController: BaseUIViewController<HomeViewModel> {
+public final class EditProfileViewController: BaseUIViewController<EditProfileViewModel> {
 
     // MARK: - Properties
 
@@ -46,5 +46,21 @@ public final class EditProfileViewController: BaseUIViewController<HomeViewModel
         editProfileView.modal.showAnimation()
     }
 
-    public override func bind(viewModel: HomeViewModel) {}
+    // MARK: - Bind
+
+    public override func bind(viewModel: EditProfileViewModel) {
+        let output = viewModel.transform(input: .init())
+
+        output.userProfilePublisher
+            .receive(on: RunLoop.main)
+            .sink { [weak self] profile in
+                guard let profile else { return }
+                self?.editProfileView.configure(
+                    profileImageURL: profile.profileImg,
+                    nickname: profile.nickname,
+                    provider: profile.provider
+                )
+            }
+            .store(in: &cancellables)
+    }
 }
