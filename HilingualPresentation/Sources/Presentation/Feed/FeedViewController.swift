@@ -91,10 +91,6 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
     
     public override func viewDidLoad() {
         super.viewDidLoad()
-
-        if let viewModel = viewModel {
-            _ = viewModel.transform(input: input)
-        }
     }
 
     //MARK: - Action
