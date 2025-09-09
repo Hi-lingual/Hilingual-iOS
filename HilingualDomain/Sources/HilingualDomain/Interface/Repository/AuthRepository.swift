@@ -11,4 +11,5 @@ public protocol AuthRepository {
     func loginWithApple(token: String) -> AnyPublisher<LoginResponseEntity, Error>
     func refreshToken(token: String) -> AnyPublisher<LoginResponseEntity, Error>
     func logout() -> AnyPublisher<Void, Error>
+    func withdraw() -> AnyPublisher<Void, Error>
 }
