@@ -41,11 +41,12 @@ public final class FeedSearchViewModel: BaseViewModel {
     
     public struct Input {
         let searchTrigger: PassthroughSubject<String, Never>
-        let followButtonTapped: PassthroughSubject<Int, Never> = .init()
+        let followButtonTapped: PassthroughSubject<(userId: Int, isFollowing: Bool), Never> = .init()
     }
     
     public struct Output {
         let searchState: AnyPublisher<SearchState, Never>
+        let followAction: AnyPublisher<(userId: Int, isFollowing: Bool), Never>
     }
     
     // MARK: - Properties
@@ -74,12 +75,13 @@ public final class FeedSearchViewModel: BaseViewModel {
     // MARK: - Transform
     
     public func transform() -> Output {
+        // 검색 스트림
         let searchStatePublisher = input.searchTrigger
             .flatMap { [weak self] query -> AnyPublisher<SearchState, Never> in
                 guard let self = self, !query.isEmpty else {
                     return Just(.enter).eraseToAnyPublisher()
                 }
-
+                
                 return self.useCase.search(keyword: query)
                     .map { entities in
                         entities.map { entity in
@@ -100,7 +102,28 @@ public final class FeedSearchViewModel: BaseViewModel {
                     .eraseToAnyPublisher()
             }
             .eraseToAnyPublisher()
-
-        return Output(searchState: searchStatePublisher)
+        
+        // 팔로우 액션 스트림
+        let followActionPublisher = input.followButtonTapped
+            .flatMap { [weak self] (userId, currentState) -> AnyPublisher<(userId: Int, isFollowing: Bool), Never> in
+                guard let self = self else { return Empty().eraseToAnyPublisher() }
+                
+                let newState = !currentState
+                let publisher: AnyPublisher<Void, Error> = newState
+                ? self.useCase.follow(userId: userId)
+                : self.useCase.unfollow(userId: userId).map { _ in () }.eraseToAnyPublisher()
+                
+                return publisher
+                    .map { (userId: userId, isFollowing: newState) }
+                    .catch { _ in Just((userId: userId, isFollowing: currentState)) }
+                    .receive(on: DispatchQueue.main)
+                    .eraseToAnyPublisher()
+            }
+            .eraseToAnyPublisher()
+        
+        return Output(
+            searchState: searchStatePublisher,
+            followAction: followActionPublisher
+        )
     }
 }

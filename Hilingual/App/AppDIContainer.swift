@@ -498,8 +498,8 @@ extension AppDIContainer {
 
 extension AppDIContainer {
 
-    private func makeFollowListService() -> MockFollowListService {
-        return MockFollowListService() // TODO: 실제 API 서비스로 교체
+    private func makeFollowListService() -> FollowListService {
+        return DefaultFollowListService() // TODO: 실제 API 서비스로 교체
     }
 
     private func makeFollowListRepository() -> FollowListRepository {
@@ -507,16 +507,21 @@ extension AppDIContainer {
     }
 
     private func makeFollowListUseCase() -> FollowListUseCase {
-        return DefaultFollowListUseCase(repository: makeFollowListRepository())
+        return DefaultFollowListUseCase(
+            followListRepository: makeFollowListRepository(),
+            followingRepository: makeFollowingRepository()
+        )
     }
 
-    private func makeFollowListViewModel() -> FollowListViewModel {
-        return FollowListViewModel(followListUseCase: makeFollowListUseCase())
+    private func makeFollowListViewModel(targetUserId: Int) -> FollowListViewModel {
+        return FollowListViewModel(
+            followListUseCase: makeFollowListUseCase(),
+            targetUserId: targetUserId
+        )
     }
-
-    func makeFollowListViewController() -> FollowListViewController {
+    func makeFollowListViewController(targetUserId: Int) -> FollowListViewController {
         let viewController = FollowListViewController(
-            viewModel: makeFollowListViewModel(),
+            viewModel: makeFollowListViewModel(targetUserId: targetUserId),
             diContainer: self
         )
         return viewController
@@ -556,8 +561,16 @@ extension AppDIContainer {
 
 extension AppDIContainer {
     
-    private func makeFeedSearchService() -> MockFeedSearchService {
-        return MockFeedSearchService()
+    private func makeFollowingService() -> FollowingService {
+        return DefaultFollowingService()
+    }
+
+    private func makeFollowingRepository() -> FollowingRepository {
+        return DefaultFollowingRepository(service: makeFollowingService())
+    }
+    
+    private func makeFeedSearchService() -> FeedSearchService {
+        return DefaultFeedSearchService()
     }
 
     private func makeFeedSearchRepository() -> FeedSearchRepository {
@@ -565,7 +578,10 @@ extension AppDIContainer {
     }
 
     private func makeFeedSearchUseCase() -> FeedSearchUseCase {
-        return DefaultFeedSearchUseCase(repository: makeFeedSearchRepository())
+        return DefaultFeedSearchUseCase(
+            feedRepository: makeFeedSearchRepository(),
+            followingRepository: makeFollowingRepository()
+        )
     }
 
     private func makeFeedSearchViewModel() -> FeedSearchViewModel {

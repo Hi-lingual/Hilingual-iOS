@@ -8,23 +8,38 @@
 import Combine
 
 public protocol FollowListUseCase {
-    func fetchFollowers() -> AnyPublisher<[Follower], Error>
-    func fetchFollowing() -> AnyPublisher<[Follower], Error>
+    func fetchFollowers(targetUserId: Int) -> AnyPublisher<[Follower], Error>
+    func fetchFollowings(targetUserId: Int) -> AnyPublisher<[Follower], Error>
+    func follow(userId: Int) -> AnyPublisher<Void, Error>
+    func unfollow(userId: Int) -> AnyPublisher<Bool, Error>
 }
 
 public final class DefaultFollowListUseCase: FollowListUseCase {
     
-    private let repository: FollowListRepository
+    private let followListRepository: FollowListRepository
+        private let followingRepository: FollowingRepository
+        
+        public init(
+            followListRepository: FollowListRepository,
+            followingRepository: FollowingRepository
+        ) {
+            self.followListRepository = followListRepository
+            self.followingRepository = followingRepository
+        }
     
-    public init(repository: FollowListRepository) {
-        self.repository = repository
+    public func fetchFollowers(targetUserId: Int) -> AnyPublisher<[Follower], Error> {
+        return followListRepository.fetchFollowers(targetUserId: targetUserId)
     }
     
-    public func fetchFollowers() -> AnyPublisher<[Follower], Error> {
-        repository.fetchFollowers()
+    public func fetchFollowings(targetUserId: Int) -> AnyPublisher<[Follower], Error> {
+        return followListRepository.fetchFollowings(targetUserId: targetUserId)
     }
     
-    public func fetchFollowing() -> AnyPublisher<[Follower], Error> {
-        repository.fetchFollowing()
+    public func follow(userId: Int) -> AnyPublisher<Void, Error> {
+        return followingRepository.follow(userId: Int64(userId))
+    }
+    
+    public func unfollow(userId: Int) -> AnyPublisher<Bool, Error> {
+        return followingRepository.unfollow(userId: Int64(userId))
     }
 }

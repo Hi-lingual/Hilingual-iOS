@@ -28,7 +28,7 @@ public final class FeedProfileViewModel: BaseViewModel, BaseViewModelType {
     private let feedUseCase: FeedProfileUseCase
     private let profileInfoUseCase: FeedProfileInfoUseCase
     private let type: FeedProfileType
-    private let targetUserId: Int64
+    public let targetUserId: Int64
     
     // MARK: - State
     private let feedsSubject = CurrentValueSubject<[FeedModel], Never>([])
