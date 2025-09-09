@@ -310,7 +310,7 @@ final class FeedCell: UITableViewCell {
             diaryLabel.attributedText = .suit(.body_r_16, text: preview)
         }
 
-        if let urlString = profileImageURL,
+        if let urlString = profileImageURL?.trimmingCharacters(in: .whitespacesAndNewlines),
            !urlString.isEmpty,
            let url = URL(string: urlString) {
             profileImageView.kf.setImage(
