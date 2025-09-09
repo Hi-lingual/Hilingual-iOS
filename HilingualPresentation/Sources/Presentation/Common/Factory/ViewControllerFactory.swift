@@ -24,7 +24,7 @@ public protocol ViewControllerFactory {
         selectedDate: Date
     ) -> DiaryWritingViewController
     func makeVerificationCodeViewController() -> VerificationCodeViewController
-    func makeFollowListViewController() -> FollowListViewController
+    func makeFollowListViewController(targetUserId:Int) -> FollowListViewController
     func makeSharedDiaryViewController(diaryId: Int) -> SharedDiaryViewController
     func makeFeedSearchViewController() -> FeedSearchViewController
     func makeNotificationViewController() -> NotificationViewController

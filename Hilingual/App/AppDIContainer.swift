@@ -502,8 +502,8 @@ extension AppDIContainer {
 
 extension AppDIContainer {
 
-    private func makeFollowListService() -> MockFollowListService {
-        return MockFollowListService() // TODO: 실제 API 서비스로 교체
+    private func makeFollowListService() -> FollowListService {
+        return DefaultFollowListService() // TODO: 실제 API 서비스로 교체
     }
 
     private func makeFollowListRepository() -> FollowListRepository {
@@ -514,13 +514,15 @@ extension AppDIContainer {
         return DefaultFollowListUseCase(repository: makeFollowListRepository())
     }
 
-    private func makeFollowListViewModel() -> FollowListViewModel {
-        return FollowListViewModel(followListUseCase: makeFollowListUseCase())
+    private func makeFollowListViewModel(targetUserId: Int) -> FollowListViewModel {
+        return FollowListViewModel(
+            followListUseCase: makeFollowListUseCase(),
+            targetUserId: targetUserId
+        )
     }
-
-    func makeFollowListViewController() -> FollowListViewController {
+    func makeFollowListViewController(targetUserId: Int) -> FollowListViewController {
         let viewController = FollowListViewController(
-            viewModel: makeFollowListViewModel(),
+            viewModel: makeFollowListViewModel(targetUserId: targetUserId),
             diContainer: self
         )
         return viewController
