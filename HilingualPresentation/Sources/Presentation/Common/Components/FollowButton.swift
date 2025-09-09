@@ -19,7 +19,7 @@ final class FollowButton: UIButton {
     
     // MARK: - Properties
     
-    private var currentState: FollowButtonState = .follow {
+    public private(set) var currentState: FollowButtonState = .follow {
         didSet { setStyle() }
     }
     

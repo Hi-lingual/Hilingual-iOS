@@ -10,8 +10,14 @@ import SnapKit
 
 final class UserFeedProfileView: BaseUIView {
     
-    // MARK: - UI Components
+    // MARK: - Callbacks
+    var onFollowTapped: ((FollowButtonState) -> Void)?
+    var onBlockTapped: (() -> Void)?
+    var onBlockConfirmTapped: (() -> Void)?
+    var onReportTapped: (() -> Void)?
+    var onUnblockTapped: (() -> Void)?
     
+    // MARK: - UI Components
     private let userFeedView = FeedUserProfile()
     private(set) var button = FollowButton()
     private var feedTopConstraint: Constraint?
@@ -48,29 +54,11 @@ final class UserFeedProfileView: BaseUIView {
     
     private let blockModal = BlockModal()
     
-    // MARK: - Callbacks
-    
-    var onBlockTapped: (() -> Void)?
-    var onBlockConfirmTapped: (() -> Void)?
-    var onReportTapped: (() -> Void)?
-    var onUnblockTapped: (() -> Void)?
-    
-    // MARK: - State
-    
-    private enum ButtonState {
-        case follow
-        case following
-        case unblock
-    }
-    private var currentButtonState: ButtonState = .follow
-    
     // MARK: - Setup
-    
     override func setUI() {
         addSubviews(userFeedView, button, feedContainer, blockedStack, modal)
         blockedStack.isHidden = true
         blockedStack.addArrangedSubviews(titleLabel, subTitleLabel)
-        button.configure(state: .follow)
         
         button.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
     }
@@ -164,7 +152,7 @@ final class UserFeedProfileView: BaseUIView {
         blockModal.show(in: self)
         blockModal.onApplyTapped = { [weak self] in
             self?.onBlockConfirmTapped?()
-            self?.setButtonState(.unblock)
+            self?.followButtonState(.unblock)
             self?.showBlockedView()
         }
     }
@@ -191,30 +179,19 @@ final class UserFeedProfileView: BaseUIView {
         userFeedView.onFollowSectionTapped = action
     }
 
-    // MARK: - Private
-    
-    @objc private func buttonTapped() {
-        switch currentButtonState {
-        case .follow:
-            setButtonState(.following)
-        case .following:
-            setButtonState(.follow)
-        case .unblock:
-            onUnblockTapped?()
-            setButtonState(.follow)
+    func followButtonState(_ state: FollowButtonState) {
+        button.configure(state: state)
+
+        switch state {
+        case .follow, .following, .mutualFollow, .block:
             restoreFeedView()
+        case .unblock:
+            showBlockedView()
         }
     }
     
-    private func setButtonState(_ state: ButtonState) {
-        currentButtonState = state
-        switch state {
-        case .follow:
-            button.configure(state: .follow)
-        case .following:
-            button.configure(state: .following)
-        case .unblock:
-            button.configure(state: .unblock)
-        }
+    // MARK: - Private
+    @objc private func buttonTapped() {
+        onFollowTapped?(button.currentState)
     }
 }

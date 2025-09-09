@@ -21,7 +21,7 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
     private let dialog = Dialog()
     
     private var pendingDeleteRow: Int?
-
+    
     // MARK: - Init
     
     public init(
@@ -42,7 +42,7 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
     public override func loadView() {
         self.view = userFeedProfileView
     }
-
+    
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(false, animated: false)
@@ -66,22 +66,22 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
         dialog.isHidden = true
         dialog.snp.makeConstraints { $0.edges.equalToSuperview() }
         
-        /// 게시글 신고하기
+        // 게시글 신고
         sharedVC.onReportTapped = { [weak self] in
             self?.showReportDialog()
         }
         
-        /// 유저 차단 모달 띄우기
+        // 유저 차단 모달
         userFeedProfileView.onBlockTapped = { [weak self] in
             self?.userFeedProfileView.showBlockDialog()
         }
         
-        /// 유저 신고하기
+        // 유저 신고
         userFeedProfileView.onReportTapped = { [weak self] in
             self?.showAccountReportDialog()
         }
         
-        /// 유저 차단 모달 클릭 시, 차단 로직
+        // 차단 확정
         userFeedProfileView.onBlockConfirmTapped = { [weak self] in
             guard let self else { return }
             self.userFeedProfileView.dismissBlockDialog()
@@ -91,18 +91,33 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
             self.updateNavigation()
         }
         
-        /// 유저 차단해제하기
+        // 차단 해제
         userFeedProfileView.onUnblockTapped = { [weak self] in
             guard let self else { return }
             self.isBlocked = false
             self.userFeedProfileView.restoreFeedView()
             self.updateNavigation()
         }
-
+        
+        // TODO: 팔로우 등록 / 팔로우 해제 / 차단 해제 API 연동
+//        // 팔로우 등록 / 팔로우 해제 / 차단 해제
+//        userFeedProfileView.onFollowTapped = { [weak self] state in
+//            switch state {
+//            case .follow:
+//                self?.viewModel.input.follow.send(())
+//            case .following:
+//                self?.viewModel.input.unfollow.send(())
+//            case .unblock:
+//                self?.viewModel.input.unblock.send(())
+//            default:
+//                break
+//            }
+//        }
+        
         userFeedProfileView.setFollowSectionTappedAction { [weak self] in
             self?.pushFollowListViewController()
         }
-
+        
         bind()
     }
     
@@ -147,6 +162,14 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
                     following: entity.following,
                     streak: entity.streak
                 )
+            }
+            .store(in: &cancellables)
+        
+        output.buttonState
+            .compactMap { $0 }
+            .receive(on: RunLoop.main)
+            .sink { [weak self] state in
+                self?.userFeedProfileView.followButtonState(state)
             }
             .store(in: &cancellables)
         
