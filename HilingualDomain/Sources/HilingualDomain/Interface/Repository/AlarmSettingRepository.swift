@@ -9,5 +9,5 @@ import Combine
 
 public protocol AlarmSettingRepository {
     func fetchAlarmSetting() -> AnyPublisher<AlarmSettingEntity, Error>
-    func updateAlarmSetting(isMarketingOn: Bool, isFeedOn: Bool) -> AnyPublisher<Void, Error>
+    func toggleNotificationSetting(notiType: String) -> AnyPublisher<Void, Error>
 }

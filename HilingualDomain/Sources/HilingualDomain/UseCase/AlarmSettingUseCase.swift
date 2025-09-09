@@ -9,7 +9,7 @@ import Combine
 
 public protocol AlarmSettingUseCase {
     func fetchAlarmSetting() -> AnyPublisher<AlarmSettingEntity, Error>
-    func updateAlarmSetting(isMarketingOn: Bool, isFeedOn: Bool) -> AnyPublisher<Void, Error>
+    func toggleNotificationSetting(notiType: String) -> AnyPublisher<Void, Error>
 }
 
 public final class DefaultAlarmSettingUseCase: AlarmSettingUseCase {
@@ -23,7 +23,7 @@ public final class DefaultAlarmSettingUseCase: AlarmSettingUseCase {
         return repository.fetchAlarmSetting()
     }
 
-    public func updateAlarmSetting(isMarketingOn: Bool, isFeedOn: Bool) -> AnyPublisher<Void, Error> {
-        return repository.updateAlarmSetting(isMarketingOn: isMarketingOn, isFeedOn: isFeedOn)
+    public func toggleNotificationSetting(notiType: String) -> AnyPublisher<Void, Error> {
+        return repository.toggleNotificationSetting(notiType: notiType)
     }
 }
