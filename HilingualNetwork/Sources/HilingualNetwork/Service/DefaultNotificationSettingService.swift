@@ -8,12 +8,12 @@
 import Combine
 import Foundation
 
-public protocol AlarmSettingServiceProtocol {
+public protocol NotificationSettingService {
     func fetchAlarmSetting() -> AnyPublisher<NotificationSettingsResponseDTO, Error>
-    func updateAlarmSetting(isMarketingOn: Bool, isFeedOn: Bool) -> AnyPublisher<Void, Error>
+    func toggleNotificationSetting(notiType: String) -> AnyPublisher<Void, Error>
 }
 
-public final class MockAlarmSettingService: BaseService<NotificationAPI>,AlarmSettingServiceProtocol {
+public final class DefaultNotificationSettingService: BaseService<NotificationAPI>,NotificationSettingService {
 
     private var currentSetting = NotificationSettingsResponseDTO(marketing: true, feed: false)
 
@@ -26,11 +26,10 @@ public final class MockAlarmSettingService: BaseService<NotificationAPI>,AlarmSe
             .eraseToAnyPublisher()
     }
 
-    public func updateAlarmSetting(isMarketingOn: Bool, isFeedOn: Bool) -> AnyPublisher<Void, Error> {
-        currentSetting = NotificationSettingsResponseDTO(marketing: isMarketingOn, feed: isFeedOn)
-        return Just(())
-            .setFailureType(to: Error.self)
-            .delay(for: .milliseconds(300), scheduler: RunLoop.main)
+    public func toggleNotificationSetting(notiType: String) -> AnyPublisher<Void, Error> {
+        request(.toggleNotificationSetting(notiType: notiType), as: BaseAPIResponse<NotificationSettingsResponseDTO>.self)
+            .map { _ in () }
+            .mapError { $0 as Error }
             .eraseToAnyPublisher()
     }
 }

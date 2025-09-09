@@ -5,7 +5,6 @@
 //  Created by 진소은 on 8/4/25.
 //
 
-
 import UIKit
 
 final class CustomToggle: UIControl {
@@ -15,7 +14,6 @@ final class CustomToggle: UIControl {
     private(set) var isOn: Bool = true {
         didSet {
             updateUI(animated: true)
-            sendActions(for: .valueChanged)
         }
     }
 
@@ -76,6 +74,7 @@ final class CustomToggle: UIControl {
 
     @objc private func toggle() {
         isOn.toggle()
+        sendActions(for: .valueChanged)
     }
 
     // MARK: - UI Update

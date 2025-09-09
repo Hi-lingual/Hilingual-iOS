@@ -477,8 +477,8 @@ extension AppDIContainer {
 
 extension AppDIContainer {
 
-    private func makeNotificationSettingService() -> MockAlarmSettingService {
-        return MockAlarmSettingService()
+    private func makeNotificationSettingService() -> DefaultNotificationSettingService {
+        return DefaultNotificationSettingService()
     }
 
     private func makeNotificationRepository() -> AlarmSettingRepository {
