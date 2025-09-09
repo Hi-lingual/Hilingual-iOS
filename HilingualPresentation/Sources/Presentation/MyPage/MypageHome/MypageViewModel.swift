@@ -22,24 +22,30 @@ public final class MypageViewModel: BaseViewModel {
     public struct Output {
         let logoutCompleted: AnyPublisher<Void, Never>
         let logoutError: AnyPublisher<Error, Never>
+        let userProfile: AnyPublisher<UserProfileEntity?, Never>
     }
 
     // MARK: - Properties
 
     private let mypageUseCase: MypageUseCase
+    private let fetchUserProfileUseCase: FetchUserProfileUseCase
 
     private let logoutCompletedSubject = PassthroughSubject<Void, Never>()
     private let logoutErrorSubject = PassthroughSubject<Error, Never>()
+    private let userProfileSubject = PassthroughSubject<UserProfileEntity?, Never>()
 
     // MARK: - Init
 
-    public init(mypageUseCase: MypageUseCase) {
+    public init(mypageUseCase: MypageUseCase, fetchUserProfileUseCase: FetchUserProfileUseCase) {
         self.mypageUseCase = mypageUseCase
+        self.fetchUserProfileUseCase = fetchUserProfileUseCase
     }
 
     // MARK: - Transform
 
     public func transform(input: Input) -> Output {
+        fetchUserProfile()
+
         input.logoutTapped
             .flatMap { [weak self] _ -> AnyPublisher<Void, Never> in
                 guard let self = self else { return Empty().eraseToAnyPublisher() }
@@ -61,7 +67,24 @@ public final class MypageViewModel: BaseViewModel {
 
         return Output(
             logoutCompleted: logoutCompletedSubject.eraseToAnyPublisher(),
-            logoutError: logoutErrorSubject.eraseToAnyPublisher()
+            logoutError: logoutErrorSubject.eraseToAnyPublisher(),
+            userProfile: userProfileSubject.eraseToAnyPublisher()
         )
     }
+
+    private func fetchUserProfile() {
+        fetchUserProfileUseCase.fetchMyProfile()
+            .sink(
+                receiveCompletion: { completion in
+                    if case .failure(let error) = completion {
+                        print("❌ 유저 정보 불러오기 실패: \(error)")
+                    }
+                },
+                receiveValue: { [weak self] profile in
+                    self?.userProfileSubject.send(profile)
+                }
+            )
+            .store(in: &cancellables)
+    }
+
 }

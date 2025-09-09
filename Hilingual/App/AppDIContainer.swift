@@ -452,7 +452,7 @@ extension AppDIContainer {
     }
 
     private func makeMypageViewModel() -> MypageViewModel {
-        return MypageViewModel(mypageUseCase: makeMypageUseCase())
+        return MypageViewModel(mypageUseCase: makeMypageUseCase(), fetchUserProfileUseCase: makefetchUserProfileUseCase())
     }
 }
 
