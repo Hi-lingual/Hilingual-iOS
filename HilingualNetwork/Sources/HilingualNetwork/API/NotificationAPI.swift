@@ -59,21 +59,37 @@ import Moya
 
 public enum NotificationAPI {
     case getNotifications(tab: String)
+    case getNotificationDetail(id: Int)
+    case markAsRead(id: Int)
 }
 
 extension NotificationAPI: BaseTargetType {
     public var path: String {
-        return "/users/notifications"
+        switch self {
+        case .getNotifications:
+            return "/users/notifications"
+        case .getNotificationDetail(let id):
+            return "/users/notifications/\(id)"
+        case .markAsRead(let id):
+            return "/users/notifications/\(id)/read"
+        }
     }
 
     public var method: Moya.Method {
-        return .get
+        switch self {
+        case .getNotifications, .getNotificationDetail:
+            return .get
+        case .markAsRead:
+            return .patch
+        }
     }
 
     public var task: Task {
         switch self {
         case .getNotifications(let tab):
             return .requestParameters(parameters: ["tab": tab], encoding: URLEncoding.queryString)
+        case .getNotificationDetail, .markAsRead:
+            return .requestPlain 
         }
     }
 }

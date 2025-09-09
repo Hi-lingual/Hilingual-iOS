@@ -15,6 +15,7 @@ public final class NotificationListViewController: BaseUIViewController<Notifica
     private let notificationView = NotificationView()
     private let type: NotificationType
     private let fetchTrigger = PassthroughSubject<Void, Never>()
+    private let markAsReadTrigger = PassthroughSubject<Int, Never>()
 
     private var tableView: UITableView {
         return notificationView.tableView
@@ -57,8 +58,10 @@ public final class NotificationListViewController: BaseUIViewController<Notifica
 
         let input = NotificationViewModel.Input(
             fetchGeneral: type == .feed ? fetchTrigger.eraseToAnyPublisher() : Empty().eraseToAnyPublisher(),
-            fetchNotice: type == .notice ? fetchTrigger.eraseToAnyPublisher() : Empty().eraseToAnyPublisher()
+            fetchNotice: type == .notice ? fetchTrigger.eraseToAnyPublisher() : Empty().eraseToAnyPublisher(),
+            markAsRead: markAsReadTrigger.eraseToAnyPublisher()
         )
+
 
         let output = viewModel.transform(input: input)
 
@@ -137,7 +140,7 @@ extension NotificationListViewController: UITableViewDelegate {
 //                  let url = URL(string: deeplink),
 //                  let destination = DeeplinkParser.parse(url: url),
 //                  let nav = navigationController else { return }
-
+//
 //            DeeplinkManager.shared.handle(destination, from: nav, di: diContainer)
             print("feed")
         }

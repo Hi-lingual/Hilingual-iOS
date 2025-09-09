@@ -58,9 +58,9 @@ public final class DefaultNotificationService: BaseService<NotificationAPI>, Not
        }
 
     public func markAsRead(notiId: Int) -> AnyPublisher<Void, Error> {
-            print("[Mock] 알림 읽음 처리 완료 → notiId: \(notiId)")
-            return Just(())
-                .setFailureType(to: Error.self)
-                .eraseToAnyPublisher()
-        }
+        return requestPlain(.markAsRead(id: notiId))
+            .map { _ in () }
+            .mapError { $0 as Error }
+            .eraseToAnyPublisher()
+    }
 }

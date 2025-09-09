@@ -16,6 +16,7 @@ public final class NotificationViewModel: BaseViewModel {
     public struct Input {
         let fetchGeneral: AnyPublisher<Void, Never>
         let fetchNotice: AnyPublisher<Void, Never>
+        let markAsRead: AnyPublisher<Int, Never>
     }
 
     public struct Output {
@@ -39,6 +40,24 @@ public final class NotificationViewModel: BaseViewModel {
     // MARK: - Transform
 
     public func transform(input: Input) -> Output {
+
+        input.markAsRead
+            .flatMap { [weak self] id -> AnyPublisher<Void, Never> in
+                guard let self else { return Empty().eraseToAnyPublisher() }
+
+                return self.useCase.markNotificationAsRead(notiId: id)
+                    .handleEvents(receiveOutput: {
+                    }, receiveCompletion: { completion in
+                        if case .failure(let error) = completion {
+                            print("알림 읽음 처리 실패: \(error)")
+                        }
+                    })
+                    .catch { _ in Empty() }
+                    .eraseToAnyPublisher()
+            }
+            .sink { _ in }
+            .store(in: &cancellables)
+
         input.fetchGeneral
             .flatMap { [weak self] _ -> AnyPublisher<[NotificationModel], Never> in
                 guard let self else { return Just([]).eraseToAnyPublisher() }
