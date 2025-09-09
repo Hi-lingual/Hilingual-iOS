@@ -44,7 +44,7 @@ public final class FeedProfileViewModel: BaseViewModel, BaseViewModelType {
     private let publishDiaryUseCase: PublishDiaryUseCase
     private let toggleLikeUseCase: ToggleLikeUseCase
     private let type: FeedProfileType
-    private let targetUserId: Int64
+    public let targetUserId: Int64
     
     // MARK: - State
     

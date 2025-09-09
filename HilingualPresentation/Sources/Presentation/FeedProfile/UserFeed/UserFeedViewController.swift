@@ -254,9 +254,11 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
         let safariVC = SFSafariViewController(url: url)
         present(safariVC, animated: true)
     }
-
+    
     private func pushFollowListViewController() {
-        let followVC = self.diContainer.makeFollowListViewController()
+        guard let viewModel = self.viewModel else { return }
+        
+        let followVC = self.diContainer.makeFollowListViewController(targetUserId: Int(viewModel.targetUserId))
         self.navigationController?.pushViewController(followVC, animated: true)
     }
 }
