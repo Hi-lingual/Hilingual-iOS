@@ -63,11 +63,8 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
             guard let self else { return }
             
             if self.isPostDeletionState {
-                self.isPostDeletionState = false // 플래그 초기화
-                
+                self.isPostDeletionState = false
                 let requestedDate = date
-                
-                // '미작성' 상태로 명시적 업데이트
                 self.homeView.selectedInfo.updateView(
                     for: requestedDate,
                     diaryId: nil,
@@ -79,7 +76,6 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                 )
                 return
             }
-            
             
             let requestedDate = date
             let today = Calendar.current.startOfDay(for: Date())
@@ -130,10 +126,20 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                 self.currentDateRequestCancellable = self.viewModel?.fetchTopic(for: requestedDate)
                     .receive(on: RunLoop.main)
                     .sink(receiveCompletion: { completion in
+                        if case .failure = completion {
+                            self.homeView.selectedInfo.updateView(
+                                for: requestedDate,
+                                diaryId: nil,
+                                isPublished: nil,
+                                remainingTime: 0,
+                                topicData: nil,
+                                diaryData: nil,
+                                imageURL: nil
+                            )
+                        }
                     }, receiveValue: { [weak self] topic in
                         guard let self else { return }
                         let remaining = max(0, topic?.remainingTime ?? 0)
-                        
                         let topicData = self.homeView.calendarView.filledDates.contains(where: {
                             Calendar.current.isDate($0, inSameDayAs: requestedDate)
                         }) ? nil : topic.map { ($0.topicKor, $0.topicEn) }
@@ -154,6 +160,8 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         
         homeView.onMonthChanged = { [weak self] year, month in
             guard self != nil else { return }
+            self?.homeView.selectedInfo.reset()
+            
             let calendar = Calendar.current
             let today = Date()
             
@@ -168,6 +176,19 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
             }
             
             self?.homeView.calendarView.select(date: selectedDate)
+            self?.input.monthChange.send((year, month))
+            
+            self?.viewModel?.fetchUserInfo()
+                .receive(on: RunLoop.main)
+                .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] entity in
+                    self?.homeView.profileView.updateView(
+                        nickname: entity.nickname,
+                        profileImageURL: entity.profileImg,
+                        totalDiaries: entity.totalDiaries,
+                        streak: entity.streak
+                    )
+                })
+                .store(in: &self!.viewModel!.cancellables)
         }
         
         let output = viewModel.transform(input: input)

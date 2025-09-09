@@ -198,6 +198,12 @@ final class SelectedInfo: UIView {
         notWrittenLabel.textColor = color
     }
     
+    public func reset() {
+        [cardPreview, cardTopicView, emptyDiaryView, diaryLockView, moreImageView, dot, notWrittenLabel, iconView, timeLeftStack].forEach {
+            $0.isHidden = true
+        }
+    }
+    
     // MARK: - Public
 
     func updateView(
@@ -209,9 +215,7 @@ final class SelectedInfo: UIView {
         diaryData: String? = nil,
         imageURL: String? = nil
     ) {
-        [cardPreview, cardTopicView, emptyDiaryView, diaryLockView, moreImageView, dot, notWrittenLabel, iconView, timeLeftStack].forEach {
-            $0.isHidden = true
-        }
+        reset()
         
         setSelectedDate(date)
         currentDiaryId = diaryId
