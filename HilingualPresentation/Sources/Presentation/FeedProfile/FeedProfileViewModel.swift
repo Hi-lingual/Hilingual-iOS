@@ -38,9 +38,8 @@ public final class FeedProfileViewModel: BaseViewModel, BaseViewModelType {
     
     private let feedUseCase: FeedProfileUseCase
     private let profileInfoUseCase: FeedProfileInfoUseCase
-//    private let followUseCase: FollowUseCase
-//    private let unfollowUseCase: UnfollowUseCase
-//    private let blockUserUseCase: BlockUserUseCase
+//    private let followUseCase: FollowListUseCase
+    private let blockUserUseCase: BlockUserUseCase
     private let publishDiaryUseCase: PublishDiaryUseCase
     private let toggleLikeUseCase: ToggleLikeUseCase
     private let type: FeedProfileType
@@ -64,6 +63,7 @@ public final class FeedProfileViewModel: BaseViewModel, BaseViewModelType {
         profileInfoUseCase: FeedProfileInfoUseCase,
         publishDiaryUseCase: PublishDiaryUseCase,
         toggleLikeUseCase: ToggleLikeUseCase,
+        blockUserUseCase: BlockUserUseCase,
         type: FeedProfileType,
         targetUserId: Int64 = 0
     ) {
@@ -71,6 +71,7 @@ public final class FeedProfileViewModel: BaseViewModel, BaseViewModelType {
         self.profileInfoUseCase = profileInfoUseCase
         self.publishDiaryUseCase = publishDiaryUseCase
         self.toggleLikeUseCase = toggleLikeUseCase
+        self.blockUserUseCase = blockUserUseCase
         self.type = type
         self.targetUserId = targetUserId
         super.init()
@@ -143,74 +144,52 @@ public final class FeedProfileViewModel: BaseViewModel, BaseViewModelType {
             }
             .store(in: &cancellables)
         
+        // 피드 비공개하기
         input.unpublish
             .sink { [weak self] diaryId in
                 self?.unpublishDiary(diaryId: diaryId)
             }
             .store(in: &cancellables)
         
+        // 공감하기
         input.likeTapped
             .sink { [weak self] (diaryId, isLiked) in
                 self?.toggleLike(diaryId: diaryId, isLiked: isLiked)
             }
             .store(in: &cancellables)
         
-        // 팔로우 등록
-//        input.follow
-//            .flatMap { [weak self] _ -> AnyPublisher<Void, Never> in
-//                guard let self else { return Empty().eraseToAnyPublisher() }
-//                return self.followUseCase.execute(userId: self.targetUserId)
-//                    .catch { [weak self] error -> Just<Void> in
-//                        self?.errorSubject.send(error.localizedDescription)
-//                        return Just(())
-//                    }
-//                    .eraseToAnyPublisher()
-//            }
-//            .sink { [weak self] _ in self?.reloadProfile() }
-//            .store(in: &cancellables)
-//        
-//        // 팔로우 해제
-//        input.unfollow
-//            .flatMap { [weak self] _ -> AnyPublisher<Void, Never> in
-//                guard let self else { return Empty().eraseToAnyPublisher() }
-//                return self.unfollowUseCase.execute(userId: self.targetUserId)
-//                    .catch { [weak self] error -> Just<Void> in
-//                        self?.errorSubject.send(error.localizedDescription)
-//                        return Just(())
-//                    }
-//                    .eraseToAnyPublisher()
-//            }
-//            .sink { [weak self] _ in self?.reloadProfile() }
-//            .store(in: &cancellables)
+        // 차단하기
+        input.block
+            .flatMap { [weak self] _ -> AnyPublisher<Void, Never> in
+                guard let self else { return Empty().eraseToAnyPublisher() }
+                return self.blockUserUseCase.blockUser(id: Int(self.targetUserId))
+                    .catch { [weak self] error -> Just<Void> in
+                        self?.errorSubject.send("차단 실패: \(error.localizedDescription)")
+                        return Just(())
+                    }
+                    .eraseToAnyPublisher()
+            }
+            .sink { [weak self] _ in
+                self?.buttonStateSubject.send(.unblock)
+            }
+            .store(in: &cancellables)
         
-//        // 차단
-//        input.block
-//            .flatMap { [weak self] _ -> AnyPublisher<Void, Never> in
-//                guard let self else { return Empty().eraseToAnyPublisher() }
-//                return self.blockUserUseCase.blockUser(id: Int(self.targetUserId))
-//                    .catch { [weak self] error -> Just<Void> in
-//                        self?.errorSubject.send(error.localizedDescription)
-//                        return Just(())
-//                    }
-//                    .eraseToAnyPublisher()
-//            }
-//            .sink { [weak self] _ in self?.reloadProfile() }
-//            .store(in: &cancellables)
-//        
-//        // 차단 해제
-//        input.unblock
-//            .flatMap { [weak self] _ -> AnyPublisher<Void, Never> in
-//                guard let self else { return Empty().eraseToAnyPublisher() }
-//                return self.blockUserUseCase.unblockUser(id: Int(self.targetUserId))
-//                    .catch { [weak self] error -> Just<Void> in
-//                        self?.errorSubject.send(error.localizedDescription)
-//                        return Just(())
-//                    }
-//                    .eraseToAnyPublisher()
-//            }
-//            .sink { [weak self] _ in self?.reloadProfile() }
-//            .store(in: &cancellables)
-//        
+        // 차단 해제하기
+        input.unblock
+            .flatMap { [weak self] _ -> AnyPublisher<Void, Never> in
+                guard let self else { return Empty().eraseToAnyPublisher() }
+                return self.blockUserUseCase.unblockUser(id: Int(self.targetUserId))
+                    .catch { [weak self] error -> Just<Void> in
+                        self?.errorSubject.send("차단 해제 실패: \(error.localizedDescription)")
+                        return Just(())
+                    }
+                    .eraseToAnyPublisher()
+            }
+            .sink { [weak self] _ in
+                self?.buttonStateSubject.send(.follow)
+            }
+            .store(in: &cancellables)
+        
         return Output(
             feeds: feedsSubject.eraseToAnyPublisher(),
             profile: profileSubject.eraseToAnyPublisher(),
