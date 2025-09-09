@@ -161,6 +161,7 @@ extension NotificationListViewController: UITableViewDelegate {
             }
 
         case .notice(let rawType):
+            markAsReadTrigger.send(selectedItem.id);
             let detailVC = self.diContainer.makeNotificationDetailViewController(notiId: selectedItem.id)
             navigationController?.pushViewController(detailVC, animated: true)
         }
