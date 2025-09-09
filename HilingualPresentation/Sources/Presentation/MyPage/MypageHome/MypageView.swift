@@ -7,6 +7,7 @@
 
 import UIKit
 import SnapKit
+import Kingfisher
 
 final class MypageView: BaseUIView {
 
@@ -269,5 +270,24 @@ final class MypageView: BaseUIView {
         }
         container.addAction(UIAction { _ in action() }, for: .touchUpInside)
         return container
+    }
+}
+
+extension MypageView {
+    public func configure(nickname: String, profileImageURL: String?) {
+        nicknameLabel.text = nickname
+
+        if let urlString = profileImageURL, let url = URL(string: urlString) {
+            profileImageView.kf.setImage(
+                with: url,
+                placeholder: UIImage(named: "img_profile_normal_ios", in: .module, compatibleWith: nil),
+                options: [
+                    .transition(.fade(0.2)),
+                    .cacheOriginalImage
+                ]
+            )
+        } else {
+            profileImageView.image = UIImage(named: "img_profile_normal_ios", in: .module, compatibleWith: nil)
+        }
     }
 }

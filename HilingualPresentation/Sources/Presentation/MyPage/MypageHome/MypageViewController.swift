@@ -91,6 +91,18 @@ public final class MypageViewController: BaseUIViewController<MypageViewModel> {
                 //TODO: - error 모달 추가하기
             }
             .store(in: &cancellables)
+
+        output.userProfile
+            .compactMap { $0 }
+            .receive(on: RunLoop.main)
+            .sink { [weak self] profile in
+                self?.mypageView.configure(
+                    nickname: profile.nickname,
+                    profileImageURL: profile.profileImg
+                )
+            }
+            .store(in: &cancellables)
+
     }
 
     // MARK: - PrivatMethod
