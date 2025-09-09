@@ -10,26 +10,42 @@ import Moya
 public enum NotificationAPI {
     case fetchNotificationSettings
     case toggleNotificationSetting(notiType: String)
+    case getNotifications(tab: String)
+    case getNotificationDetail(id: Int)
+    case markAsRead(id: Int)
 }
 
 extension NotificationAPI: BaseTargetType {
 
     public var path: String {
-        return "/users/mypage/noti"
+        switch self {
+        case .fetchNotificationSettings, .toggleNotificationSetting:
+            return "/users/mypage/noti"
+
+        case .getNotifications:
+            return "/users/notifications"
+
+        case .getNotificationDetail(let id):
+            return "/users/notifications/\(id)"
+
+        case .markAsRead(let id):
+            return "/users/notifications/\(id)/read"
+        }
     }
 
     public var method: Moya.Method {
         switch self {
-        case .fetchNotificationSettings:
+        case .fetchNotificationSettings, .getNotifications, .getNotificationDetail:
             return .get
-        case .toggleNotificationSetting:
+
+        case .toggleNotificationSetting, .markAsRead:
             return .patch
         }
     }
 
     public var task: Task {
         switch self {
-        case .fetchNotificationSettings:
+        case .fetchNotificationSettings, .getNotificationDetail, .markAsRead:
             return .requestPlain
 
         case let .toggleNotificationSetting(notiType):
@@ -37,13 +53,12 @@ extension NotificationAPI: BaseTargetType {
                 parameters: ["notiType": notiType],
                 encoding: URLEncoding.queryString
             )
-        }
-    }
 
-    public var headers: [String: String]? {
-        return [
-            "Content-Type": "application/json",
-            "Authorization": "Bearer \(UserDefaultHandler.accessToken)"
-        ]
+        case let .getNotifications(tab):
+            return .requestParameters(
+                parameters: ["tab": tab],
+                encoding: URLEncoding.queryString
+            )
+        }
     }
 }

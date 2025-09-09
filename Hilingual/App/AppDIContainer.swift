@@ -591,8 +591,8 @@ extension AppDIContainer {
 // MARK: - NotificiatoinDIContainer
 
 extension AppDIContainer {
-    private func makeNotificationService() -> MockNotificationService {
-        return MockNotificationService()
+    private func makeNotificationService() -> DefaultNotificationService {
+        return DefaultNotificationService()
     }
 
     private func makeNotificationRepository() -> NotificationRepository {

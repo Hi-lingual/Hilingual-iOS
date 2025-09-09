@@ -15,6 +15,7 @@ public final class NotificationListViewController: BaseUIViewController<Notifica
     private let notificationView = NotificationView()
     private let type: NotificationType
     private let fetchTrigger = PassthroughSubject<Void, Never>()
+    private let markAsReadTrigger = PassthroughSubject<Int, Never>()
 
     private var tableView: UITableView {
         return notificationView.tableView
@@ -56,27 +57,40 @@ public final class NotificationListViewController: BaseUIViewController<Notifica
         super.bind(viewModel: viewModel)
 
         let input = NotificationViewModel.Input(
-            fetchGeneral: type == .feed ? fetchTrigger.eraseToAnyPublisher() : Empty().eraseToAnyPublisher(),
-            fetchNotice: type == .notice ? fetchTrigger.eraseToAnyPublisher() : Empty().eraseToAnyPublisher()
+            fetchGeneral: {
+                if case .feed = type { return fetchTrigger.eraseToAnyPublisher() }
+                return Empty().eraseToAnyPublisher()
+            }(),
+            fetchNotice: {
+                if case .notice = type { return fetchTrigger.eraseToAnyPublisher() }
+                return Empty().eraseToAnyPublisher()
+            }(),
+            markAsRead: markAsReadTrigger.eraseToAnyPublisher()
         )
 
         let output = viewModel.transform(input: input)
 
         switch type {
-        case .feed:
+        case .feed(let raw):
             output.generalNotifications
                 .receive(on: DispatchQueue.main)
                 .sink { [weak self] list in
-                    self?.notificationView.notificationListModel = NotificationListModel(type: .feed, items: list)
+                    self?.notificationView.notificationListModel = NotificationListModel(
+                        type: .feed(raw),
+                        items: list
+                    )
                     self?.notificationView.refreshControl.endRefreshing()
                 }
                 .store(in: &cancellables)
 
-        case .notice:
+        case .notice(let raw):
             output.noticeNotifications
                 .receive(on: DispatchQueue.main)
                 .sink { [weak self] list in
-                    self?.notificationView.notificationListModel = NotificationListModel(type: .notice, items: list)
+                    self?.notificationView.notificationListModel = NotificationListModel(
+                        type: .notice(raw),
+                        items: list
+                    )
                     self?.notificationView.refreshControl.endRefreshing()
                 }
                 .store(in: &cancellables)
@@ -128,17 +142,28 @@ extension NotificationListViewController: UITableViewDelegate {
         let selectedItem = notificationView.notificationListModel.items[indexPath.row]
 
         switch selectedItem.type {
-        case .notice:
+        case .feed(let rawType):
+            switch rawType {
+            case "LIKE_DIARY":
+                guard let diaryId = selectedItem.targetId else {return}
+                markAsReadTrigger.send(selectedItem.id)
+                let vc = self.diContainer.makeSharedDiaryViewController(diaryId: diaryId)
+                navigationController?.pushViewController(vc, animated: true)
+
+            case "FOLLOW_USER":
+                guard let userId = selectedItem.targetId else {return}
+                markAsReadTrigger.send(selectedItem.id)
+                let vc = self.diContainer.makeUserFeedProfileViewController(userId: Int64(userId))
+                navigationController?.pushViewController(vc, animated: true)
+
+            default:
+                print("알 수 없는 feed 타입: \(rawType)")
+            }
+
+        case .notice(let rawType):
+            markAsReadTrigger.send(selectedItem.id);
             let detailVC = self.diContainer.makeNotificationDetailViewController(notiId: selectedItem.id)
             navigationController?.pushViewController(detailVC, animated: true)
-
-        case .feed:
-            guard let deeplink = selectedItem.deeplink,
-                  let url = URL(string: deeplink),
-                  let destination = DeeplinkParser.parse(url: url),
-                  let nav = navigationController else { return }
-
-            DeeplinkManager.shared.handle(destination, from: nav, di: diContainer)
         }
     }
 }

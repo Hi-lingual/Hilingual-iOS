@@ -16,14 +16,14 @@ public final class NotificationViewController: BaseUIViewController<Notification
         guard let viewModel = self.viewModel else {
             fatalError("NotificationViewModel is not initialized")
         }
-        return NotificationListViewController(viewModel: viewModel, diContainer: self.diContainer, type: .feed)
+        return NotificationListViewController(viewModel: viewModel, diContainer: self.diContainer, type: .feed(""))
     }()
 
     private lazy var noticeNotificationVC: NotificationListViewController = {
         guard let viewModel = self.viewModel else {
             fatalError("NotificationViewModel is not initialized")
         }
-        return NotificationListViewController(viewModel: viewModel, diContainer: self.diContainer, type: .notice)
+        return NotificationListViewController(viewModel: viewModel, diContainer: self.diContainer, type: .notice(""))
     }()
 
     private lazy var segmentedControl = SegmentedControl(

@@ -10,7 +10,7 @@ public struct NotificationEntity: Equatable {
     public let title: String
     public let isRead: Bool
     public let publishedAt: String
-    public let deeplink: String?
+    public let targetId: Int?
     public let type: NotificationType
 
     public init(
@@ -18,14 +18,14 @@ public struct NotificationEntity: Equatable {
         title: String,
         isRead: Bool,
         publishedAt: String,
-        deeplink: String? = nil,
+        targetId: Int? = nil,
         type: NotificationType
     ) {
         self.id = id
         self.title = title
         self.isRead = isRead
         self.publishedAt = publishedAt
-        self.deeplink = deeplink
+        self.targetId = targetId
         self.type = type
     }
 }

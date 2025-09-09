@@ -7,9 +7,9 @@
 
 import Foundation
 
-public enum NotificationType {
-    case feed
-    case notice
+public enum NotificationType: Equatable {
+    case feed(String)
+    case notice(String)
 }
 
 public struct NotificationModel {
@@ -17,8 +17,8 @@ public struct NotificationModel {
     public let type: NotificationType
     public let title: String
     public let isRead: Bool
-    public let publishedAt: String 
-    public let deeplink: String?
+    public let publishedAt: String
+    public let targetId: Int?
 }
 
 public struct NotificationListModel {
