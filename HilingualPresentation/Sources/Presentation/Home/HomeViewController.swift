@@ -5,6 +5,7 @@ import UIKit
 public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     
     // MARK: - Properties
+    private var isPostDeletionState: Bool = false
     
     private var overlayView: UIControl?
     private let homeView = HomeView()
@@ -61,12 +62,31 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         homeView.calendarView.onDateSelected = { [weak self] date in
             guard let self else { return }
             
-            // UI 즉시 초기화해서 겹치는 것을 방지
-            let requestedDate = date
-            self.homeView.selectedInfo.setSelectedDate(requestedDate)
+            if self.isPostDeletionState {
+                self.isPostDeletionState = false // 플래그 초기화
+                
+                let requestedDate = date
+                
+                // '미작성' 상태로 명시적 업데이트
+                self.homeView.selectedInfo.updateView(
+                    for: requestedDate,
+                    diaryId: nil,
+                    isPublished: nil,
+                    remainingTime: 0,
+                    topicData: nil,
+                    diaryData: nil,
+                    imageURL: nil
+                )
+                return
+            }
             
+            
+            let requestedDate = date
             let today = Calendar.current.startOfDay(for: Date())
             let selectedDay = Calendar.current.startOfDay(for: requestedDate)
+            
+            self.homeView.selectedInfo.setSelectedDate(requestedDate)
+            self.homeView.selectedInfo.currentDiaryId = nil
             
             // 1) 미래 날짜면 바로 Lock 상태로 보여주고 네트워크 호출하지 않음
             if selectedDay > today {
@@ -113,17 +133,23 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                     }, receiveValue: { [weak self] topic in
                         guard let self else { return }
                         let remaining = max(0, topic?.remainingTime ?? 0)
+                        
+                        let topicData = self.homeView.calendarView.filledDates.contains(where: {
+                            Calendar.current.isDate($0, inSameDayAs: requestedDate)
+                        }) ? nil : topic.map { ($0.topicKor, $0.topicEn) }
+                        
                         self.homeView.selectedInfo.updateView(
                             for: requestedDate,
                             diaryId: nil,
                             isPublished: nil,
                             remainingTime: remaining,
-                            topicData: topic.map { ($0.topicKor, $0.topicEn) },
+                            topicData: topicData,
                             diaryData: nil,
                             imageURL: nil
                         )
                     })
             }
+            self.currentDateRequestCancellable?.store(in: &self.viewModel!.cancellables)
         }
         
         homeView.onMonthChanged = { [weak self] year, month in
@@ -265,8 +291,6 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         containerView.addSubview(dialog)
         dialog.snp.remakeConstraints { $0.edges.equalTo(containerView) }
         
-        let selectedDate = self.homeView.calendarView.selectedDate ?? Date()
-        
         switch action {
         case .publish:
             dialog.configure(
@@ -378,7 +402,16 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                             let month = calendar.component(.month, from: selectedDate)
                             self.input.monthChange.send((year, month))
                             
-                            // TODO: SelectedInfo 업데이트
+                            // 3. SelectedInfo 뷰를 '미작성' 상태로 명시적 업데이트
+                            self.homeView.selectedInfo.updateView(
+                                for: selectedDate,
+                                diaryId: nil,
+                                isPublished: nil,
+                                remainingTime: 0,
+                                topicData: nil,
+                                diaryData: nil,
+                                imageURL: nil
+                            )
                             
                             let toast = ToastMessage()
                             self.view.addSubview(toast)

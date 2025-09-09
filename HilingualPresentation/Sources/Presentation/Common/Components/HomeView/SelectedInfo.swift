@@ -255,7 +255,7 @@ final class SelectedInfo: UIView {
             timeLeftStack.isHidden = false
         }
         
-        // 4. 그 외의 모든 경우 (과거 날짜이거나 오늘 날짜인데 일기가 없고 주제도 없는 경우)
+        // 4. 그 외의 모든 경우
         else {
             setNotWrittenState("미작성")
             emptyDiaryView.isHidden = false
