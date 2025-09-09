@@ -10,6 +10,7 @@ import Moya
 
 public protocol UserProfileService {
     func fetchMyProfile() -> AnyPublisher<UserProfileResponseDTO, Error>
+    func updateProfileImage(fileKey: String) -> AnyPublisher<Void, Error>
 }
 
 public final class DefaultUserProfileService: BaseService<MypageAPI>, UserProfileService {
@@ -22,4 +23,11 @@ public final class DefaultUserProfileService: BaseService<MypageAPI>, UserProfil
             .eraseToAnyPublisher()
     }
 
+    public func updateProfileImage(fileKey: String) -> AnyPublisher<Void, Error> {
+        let dto = ProfileImageRequestDTO(fileKey: fileKey)
+        return requestPlain(.updateProfileImage(request: dto))
+            .map { _ in () }
+            .mapError { $0 as Error }
+            .eraseToAnyPublisher()
+    }
 }

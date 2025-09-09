@@ -10,6 +10,7 @@ import Moya
 
 public enum MypageAPI {
     case fetchMyProfile
+    case updateProfileImage(request: ProfileImageRequestDTO)
 }
 
 extension MypageAPI: BaseTargetType {
@@ -18,14 +19,26 @@ extension MypageAPI: BaseTargetType {
         switch self {
         case .fetchMyProfile:
             return "/users/mypage/info"
+        case .updateProfileImage:
+            return "/users/mypage/profileImg"
         }
     }
 
     public var method: Moya.Method {
-        return .get
+        switch self {
+        case .fetchMyProfile:
+            return .get
+        case .updateProfileImage:
+            return .patch
+        }
     }
 
     public var task: Task {
-        return .requestPlain
+        switch self {
+        case .fetchMyProfile:
+            return .requestPlain
+        case .updateProfileImage(let request):
+            return .requestJSONEncodable(request)
+        }
     }
 }

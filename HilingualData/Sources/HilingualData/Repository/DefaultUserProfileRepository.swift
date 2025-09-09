@@ -22,4 +22,7 @@ public final class DefaultUserProfileRepository: UserProfileRepository {
             .map { $0.toEntity() }
             .eraseToAnyPublisher()
     }
+    public func updateProfileImage(fileKey: String) -> AnyPublisher<Void, Error> {
+           service.updateProfileImage(fileKey: fileKey)
+    }
 }

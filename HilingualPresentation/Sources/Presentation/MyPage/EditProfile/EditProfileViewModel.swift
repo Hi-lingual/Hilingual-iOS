@@ -17,17 +17,27 @@ public final class EditProfileViewModel: BaseViewModel {
 
     public struct Output {
         public let userProfilePublisher: AnyPublisher<UserProfileEntity?, Never>
+        public let profileImageUploadSuccess: AnyPublisher<Void, Never>
+        public let profileImageUploadError: AnyPublisher<Error, Never>
     }
 
     // MARK: - Properties
 
     private let fetchUserProfileUseCase: FetchUserProfileUseCase
+    private let uploadImageUseCase: UploadImageUseCase
+
     private let userProfileSubject = CurrentValueSubject<UserProfileEntity?, Never>(nil)
+    private let profileImageUploadSuccessSubject = PassthroughSubject<Void, Never>()
+    private let profileImageUploadErrorSubject = PassthroughSubject<Error, Never>()
 
     // MARK: - Init
 
-    public init(fetchUserProfileUseCase: FetchUserProfileUseCase) {
+    public init(
+        fetchUserProfileUseCase: FetchUserProfileUseCase,
+        uploadImageUseCase: UploadImageUseCase
+    ) {
         self.fetchUserProfileUseCase = fetchUserProfileUseCase
+        self.uploadImageUseCase = uploadImageUseCase
     }
 
     // MARK: - Transform
@@ -36,8 +46,33 @@ public final class EditProfileViewModel: BaseViewModel {
         fetchUserProfile()
 
         return Output(
-            userProfilePublisher: userProfileSubject.eraseToAnyPublisher()
+            userProfilePublisher: userProfileSubject.eraseToAnyPublisher(),
+            profileImageUploadSuccess: profileImageUploadSuccessSubject.eraseToAnyPublisher(),
+            profileImageUploadError: profileImageUploadErrorSubject.eraseToAnyPublisher()
         )
+    }
+
+    // MARK: - Public
+
+    public func uploadProfileImage(data: Data) {
+        let contentType = "image/jpeg"
+        uploadImageUseCase
+            .execute(data: data, contentType: contentType, purpose: "PROFILE_UPDATE")
+            .flatMap { fileKey  in self.fetchUserProfileUseCase.updateProfileImage(fileKey: fileKey)
+            }
+            .sink(
+                receiveCompletion: { [weak self] completion in
+                    switch completion {
+                    case .finished:
+                        self?.profileImageUploadSuccessSubject.send(())
+                        self?.fetchUserProfile()
+                    case .failure(let error):
+                        self?.profileImageUploadErrorSubject.send(error)
+                    }
+                },
+                receiveValue: { }
+            )
+            .store(in: &cancellables)
     }
 
     // MARK: - Private
@@ -47,7 +82,6 @@ public final class EditProfileViewModel: BaseViewModel {
             .sink(
                 receiveCompletion: { completion in
                     if case .failure(let error) = completion {
-                        // TODO: 에러 처리 필요시 여기에
                         print("❌ 유저 정보 불러오기 실패: \(error)")
                     }
                 },
