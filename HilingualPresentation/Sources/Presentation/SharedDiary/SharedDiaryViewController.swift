@@ -113,7 +113,8 @@ public final class SharedDiaryViewController: BaseUIViewController<SharedDiaryVi
     // MARK: - Binding
     
     private let likeToggleSubject = PassthroughSubject<(Int, Bool), Never>()
-    private let publishToggleSubject = PassthroughSubject<(Int, Bool), Never>()
+    private let publishTappedSubject = PassthroughSubject<Int, Never>()
+    private let unpublishTappedSubject = PassthroughSubject<Int, Never>()
     private let blockUserSubject = PassthroughSubject<Int64, Never>()
     
     public override func bind(viewModel: SharedDiaryViewModel) {
@@ -129,9 +130,10 @@ public final class SharedDiaryViewController: BaseUIViewController<SharedDiaryVi
         return SharedDiaryViewModel.Input(
             viewDidLoad: viewDidLoadSubject.eraseToAnyPublisher(),
             likeTapped: likeToggleSubject.eraseToAnyPublisher(),
-            publishTapped: publishToggleSubject.eraseToAnyPublisher(),
+            publishTapped: publishTappedSubject.eraseToAnyPublisher(),
+            unpublishTapped: unpublishTappedSubject.eraseToAnyPublisher(),
             blockTapped: blockUserSubject.eraseToAnyPublisher()
-            )
+        )
     }
     
     private func bindOutput(_ output: SharedDiaryViewModel.Output) {
@@ -236,7 +238,7 @@ public final class SharedDiaryViewController: BaseUIViewController<SharedDiaryVi
             rightAction: { [weak self] in
                 guard let self else { return }
                 self.dialog.dismiss()
-                self.publishToggleSubject.send((self.diaryId, false))
+                self.unpublishTappedSubject.send(self.diaryId)
                 
                 if let nav = self.navigationController {
                     nav.popViewController(animated: true)
@@ -259,7 +261,7 @@ public final class SharedDiaryViewController: BaseUIViewController<SharedDiaryVi
             rightButtonTitle: "확인",
             rightAction: { [weak self] in
                 self?.dialog.dismiss()
-                self?.navigationController?.popViewController(animated: true)
+//                self?.navigationController?.popViewController(animated: true)
             }
         )
         dialog.showAnimation()

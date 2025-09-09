@@ -18,8 +18,9 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
     var date: String = ""
     private var isPublished: Bool = true
     private let deleteTappedSubject = PassthroughSubject<Void, Never>()
-    private let publishTappedSubject = PassthroughSubject<Bool, Never>()
-    
+    private let publishTappedSubject = PassthroughSubject<Void, Never>()
+    private let unpublishTappedSubject = PassthroughSubject<Void, Never>()
+
     private let diaryDetailView = DiaryDetailView()
     private var isHighlightingEnabled: Bool = true
     private let dialog = Dialog()
@@ -35,7 +36,7 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
     }()
     
     private let button: CTAButton = {
-        let button = CTAButton(style: .TextButton("피드에 게시하기"), autoBackground: true)
+        let button = CTAButton(style: .TextButton("게시하기"), autoBackground: true)
         button.isEnabled = true
         return button
     }()
@@ -153,8 +154,10 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
         
         let input = DiaryDetailViewModel.Input(
             deleteTapped: deleteTappedSubject.eraseToAnyPublisher(),
-            publishTapped: publishTappedSubject.eraseToAnyPublisher()
+            publishTapped: publishTappedSubject.eraseToAnyPublisher(),
+            unpublishTapped: unpublishTappedSubject.eraseToAnyPublisher()
         )
+
         let output = viewModel.transform(input: input)
         
         output.deleteResult
@@ -297,7 +300,7 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
             },
             rightAction: { [weak self] in
                 self?.dialog.dismiss()
-                self?.publishTappedSubject.send(true)
+                self?.publishTappedSubject.send(())
             }
         )
         dialog.showAnimation()
@@ -315,7 +318,7 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
             rightAction: { [weak self] in
                 guard let self else { return }
                 self.dialog.dismiss()
-                self.publishTappedSubject.send(false)
+                self.unpublishTappedSubject.send(())
             }
         )
         dialog.showAnimation()

@@ -12,9 +12,9 @@ import HilingualNetwork
 
 public final class DefaultSharedDiaryRepository: SharedDiaryRepository {
     
-    private var service: MockSharedDiaryService
+    private var service: SharedDiaryService
     
-    public init(service: MockSharedDiaryService) {
+    public init(service: SharedDiaryService) {
         self.service = service
     }
     
@@ -25,7 +25,7 @@ public final class DefaultSharedDiaryRepository: SharedDiaryRepository {
                 
                 let profile = SharedDiaryEntity.Profile(
                     userId: data.profile.userId,
-                    profileImg: data.profile.profileImg,
+                    profileImg: data.profile.profileImg ?? "",
                     nickname: data.profile.nickname,
                     streak: data.profile.streak
                 )

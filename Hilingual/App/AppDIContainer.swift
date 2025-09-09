@@ -54,8 +54,8 @@ final class AppDIContainer: ViewControllerFactory {
 //        return FeedbackViewController(viewModel: makeFeedbackViewModel(diaryId: diaryId), diContainer: self)
         let viewModel = FeedbackViewModel(
                 diaryId: diaryId,
-                diaryDetailUseCase: MockDiaryDetailUseCase(),
-                feedbackUseCase: MockFeedbackUseCase()
+                diaryDetailUseCase: makeDiaryDetailUseCase(),
+                feedbackUseCase: makeFeedbackUseCase()
             )
             return FeedbackViewController(viewModel: viewModel, diContainer:  self)
     }
@@ -64,7 +64,7 @@ final class AppDIContainer: ViewControllerFactory {
 //        return VocaViewController(viewModel: makeVocaViewModel(diaryId: diaryId), diContainer: self)
         let viewModel = RecommendedExpressionViewModel(
             diaryId: diaryId,
-            recommendedExpressionUseCase: MockRecommendedUseCase(),
+            recommendedExpressionUseCase: makeRecommendedExpressionUseCase(),
             toggleBookmarkUseCase: makeToggleBookmarkUseCase()
         )
         return RecommendedExpressionViewController(viewModel: viewModel, diContainer: self)
@@ -317,11 +317,11 @@ extension AppDIContainer {
     }
     
     private func makeDeleteDiaryRepository() -> DeleteDiaryRepository {
-        return DefaultDeleteDiaryRepository(service: makeDeleteDiaryService())
+        return DefaultDeleteDiaryRepository(service: makeDiaryControlService())
     }
     
-    private func makeDeleteDiaryService() -> DeleteDiaryService {
-        return MockDeleteDiaryService()
+    private func makeDiaryControlService() -> DiaryControlService {
+        return DefaultDiaryControlService()
     }
 }
 
@@ -331,11 +331,7 @@ extension AppDIContainer {
     }
     
     private func makePublishDiaryRepository() -> PublishDiaryRepository {
-        return DefaultPublishDiaryRepository(service: makePublishDiaryService())
-    }
-    
-    private func makePublishDiaryService() -> PublishDiaryService {
-        return MockPublishDiaryService()
+        return DefaultPublishDiaryRepository(service: makeDiaryControlService())
     }
 }
 
@@ -531,8 +527,8 @@ extension AppDIContainer {
 
 extension AppDIContainer {
     
-    private func makeSharedDiaryService() -> MockSharedDiaryService {
-        return MockSharedDiaryService()
+    private func makeSharedDiaryService() -> SharedDiaryService {
+        return DefaultSharedDiaryService()
     }
     
     private func makeSharedDiaryRepository() -> SharedDiaryRepository {

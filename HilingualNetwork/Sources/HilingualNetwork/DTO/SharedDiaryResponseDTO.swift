@@ -20,7 +20,7 @@ public struct SharedDiaryResponseDTO: Decodable {
     
     public struct Profile: Decodable {
         public let userId: Int
-        public let profileImg: String
+        public let profileImg: String?
         public let nickname: String
         public let streak: Int
     }

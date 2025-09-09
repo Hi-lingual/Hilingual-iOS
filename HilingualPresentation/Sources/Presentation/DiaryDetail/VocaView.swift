@@ -58,7 +58,7 @@ final class RecommendedExpressionView: BaseUIView {
         }
         
         contentView.isLayoutMarginsRelativeArrangement = true
-        contentView.layoutMargins = UIEdgeInsets(top: 24, left: 16, bottom: 0, right: 16)
+        contentView.layoutMargins = UIEdgeInsets(top: 24, left: 16, bottom: 0, right: 0)
 
         bottomSpacingView.snp.makeConstraints {
             $0.height.equalTo(16)

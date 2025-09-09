@@ -8,10 +8,10 @@
 import Foundation
 import Combine
 
-public protocol SharedDiaryService {
-    func fetchSharedDiary(diaryId: Int) -> AnyPublisher<SharedDiaryResponseDTO, Error>
-    func toggleLike(diaryId: Int, isLiked: Bool) -> AnyPublisher<Void, Error>
-}
+//public protocol SharedDiaryService {
+//    func fetchSharedDiary(diaryId: Int) -> AnyPublisher<SharedDiaryResponseDTO, Error>
+//    func toggleLike(diaryId: Int, isLiked: Bool) -> AnyPublisher<Void, Error>
+//}
 
 public final class MockSharedDiaryService: SharedDiaryService {
     public init() {}
