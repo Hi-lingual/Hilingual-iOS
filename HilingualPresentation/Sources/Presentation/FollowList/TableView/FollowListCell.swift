@@ -114,11 +114,15 @@ final class FollowListCell: UITableViewCell {
         let nameTap = UITapGestureRecognizer(target: self, action: #selector(profileTapped))
         nickname.addGestureRecognizer(nameTap)
     }
-
+    
     // MARK: - Configure
     
     func configure(with user: UserDisplayable) {
-        profileImg.kf.setImage(with: URL(string: user.profileImg))
+        if !user.profileImg.isEmpty, let profileURL = URL(string: user.profileImg) {
+            profileImg.kf.setImage(with: profileURL, placeholder: UIImage(resource: .imgProfileNormalIos))
+        } else {
+            profileImg.image = UIImage(resource: .imgProfileNormalIos)
+        }
         nickname.text = user.nickname
         button.configure(state: user.buttonState)
     }
