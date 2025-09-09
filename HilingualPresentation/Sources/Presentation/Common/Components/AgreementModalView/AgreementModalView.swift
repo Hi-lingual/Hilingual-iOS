@@ -74,7 +74,6 @@ final class AgreementModalView: UIView {
         allAgreeContainer.addSubview(allAgree)
 
         stackView.axis = .vertical
-        stackView.spacing = 12
         [serviceAgree, privacyAgree, marketingAgree].forEach {
             stackView.addArrangedSubview($0)
         }
@@ -95,12 +94,12 @@ final class AgreementModalView: UIView {
         }
 
         descriptionLabel.snp.makeConstraints {
-            $0.top.equalTo(titleLabel.snp.bottom).offset(6)
+            $0.top.equalTo(titleLabel.snp.bottom).offset(4)
             $0.leading.trailing.equalTo(titleLabel)
         }
 
         allAgreeContainer.snp.makeConstraints {
-            $0.top.equalTo(descriptionLabel.snp.bottom).offset(24)
+            $0.top.equalTo(descriptionLabel.snp.bottom).offset(32)
             $0.leading.trailing.equalTo(titleLabel)
             $0.height.equalTo(52)
         }
@@ -110,14 +109,14 @@ final class AgreementModalView: UIView {
         }
 
         stackView.snp.makeConstraints {
-            $0.top.equalTo(allAgreeContainer.snp.bottom).offset(16)
+            $0.top.equalTo(allAgreeContainer.snp.bottom).offset(12)
             $0.leading.trailing.equalTo(titleLabel)
         }
 
         startButton.snp.makeConstraints {
-            $0.top.equalTo(stackView.snp.bottom).offset(24)
+            $0.top.equalTo(stackView.snp.bottom).offset(74)
             $0.leading.trailing.equalTo(titleLabel)
-            $0.bottom.equalToSuperview().inset(36)
+            $0.bottom.equalToSuperview().inset(46)
         }
     }
 
