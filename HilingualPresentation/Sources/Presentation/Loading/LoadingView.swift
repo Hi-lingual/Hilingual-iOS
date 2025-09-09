@@ -178,7 +178,7 @@ final class LoadingView: BaseUIView {
         
         switch state {
         case .loading:
-            titleLabel.text = "일기 저장중..."
+            titleLabel.text = "일기 저장 중..."
             subtitleLabel.text = "피드백을 요청하고 있어요."
             animationView.animation = LottieAnimation.named("feedback1", bundle: .module)
             animationView.play()
@@ -187,7 +187,7 @@ final class LoadingView: BaseUIView {
             footerLabel.isHidden = false
             
         case .success:
-            titleLabel.text = "AI 피드백 완료!"
+            titleLabel.text = "일기 저장 완료!"
             subtitleLabel.text = "틀린 부분을 고치고,\n더 나은 표현으로 수정했어요!"
             animationView.animation = LottieAnimation.named("feedback2", bundle: .module)
             animationView.play()
