@@ -21,7 +21,6 @@ public final class DefaultFollowListRepository: FollowListRepository {
     public func fetchFollowers(targetUserId: Int) -> AnyPublisher<[HilingualDomain.Follower], Error> {
         return service.fetchFollowers(targetUserId: targetUserId)
             .map { response in
-                // FollowListResponseDTO의 data에 followerList가 직접 있습니다.
                 response.data.followerList?.map { dto in
                     HilingualDomain.Follower(
                         userId: dto.userId,
@@ -38,7 +37,6 @@ public final class DefaultFollowListRepository: FollowListRepository {
     public func fetchFollowings(targetUserId: Int) -> AnyPublisher<[HilingualDomain.Follower], Error> {
         return service.fetchFollowings(targetUserId: targetUserId)
             .map { response in
-                // FollowListResponseDTO의 data에 followingList가 직접 있습니다.
                 response.data.followingList?.map { dto in
                     HilingualDomain.Follower(
                         userId: dto.userId,

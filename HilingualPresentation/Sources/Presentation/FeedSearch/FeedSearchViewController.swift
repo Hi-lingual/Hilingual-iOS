@@ -82,10 +82,26 @@ public final class FeedSearchViewController: BaseUIViewController<FeedSearchView
     private func bind() {
         let output = viewModel?.transform()
         
+        // 검색 결과
         output?.searchState
             .receive(on: DispatchQueue.main)
             .sink { [weak self] state in
                 self?.updateUI(for: state)
+            }
+            .store(in: &cancellables)
+        
+        // 팔로우 액션 결과
+        output?.followAction
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] result in
+                guard let self = self else { return }
+                if let index = self.userList.firstIndex(where: { $0.userId == result.userId }) {
+                    self.userList[index].isFollowing = result.isFollowing
+                    let indexPath = IndexPath(row: index, section: 0)
+                    if let cell = self.tableView.cellForRow(at: indexPath) as? FollowListCell {
+                        cell.configure(with: self.userList[index])
+                    }
+                }
             }
             .store(in: &cancellables)
     }
@@ -187,13 +203,8 @@ extension FeedSearchViewController: FollowListCellDelegate {
     @MainActor
     func followButtonTapped(cell: FollowListCell) {
         guard let indexPath = tableView.indexPath(for: cell) else { return }
-        var user = userList[indexPath.row]
+        let user = userList[indexPath.row]
         
-        user.isFollowing.toggle()
-        userList[indexPath.row] = user
-        
-        cell.configure(with: user)
-        
-        viewModel?.input.followButtonTapped.send(user.userId)
+        viewModel?.input.followButtonTapped.send((userId: user.userId, isFollowing: user.isFollowing))
     }
 }
