@@ -10,6 +10,11 @@ import SnapKit
 
 final class EditProfileView: BaseUIView {
 
+    // MARK: - Public Callback
+
+     var onSelectDefaultImage: (() -> Void)?
+     var onSelectGallery: (() -> Void)?
+
     // MARK: - UI Components
 
     let backButton: UIButton = {
@@ -21,15 +26,6 @@ final class EditProfileView: BaseUIView {
     let modal: Modal = {
         let modal = Modal()
         modal.isHidden = true
-        modal.configure(
-            title: "이미지 선택하기",
-            items: [
-                ("기본 이미지로 변경하기", UIImage(resource: .icImage24Ios), {
-                }),
-                ("갤러리에서 선택하기", UIImage(resource: .icGallary24Ios), {
-                })
-            ]
-        )
         return modal
     }()
 
@@ -59,6 +55,7 @@ final class EditProfileView: BaseUIView {
     override func setUI() {
         backgroundColor = .white
         addSubviews(backButton, titleLabel, profileImageView, nicknameRow, socialRow, withdrawButton, modal)
+        configureModal()
     }
 
     override func setLayout() {
@@ -99,5 +96,29 @@ final class EditProfileView: BaseUIView {
             $0.bottom.equalToSuperview().inset(40)
             $0.centerX.equalToSuperview()
         }
+    }
+
+    private func configureModal() {
+            modal.configure(
+                title: "이미지 선택하기",
+                items: [
+                    ("기본 이미지로 변경하기", UIImage(resource: .icImage24Ios), { [weak self] in
+                        self?.onSelectDefaultImage?()
+                        self?.modal.dismissModal()
+                    }),
+                    ("갤러리에서 선택하기", UIImage(resource: .icGallary24Ios), { [weak self] in
+                        self?.onSelectGallery?()
+                        self?.modal.dismissModal()
+                    })
+                ]
+            )
+        }
+}
+
+extension EditProfileView {
+    public func configure(profileImageURL: String?, nickname: String, provider: String) {
+        profileImageView.setImage(urlString: profileImageURL)
+        nicknameRow.setValue(value: nickname)
+        socialRow.setValue(value: provider)
     }
 }

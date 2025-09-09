@@ -12,9 +12,9 @@ import HilingualNetwork
 
 public final class DefaultAlarmSettingRepository: AlarmSettingRepository {
 
-    private let service: AlarmSettingServiceProtocol
+    private let service: NotificationSettingService
 
-    public init(service: AlarmSettingServiceProtocol) {
+    public init(service: NotificationSettingService) {
         self.service = service
     }
 
@@ -24,7 +24,7 @@ public final class DefaultAlarmSettingRepository: AlarmSettingRepository {
             .eraseToAnyPublisher()
     }
 
-    public func updateAlarmSetting(isMarketingOn: Bool, isFeedOn: Bool) -> AnyPublisher<Void, Error> {
-        return service.updateAlarmSetting(isMarketingOn: isMarketingOn, isFeedOn: isFeedOn)
+    public func toggleNotificationSetting(notiType: String) -> AnyPublisher<Void, Error> {
+        service.toggleNotificationSetting(notiType: notiType)
     }
 }

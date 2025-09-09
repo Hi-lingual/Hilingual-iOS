@@ -12,6 +12,7 @@ import UIKit
 public protocol AuthService {
     func loginWithApple(token: String) -> AnyPublisher<LoginResponseDTO, Error>
     func refreshToken(token: String) -> AnyPublisher<TokenRefreshResponseDTO, Error>
+    func withdraw() -> AnyPublisher<Void, Error>
 }
 
 public final class DefaultAuthService: BaseService<AuthAPI>, AuthService {
@@ -74,5 +75,11 @@ public final class DefaultAuthService: BaseService<AuthAPI>, AuthService {
             .mapError { $0 as Error }
             .eraseToAnyPublisher()
 //        #endif
+    }
+    public func withdraw() -> AnyPublisher<Void, Error> {
+        return requestPlain(.withdraw)
+            .map { _ in }
+            .mapError { $0 as Error }
+            .eraseToAnyPublisher()
     }
 }

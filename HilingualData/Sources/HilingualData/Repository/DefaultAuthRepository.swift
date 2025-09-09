@@ -55,5 +55,13 @@ public final class DefaultAuthRepository: AuthRepository {
         }
         .eraseToAnyPublisher()
     }
+
+    public func withdraw() -> AnyPublisher<Void, Error> {
+        return authService.withdraw()
+            .handleEvents(receiveOutput: { [weak self] in
+                self?.tokenStore.clear()
+            })
+            .eraseToAnyPublisher()
+    }
 }
 

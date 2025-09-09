@@ -68,7 +68,7 @@ public final class NotificationSettingViewModel: BaseViewModel {
             .sink { [weak self] in
                 guard let self = self else { return }
                 let newValue = !self.marketingSubject.value
-                self.updateSetting(marketing: newValue, feed: self.feedSubject.value)
+                self.toggleSetting(for: "MARKETING", isOn: newValue)
             }
             .store(in: &cancellables)
 
@@ -76,7 +76,7 @@ public final class NotificationSettingViewModel: BaseViewModel {
             .sink { [weak self] in
                 guard let self = self else { return }
                 let newValue = !self.feedSubject.value
-                self.updateSetting(marketing: self.marketingSubject.value, feed: newValue)
+                self.toggleSetting(for: "FEED", isOn: newValue)
             }
             .store(in: &cancellables)
 
@@ -89,15 +89,18 @@ public final class NotificationSettingViewModel: BaseViewModel {
 
     // MARK: - Private
 
-    private func updateSetting(marketing: Bool, feed: Bool) {
-        useCase.updateAlarmSetting(isMarketingOn: marketing, isFeedOn: feed)
+    private func toggleSetting(for type: String, isOn: Bool) {
+        useCase.toggleNotificationSetting(notiType: type)
             .sink(receiveCompletion: { [weak self] completion in
                 if case .failure(let error) = completion {
                     self?.errorSubject.send(error)
                 }
             }, receiveValue: { [weak self] in
-                self?.marketingSubject.send(marketing)
-                self?.feedSubject.send(feed)
+                if type == "MARKETING" {
+                    self?.marketingSubject.send(isOn)
+                } else if type == "FEED" {
+                    self?.feedSubject.send(isOn)
+                }
             })
             .store(in: &cancellables)
     }

@@ -8,6 +8,7 @@
 
 import UIKit
 import SnapKit
+import Kingfisher
 
 final class EditableProfileImageView: UIView {
 
@@ -73,5 +74,23 @@ final class EditableProfileImageView: UIView {
     override func layoutSubviews() {
         super.layoutSubviews()
         profileImageView.layer.cornerRadius = bounds.width / 2
+    }
+}
+
+extension EditableProfileImageView {
+    public func setImage(urlString: String?) {
+        guard let urlString = urlString, let url = URL(string: urlString) else {
+            profileImageView.image = UIImage(named: "img_profile_normal_ios", in: .module, compatibleWith: nil)
+            return
+        }
+
+        profileImageView.kf.setImage(
+            with: url,
+            placeholder: UIImage(named: "img_profile_normal_ios", in: .module, compatibleWith: nil),
+            options: [
+                .transition(.fade(0.2)),
+                .cacheOriginalImage
+            ]
+        )
     }
 }

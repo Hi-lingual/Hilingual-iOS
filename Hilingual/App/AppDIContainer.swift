@@ -175,7 +175,7 @@ final class AppDIContainer: ViewControllerFactory {
     }
 
     public func makeEditProfileViewController() -> EditProfileViewController {
-        return EditProfileViewController(viewModel: makeHomeViewModel(), diContainer: self)
+        return EditProfileViewController(viewModel: makeEditProfileViewModel(), diContainer: self)
     }
 
     public func makeBlockUserViewController() -> BlockUserViewController {
@@ -448,7 +448,7 @@ extension AppDIContainer {
     }
 
     private func makeMypageViewModel() -> MypageViewModel {
-        return MypageViewModel(mypageUseCase: makeMypageUseCase())
+        return MypageViewModel(mypageUseCase: makeMypageUseCase(), fetchUserProfileUseCase: makefetchUserProfileUseCase())
     }
 }
 
@@ -477,8 +477,8 @@ extension AppDIContainer {
 
 extension AppDIContainer {
 
-    private func makeNotificationSettingService() -> MockAlarmSettingService {
-        return MockAlarmSettingService()
+    private func makeNotificationSettingService() -> DefaultNotificationSettingService {
+        return DefaultNotificationSettingService()
     }
 
     private func makeNotificationRepository() -> AlarmSettingRepository {
@@ -700,4 +700,23 @@ extension AppDIContainer {
     private func makeUploadImageService() -> PresignedURLService {
         DefaultPresignedURLService()
     }
+
+    //MARK: - EditProfileDIContainer
+
+    private func makefetchUserProfileUseCase() -> FetchUserProfileUseCase {
+        return DefaultFetchUserProfileUseCase(repository: makeUserProfileRepository())
+    }
+
+    private func makeUserProfileRepository() -> UserProfileRepository {
+        return DefaultUserProfileRepository(service: makeUserProfileService())
+    }
+
+    private func makeUserProfileService() -> UserProfileService {
+        return DefaultUserProfileService()
+    }
+
+    private func makeEditProfileViewModel() -> EditProfileViewModel {
+        return EditProfileViewModel(fetchUserProfileUseCase: makefetchUserProfileUseCase(), uploadImageUseCase: makeUploadImageUseCase(), mypageUseCase: makeMypageUseCase())
+    }
+
 }

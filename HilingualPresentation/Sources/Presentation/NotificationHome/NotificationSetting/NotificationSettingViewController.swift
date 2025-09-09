@@ -68,14 +68,10 @@ public final class NotificationSettingViewController: BaseUIViewController<Notif
     }
 
     @objc private func marketingSwitchToggled() {
-        if alarmSettingView.marketingToggle.isTracking {
-            marketingToggledSubject.send(())
-        }
+        marketingToggledSubject.send(())
     }
 
     @objc private func feedSwitchToggled() {
-        if alarmSettingView.feedToggle.isTracking {
-            feedToggledSubject.send(())
-        }
+        feedToggledSubject.send(())
     }
 }
