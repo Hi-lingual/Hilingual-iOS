@@ -29,6 +29,7 @@ public final class FollowerListViewController: BaseUIViewController<FollowListVi
         setDelegate()
         setRefreshControl()
         bindViewModel()
+        refresh()
     }
 
     // MARK: - Setup Methods
@@ -44,21 +45,22 @@ public final class FollowerListViewController: BaseUIViewController<FollowListVi
     public override func setDelegate() {
         tableView.dataSource = self
         tableView.delegate = self
-        
-        refresh()
     }
 
     // MARK: - Bind
 
     private func bindViewModel() {
-        viewModel?.output.followList
+        viewModel?.followListPublisher
             .receive(on: DispatchQueue.main)
             .sink { [weak self] model in
-                self?.updateList(model)
+                guard model.type == .follower else { return }
+                self?.followListView.followListModel = model
+                self?.tableView.reloadData()
+                self?.tableView.refreshControl?.endRefreshing()
             }
             .store(in: &cancellables)
     }
-
+    
     private func updateList(_ model: FollowListModel) {
         guard model.type == .follower else { return }
 

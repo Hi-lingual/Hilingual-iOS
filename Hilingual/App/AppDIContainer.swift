@@ -507,7 +507,10 @@ extension AppDIContainer {
     }
 
     private func makeFollowListUseCase() -> FollowListUseCase {
-        return DefaultFollowListUseCase(repository: makeFollowListRepository())
+        return DefaultFollowListUseCase(
+            followListRepository: makeFollowListRepository(),
+            followingRepository: makeFollowingRepository()
+        )
     }
 
     private func makeFollowListViewModel(targetUserId: Int) -> FollowListViewModel {
