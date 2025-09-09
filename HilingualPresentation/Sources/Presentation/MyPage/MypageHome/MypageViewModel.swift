@@ -11,6 +11,8 @@ import HilingualDomain
 
 public final class MypageViewModel: BaseViewModel {
 
+    //TODO: - Default 이미지 처리 로직 추가
+
     // MARK: - Input
 
     public struct Input {
@@ -72,12 +74,11 @@ public final class MypageViewModel: BaseViewModel {
         )
     }
 
-    private func fetchUserProfile() {
+    func fetchUserProfile() {
         fetchUserProfileUseCase.fetchMyProfile()
             .sink(
                 receiveCompletion: { completion in
                     if case .failure(let error) = completion {
-                        print("❌ 유저 정보 불러오기 실패: \(error)")
                     }
                 },
                 receiveValue: { [weak self] profile in

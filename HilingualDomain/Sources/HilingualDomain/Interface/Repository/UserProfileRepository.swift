@@ -9,4 +9,5 @@ import Combine
 
 public protocol UserProfileRepository {
     func fetchMyProfile() -> AnyPublisher<UserProfileEntity, Error>
+    func updateProfileImage(fileKey: String) -> AnyPublisher<Void, Error>
 }

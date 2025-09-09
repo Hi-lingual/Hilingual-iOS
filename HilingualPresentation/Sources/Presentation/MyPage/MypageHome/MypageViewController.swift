@@ -22,6 +22,7 @@ public final class MypageViewController: BaseUIViewController<MypageViewModel> {
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: false)
+        viewModel?.fetchUserProfile()
     }
 
     // MARK: - Custom Method
