@@ -11,6 +11,7 @@ import Combine
 public final class FollowerListViewController: BaseUIViewController<FollowListViewModel> {
 
     private let followListView = FollowListView()
+    private let refreshControl = UIRefreshControl()
 
     private var tableView: UITableView {
         return followListView.tableView
@@ -26,6 +27,7 @@ public final class FollowerListViewController: BaseUIViewController<FollowListVi
         super.viewDidLoad()
 
         setDelegate()
+        setRefreshControl()
         bindViewModel()
     }
 
@@ -42,23 +44,38 @@ public final class FollowerListViewController: BaseUIViewController<FollowListVi
     public override func setDelegate() {
         tableView.dataSource = self
         tableView.delegate = self
+        
+        refresh()
     }
 
     // MARK: - Bind
 
     private func bindViewModel() {
-        viewModel?.followerListPublisher
+        viewModel?.output.followList
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] users in
-                self?.updateList(users)
+            .sink { [weak self] model in
+                self?.updateList(model)
             }
             .store(in: &cancellables)
     }
 
-    private func updateList(_ users: [FollowUserModel]) {
-        let model = FollowListModel(type: .follower, users: users)
-        followListView.followListModel = model
-        tableView.reloadData()
+    private func updateList(_ model: FollowListModel) {
+        guard model.type == .follower else { return }
+
+        self.followListView.followListModel = model
+        self.tableView.reloadData()
+    }
+    
+    // MARK: - Action
+    
+    private func setRefreshControl() {
+        refreshControl.addTarget(self, action: #selector(refresh), for: .valueChanged)
+        tableView.refreshControl = refreshControl
+    }
+    
+    @objc private func refresh() {
+        viewModel?.input.fetchFollowers.send(())
+        tableView.refreshControl?.endRefreshing()
     }
 }
 
