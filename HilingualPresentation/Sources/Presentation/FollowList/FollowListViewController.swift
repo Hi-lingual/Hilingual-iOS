@@ -47,6 +47,17 @@ public final class FollowListViewController: BaseUIViewController<FollowListView
         viewModel?.bind()
         viewModel?.fetchFollowers()
         viewModel?.fetchFollowing()
+        
+        segmentedControl.onIndexChange = { [weak self] (index: Int) in
+            switch index {
+            case 0:
+                self?.viewModel?.fetchFollowers()
+            case 1:
+                self?.viewModel?.fetchFollowing()
+            default:
+                break
+            }
+        }
     }
     
     // MARK: - Setup Methods
