@@ -10,6 +10,8 @@ import Foundation
 import SafariServices
 
 public final class FeedViewController: BaseUIViewController<FeedViewModel> {
+    
+    var onLikeTapped: ((Int, Bool) -> Void)?
 
     // MARK: - Properties
     
@@ -33,6 +35,9 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
         vc.onRefresh = { [weak self] in
             self?.showToast(message: "피드의 일기를 모두 확인했어요.")
         }
+        vc.onLikeTapped = { [weak self] diaryId, isLiked in
+            self?.input.likeTapped.send((diaryId, isLiked))
+        }
         return vc
     }()
 
@@ -51,6 +56,9 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
         }
         vc.onRefresh = { [weak self] in
             self?.showToast(message: "피드의 일기를 모두 확인했어요.")
+        }
+        vc.onLikeTapped = { [weak self] diaryId, isLiked in
+            self?.input.likeTapped.send((diaryId, isLiked))
         }
         return vc
     }()

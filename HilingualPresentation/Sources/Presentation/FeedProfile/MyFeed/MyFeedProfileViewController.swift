@@ -11,7 +11,7 @@ import SafariServices
 import Combine
 
 public final class MyFeedProfileViewController: BaseUIViewController<FeedProfileViewModel> {
-
+    
     // MARK: - Properties
     
     private let input = FeedProfileViewModel.Input()
@@ -84,6 +84,11 @@ public final class MyFeedProfileViewController: BaseUIViewController<FeedProfile
             self?.showReportDialog()
         }
         
+        /// 공유 - 공감하기
+        sharedVC.onLikeTapped = { [weak self] diaryId, isLiked in
+            self?.input.likeTapped.send((diaryId, isLiked))
+        }
+        
         /// 공감 - 게시글 비공개하기
         likedVC.onHideTapped = { [weak self] row in
             self?.showHideDialog(listVC: self?.likedVC, row: row)
@@ -92,6 +97,11 @@ public final class MyFeedProfileViewController: BaseUIViewController<FeedProfile
         /// 공감 - 게시글 신고하기
         likedVC.onReportTapped = { [weak self] in
             self?.showReportDialog()
+        }
+        
+        /// 공감 - 공감하기
+        likedVC.onLikeTapped = { [weak self] diaryId, isLiked in
+            self?.input.likeTapped.send((diaryId, isLiked))
         }
 
         myFeedProfileView.setFollowSectionTappedAction { [weak self] in

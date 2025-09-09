@@ -20,6 +20,7 @@ public final class FeedListViewController: BaseUIViewController<FeedViewModel> {
     var onHideTapped: ((Int) -> Void)?
     var onReportTapped: (() -> Void)?
     var onRefresh: (() -> Void)?
+    var onLikeTapped: ((Int, Bool) -> Void)?
 
     private(set) var currentFeeds: [FeedModel] = []
 
@@ -34,7 +35,7 @@ public final class FeedListViewController: BaseUIViewController<FeedViewModel> {
         bindViewModel()
         input.reload.send(())
         
-        //위로 끌어당겼을 때 새로고침 추가
+        // 위로 끌어당겼을 때 새로고침 추가
         let refreshControl = UIRefreshControl()
         refreshControl.addTarget(self, action: #selector(didTopScrollRefresh), for: .valueChanged)
         feedCellView.tableView.refreshControl = refreshControl
@@ -51,7 +52,6 @@ public final class FeedListViewController: BaseUIViewController<FeedViewModel> {
         
         feedCellView.onRefresh = { [weak self] in
             guard let self else { return }
-//            self.input.reload.send(())
             self.onRefresh?()
         }
 
@@ -93,6 +93,16 @@ public final class FeedListViewController: BaseUIViewController<FeedViewModel> {
                     items: feeds,
                     followingState: haveFollowing
                 )
+
+                for (index, cell) in self.feedCellView.tableView.visibleCells.enumerated() {
+                    if let feedCell = cell as? FeedCell {
+                        feedCell.onLikeToggled = { [weak self] isLiked in
+                            guard let self else { return }
+                            let diaryId = self.currentFeeds[index].diaryID
+                            self.onLikeTapped?(diaryId, isLiked)
+                        }
+                    }
+                }
             }
             .store(in: &cancellables)
     }

@@ -610,6 +610,7 @@ extension AppDIContainer {
         return FeedViewModel(
             feedUseCase: makeFeedUseCase(),
             publishDiaryUseCase: makePublishDiaryUseCase(),
+            toggleLikeUseCase: makeToggleLikeUseCase(),
             type: nil
         )
     }
@@ -619,6 +620,7 @@ extension AppDIContainer {
         return FeedViewModel(
             feedUseCase: makeFeedUseCase(),
             publishDiaryUseCase: makePublishDiaryUseCase(),
+            toggleLikeUseCase: makeToggleLikeUseCase(),
             type: type
         )
     }
@@ -657,6 +659,7 @@ extension AppDIContainer {
             feedUseCase: makeFeedProfileUseCase(),
             profileInfoUseCase: makeFeedProfileInfoUseCase(),
             publishDiaryUseCase: makePublishDiaryUseCase(),
+            toggleLikeUseCase: makeToggleLikeUseCase(),
             type: type,
             targetUserId: targetUserId
         )

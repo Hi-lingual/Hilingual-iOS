@@ -11,9 +11,10 @@ import SafariServices
 import Combine
 
 public final class UserFeedProfileViewController: BaseUIViewController<FeedProfileViewModel> {
-    
+        
     // MARK: - Properties
     
+    private let input = FeedProfileViewModel.Input()
     private let userFeedProfileView = UserFeedProfileView()
     private let sharedVC: FeedProfileViewController
     private let targetUserId: Int64
@@ -69,6 +70,11 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
         // 게시글 신고
         sharedVC.onReportTapped = { [weak self] in
             self?.showReportDialog()
+        }
+        
+        // 게시글 공감하기
+        sharedVC.onLikeTapped = { [weak self] diaryId, isLiked in
+            self?.input.likeTapped.send((diaryId, isLiked))
         }
         
         // 유저 차단 모달
@@ -146,11 +152,9 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
     // MARK: - Bind
     
     private func bind() {
-        let input = FeedProfileViewModel.Input()
         guard let viewModel else { return }
-        
-        let output = viewModel.transform(input: input)
-        
+        let output = viewModel.transform(input: self.input)
+
         output.profile
             .compactMap { $0 }
             .receive(on: RunLoop.main)
@@ -164,7 +168,7 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
                 )
             }
             .store(in: &cancellables)
-        
+
         output.buttonState
             .compactMap { $0 }
             .receive(on: RunLoop.main)
@@ -172,8 +176,8 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
                 self?.userFeedProfileView.followButtonState(state)
             }
             .store(in: &cancellables)
-        
-        input.reload.send(())
+
+        self.input.reload.send(())
     }
         
     // MARK: - Private Methods

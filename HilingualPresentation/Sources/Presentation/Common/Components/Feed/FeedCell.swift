@@ -27,6 +27,8 @@ final class FeedCell: UITableViewCell {
     
     weak var delegate: FeedCellDelegate?
     private var isMine: Bool = false
+    
+    var onLikeToggled: ((Bool) -> Void)?
 
     // MARK: - UI Components
 
@@ -186,6 +188,7 @@ final class FeedCell: UITableViewCell {
         menu.delegate = self
         setUI()
         setLayout()
+        bindActions()
         setupGestureRecognizers()
         selectionStyle = .none
     }
@@ -253,6 +256,12 @@ final class FeedCell: UITableViewCell {
             $0.horizontalEdges.equalToSuperview()
             $0.bottom.equalToSuperview()
             $0.height.equalTo(1)
+        }
+    }
+
+    private func bindActions() {
+        likeView.onToggle = { [weak self] isLiked in
+            self?.onLikeToggled?(isLiked)
         }
     }
 
@@ -367,7 +376,6 @@ final class FeedCell: UITableViewCell {
     @objc private func detailTapped() {
         delegate?.feedCellDidTapDetail(self)
     }
-
 
     //MARK: - Private Method
 

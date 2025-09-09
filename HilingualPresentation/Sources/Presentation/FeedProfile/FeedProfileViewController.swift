@@ -35,7 +35,7 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
     
     var onHideTapped: ((Int) -> Void)?
     var onReportTapped: (() -> Void)?
-    
+    var onLikeTapped: ((Int, Bool) -> Void)?
     public var onScroll: ((CGFloat) -> Void)?
     
     // MARK: - Init
@@ -94,6 +94,16 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
                     type: type
                 )
                 
+                for (index, cell) in self.feedCellView.tableView.visibleCells.enumerated() {
+                    if let feedCell = cell as? FeedCell {
+                        feedCell.onLikeToggled = { [weak self] isLiked in
+                            guard let self else { return }
+                            let diaryId = self.currentFeeds[index].diaryID
+                            self.onLikeTapped?(diaryId, isLiked)
+                        }
+                    }
+                }
+
                 DispatchQueue.main.async {
                     self.footerForStickyHeader()
                 }

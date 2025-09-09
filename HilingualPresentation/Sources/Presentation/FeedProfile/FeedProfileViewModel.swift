@@ -20,6 +20,7 @@ public final class FeedProfileViewModel: BaseViewModel, BaseViewModelType {
         let block = PassthroughSubject<Void, Never>()
         let unblock = PassthroughSubject<Void, Never>()
         let unpublish = PassthroughSubject<Int, Never>()
+        let likeTapped = PassthroughSubject<(Int, Bool), Never>()
     }
     
     public struct Output {
@@ -30,6 +31,7 @@ public final class FeedProfileViewModel: BaseViewModel, BaseViewModelType {
         let isEmpty: AnyPublisher<Bool, Never>
         let buttonState: AnyPublisher<FollowButtonState?, Never>
         let publishResult: AnyPublisher<Bool, Never>
+        let likeResult: AnyPublisher<(Int, Bool), Never>
     }
     
     // MARK: - Dependencies
@@ -40,6 +42,7 @@ public final class FeedProfileViewModel: BaseViewModel, BaseViewModelType {
 //    private let unfollowUseCase: UnfollowUseCase
 //    private let blockUserUseCase: BlockUserUseCase
     private let publishDiaryUseCase: PublishDiaryUseCase
+    private let toggleLikeUseCase: ToggleLikeUseCase
     private let type: FeedProfileType
     private let targetUserId: Int64
     
@@ -52,6 +55,7 @@ public final class FeedProfileViewModel: BaseViewModel, BaseViewModelType {
     private let errorSubject = CurrentValueSubject<String?, Never>(nil)
     private let buttonStateSubject = CurrentValueSubject<FollowButtonState?, Never>(nil)
     private let publishSubject = PassthroughSubject<Bool, Never>()
+    private let likeSubject = PassthroughSubject<(Int, Bool), Never>()
     
     // MARK: - Init
     
@@ -59,12 +63,14 @@ public final class FeedProfileViewModel: BaseViewModel, BaseViewModelType {
         feedUseCase: FeedProfileUseCase,
         profileInfoUseCase: FeedProfileInfoUseCase,
         publishDiaryUseCase: PublishDiaryUseCase,
+        toggleLikeUseCase: ToggleLikeUseCase,
         type: FeedProfileType,
         targetUserId: Int64 = 0
     ) {
         self.feedUseCase = feedUseCase
         self.profileInfoUseCase = profileInfoUseCase
         self.publishDiaryUseCase = publishDiaryUseCase
+        self.toggleLikeUseCase = toggleLikeUseCase
         self.type = type
         self.targetUserId = targetUserId
         super.init()
@@ -143,6 +149,12 @@ public final class FeedProfileViewModel: BaseViewModel, BaseViewModelType {
             }
             .store(in: &cancellables)
         
+        input.likeTapped
+            .sink { [weak self] (diaryId, isLiked) in
+                self?.toggleLike(diaryId: diaryId, isLiked: isLiked)
+            }
+            .store(in: &cancellables)
+        
         // 팔로우 등록
 //        input.follow
 //            .flatMap { [weak self] _ -> AnyPublisher<Void, Never> in
@@ -206,7 +218,8 @@ public final class FeedProfileViewModel: BaseViewModel, BaseViewModelType {
             errorMessage: errorSubject.eraseToAnyPublisher(),
             isEmpty: isEmptySubject.eraseToAnyPublisher(),
             buttonState: buttonStateSubject.eraseToAnyPublisher(),
-            publishResult: publishSubject.eraseToAnyPublisher()
+            publishResult: publishSubject.eraseToAnyPublisher(),
+            likeResult: likeSubject.eraseToAnyPublisher()
         )
     }
     
@@ -248,6 +261,18 @@ public final class FeedProfileViewModel: BaseViewModel, BaseViewModelType {
                 }
             }, receiveValue: { [weak self] _ in
                 self?.publishSubject.send(false)
+            })
+            .store(in: &cancellables)
+    }
+    
+    private func toggleLike(diaryId: Int, isLiked: Bool) {
+        toggleLikeUseCase.toggleLike(diaryId: diaryId, isLiked: isLiked)
+            .sink(receiveCompletion: { [weak self] completion in
+                if case let .failure(error) = completion {
+                    self?.errorSubject.send("공감하기 실패: \(error.localizedDescription)")
+                }
+            }, receiveValue: { [weak self] _ in
+                self?.likeSubject.send((diaryId, !isLiked))
             })
             .store(in: &cancellables)
     }

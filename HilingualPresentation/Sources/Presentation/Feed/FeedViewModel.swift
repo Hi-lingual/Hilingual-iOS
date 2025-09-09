@@ -17,9 +17,11 @@ public enum FeedListType {
 public final class FeedViewModel: BaseViewModel, BaseViewModelType {
     
     // MARK: - Input/Output
+    
     public struct Input {
         let reload = PassthroughSubject<Void, Never>()
         let unpublish = PassthroughSubject<Int, Never>()
+        let likeTapped = PassthroughSubject<(Int, Bool), Never>()
     }
 
     public struct Output {
@@ -28,33 +30,42 @@ public final class FeedViewModel: BaseViewModel, BaseViewModelType {
         let isLoading: AnyPublisher<Bool, Never>
         let errorMessage: AnyPublisher<String?, Never>
         let publishResult: AnyPublisher<Bool, Never>
+        let likeResult: AnyPublisher<(Int, Bool), Never>
     }
     
     // MARK: - Dependencies
+    
     private let feedUseCase: FeedUseCase
     private let publishDiaryUseCase: PublishDiaryUseCase
+    private let toggleLikeUseCase: ToggleLikeUseCase
     private let type: FeedListType?
     
     // MARK: - State
+    
     private let feedsSubject = CurrentValueSubject<[FeedModel], Never>([])
     private let haveFollowingSubject = CurrentValueSubject<Bool?, Never>(nil)
     private let isLoadingSubject = CurrentValueSubject<Bool, Never>(false)
     private let errorSubject = CurrentValueSubject<String?, Never>(nil)
     private let publishSubject = PassthroughSubject<Bool, Never>()
+    private let likeSubject = PassthroughSubject<(Int, Bool), Never>()
     
     // MARK: - Init
+    
     public init(
         feedUseCase: FeedUseCase,
         publishDiaryUseCase: PublishDiaryUseCase,
+        toggleLikeUseCase: ToggleLikeUseCase,
         type: FeedListType? = nil
     ) {
         self.feedUseCase = feedUseCase
         self.publishDiaryUseCase = publishDiaryUseCase
+        self.toggleLikeUseCase = toggleLikeUseCase
         self.type = type
         super.init()
     }
     
     // MARK: - Transform
+    
     public func transform(input: Input) -> Output {
         if let type = type {
             let trigger = Publishers.Merge(viewDidLoad, input.reload.eraseToAnyPublisher())
@@ -114,16 +125,25 @@ public final class FeedViewModel: BaseViewModel, BaseViewModelType {
             }
             .store(in: &cancellables)
         
+        input.likeTapped
+            .sink { [weak self] (diaryId, isLiked) in
+                self?.toggleLike(diaryId: diaryId, isLiked: isLiked)
+            }
+            .store(in: &cancellables)
+        
         return Output(
             feeds: feedsSubject.eraseToAnyPublisher(),
             haveFollowing: haveFollowingSubject.eraseToAnyPublisher(),
             isLoading: isLoadingSubject.eraseToAnyPublisher(),
             errorMessage: errorSubject.eraseToAnyPublisher(),
-            publishResult: publishSubject.eraseToAnyPublisher()
+            publishResult: publishSubject.eraseToAnyPublisher(),
+            likeResult: likeSubject.eraseToAnyPublisher()
+
         )
     }
     
     // MARK: - Private
+
     private func unpublishDiary(diaryId: Int) {
         publishDiaryUseCase.unpublishDiary(diaryId: diaryId)
             .sink(receiveCompletion: { [weak self] completion in
@@ -132,6 +152,18 @@ public final class FeedViewModel: BaseViewModel, BaseViewModelType {
                 }
             }, receiveValue: { [weak self] _ in
                 self?.publishSubject.send(false)
+            })
+            .store(in: &cancellables)
+    }
+    
+    private func toggleLike(diaryId: Int, isLiked: Bool) {
+        toggleLikeUseCase.toggleLike(diaryId: diaryId, isLiked: isLiked)
+            .sink(receiveCompletion: { [weak self] completion in
+                if case let .failure(error) = completion {
+                    self?.errorSubject.send("공감하기 실패: \(error.localizedDescription)")
+                }
+            }, receiveValue: { [weak self] _ in
+                self?.likeSubject.send((diaryId, !isLiked))
             })
             .store(in: &cancellables)
     }
