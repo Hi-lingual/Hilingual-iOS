@@ -51,32 +51,32 @@ public struct FollowerDTO: Codable {
 
 // MARK: - Mock 팔로워/팔로잉 데이터
 
-extension FollowListResponseDTO {
-    
-    public static let mockFollowers: FollowListResponseDTO = {
-        let followers = [
-            FollowerDTO(userId: 1, profileImg: "image/url/.jpg", nickname: "닉네임이지롱1", isFollowing: true, isFollowed: true),
-            FollowerDTO(userId: 2, profileImg: "image/url/.jpg", nickname: "닉네임이지롱2", isFollowing: false, isFollowed: true),
-            FollowerDTO(userId: 3, profileImg: "image/url/.jpg", nickname: "닉네임이지롱3", isFollowing: true, isFollowed: true)
-        ]
-//        let followers: [FollowerDTO] = [] // EmptyView 확인용
-        let data = FollowListDataDTO(followerList: followers, followingList: nil)
-        let dto = FollowListResponseDTO(code: 20000, data: data, message: "팔로워 리스트를 조회했습니다.")
-        
-        print("Mock Followers 생성됨:", dto)
-        return dto
-    }()
-    
-    public static let mockFollowing: FollowListResponseDTO = {
-        let following = [
-            FollowerDTO(userId: 4, profileImg: "image/url/.jpg", nickname: "팔로잉닉네임1", isFollowing: true, isFollowed: true),
-            FollowerDTO(userId: 5, profileImg: "image/url/.jpg", nickname: "팔로잉닉네임2", isFollowing: true, isFollowed: false),
-            FollowerDTO(userId: 6, profileImg: "image/url/.jpg", nickname: "팔로잉닉네임3", isFollowing: true, isFollowed: true)
-        ]
-        let data = FollowListDataDTO(followerList: nil, followingList: following)
-        let dto = FollowListResponseDTO(code: 20000, data: data, message: "팔로잉 리스트를 조회했습니다.")
-        
-        print("Mock Following 생성됨:", dto)
-        return dto
-    }()
-}
+//extension FollowListResponseDTO {
+//    
+//    public static let mockFollowers: FollowListResponseDTO = {
+//        let followers = [
+//            FollowerDTO(userId: 1, profileImg: "image/url/.jpg", nickname: "닉네임이지롱1", isFollowing: true, isFollowed: true),
+//            FollowerDTO(userId: 2, profileImg: "image/url/.jpg", nickname: "닉네임이지롱2", isFollowing: false, isFollowed: true),
+//            FollowerDTO(userId: 3, profileImg: "image/url/.jpg", nickname: "닉네임이지롱3", isFollowing: true, isFollowed: true)
+//        ]
+////        let followers: [FollowerDTO] = [] // EmptyView 확인용
+//        let data = FollowListDataDTO(followerList: followers, followingList: nil)
+//        let dto = FollowListResponseDTO(code: 20000, data: data, message: "팔로워 리스트를 조회했습니다.")
+//        
+//        print("Mock Followers 생성됨:", dto)
+//        return dto
+//    }()
+//    
+//    public static let mockFollowing: FollowListResponseDTO = {
+//        let following = [
+//            FollowerDTO(userId: 4, profileImg: "image/url/.jpg", nickname: "팔로잉닉네임1", isFollowing: true, isFollowed: true),
+//            FollowerDTO(userId: 5, profileImg: "image/url/.jpg", nickname: "팔로잉닉네임2", isFollowing: true, isFollowed: false),
+//            FollowerDTO(userId: 6, profileImg: "image/url/.jpg", nickname: "팔로잉닉네임3", isFollowing: true, isFollowed: true)
+//        ]
+//        let data = FollowListDataDTO(followerList: nil, followingList: following)
+//        let dto = FollowListResponseDTO(code: 20000, data: data, message: "팔로잉 리스트를 조회했습니다.")
+//        
+//        print("Mock Following 생성됨:", dto)
+//        return dto
+//    }()
+//}

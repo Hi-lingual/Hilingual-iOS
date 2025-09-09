@@ -11,9 +11,9 @@ import HilingualDomain
 import HilingualNetwork
 
 public final class DefaultDeleteDiaryRepository: DeleteDiaryRepository {
-    private let service: DeleteDiaryService
+    private let service: DiaryControlService
     
-    public init(service: DeleteDiaryService) {
+    public init(service: DiaryControlService) {
         self.service = service
     }
     

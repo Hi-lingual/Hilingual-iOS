@@ -105,7 +105,7 @@ final class HighlightTextView: BaseUIView {
     }
     
     func highlightCorrections(textType: String, diffRanges: [DiffRange]) {
-        let attributed = NSMutableAttributedString(attributedString: .suit(.body_r_16, text: textType))
+        let attributed = NSMutableAttributedString(attributedString: .suit(.body_r_16, text: textType, lineBreakMode: .byWordWrapping))
         attributed.addAttribute(.foregroundColor, value: UIColor.hilingualBlack, range: NSRange(location: 0, length: attributed.length))
         
         for range in diffRanges {

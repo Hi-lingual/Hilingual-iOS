@@ -199,7 +199,6 @@ final class WordCard: UIView {
         }
 
         let image = UIImage(named: imageName, in: .module, compatibleWith: nil)
-        print("✅ 북마크 상태: \(isMarked), imageName: \(imageName), image 존재 여부: \(image != nil)")
         bookmarkButton.setImage(image, for: .normal)
     }
 

@@ -22,6 +22,7 @@ public final class MypageViewController: BaseUIViewController<MypageViewModel> {
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: false)
+        viewModel?.fetchUserProfile()
     }
 
     // MARK: - Custom Method
@@ -91,6 +92,18 @@ public final class MypageViewController: BaseUIViewController<MypageViewModel> {
                 //TODO: - error 모달 추가하기
             }
             .store(in: &cancellables)
+
+        output.userProfile
+            .compactMap { $0 }
+            .receive(on: RunLoop.main)
+            .sink { [weak self] profile in
+                self?.mypageView.configure(
+                    nickname: profile.nickname,
+                    profileImageURL: profile.profileImg
+                )
+            }
+            .store(in: &cancellables)
+
     }
 
     // MARK: - PrivatMethod

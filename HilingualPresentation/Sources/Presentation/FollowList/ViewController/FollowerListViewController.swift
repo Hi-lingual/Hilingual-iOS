@@ -11,6 +11,7 @@ import Combine
 public final class FollowerListViewController: BaseUIViewController<FollowListViewModel> {
 
     private let followListView = FollowListView()
+    private let refreshControl = UIRefreshControl()
 
     private var tableView: UITableView {
         return followListView.tableView
@@ -26,7 +27,9 @@ public final class FollowerListViewController: BaseUIViewController<FollowListVi
         super.viewDidLoad()
 
         setDelegate()
+        setRefreshControl()
         bindViewModel()
+        refresh()
     }
 
     // MARK: - Setup Methods
@@ -47,18 +50,34 @@ public final class FollowerListViewController: BaseUIViewController<FollowListVi
     // MARK: - Bind
 
     private func bindViewModel() {
-        viewModel?.followerListPublisher
+        viewModel?.followListPublisher
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] users in
-                self?.updateList(users)
+            .sink { [weak self] model in
+                guard model.type == .follower else { return }
+                self?.followListView.followListModel = model
+                self?.tableView.reloadData()
+                self?.tableView.refreshControl?.endRefreshing()
             }
             .store(in: &cancellables)
     }
+    
+    private func updateList(_ model: FollowListModel) {
+        guard model.type == .follower else { return }
 
-    private func updateList(_ users: [FollowUserModel]) {
-        let model = FollowListModel(type: .follower, users: users)
-        followListView.followListModel = model
-        tableView.reloadData()
+        self.followListView.followListModel = model
+        self.tableView.reloadData()
+    }
+    
+    // MARK: - Action
+    
+    private func setRefreshControl() {
+        refreshControl.addTarget(self, action: #selector(refresh), for: .valueChanged)
+        tableView.refreshControl = refreshControl
+    }
+    
+    @objc private func refresh() {
+        viewModel?.input.fetchFollowers.send(())
+        tableView.refreshControl?.endRefreshing()
     }
 }
 
@@ -77,6 +96,7 @@ extension FollowerListViewController: UITableViewDataSource {
 
         cell.nickname.text = user.nickname
         cell.button.configure(state: user.buttonState)
+        cell.configure(with: user)
         cell.delegate = self
         return cell
     }

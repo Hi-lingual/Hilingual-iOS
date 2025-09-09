@@ -8,7 +8,8 @@
 import Combine
 
 public protocol PublishDiaryUseCase {
-    func execute(diaryId: Int, isPublished: Bool) -> AnyPublisher<Void, Error>
+    func publishDiary(diaryId: Int) -> AnyPublisher<Void, Error>
+    func unpublishDiary(diaryId: Int) -> AnyPublisher<Void, Error>
 }
 
 public final class DefaultPublishDiaryUseCase: PublishDiaryUseCase {
@@ -18,7 +19,11 @@ public final class DefaultPublishDiaryUseCase: PublishDiaryUseCase {
         self.repository = repository
     }
     
-    public func execute(diaryId: Int, isPublished: Bool) -> AnyPublisher<Void, Error> {
-        return repository.publishDiary(diaryId: diaryId, isPublished: isPublished)
+    public func publishDiary(diaryId: Int) -> AnyPublisher<Void, Error> {
+        return repository.publishDiary(diaryId: diaryId)
+    }
+    
+    public func unpublishDiary(diaryId: Int) -> AnyPublisher<Void, Error> {
+        return repository.unpublishDiary(diaryId: diaryId)
     }
 }

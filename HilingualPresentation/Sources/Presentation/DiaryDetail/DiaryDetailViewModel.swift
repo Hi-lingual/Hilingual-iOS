@@ -32,7 +32,8 @@ public final class DiaryDetailViewModel: BaseViewModel {
     
     public struct Input {
         let deleteTapped: AnyPublisher<Void, Never>
-        let publishTapped: AnyPublisher<Bool, Never>
+        let publishTapped: AnyPublisher<Void, Never>
+        let unpublishTapped: AnyPublisher<Void, Never>
     }
     
     public struct Output {
@@ -49,10 +50,17 @@ public final class DiaryDetailViewModel: BaseViewModel {
             .store(in: &cancellables)
         
         input.publishTapped
-            .sink { [weak self] isPublished in
-                self?.publishDiary(isPublished: isPublished)
+            .sink { [weak self] in
+                self?.publishDiary()
             }
             .store(in: &cancellables)
+        
+        input.unpublishTapped
+            .sink { [weak self] in
+                self?.unpublishDiary()
+            }
+            .store(in: &cancellables)
+        
         
         return Output(
             deleteResult: deleteSubject.eraseToAnyPublisher(),
@@ -69,21 +77,35 @@ public final class DiaryDetailViewModel: BaseViewModel {
                 if case let .failure(error) = completion {
                     self?.errorSubject.send("삭제 실패: \(error.localizedDescription)")
                 }
-            }, receiveValue: { [weak self] in
+            }, receiveValue: { [weak self] _ in
                 self?.deleteSubject.send(())
             })
             .store(in: &cancellables)
     }
     
-    private func publishDiary(isPublished: Bool) {
-        publishDiaryUseCase.execute(diaryId: diaryId, isPublished: isPublished)
+    private func publishDiary() {
+        publishDiaryUseCase.publishDiary(diaryId: diaryId)
             .sink(receiveCompletion: { [weak self] completion in
                 if case let .failure(error) = completion {
                     self?.errorSubject.send("공개 상태 변경 실패: \(error.localizedDescription)")
                 }
-            }, receiveValue: { [weak self] in
-                self?.publishSubject.send(isPublished)
+            }, receiveValue: { [weak self] _ in
+                self?.publishSubject.send(true)
             })
             .store(in: &cancellables)
     }
+
+    private func unpublishDiary() {
+        publishDiaryUseCase.unpublishDiary(diaryId: diaryId)
+            .sink(receiveCompletion: { [weak self] completion in
+                if case let .failure(error) = completion {
+                    self?.errorSubject.send("공개 상태 변경 실패: \(error.localizedDescription)")
+                }
+            }, receiveValue: { [weak self] _ in
+                self?.publishSubject.send(false)
+            })
+            .store(in: &cancellables)
+    }
+
+
 }

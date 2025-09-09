@@ -54,8 +54,8 @@ final class AppDIContainer: ViewControllerFactory {
 //        return FeedbackViewController(viewModel: makeFeedbackViewModel(diaryId: diaryId), diContainer: self)
         let viewModel = FeedbackViewModel(
                 diaryId: diaryId,
-                diaryDetailUseCase: MockDiaryDetailUseCase(),
-                feedbackUseCase: MockFeedbackUseCase()
+                diaryDetailUseCase: makeDiaryDetailUseCase(),
+                feedbackUseCase: makeFeedbackUseCase()
             )
             return FeedbackViewController(viewModel: viewModel, diContainer:  self)
     }
@@ -64,7 +64,7 @@ final class AppDIContainer: ViewControllerFactory {
 //        return VocaViewController(viewModel: makeVocaViewModel(diaryId: diaryId), diContainer: self)
         let viewModel = RecommendedExpressionViewModel(
             diaryId: diaryId,
-            recommendedExpressionUseCase: MockRecommendedUseCase(),
+            recommendedExpressionUseCase: makeRecommendedExpressionUseCase(),
             toggleBookmarkUseCase: makeToggleBookmarkUseCase()
         )
         return RecommendedExpressionViewController(viewModel: viewModel, diContainer: self)
@@ -175,7 +175,7 @@ final class AppDIContainer: ViewControllerFactory {
     }
 
     public func makeEditProfileViewController() -> EditProfileViewController {
-        return EditProfileViewController(viewModel: makeHomeViewModel(), diContainer: self)
+        return EditProfileViewController(viewModel: makeEditProfileViewModel(), diContainer: self)
     }
 
     public func makeBlockUserViewController() -> BlockUserViewController {
@@ -317,11 +317,11 @@ extension AppDIContainer {
     }
     
     private func makeDeleteDiaryRepository() -> DeleteDiaryRepository {
-        return DefaultDeleteDiaryRepository(service: makeDeleteDiaryService())
+        return DefaultDeleteDiaryRepository(service: makeDiaryControlService())
     }
     
-    private func makeDeleteDiaryService() -> DeleteDiaryService {
-        return MockDeleteDiaryService()
+    private func makeDiaryControlService() -> DiaryControlService {
+        return DefaultDiaryControlService()
     }
 }
 
@@ -331,11 +331,7 @@ extension AppDIContainer {
     }
     
     private func makePublishDiaryRepository() -> PublishDiaryRepository {
-        return DefaultPublishDiaryRepository(service: makePublishDiaryService())
-    }
-    
-    private func makePublishDiaryService() -> PublishDiaryService {
-        return MockPublishDiaryService()
+        return DefaultPublishDiaryRepository(service: makeDiaryControlService())
     }
 }
 
@@ -451,7 +447,7 @@ extension AppDIContainer {
     }
 
     private func makeMypageViewModel() -> MypageViewModel {
-        return MypageViewModel(mypageUseCase: makeMypageUseCase())
+        return MypageViewModel(mypageUseCase: makeMypageUseCase(), fetchUserProfileUseCase: makefetchUserProfileUseCase())
     }
 }
 
@@ -480,8 +476,8 @@ extension AppDIContainer {
 
 extension AppDIContainer {
 
-    private func makeNotificationSettingService() -> MockAlarmSettingService {
-        return MockAlarmSettingService()
+    private func makeNotificationSettingService() -> DefaultNotificationSettingService {
+        return DefaultNotificationSettingService()
     }
 
     private func makeNotificationRepository() -> AlarmSettingRepository {
@@ -501,8 +497,8 @@ extension AppDIContainer {
 
 extension AppDIContainer {
 
-    private func makeFollowListService() -> MockFollowListService {
-        return MockFollowListService() // TODO: 실제 API 서비스로 교체
+    private func makeFollowListService() -> FollowListService {
+        return DefaultFollowListService() // TODO: 실제 API 서비스로 교체
     }
 
     private func makeFollowListRepository() -> FollowListRepository {
@@ -510,16 +506,21 @@ extension AppDIContainer {
     }
 
     private func makeFollowListUseCase() -> FollowListUseCase {
-        return DefaultFollowListUseCase(repository: makeFollowListRepository())
+        return DefaultFollowListUseCase(
+            followListRepository: makeFollowListRepository(),
+            followingRepository: makeFollowingRepository()
+        )
     }
 
-    private func makeFollowListViewModel() -> FollowListViewModel {
-        return FollowListViewModel(followListUseCase: makeFollowListUseCase())
+    private func makeFollowListViewModel(targetUserId: Int) -> FollowListViewModel {
+        return FollowListViewModel(
+            followListUseCase: makeFollowListUseCase(),
+            targetUserId: targetUserId
+        )
     }
-
-    func makeFollowListViewController() -> FollowListViewController {
+    func makeFollowListViewController(targetUserId: Int) -> FollowListViewController {
         let viewController = FollowListViewController(
-            viewModel: makeFollowListViewModel(),
+            viewModel: makeFollowListViewModel(targetUserId: targetUserId),
             diContainer: self
         )
         return viewController
@@ -530,8 +531,8 @@ extension AppDIContainer {
 
 extension AppDIContainer {
     
-    private func makeSharedDiaryService() -> MockSharedDiaryService {
-        return MockSharedDiaryService()
+    private func makeSharedDiaryService() -> SharedDiaryService {
+        return DefaultSharedDiaryService()
     }
     
     private func makeSharedDiaryRepository() -> SharedDiaryRepository {
@@ -559,8 +560,16 @@ extension AppDIContainer {
 
 extension AppDIContainer {
     
-    private func makeFeedSearchService() -> MockFeedSearchService {
-        return MockFeedSearchService()
+    private func makeFollowingService() -> FollowingService {
+        return DefaultFollowingService()
+    }
+
+    private func makeFollowingRepository() -> FollowingRepository {
+        return DefaultFollowingRepository(service: makeFollowingService())
+    }
+    
+    private func makeFeedSearchService() -> FeedSearchService {
+        return DefaultFeedSearchService()
     }
 
     private func makeFeedSearchRepository() -> FeedSearchRepository {
@@ -568,7 +577,10 @@ extension AppDIContainer {
     }
 
     private func makeFeedSearchUseCase() -> FeedSearchUseCase {
-        return DefaultFeedSearchUseCase(repository: makeFeedSearchRepository())
+        return DefaultFeedSearchUseCase(
+            feedRepository: makeFeedSearchRepository(),
+            followingRepository: makeFollowingRepository()
+        )
     }
 
     private func makeFeedSearchViewModel() -> FeedSearchViewModel {
@@ -703,4 +715,23 @@ extension AppDIContainer {
     private func makeUploadImageService() -> PresignedURLService {
         DefaultPresignedURLService()
     }
+
+    //MARK: - EditProfileDIContainer
+
+    private func makefetchUserProfileUseCase() -> FetchUserProfileUseCase {
+        return DefaultFetchUserProfileUseCase(repository: makeUserProfileRepository())
+    }
+
+    private func makeUserProfileRepository() -> UserProfileRepository {
+        return DefaultUserProfileRepository(service: makeUserProfileService())
+    }
+
+    private func makeUserProfileService() -> UserProfileService {
+        return DefaultUserProfileService()
+    }
+
+    private func makeEditProfileViewModel() -> EditProfileViewModel {
+        return EditProfileViewModel(fetchUserProfileUseCase: makefetchUserProfileUseCase(), uploadImageUseCase: makeUploadImageUseCase(), mypageUseCase: makeMypageUseCase())
+    }
+
 }

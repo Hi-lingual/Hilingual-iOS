@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct AlarmSettingDTO: Decodable {
+public struct NotificationSettingsResponseDTO: Decodable {
     public let marketing: Bool
     public let feed: Bool
 }

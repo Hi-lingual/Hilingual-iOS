@@ -5,11 +5,12 @@
 //  Created by 성현주 on 8/21/25.
 //
 
-
 import UIKit
 import SnapKit
 
 final class ProfileRow: UIView {
+
+    // MARK: - UI Components
 
     private let titleLabel: UILabel = {
         let label = UILabel()
@@ -18,13 +19,15 @@ final class ProfileRow: UIView {
         return label
     }()
 
-    let valueLabel: UILabel = {
+    private let valueLabel: UILabel = {
         let label = UILabel()
         label.textColor = .gray500
         label.font = .suit(.body_m_16)
         label.textAlignment = .right
         return label
     }()
+
+    // MARK: - Init
 
     init(title: String, value: String) {
         super.init(frame: .zero)
@@ -37,6 +40,8 @@ final class ProfileRow: UIView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+
+    // MARK: - Setup
 
     private func setupUI() {
         backgroundColor = .white
@@ -56,5 +61,11 @@ final class ProfileRow: UIView {
             $0.trailing.equalToSuperview().inset(16)
             $0.centerY.equalToSuperview()
         }
+    }
+
+    // MARK: - Public Method
+
+    public func setValue(value: String) {
+        valueLabel.text = value
     }
 }
