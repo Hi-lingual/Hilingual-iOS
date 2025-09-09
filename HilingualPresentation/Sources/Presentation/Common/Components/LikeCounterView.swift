@@ -121,9 +121,7 @@ final class LikeCounterView: UIView {
     func configure(likeCount: Int, isLiked: Bool) {
         self.likeCount = max(0, likeCount)
         self.isLiked = isLiked
+        updateIcon()
+        updateCount()
     }
-}
-
-#Preview {
-    LikeCounterView(style: .vertical)
 }

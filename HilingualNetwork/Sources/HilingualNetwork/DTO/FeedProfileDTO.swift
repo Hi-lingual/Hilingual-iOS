@@ -42,7 +42,7 @@ public struct FeedProfileItemDTO: Decodable {
     public struct ProfileDTO: Decodable {
         public let userId: Int
         public let isMine: Bool
-        public let profileImg: String
+        public let profileImg: String?
         public let nickname: String
         public let streak: Int
     }

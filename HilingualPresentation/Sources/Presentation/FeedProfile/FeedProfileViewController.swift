@@ -30,11 +30,12 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
     private let input = FeedProfileViewModel.Input()
     private let type: FeedProfileListType
     
-    private var currentFeeds: [FeedModel] = []
+    private(set) var currentFeeds: [FeedModel] = []
+    private var isFooterApplied = false
     
     var onHideTapped: ((Int) -> Void)?
     var onReportTapped: (() -> Void)?
-    
+    var onLikeTapped: ((Int, Bool) -> Void)?
     public var onScroll: ((CGFloat) -> Void)?
     
     // MARK: - Init
@@ -56,8 +57,14 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
         view.addSubview(feedCellView)
         feedCellView.snp.makeConstraints { $0.edges.equalToSuperview() }
         
+        //위로 끌어당겼을 때 새로고침 추가
+        let refreshControl = UIRefreshControl()
+        refreshControl.addTarget(self, action: #selector(didTopScrollRefresh), for: .valueChanged)
+        feedCellView.tableView.refreshControl = refreshControl
+        
         feedCellView.tableView.delegate = self
         feedCellView.tableView.dataSource = feedCellView
+        
         feedCellView.tableView.alwaysBounceVertical = false
         
         feedCellView.addTableTapGesture(target: self, action: #selector(didTapTableView))
@@ -69,11 +76,6 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
         feedCellView.onReportTapped = { [weak self] in
             self?.onReportTapped?()
         }
-    }
-    
-    public override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        footerForStickyHeader()
     }
     
     // MARK: - Bind
@@ -91,7 +93,20 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
                     emptyMessage: type.emptyMessage,
                     type: type
                 )
-                self.footerForStickyHeader()
+                
+                for (index, cell) in self.feedCellView.tableView.visibleCells.enumerated() {
+                    if let feedCell = cell as? FeedCell {
+                        feedCell.onLikeToggled = { [weak self] isLiked in
+                            guard let self else { return }
+                            let diaryId = self.currentFeeds[index].diaryID
+                            self.onLikeTapped?(diaryId, isLiked)
+                        }
+                    }
+                }
+
+                DispatchQueue.main.async {
+                    self.footerForStickyHeader()
+                }
             }
             .store(in: &cancellables)
     }
@@ -106,7 +121,14 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
             emptyMessage: type.emptyMessage,
             type: type
         )
-        footerForStickyHeader()
+        
+        DispatchQueue.main.async {
+            self.footerForStickyHeader()
+        }
+    }
+    
+    public func refresh() {
+        input.reload.send(())
     }
     
     // MARK: - Actions
@@ -115,25 +137,43 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
         feedCellView.closeAllMenus()
     }
     
+    @objc private func didTopScrollRefresh() {
+        self.input.reload.send(())
+        feedCellView.tableView.refreshControl?.endRefreshing()
+    }
+    
     // MARK: - Private Method
     
     private func footerForStickyHeader() {
-        let tableView = feedCellView.tableView
-        let contentHeight = tableView.contentSize.height
-        let safeAreaHeight = view.safeAreaLayoutGuide.layoutFrame.height
+        guard !isFooterApplied else { return }
         
-        if contentHeight > safeAreaHeight - 195 {
+        let tableView = feedCellView.tableView
+        tableView.layoutIfNeeded()
+        let contentHeight = tableView.contentSize.height
+        
+        guard let window = UIApplication.shared.connectedScenes
+            .compactMap({ $0 as? UIWindowScene })
+            .first?.windows.first
+        else { return }
+        
+        let screenHeight = UIScreen.main.bounds.height
+        let topInset = window.safeAreaInsets.top
+        let bottomInset = window.safeAreaInsets.bottom
+        let fixedSafeAreaHeight = screenHeight - topInset - bottomInset
+                
+        if contentHeight > fixedSafeAreaHeight - 100 {
+            tableView.tableFooterView = nil
+        }
+        else if contentHeight > fixedSafeAreaHeight - 195 {
             let footer = UIView()
+            footer.backgroundColor = .red
             footer.frame.size.height = 110
             tableView.tableFooterView = footer
-        }
-        else if
-            contentHeight > safeAreaHeight - 100 {
-            tableView.tableFooterView = nil
         }
         else {
             tableView.tableFooterView = nil
         }
+        isFooterApplied = true
     }
 }
 

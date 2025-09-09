@@ -10,9 +10,12 @@ import Foundation
 import SafariServices
 
 public final class FeedViewController: BaseUIViewController<FeedViewModel> {
+    
+    var onLikeTapped: ((Int, Bool) -> Void)?
 
     // MARK: - Properties
     
+    private let input = FeedViewModel.Input()
     private let feedView = FeedView()
     private let dialog = Dialog()
 
@@ -32,6 +35,9 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
         vc.onRefresh = { [weak self] in
             self?.showToast(message: "피드의 일기를 모두 확인했어요.")
         }
+        vc.onLikeTapped = { [weak self] diaryId, isLiked in
+            self?.input.likeTapped.send((diaryId, isLiked))
+        }
         return vc
     }()
 
@@ -50,6 +56,9 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
         }
         vc.onRefresh = { [weak self] in
             self?.showToast(message: "피드의 일기를 모두 확인했어요.")
+        }
+        vc.onLikeTapped = { [weak self] diaryId, isLiked in
+            self?.input.likeTapped.send((diaryId, isLiked))
         }
         return vc
     }()
@@ -75,16 +84,37 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: false)
+
+        recommendFeedVC.refresh()
+        followingFeedVC.refresh()
+    }
+    
+    public override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        if let viewModel = viewModel {
+            _ = viewModel.transform(input: input)
+        }
+
     }
 
     //MARK: - Action
 
     public override func addTarget() {
         feedView.searchButton.addTarget(self, action: #selector(didTapSearch), for: .touchUpInside)
-
+        
         feedView.onProfileTapped = { [weak self] in
-               self?.navigateToMyProfile()
-           }
+            self?.navigateToMyProfile()
+        }
+        
+        feedView.onSegmentChanged = { [weak self] index in
+            guard let self else { return }
+            if index == 0 {
+                self.recommendFeedVC.refresh()
+            } else {
+                self.followingFeedVC.refresh()
+            }
+        }
     }
 
     @objc private func didTapSearch() {
@@ -100,6 +130,7 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
     }
 
     // MARK: - Public Methods
+    
     func showToast(message: String) {
         feedView.showToast(message: message)
     }
@@ -115,8 +146,11 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
                 self?.dialog.dismiss()
             },
             rightAction: { [weak self] in
-                self?.dialog.dismiss()
+                guard let self else { return }
+                self.dialog.dismiss()
+                let diaryId = listVC.currentFeeds[row].diaryID
                 listVC.removeDiary(at: row)
+                self.input.unpublish.send(diaryId)
             }
         )
         dialog.isHidden = false

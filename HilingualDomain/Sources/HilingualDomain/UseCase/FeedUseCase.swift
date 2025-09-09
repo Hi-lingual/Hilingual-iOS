@@ -25,6 +25,6 @@ public final class DefaultFeedUseCase: FeedUseCase {
 
 // 얜 어디로 가야 할까...
 public enum FeedType {
-    case recommended
+    case recommend
     case following
 }

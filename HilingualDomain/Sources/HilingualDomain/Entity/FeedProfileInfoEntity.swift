@@ -8,7 +8,6 @@
 import Foundation
 
 public struct FeedProfileInfoEntity {
-    public let userId: Int
     public let isMine: Bool
     public let profileImg: String
     public let nickname: String
@@ -19,8 +18,7 @@ public struct FeedProfileInfoEntity {
     public let isFollowed: Bool?
     public let isBlocked: Bool?
 
-    public init(userId: Int,
-                isMine: Bool,
+    public init(isMine: Bool,
                 profileImg: String,
                 nickname: String,
                 follower: Int,
@@ -30,7 +28,6 @@ public struct FeedProfileInfoEntity {
                 isFollowed: Bool?,
                 isBlocked: Bool?)
     {
-        self.userId = userId
         self.isMine = isMine
         self.profileImg = profileImg
         self.nickname = nickname

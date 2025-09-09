@@ -11,9 +11,10 @@ import SafariServices
 import Combine
 
 public final class MyFeedProfileViewController: BaseUIViewController<FeedProfileViewModel> {
-
+    
     // MARK: - Properties
     
+    private let input = FeedProfileViewModel.Input()
     private let myFeedProfileView = MyFeedProfileView()
     private let likedVC: FeedProfileViewController
     private let sharedVC: FeedProfileViewController
@@ -42,11 +43,24 @@ public final class MyFeedProfileViewController: BaseUIViewController<FeedProfile
     public override func viewDidLoad() {
         super.viewDidLoad()
         
+        if let viewModel = viewModel {
+            _ = viewModel.transform(input: input)
+        }
+        
         myFeedProfileView.configureSegmentedControl(
             parentVC: self,
             viewControllers: [sharedVC, likedVC],
             titles: ["공유한 일기", "공감한 일기"]
         )
+        
+        myFeedProfileView.onSegmentChanged = { [weak self] index in
+                guard let self else { return }
+                if index == 0 {
+                    self.sharedVC.refresh()
+                } else {
+                    self.likedVC.refresh()
+                }
+            }
         
         view.addSubview(dialog)
         dialog.isHidden = true
@@ -70,6 +84,11 @@ public final class MyFeedProfileViewController: BaseUIViewController<FeedProfile
             self?.showReportDialog()
         }
         
+        /// 공유 - 공감하기
+        sharedVC.onLikeTapped = { [weak self] diaryId, isLiked in
+            self?.input.likeTapped.send((diaryId, isLiked))
+        }
+        
         /// 공감 - 게시글 비공개하기
         likedVC.onHideTapped = { [weak self] row in
             self?.showHideDialog(listVC: self?.likedVC, row: row)
@@ -78,6 +97,11 @@ public final class MyFeedProfileViewController: BaseUIViewController<FeedProfile
         /// 공감 - 게시글 신고하기
         likedVC.onReportTapped = { [weak self] in
             self?.showReportDialog()
+        }
+        
+        /// 공감 - 공감하기
+        likedVC.onLikeTapped = { [weak self] diaryId, isLiked in
+            self?.input.likeTapped.send((diaryId, isLiked))
         }
 
         myFeedProfileView.setFollowSectionTappedAction { [weak self] in
@@ -138,11 +162,11 @@ public final class MyFeedProfileViewController: BaseUIViewController<FeedProfile
                 self?.pendingDeleteRow = nil
             },
             rightAction: { [weak self] in
-                guard let self,
-                      let (listVC, row) = self.pendingDeleteRow else { return }
+                guard let self else { return }
                 self.dialog.dismiss()
+                let diaryId = listVC.currentFeeds[row].diaryID
                 listVC.removeDiary(at: row)
-                self.pendingDeleteRow = nil
+                self.input.unpublish.send(diaryId)
             }
         )
         dialog.isHidden = false

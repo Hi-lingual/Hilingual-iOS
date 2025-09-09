@@ -10,6 +10,8 @@ import SnapKit
 
 final class MyFeedProfileView: BaseUIView {
     
+    var onSegmentChanged: ((Int) -> Void)?
+    
     // MARK: - UI Components
     
     private let myFeedView = FeedUserProfile()
@@ -64,6 +66,10 @@ final class MyFeedProfileView: BaseUIView {
             segmentedTopConstraint = $0.top.equalTo(myFeedView.snp.bottom).offset(20).constraint
             $0.horizontalEdges.equalToSuperview()
             $0.bottom.equalTo(safeAreaLayoutGuide)
+        }
+        
+        control.onIndexChanged = { [weak self] index in
+            self?.onSegmentChanged?(index)
         }
     }
 

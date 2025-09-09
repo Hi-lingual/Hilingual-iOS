@@ -9,14 +9,14 @@ import Foundation
 import Moya
 
 public enum FeedAPI {
-    case fetchRecommendedFeed
+    case fetchRecommendFeed
     case fetchFollowingFeed
 }
 
 extension FeedAPI: BaseTargetType {
     public var path: String {
         switch self {
-        case .fetchRecommendedFeed: return "/feed/recommended"
+        case .fetchRecommendFeed: return "/feed/recommend"
         case .fetchFollowingFeed:   return "/feed/following"
         }
     }

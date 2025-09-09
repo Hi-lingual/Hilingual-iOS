@@ -13,16 +13,19 @@ import SafariServices
 public final class FeedListViewController: BaseUIViewController<FeedViewModel> {
 
     // MARK: - Properties
+    
     private let feedCellView = FeedList()
     private let input = FeedViewModel.Input()
     
     var onHideTapped: ((Int) -> Void)?
     var onReportTapped: (() -> Void)?
     var onRefresh: (() -> Void)?
+    var onLikeTapped: ((Int, Bool) -> Void)?
 
-    private var currentFeeds: [FeedModel] = []
+    private(set) var currentFeeds: [FeedModel] = []
 
     // MARK: - Lifecycle
+    
     public override func loadView() {
         self.view = feedCellView
     }
@@ -32,6 +35,11 @@ public final class FeedListViewController: BaseUIViewController<FeedViewModel> {
         bindViewModel()
         input.reload.send(())
         
+        // 위로 끌어당겼을 때 새로고침 추가
+        let refreshControl = UIRefreshControl()
+        refreshControl.addTarget(self, action: #selector(didTopScrollRefresh), for: .valueChanged)
+        feedCellView.tableView.refreshControl = refreshControl
+
         feedCellView.addTableTapGesture(target: self, action: #selector(didTapTableView))
         
         feedCellView.onHideTapped = { [weak self] row in
@@ -43,7 +51,8 @@ public final class FeedListViewController: BaseUIViewController<FeedViewModel> {
         }
         
         feedCellView.onRefresh = { [weak self] in
-            self?.onRefresh?()
+            guard let self else { return }
+            self.onRefresh?()
         }
 
         feedCellView.onProfileTapped = { [weak self] row in
@@ -61,7 +70,6 @@ public final class FeedListViewController: BaseUIViewController<FeedViewModel> {
             }
         }
 
-
         feedCellView.onDetailTapped = { [weak self] row in
             guard let self else { return }
             let feed = self.currentFeeds[row]
@@ -69,10 +77,10 @@ public final class FeedListViewController: BaseUIViewController<FeedViewModel> {
             vc.hidesBottomBarWhenPushed = true
             self.navigationController?.pushViewController(vc, animated: true)
         }
-
     }
 
     // MARK: - Bindings
+    
     private func bindViewModel() {
         guard let output = viewModel?.transform(input: input) else { return }
 
@@ -85,20 +93,41 @@ public final class FeedListViewController: BaseUIViewController<FeedViewModel> {
                     items: feeds,
                     followingState: haveFollowing
                 )
+
+                for (index, cell) in self.feedCellView.tableView.visibleCells.enumerated() {
+                    if let feedCell = cell as? FeedCell {
+                        feedCell.onLikeToggled = { [weak self] isLiked in
+                            guard let self else { return }
+                            let diaryId = self.currentFeeds[index].diaryID
+                            self.onLikeTapped?(diaryId, isLiked)
+                        }
+                    }
+                }
             }
             .store(in: &cancellables)
     }
     
     // MARK: - Actions
+    
     @objc private func didTapTableView() {
         feedCellView.closeAllMenus()
     }
     
+    @objc private func didTopScrollRefresh() {
+        self.input.reload.send(())
+        feedCellView.tableView.refreshControl?.endRefreshing()
+    }
+    
     // MARK: - Public
+    
     func removeDiary(at row: Int) {
         guard row < currentFeeds.count else { return }
         
         currentFeeds.remove(at: row)
         feedCellView.apply(items: currentFeeds)
+    }
+    
+    public func refresh() {
+        input.reload.send(())
     }
 }
