@@ -651,14 +651,9 @@ extension AppDIContainer {
     }
     
     // Service
-    
     private func makeFeedService() -> FeedService {
         return DefaultFeedService()
     }
-    
-//    private func makeFeedService() -> FeedService {
-//        return MockFeedService()
-//    }
 }
 
 
@@ -673,8 +668,10 @@ extension AppDIContainer {
         return FeedProfileViewModel(
             feedUseCase: makeFeedProfileUseCase(),
             profileInfoUseCase: makeFeedProfileInfoUseCase(),
+            followUseCase: makeFollowListUseCase(),
             publishDiaryUseCase: makePublishDiaryUseCase(),
             toggleLikeUseCase: makeToggleLikeUseCase(),
+            blockUserUseCase: makeBlockUserUsecase(),
             type: type,
             targetUserId: targetUserId
         )
@@ -691,10 +688,6 @@ extension AppDIContainer {
     private func makeFeedProfileService() -> FeedProfileService {
         return DefaultFeedProfileService()
     }
-
-//    private func makeFeedProfileService() -> FeedProfileService {
-//        return MockFeedProfileService()
-//    }
         
     // FeedProfileInfo (프로필 정보)
     private func makeFeedProfileInfoUseCase() -> FeedProfileInfoUseCase {

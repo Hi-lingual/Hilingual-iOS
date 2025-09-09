@@ -16,7 +16,7 @@ final class UserFeedProfileView: BaseUIView {
     var onBlockConfirmTapped: (() -> Void)?
     var onReportTapped: (() -> Void)?
     var onUnblockTapped: (() -> Void)?
-    
+
     // MARK: - UI Components
     private let userFeedView = FeedUserProfile()
     private(set) var button = FollowButton()
@@ -140,6 +140,7 @@ final class UserFeedProfileView: BaseUIView {
                  { [weak self] in self?.onReportTapped?() })
             ]
         )
+        
         modal.isHidden = false
         bringSubviewToFront(modal)
         
@@ -192,6 +193,11 @@ final class UserFeedProfileView: BaseUIView {
     
     // MARK: - Private
     @objc private func buttonTapped() {
-        onFollowTapped?(button.currentState)
+        switch button.currentState {
+        case .unblock:
+            onUnblockTapped?()
+        default:
+            onFollowTapped?(button.currentState)
+        }
     }
 }

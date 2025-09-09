@@ -23,6 +23,9 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
     
     private var pendingDeleteRow: Int?
     
+    let unblockTappedSubject = PassthroughSubject<Int64, Never>()
+    let blockTappedSubject = PassthroughSubject<Int64, Never>()
+    
     // MARK: - Init
     
     public init(
@@ -77,48 +80,51 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
             self?.input.likeTapped.send((diaryId, isLiked))
         }
         
-        // 유저 차단 모달
+        // 유저 차단 모달 띄우기
         userFeedProfileView.onBlockTapped = { [weak self] in
+            self?.userFeedProfileView.dismissModal()
             self?.userFeedProfileView.showBlockDialog()
         }
-        
+
         // 유저 신고
         userFeedProfileView.onReportTapped = { [weak self] in
             self?.showAccountReportDialog()
         }
         
-        // 차단 확정
+        // 유저 차단
         userFeedProfileView.onBlockConfirmTapped = { [weak self] in
             guard let self else { return }
             self.userFeedProfileView.dismissBlockDialog()
             self.userFeedProfileView.dismissModal()
             self.userFeedProfileView.showBlockedView()
+            
+            self.blockTappedSubject.send(self.targetUserId)
+            
             self.isBlocked = true
             self.updateNavigation()
         }
         
-        // 차단 해제
+        // 유저 차단해제
         userFeedProfileView.onUnblockTapped = { [weak self] in
             guard let self else { return }
+            self.unblockTappedSubject.send(self.targetUserId)
             self.isBlocked = false
             self.userFeedProfileView.restoreFeedView()
             self.updateNavigation()
         }
         
-        // TODO: 팔로우 등록 / 팔로우 해제 / 차단 해제 API 연동
-//        // 팔로우 등록 / 팔로우 해제 / 차단 해제
-//        userFeedProfileView.onFollowTapped = { [weak self] state in
-//            switch state {
-//            case .follow:
-//                self?.viewModel.input.follow.send(())
-//            case .following:
-//                self?.viewModel.input.unfollow.send(())
-//            case .unblock:
-//                self?.viewModel.input.unblock.send(())
-//            default:
-//                break
-//            }
-//        }
+        // 유저 팔로우 & 팔로우 해제
+        userFeedProfileView.onFollowTapped = { [weak self] state in
+            guard let self else { return }
+            switch state {
+            case .follow, .mutualFollow:
+                self.input.follow.send(())
+            case .following:
+                self.input.unfollow.send(())
+            default:
+                break
+            }
+        }
         
         userFeedProfileView.setFollowSectionTappedAction { [weak self] in
             self?.pushFollowListViewController()
@@ -154,6 +160,16 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
     private func bind() {
         guard let viewModel else { return }
         let output = viewModel.transform(input: self.input)
+
+        blockTappedSubject
+            .map { _ in () }
+            .subscribe(input.block)
+            .store(in: &cancellables)
+
+        unblockTappedSubject
+            .map { _ in () }
+            .subscribe(input.unblock)
+            .store(in: &cancellables)
 
         output.profile
             .compactMap { $0 }

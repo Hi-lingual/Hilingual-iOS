@@ -76,6 +76,30 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
         feedCellView.onReportTapped = { [weak self] in
             self?.onReportTapped?()
         }
+        
+        feedCellView.onFeedTextTapped = { [weak self] row in
+            guard let self else { return }
+            let feed = self.currentFeeds[row]
+            let vc = self.diContainer.makeSharedDiaryViewController(diaryId: feed.diaryID)
+            vc.hidesBottomBarWhenPushed = true
+            self.navigationController?.pushViewController(vc, animated: true)
+        }
+        
+        feedCellView.onFeedImageTapped = { [weak self] row in
+            guard let self else { return }
+            let feed = self.currentFeeds[row]
+            let vc = self.diContainer.makeSharedDiaryViewController(diaryId: feed.diaryID)
+            vc.hidesBottomBarWhenPushed = true
+            self.navigationController?.pushViewController(vc, animated: true)
+        }
+
+        feedCellView.onDetailTapped = { [weak self] row in
+            guard let self else { return }
+            let feed = self.currentFeeds[row]
+            let vc = self.diContainer.makeSharedDiaryViewController(diaryId: feed.diaryID)
+            vc.hidesBottomBarWhenPushed = true
+            self.navigationController?.pushViewController(vc, animated: true)
+        }
     }
     
     // MARK: - Bind

@@ -60,8 +60,13 @@ public final class SharedDiaryViewController: BaseUIViewController<SharedDiaryVi
         
         sharedDiaryView.onProfileAction = { [weak self] in
             guard let self else { return }
-            let vc = diContainer.makeMyFeedProfileViewController()
-            self.navigationController?.pushViewController(vc, animated: true)
+            if isMine {
+                let vc = diContainer.makeMyFeedProfileViewController()
+                self.navigationController?.pushViewController(vc, animated: true)
+            } else {
+                let vc = diContainer.makeUserFeedProfileViewController(userId: userId ?? 0)
+                self.navigationController?.pushViewController(vc, animated: true)
+            }
         }
 
         sharedDiaryView.onLikeAction = { [weak self] isLiked in

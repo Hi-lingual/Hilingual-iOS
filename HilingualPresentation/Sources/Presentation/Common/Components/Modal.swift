@@ -221,7 +221,3 @@ final class ModalPreviewViewController: UIViewController {
         modal.showAnimation()
     }
 }
-
-#Preview {
-    ModalPreviewViewController()
-}

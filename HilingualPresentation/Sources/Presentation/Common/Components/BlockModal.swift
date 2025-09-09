@@ -119,7 +119,7 @@ final class BlockModal: UIView {
         modalSheetView.addSubviews(titleLabel, infoLabel, blockedUserStack, blockedByMeStack, applyButton)
 
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismiss))
-        backgroundDimView.addGestureRecognizer(tapGesture)
+        self.addGestureRecognizer(tapGesture)
     }
 
     private func setupLayout() {
