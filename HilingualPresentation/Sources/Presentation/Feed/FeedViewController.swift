@@ -97,19 +97,19 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
 
     public override func addTarget() {
         feedView.searchButton.addTarget(self, action: #selector(didTapSearch), for: .touchUpInside)
-
+        
         feedView.onProfileTapped = { [weak self] in
-               self?.navigateToMyProfile()
-           }
+            self?.navigateToMyProfile()
+        }
         
         feedView.onSegmentChanged = { [weak self] index in
-                guard let self else { return }
-                if index == 0 {
-                    self.recommendFeedVC.refresh()
-                } else {
-                    self.followingFeedVC.refresh()
-                }
+            guard let self else { return }
+            if index == 0 {
+                self.recommendFeedVC.refresh()
+            } else {
+                self.followingFeedVC.refresh()
             }
+        }
     }
 
     @objc private func didTapSearch() {
