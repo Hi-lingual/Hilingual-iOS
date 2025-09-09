@@ -14,57 +14,23 @@ public protocol NotificationService {
     func markAsRead(notiId: Int) -> AnyPublisher<Void, Error>
 }
 
-public final class MockNotificationService: NotificationService {
+public final class DefaultNotificationService: BaseService<NotificationAPI>, NotificationService {
 
     public init() {}
 
     public func fetchGeneralNotifications() -> AnyPublisher<[GeneralNotificationDTO], Error> {
-        let mockData: [GeneralNotificationDTO] = [
-            GeneralNotificationDTO(
-                notiId: 1,
-                type: "LIKE_DIARY",
-                title: "홍길동님이 당신의 일기에 공감했습니다.",
-                deeplink: "Hilingual://notification/diarydetail?diaryId=1",
-                isRead: false,
-                publishedAt: "2025-08-04"
-            ),
-            GeneralNotificationDTO(
-                notiId: 2,
-                type: "FOLLOW_USER",
-                title: "이몽룡님이 당신을 팔로우했습니다.",
-                deeplink: "Hilingual://notification/feedprofile?userId=45",
-                isRead: true,
-                publishedAt: "2025-07-21"
-            )
-        ]
+          return request(.getNotifications(tab: "feed"), as: BaseAPIResponse<[GeneralNotificationDTO]>.self)
+              .map { $0.data }
+              .mapError { $0 as Error }
+              .eraseToAnyPublisher()
+      }
 
-        return Just(mockData)
-            .setFailureType(to: Error.self)
-            .eraseToAnyPublisher()
-    }
-
-    public func fetchNoticeNotifications() -> AnyPublisher<[NoticeNotificationDTO], Error> {
-        let mockData: [NoticeNotificationDTO] = [
-            NoticeNotificationDTO(
-                notiId: 10,
-                category: "NOTIFICATION",
-                title: "v1.1.1 업데이트 알림",
-                isRead: false,
-                publishedAt: "2025-08-08"
-            ),
-            NoticeNotificationDTO(
-                notiId: 11,
-                category: "MARKETING",
-                title: "매일 작성 이벤트에 참여해보세요!",
-                isRead: true,
-                publishedAt: "2025-08-08"
-            )
-        ]
-
-        return Just(mockData)
-            .setFailureType(to: Error.self)
-            .eraseToAnyPublisher()
-    }
+      public func fetchNoticeNotifications() -> AnyPublisher<[NoticeNotificationDTO], Error> {
+          return request(.getNotifications(tab: "notice"), as: BaseAPIResponse<[NoticeNotificationDTO]>.self)
+              .map { $0.data }
+              .mapError { $0 as Error }
+              .eraseToAnyPublisher()
+      }
 
     public func fetchNotificationDetail(notiId: Int) -> AnyPublisher<NotificationDetailDTO, Error> {
            let mock = NotificationDetailDTO(

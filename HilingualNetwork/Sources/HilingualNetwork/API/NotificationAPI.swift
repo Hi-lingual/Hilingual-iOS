@@ -47,3 +47,33 @@ extension NotificationAPI: BaseTargetType {
         ]
     }
 }
+
+//
+//  NotificationAPI.swift
+//  HilingualNetwork
+//
+//  Created by 성현주 on 9/9/25.
+//
+
+import Moya
+
+public enum NotificationAPI {
+    case getNotifications(tab: String)
+}
+
+extension NotificationAPI: BaseTargetType {
+    public var path: String {
+        return "/users/notifications"
+    }
+
+    public var method: Moya.Method {
+        return .get
+    }
+
+    public var task: Task {
+        switch self {
+        case .getNotifications(let tab):
+            return .requestParameters(parameters: ["tab": tab], encoding: URLEncoding.queryString)
+        }
+    }
+}

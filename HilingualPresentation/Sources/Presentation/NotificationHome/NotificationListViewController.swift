@@ -133,12 +133,13 @@ extension NotificationListViewController: UITableViewDelegate {
             navigationController?.pushViewController(detailVC, animated: true)
 
         case .feed:
-            guard let deeplink = selectedItem.deeplink,
-                  let url = URL(string: deeplink),
-                  let destination = DeeplinkParser.parse(url: url),
-                  let nav = navigationController else { return }
+//            guard let deeplink = selectedItem.deeplink,
+//                  let url = URL(string: deeplink),
+//                  let destination = DeeplinkParser.parse(url: url),
+//                  let nav = navigationController else { return }
 
-            DeeplinkManager.shared.handle(destination, from: nav, di: diContainer)
+//            DeeplinkManager.shared.handle(destination, from: nav, di: diContainer)
+            print("feed")
         }
     }
 }

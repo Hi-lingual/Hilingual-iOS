@@ -52,7 +52,7 @@ public final class NotificationViewModel: BaseViewModel {
                                 title: $0.title,
                                 isRead: $0.isRead,
                                 publishedAt: $0.publishedAt,
-                                deeplink: $0.deeplink
+                                targetId: $0.targetId
                             )
                         }
                     }
@@ -78,7 +78,7 @@ public final class NotificationViewModel: BaseViewModel {
                                 title: $0.title,
                                 isRead: $0.isRead,
                                 publishedAt: $0.publishedAt,
-                                deeplink: nil
+                                targetId: nil
                             )
                         }
                     }

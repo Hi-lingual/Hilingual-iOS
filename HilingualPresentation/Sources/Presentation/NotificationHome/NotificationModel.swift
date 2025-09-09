@@ -18,7 +18,7 @@ public struct NotificationModel {
     public let title: String
     public let isRead: Bool
     public let publishedAt: String 
-    public let deeplink: String?
+    public let targetId: Int?
 }
 
 public struct NotificationListModel {

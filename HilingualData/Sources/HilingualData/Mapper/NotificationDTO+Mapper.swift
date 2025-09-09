@@ -13,11 +13,11 @@ import HilingualNetwork
 extension GeneralNotificationDTO {
     func toEntity() -> NotificationEntity {
         return NotificationEntity(
-            id: notiId,
+            id: noticeId,
             title: title,
             isRead: isRead,
             publishedAt: publishedAt,
-            deeplink: deeplink,
+            targetId: targetId,
             type: .general(type)
         )
     }
@@ -26,11 +26,11 @@ extension GeneralNotificationDTO {
 extension NoticeNotificationDTO {
     func toEntity() -> NotificationEntity {
         return NotificationEntity(
-            id: notiId,
+            id: noticeId,
             title: title,
             isRead: isRead,
             publishedAt: publishedAt,
-            deeplink: nil,
+            targetId: nil,
             type: .notice(category)
         )
     }

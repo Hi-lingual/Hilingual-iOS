@@ -6,16 +6,16 @@
 //
 
 public struct GeneralNotificationDTO: Decodable {
-    public let notiId: Int
+    public let noticeId: Int
     public let type: String
     public let title: String
-    public let deeplink: String
+    public let targetId: Int
     public let isRead: Bool
     public let publishedAt: String
 }
 
 public struct NoticeNotificationDTO: Decodable {
-    public let notiId: Int
+    public let noticeId: Int
     public let category: String
     public let title: String
     public let isRead: Bool
