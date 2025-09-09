@@ -59,9 +59,9 @@ public final class OnBoardingViewModel: BaseViewModel {
                 case .empty:
                     return .normal
                 case .tooShort:
-                    return .error("최소 2글자 이상 입력해주세요")
+                    return .error("최소 2글자 이상 입력해주세요.")
                 case .containsInvalidCharacters:
-                    return .error("특수문자, 이모지는 사용이 불가능해요")
+                    return .error("특수문자, 이모지는 사용이 불가능해요.")
                 case .valid:
                     return .wait
                 }
