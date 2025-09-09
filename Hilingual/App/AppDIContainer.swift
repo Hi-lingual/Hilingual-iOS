@@ -558,6 +558,14 @@ extension AppDIContainer {
 
 extension AppDIContainer {
     
+    private func makeFollowingService() -> FollowingService {
+        return DefaultFollowingService()
+    }
+
+    private func makeFollowingRepository() -> FollowingRepository {
+        return DefaultFollowingRepository(service: makeFollowingService())
+    }
+    
     private func makeFeedSearchService() -> FeedSearchService {
         return DefaultFeedSearchService()
     }
@@ -567,7 +575,10 @@ extension AppDIContainer {
     }
 
     private func makeFeedSearchUseCase() -> FeedSearchUseCase {
-        return DefaultFeedSearchUseCase(repository: makeFeedSearchRepository())
+        return DefaultFeedSearchUseCase(
+            feedRepository: makeFeedSearchRepository(),
+            followingRepository: makeFollowingRepository()
+        )
     }
 
     private func makeFeedSearchViewModel() -> FeedSearchViewModel {
