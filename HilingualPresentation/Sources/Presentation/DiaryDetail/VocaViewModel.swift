@@ -80,10 +80,9 @@ public final class RecommendedExpressionViewModel: BaseViewModel {
                 case .finished:
                     self?.updateBookmarkState(phraseId: phraseId, isBookmarked: isBookmarked)
                 case .failure(let error):
-                    print("북마크 토글 실패: \(error.localizedDescription)")
+                    self?.errorSubject.send(error.localizedDescription)
                 }
-            }, receiveValue: { _ in
-            })
+            }, receiveValue: { _ in })
             .store(in: &cancellables)
     }
     
