@@ -59,7 +59,6 @@ public final class FollowListViewModel: BaseViewModel {
         self.followListUseCase = followListUseCase
         self.targetUserId = targetUserId
         super.init()
-        self.bind()
     }
     
     // MARK: - Input / Output
