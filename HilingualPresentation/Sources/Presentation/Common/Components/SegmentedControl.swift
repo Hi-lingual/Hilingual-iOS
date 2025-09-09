@@ -14,6 +14,9 @@ protocol ScrollControllable: AnyObject {
 }
 
 final class SegmentedControl: UIView {
+    
+    // 외부에 탭 전환 알려주는 콜백
+    var onIndexChanged: ((Int) -> Void)?
 
     private let segmentedControl: UnderlineSegmentedControl
     private let pageViewController: UIPageViewController
@@ -32,6 +35,9 @@ final class SegmentedControl: UIView {
             if let scrollableVC = viewControllers[currentPage] as? ScrollControllable {
                 scrollableVC.scrollToTop()
             }
+            
+            //탭 전환
+            onIndexChanged?(currentPage)
         }
     }
 

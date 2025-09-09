@@ -88,6 +88,15 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
         feedView.onProfileTapped = { [weak self] in
                self?.navigateToMyProfile()
            }
+        
+        feedView.onSegmentChanged = { [weak self] index in
+                guard let self else { return }
+                if index == 0 {
+                    self.recommendFeedVC.refresh()
+                } else {
+                    self.followingFeedVC.refresh()
+                }
+            }
     }
 
     @objc private func didTapSearch() {

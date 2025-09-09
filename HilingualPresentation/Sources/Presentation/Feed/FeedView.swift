@@ -13,6 +13,7 @@ final class FeedView: BaseUIView {
     // MARK: - CallBacks
 
     var onProfileTapped: (() -> Void)?
+    var onSegmentChanged: ((Int) -> Void)?
 
     // MARK: - UI Components
 
@@ -119,11 +120,15 @@ final class FeedView: BaseUIView {
         )
         self.segmentedControl = control
         addSubview(control)
-
+        
         control.snp.makeConstraints {
             $0.top.equalTo(headerStack.snp.bottom).offset(9)
             $0.horizontalEdges.equalToSuperview()
             $0.bottom.equalTo(safeAreaLayoutGuide)
+        }
+        
+        control.onIndexChanged = { [weak self] index in
+            self?.onSegmentChanged?(index)
         }
     }
     
