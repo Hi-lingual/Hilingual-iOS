@@ -17,7 +17,6 @@ public enum FeedListType {
 public final class FeedViewModel: BaseViewModel, BaseViewModelType {
     
     // MARK: - Input/Output
-    
     public struct Input {
         let reload = PassthroughSubject<Void, Never>()
         let unpublish = PassthroughSubject<Int, Never>()
@@ -34,14 +33,12 @@ public final class FeedViewModel: BaseViewModel, BaseViewModelType {
     }
     
     // MARK: - Dependencies
-    
     private let feedUseCase: FeedUseCase
     private let publishDiaryUseCase: PublishDiaryUseCase
     private let toggleLikeUseCase: ToggleLikeUseCase
     private let type: FeedListType?
     
     // MARK: - State
-    
     private let feedsSubject = CurrentValueSubject<[FeedModel], Never>([])
     private let haveFollowingSubject = CurrentValueSubject<Bool?, Never>(nil)
     private let isLoadingSubject = CurrentValueSubject<Bool, Never>(false)
