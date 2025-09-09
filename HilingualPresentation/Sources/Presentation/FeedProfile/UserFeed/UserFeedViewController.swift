@@ -82,9 +82,10 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
         
         // 유저 차단 모달 띄우기
         userFeedProfileView.onBlockTapped = { [weak self] in
+            self?.userFeedProfileView.dismissModal()
             self?.userFeedProfileView.showBlockDialog()
         }
-        
+
         // 유저 신고
         userFeedProfileView.onReportTapped = { [weak self] in
             self?.showAccountReportDialog()
@@ -110,6 +111,19 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
             self.isBlocked = false
             self.userFeedProfileView.restoreFeedView()
             self.updateNavigation()
+        }
+        
+        // 유저 팔로우 & 팔로우 해제
+        userFeedProfileView.onFollowTapped = { [weak self] state in
+            guard let self else { return }
+            switch state {
+            case .follow:
+                self.input.follow.send(())
+            case .following, .mutualFollow:
+                self.input.unfollow.send(())
+            default:
+                break
+            }
         }
         
         userFeedProfileView.setFollowSectionTappedAction { [weak self] in

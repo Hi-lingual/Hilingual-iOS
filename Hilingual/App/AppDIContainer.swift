@@ -669,6 +669,7 @@ extension AppDIContainer {
         return FeedProfileViewModel(
             feedUseCase: makeFeedProfileUseCase(),
             profileInfoUseCase: makeFeedProfileInfoUseCase(),
+            followUseCase: makeFollowListUseCase(),
             publishDiaryUseCase: makePublishDiaryUseCase(),
             toggleLikeUseCase: makeToggleLikeUseCase(),
             blockUserUseCase: makeBlockUserUsecase(),

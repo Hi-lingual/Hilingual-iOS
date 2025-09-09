@@ -38,7 +38,7 @@ public final class FeedProfileViewModel: BaseViewModel, BaseViewModelType {
     
     private let feedUseCase: FeedProfileUseCase
     private let profileInfoUseCase: FeedProfileInfoUseCase
-//    private let followUseCase: FollowListUseCase
+    private let followUseCase: FollowListUseCase
     private let blockUserUseCase: BlockUserUseCase
     private let publishDiaryUseCase: PublishDiaryUseCase
     private let toggleLikeUseCase: ToggleLikeUseCase
@@ -61,6 +61,7 @@ public final class FeedProfileViewModel: BaseViewModel, BaseViewModelType {
     public init(
         feedUseCase: FeedProfileUseCase,
         profileInfoUseCase: FeedProfileInfoUseCase,
+        followUseCase: FollowListUseCase,
         publishDiaryUseCase: PublishDiaryUseCase,
         toggleLikeUseCase: ToggleLikeUseCase,
         blockUserUseCase: BlockUserUseCase,
@@ -69,6 +70,7 @@ public final class FeedProfileViewModel: BaseViewModel, BaseViewModelType {
     ) {
         self.feedUseCase = feedUseCase
         self.profileInfoUseCase = profileInfoUseCase
+        self.followUseCase = followUseCase
         self.publishDiaryUseCase = publishDiaryUseCase
         self.toggleLikeUseCase = toggleLikeUseCase
         self.blockUserUseCase = blockUserUseCase
@@ -144,7 +146,7 @@ public final class FeedProfileViewModel: BaseViewModel, BaseViewModelType {
             }
             .store(in: &cancellables)
         
-        // 피드 비공개하기
+        // 일기 비공개하기
         input.unpublish
             .sink { [weak self] diaryId in
                 self?.unpublishDiary(diaryId: diaryId)
@@ -155,6 +157,40 @@ public final class FeedProfileViewModel: BaseViewModel, BaseViewModelType {
         input.likeTapped
             .sink { [weak self] (diaryId, isLiked) in
                 self?.toggleLike(diaryId: diaryId, isLiked: isLiked)
+            }
+            .store(in: &cancellables)
+        
+        // 팔로우하기
+        input.follow
+            .flatMap { [weak self] _ -> AnyPublisher<Void, Never> in
+                guard let self else { return Empty().eraseToAnyPublisher() }
+                return self.followUseCase.follow(userId: Int(self.targetUserId))
+                    .catch { [weak self] error -> Just<Void> in
+                        self?.errorSubject.send("팔로우 실패: \(error.localizedDescription)")
+                        return Just(())
+                    }
+                    .eraseToAnyPublisher()
+            }
+            .sink { [weak self] _ in
+                self?.buttonStateSubject.send(.following)
+            }
+            .store(in: &cancellables)
+        
+        // 팔로우 해제하기
+        input.unfollow
+            .flatMap { [weak self] _ -> AnyPublisher<Bool, Never> in
+                guard let self else { return Empty().eraseToAnyPublisher() }
+                return self.followUseCase.unfollow(userId: Int(self.targetUserId))
+                    .catch { [weak self] error -> Just<Bool> in
+                        self?.errorSubject.send("언팔로우 실패: \(error.localizedDescription)")
+                        return Just(false)
+                    }
+                    .eraseToAnyPublisher()
+            }
+            .sink { [weak self] success in
+                if success {
+                    self?.reloadProfile()
+                }
             }
             .store(in: &cancellables)
         
