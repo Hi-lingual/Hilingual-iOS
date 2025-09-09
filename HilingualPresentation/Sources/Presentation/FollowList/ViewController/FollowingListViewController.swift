@@ -98,6 +98,7 @@ extension FollowingListViewController: UITableViewDataSource {
 
         cell.nickname.text = user.nickname
         cell.button.configure(state: user.buttonState)
+        cell.configure(with: user)
         cell.delegate = self
         return cell
     }

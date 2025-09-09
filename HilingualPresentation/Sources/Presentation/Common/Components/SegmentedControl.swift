@@ -19,6 +19,7 @@ final class SegmentedControl: UIView {
     private let pageViewController: UIPageViewController
     private let viewControllers: [UIViewController]
     private weak var parentViewController: UIViewController?
+    var onIndexChange: ((Int) -> Void)?
 
     private var currentPage: Int = 0 {
         didSet {
@@ -89,6 +90,7 @@ final class SegmentedControl: UIView {
     private func bindSegmentControl() {
         segmentedControl.didSelectIndex = { [weak self] index in
             self?.currentPage = index
+            self?.onIndexChange?(index)
         }
     }
 }
