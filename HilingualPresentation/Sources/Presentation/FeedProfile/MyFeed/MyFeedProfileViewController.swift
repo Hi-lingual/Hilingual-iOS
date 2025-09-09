@@ -43,6 +43,10 @@ public final class MyFeedProfileViewController: BaseUIViewController<FeedProfile
     public override func viewDidLoad() {
         super.viewDidLoad()
         
+        if let viewModel = viewModel {
+            _ = viewModel.transform(input: input)
+        }
+        
         myFeedProfileView.configureSegmentedControl(
             parentVC: self,
             viewControllers: [sharedVC, likedVC],
