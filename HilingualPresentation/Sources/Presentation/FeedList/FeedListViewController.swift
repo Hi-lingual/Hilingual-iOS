@@ -69,6 +69,22 @@ public final class FeedListViewController: BaseUIViewController<FeedViewModel> {
                 self.navigationController?.pushViewController(vc, animated: true)
             }
         }
+        
+        feedCellView.onFeedTextTapped = { [weak self] row in
+            guard let self else { return }
+            let feed = self.currentFeeds[row]
+            let vc = self.diContainer.makeSharedDiaryViewController(diaryId: feed.diaryID)
+            vc.hidesBottomBarWhenPushed = true
+            self.navigationController?.pushViewController(vc, animated: true)
+        }
+        
+        feedCellView.onFeedImageTapped = { [weak self] row in
+            guard let self else { return }
+            let feed = self.currentFeeds[row]
+            let vc = self.diContainer.makeSharedDiaryViewController(diaryId: feed.diaryID)
+            vc.hidesBottomBarWhenPushed = true
+            self.navigationController?.pushViewController(vc, animated: true)
+        }
 
         feedCellView.onDetailTapped = { [weak self] row in
             guard let self else { return }

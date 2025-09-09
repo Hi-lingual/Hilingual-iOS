@@ -17,6 +17,8 @@ final class FeedList: BaseUIView {
     var onRefresh: (() -> Void)?
     var onProfileTapped: ((Int) -> Void)?
     var onDetailTapped: ((Int) -> Void)?
+    var onFeedTextTapped: ((Int) -> Void)?
+    var onFeedImageTapped: ((Int) -> Void)?
 
     // MARK: - Properties
     private var items: [FeedModel] = [] {
@@ -201,6 +203,18 @@ extension FeedList: FeedCell.FeedCellDelegate {
     func feedCellDidTapDetail(_ cell: FeedCell) {
         if let row = tableView.indexPath(for: cell)?.row {
             onDetailTapped?(row)
+        }
+    }
+    
+    func feedCellDidTapFeedText(_ cell: FeedCell) {
+        if let row = tableView.indexPath(for: cell)?.row {
+            onFeedTextTapped?(row)
+        }
+    }
+    
+    func feedCellDidTapFeedImage(_ cell: FeedCell) {
+        if let row = tableView.indexPath(for: cell)?.row {
+            onFeedImageTapped?(row)
         }
     }
 

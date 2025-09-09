@@ -19,6 +19,8 @@ final class FeedCell: UITableViewCell {
         func feedCell(_ cell: FeedCell, didTapMenuItemAt index: Int, isMine: Bool)
         func feedCellDidTapProfile(_ cell: FeedCell)
         func feedCellDidTapDetail(_ cell: FeedCell)
+        func feedCellDidTapFeedText(_ cell: FeedCell)
+        func feedCellDidTapFeedImage(_ cell: FeedCell)
     }
 
     // MARK: - Properties
@@ -376,6 +378,14 @@ final class FeedCell: UITableViewCell {
     @objc private func detailTapped() {
         delegate?.feedCellDidTapDetail(self)
     }
+    
+    @objc private func feedTextTapped() {
+        delegate?.feedCellDidTapFeedText(self)
+    }
+    
+    @objc private func feedImageTapped() {
+        delegate?.feedCellDidTapFeedImage(self)
+    }
 
     //MARK: - Private Method
 
@@ -383,15 +393,23 @@ final class FeedCell: UITableViewCell {
         profileImageView.isUserInteractionEnabled = true
         nameLabel.isUserInteractionEnabled = true
         detailStack.isUserInteractionEnabled = true
+        diaryLabel.isUserInteractionEnabled = true
+        diaryImageView.isUserInteractionEnabled = true
 
         let profileTap = UITapGestureRecognizer(target: self, action: #selector(profileTapped))
         profileImageView.addGestureRecognizer(profileTap)
 
         let nameTap = UITapGestureRecognizer(target: self, action: #selector(profileTapped))
         nameLabel.addGestureRecognizer(nameTap)
-
+        
         let detailTap = UITapGestureRecognizer(target: self, action: #selector(detailTapped))
         detailStack.addGestureRecognizer(detailTap)
+        
+        let feedTextTap = UITapGestureRecognizer(target: self, action: #selector(feedTextTapped))
+        diaryLabel.addGestureRecognizer(feedTextTap)
+        
+        let feedImageTap = UITapGestureRecognizer(target: self, action: #selector(feedImageTapped))
+        diaryImageView.addGestureRecognizer(feedImageTap)
     }
 
 }
