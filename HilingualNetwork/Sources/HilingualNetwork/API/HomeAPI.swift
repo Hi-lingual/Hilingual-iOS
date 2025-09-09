@@ -13,6 +13,9 @@ public enum HomeAPI {
     case getMonthInfo(year: Int, month: Int)
     case getDiaryInfo(date: String)
     case getTopic(date: String)
+    case publishDiary(diaryId: Int)
+    case unpublishDiary(diaryId: Int)
+    case deleteDiary(diaryId: Int)
 }
 
 extension HomeAPI: BaseTargetType {
@@ -20,13 +23,19 @@ extension HomeAPI: BaseTargetType {
     public var path: String {
         switch self {
         case .getUserInfo:
-            return "/users/info"
+            return "/users/home/info"
         case .getMonthInfo:
-            return "/calendar/month"
+            return "/home/calendar/month"
         case let .getDiaryInfo(date):
-            return "/calendar/\(date)"
+            return "/home/calendar/\(date)"
         case let .getTopic(date):
-            return "/calendar/\(date)/topic"
+            return "/home/calendar/\(date)/topic"
+        case let .publishDiary(diaryId):
+            return "/diaries/\(diaryId)/publish"
+        case let .unpublishDiary(diaryId):
+            return "/diaries/\(diaryId)/unpublish"
+        case let .deleteDiary(diaryId):
+            return "/diaries/\(diaryId)"
         }
     }
 
@@ -37,6 +46,11 @@ extension HomeAPI: BaseTargetType {
              .getDiaryInfo,
              .getTopic:
             return .get
+        case .publishDiary,
+                .unpublishDiary:
+            return .patch
+        case .deleteDiary:
+            return .delete
         }
     }
 
@@ -50,6 +64,8 @@ extension HomeAPI: BaseTargetType {
                 encoding: OrderedURLEncoding()
             )
         case .getDiaryInfo, .getTopic:
+            return .requestPlain
+        case .publishDiary, .unpublishDiary, .deleteDiary:
             return .requestPlain
         }
     }

@@ -14,7 +14,7 @@ final class SelectedInfo: UIView {
         return cardTopicView.topicData
     }
 
-    private var currentDiaryId: Int?
+    public var currentDiaryId: Int?
     private var currentIsPublished: Bool?
     private var overlayView: UIControl?
     
@@ -22,7 +22,7 @@ final class SelectedInfo: UIView {
     
     var onDiaryPreviewTapped: (() -> Void)?
     var onMoreButtonTapped: ((Bool?) -> Void)?
-    var onMenuAction: ((MenuAction) -> Void)?
+    var onMenuAction: ((MenuAction, Int) -> Void)?
     
     // MARK: - UI Components
 
@@ -191,6 +191,19 @@ final class SelectedInfo: UIView {
         menu.isHidden = true
     }
     
+    private func setNotWrittenState(_ text: String, color: UIColor = .gray300) {
+        dot.isHidden = false
+        notWrittenLabel.isHidden = false
+        notWrittenLabel.text = text
+        notWrittenLabel.textColor = color
+    }
+    
+    public func reset() {
+        [cardPreview, cardTopicView, emptyDiaryView, diaryLockView, moreImageView, dot, notWrittenLabel, iconView, timeLeftStack].forEach {
+            $0.isHidden = true
+        }
+    }
+    
     // MARK: - Public
 
     func updateView(
@@ -202,9 +215,7 @@ final class SelectedInfo: UIView {
         diaryData: String? = nil,
         imageURL: String? = nil
     ) {
-        [cardPreview, cardTopicView, emptyDiaryView, diaryLockView, moreImageView].forEach {
-            $0.isHidden = true
-        }
+        reset()
         
         setSelectedDate(date)
         currentDiaryId = diaryId
@@ -214,49 +225,45 @@ final class SelectedInfo: UIView {
         
         let today = Calendar.current.startOfDay(for: Date())
         let selectedDay = Calendar.current.startOfDay(for: date)
-
-        iconView.isHidden = true
-        timeLeftStack.isHidden = true
-
-        // 아직 작성할 수 없는 미래의 날짜를 클릭 했을 경우
+        
+        // 1. 미래인 경우
         if selectedDay > today {
-            notWrittenLabel.text = "작성불가"
-            notWrittenLabel.textColor = .gray300
+            setNotWrittenState("작성불가")
             diaryLockView.isHidden = false
-            return
         }
-
-        // 일기가 있는 경우
-        if let _ = diaryId {
+        
+        // 2. 일기가 있는 경우
+        else if let _ = diaryId {
+            dot.isHidden = false
+            notWrittenLabel.isHidden = false
             moreImageView.isHidden = false
             menu.isHidden = true
             updateMenuState(isPublished: currentIsPublished)
-            
             cardPreview.isHidden = false
+            
             if let imageURL, !imageURL.isEmpty {
                 cardPreview.configure(type: .textWithImage(text: diaryData ?? "", imageUrl: imageURL))
             } else {
                 cardPreview.configure(type: .textOnly(text: diaryData ?? ""))
             }
-            return
         }
-
-        // 48시간이 지난 날짜를 클릭했을 경우
-        if remainingTime > 0, let topic = topicData {
-            notWrittenLabel.text = "미작성"
-            notWrittenLabel.textColor = .gray300
+        
+        // 3. 남은 시간이 있고 주제가 있는 경우
+        else if remainingTime > 0, let topic = topicData {
+            setNotWrittenState("미작성")
             cardTopicView.isHidden = false
             cardTopicView.configure(kor: topic.kor, en: topic.en)
             timeLeftLabel.attributedText = formatRemainingTime(remainingTime)
+
             iconView.isHidden = false
             timeLeftStack.isHidden = false
-            moreImageView.isHidden = true
-            return
         }
-
-        notWrittenLabel.text = "미작성"
-        notWrittenLabel.textColor = .gray300
-        emptyDiaryView.isHidden = false
+        
+        // 4. 그 외의 모든 경우
+        else {
+            setNotWrittenState("미작성")
+            emptyDiaryView.isHidden = false
+        }
     }
 
     func setSelectedDate(_ date: Date) {
@@ -266,28 +273,10 @@ final class SelectedInfo: UIView {
         selectedDayLabel.text = formatter.string(from: date)
     }
     
-    func resetView() {
-        selectedDayLabel.text = ""
-        [cardTopicView, cardPreview, emptyDiaryView, diaryLockView].forEach {
-            $0.isHidden = true
-        }
-        
-        menu.isHidden = true
-        moreImageView.isHidden = true
-        
-        iconView.isHidden = true
-        timeLeftStack.isHidden = true
-        
-        currentDiaryId = nil
-        currentIsPublished = nil
-    }
-
     // MARK: - Private
 
     public func updateDiaryState(isPublished: Bool) {
         currentIsPublished = isPublished
-        guard currentDiaryId != nil else { return }
-        
         updateMenuState(isPublished: currentIsPublished)
     }
     
@@ -358,22 +347,18 @@ final class SelectedInfo: UIView {
 extension SelectedInfo: ActionMenuDelegate {
     func actionMenu(_ menu: ActionMenu, didSelectItemAt index: Int) {
         menu.isHidden = true
-        guard currentDiaryId != nil else { return }
+        guard let diaryId = currentDiaryId else { return }
 
         switch index {
         case 0:
             if currentIsPublished == true {
-                onMenuAction?(.unpublish)
+                onMenuAction?(.unpublish, diaryId)
             } else {
-                onMenuAction?(.publish)
+                onMenuAction?(.publish, diaryId)
             }
         case 1:
-            onMenuAction?(.delete)
+            onMenuAction?(.delete, diaryId)
         default: break
         }
-    }
-    
-    private func showDialog(_ action: MenuAction) {
-        onMenuAction?(action)
     }
 }

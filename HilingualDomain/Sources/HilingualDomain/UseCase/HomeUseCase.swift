@@ -12,6 +12,9 @@ public protocol HomeUseCase {
     func fetchMonthInfo(year: Int, month: Int) -> AnyPublisher<MonthInfoEntity, Error>
     func fetchDiaryInfo(for date: String) -> AnyPublisher<DiaryInfoEntity?, Error>
     func fetchTopic(for date: String) -> AnyPublisher<TopicEntity?, Error>
+    func publishDiary(diaryId: Int) -> AnyPublisher<Void, Error>
+    func unpublishDiary(diaryId: Int) -> AnyPublisher<Void, Error>
+    func deleteDiary(diaryId: Int) -> AnyPublisher<Void, Error>
 }
 
 public final class DefaultHomeUseCase: HomeUseCase {
@@ -35,5 +38,17 @@ public final class DefaultHomeUseCase: HomeUseCase {
 
     public func fetchTopic(for date: String) -> AnyPublisher<TopicEntity?, Error> {
         return repository.fetchTopic(for: date)
+    }
+    
+    public func publishDiary(diaryId: Int) -> AnyPublisher<Void, Error> {
+        return repository.publishDiary(diaryId: diaryId)
+    }
+    
+    public func unpublishDiary(diaryId: Int) -> AnyPublisher<Void, Error> {
+        return repository.unpublishDiary(diaryId: diaryId)
+    }
+    
+    public func deleteDiary(diaryId: Int) -> AnyPublisher<Void, Error> {
+        return repository.deleteDiary(diaryId: diaryId)
     }
 }

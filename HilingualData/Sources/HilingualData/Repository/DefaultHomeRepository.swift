@@ -68,4 +68,19 @@ public final class DefaultHomeRepository: HomeRepository {
             }
             .eraseToAnyPublisher()
     }
+    
+    public func publishDiary(diaryId: Int) -> AnyPublisher<Void, Error> {
+        return service.publishDiary(diaryId: diaryId)
+            .eraseToAnyPublisher()
+    }
+    
+    public func unpublishDiary(diaryId: Int) -> AnyPublisher<Void, Error> {
+        return service.unpublishDiary(diaryId: diaryId)
+            .eraseToAnyPublisher()
+    }
+    
+    public func deleteDiary(diaryId: Int) -> AnyPublisher<Void, Error> {
+        return service.deleteDiary(diaryId: diaryId)
+            .eraseToAnyPublisher()
+    }
 }

@@ -5,7 +5,6 @@
 //  Created by 조영서 on 7/7/25.
 //
 
-
 import UIKit
 import SnapKit
 
@@ -22,6 +21,7 @@ final class CalendarView: UIView {
             updateScrollViewHeight()
         }
     }
+
     // MARK: - UI Components
 
     private let headerView = CalendarHeaderView()
@@ -77,6 +77,8 @@ final class CalendarView: UIView {
         scrollView.showsHorizontalScrollIndicator = false
         scrollView.showsVerticalScrollIndicator = false
         scrollView.alwaysBounceVertical = false
+        scrollView.bounces = false
+        scrollView.isDirectionalLockEnabled = true
         scrollView.delegate = self
     }
 
@@ -210,6 +212,12 @@ final class CalendarView: UIView {
 // MARK: - UIScrollViewDelegate
 
 extension CalendarView: UIScrollViewDelegate {
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        if scrollView == self.scrollView, scrollView.contentOffset.y != 0 {
+            scrollView.contentOffset.y = 0
+        }
+    }
 
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         let pageWidth = scrollView.frame.width

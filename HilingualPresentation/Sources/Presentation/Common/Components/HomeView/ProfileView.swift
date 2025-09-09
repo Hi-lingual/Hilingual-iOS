@@ -145,16 +145,28 @@ final class ProfileView: UIView {
         totalLabel.text = "총 \(totalDiaries)편"
         streakLabel.text = "\(streak)일 연속 작성 중"
         
+        let defaultImage = UIImage(
+            named: "img_profile_normal_ios",
+            in: .module,
+            compatibleWith: nil
+        )
+        
         if let urlString = profileImageURL,
-           !urlString.isEmpty,
-           let url = URL(string: urlString) {
-            profileImageView.kf.setImage(with: url)
+           let url = URL(string: urlString),
+           !urlString.isEmpty {
+            profileImageView.kf.setImage(
+                with: url,
+                placeholder: defaultImage,
+                options: [.transition(.fade(0.2))]
+            ) { result in
+                switch result {
+                case .success: break
+                case .failure:       
+                    self.profileImageView.image = defaultImage
+                }
+            }
         } else {
-            profileImageView.image = UIImage(
-                named: "img_profile_normal_ios",
-                in: .module,
-                compatibleWith: nil
-            )
+            profileImageView.image = defaultImage
         }
     }
 }
