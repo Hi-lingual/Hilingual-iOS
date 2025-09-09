@@ -380,6 +380,10 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                             
                             // TODO: SelectedInfo 업데이트
                             
+                            let toast = ToastMessage()
+                            self.view.addSubview(toast)
+                            toast.configure(type: .basic, message: "삭제가 완료되었어요.")
+                            
                             self.dialog.dismiss()
                         })
                         .store(in: &self.viewModel!.cancellables)
