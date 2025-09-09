@@ -120,6 +120,8 @@ final class MypageView: BaseUIView {
         button.titleLabel?.font = .systemFont(ofSize: 14)
         button.contentHorizontalAlignment = .leading
         button.semanticContentAttribute = .forceLeftToRight
+        button.imageEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 8)
+        button.titleEdgeInsets = UIEdgeInsets(top: 0, left: 8, bottom: 0, right: 0)
         return button
     }()
 
