@@ -21,10 +21,10 @@ extension BaseTargetType {
             "Content-Type": "application/json"
         ]
 
-        let accessToken = UserDefaultHandler.accessToken
-        if !accessToken.isEmpty {
-            baseHeaders["Authorization"] = "Bearer \(accessToken)"
-        }
+//        let accessToken = UserDefaultHandler.accessToken
+//        if !accessToken.isEmpty {
+//            baseHeaders["Authorization"] = "Bearer \(accessToken)"
+//        }
 
         return baseHeaders
     }
