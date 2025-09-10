@@ -43,6 +43,7 @@ final class FollowListCell: UITableViewCell {
         let imageView = UIImageView(image: UIImage(resource: .imgProfileNormalIos))
         imageView.layer.borderWidth = 1
         imageView.layer.borderColor = UIColor.gray200.cgColor
+        imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         imageView.layer.cornerRadius = 21
         return imageView
