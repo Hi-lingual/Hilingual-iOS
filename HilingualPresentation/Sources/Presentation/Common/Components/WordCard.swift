@@ -61,7 +61,7 @@ final class WordCard: UIView {
 
         phraseLabel.text = data.phrase
         explanationLabel.text = data.explanation
-        savedDateLabel.text = "\(data.createdAt) 일기에서 저장됨"
+        savedDateLabel.text = "\(data.createdAt)"
         reasonLabel.isHidden = data.reason.isEmpty
         reasonLabel.text = "\(data.reason)"
         
