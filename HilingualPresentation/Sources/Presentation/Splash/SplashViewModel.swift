@@ -105,8 +105,8 @@ public final class SplashViewModel: BaseViewModel {
                         print("[SplashVM] 홈 화면 이동")
                         self?.homeSubject.send()
                     } else {
-                        print("[SplashVM] 온보딩 화면 이동")
-                        self?.onboardingSubject.send()
+                        print("[SplashVM] 로그인 화면 이동")
+                        self?.loginSubject.send()
                     }
                 }
             )
