@@ -626,7 +626,7 @@ extension AppDIContainer {
             feedUseCase: makeFeedUseCase(),
             publishDiaryUseCase: makePublishDiaryUseCase(),
             toggleLikeUseCase: makeToggleLikeUseCase(),
-            userInfoUseCase: makeHomeUseCase(),
+            homeUseCase: makeHomeUseCase(),
             type: nil
         )
     }
@@ -637,7 +637,7 @@ extension AppDIContainer {
             feedUseCase: makeFeedUseCase(),
             publishDiaryUseCase: makePublishDiaryUseCase(),
             toggleLikeUseCase: makeToggleLikeUseCase(),
-            userInfoUseCase: makeHomeUseCase(),
+            homeUseCase: makeHomeUseCase(),
             type: type
         )
     }

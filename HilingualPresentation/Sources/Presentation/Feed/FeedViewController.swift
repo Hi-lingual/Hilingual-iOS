@@ -84,24 +84,25 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: false)
+        
+        input.reload.send()
 
         recommendFeedVC.refresh()
         followingFeedVC.refresh()
     }
     
-    public override func viewDidLoad() {
-        super.viewDidLoad()
+    // MARK: - Binding
+    
+    public override func bind(viewModel: FeedViewModel) {
+        let output = viewModel.transform(input: input)
         
-        if let viewModel = viewModel {
-            let output = viewModel.transform(input: input)
-
-            output.userInfo
-                .compactMap { $0?.profileImg }
-                .sink { [weak self] profileImageURL in
-                    self?.feedView.configure(profileImageURL: profileImageURL)
-                }
-                .store(in: &cancellables)
-        }
+        
+        output.userProfileImage
+            .receive(on: RunLoop.main)
+            .sink { [weak self] url in
+                self?.feedView.updateProfileImage(url)
+            }
+            .store(in: &viewModel.cancellables)
     }
 
     //MARK: - Action
@@ -185,7 +186,9 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
     }
 
     private func openReportPage() {
-        guard let url = URL(string: "https://hilingual.notion.site/230829677ebf801c965be24b0ef444e9") else { return }
+        guard let url =
+                URL(string: "https://hilingual.notion.site/230829677ebf801c965be24b0ef444e9")
+        else { return }
         let safariVC = SFSafariViewController(url: url)
         self.present(safariVC, animated: true)
     }

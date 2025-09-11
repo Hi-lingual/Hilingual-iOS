@@ -7,6 +7,7 @@
 
 import UIKit
 import SnapKit
+import Kingfisher
 
 final class FeedView: BaseUIView {
 
@@ -141,9 +142,8 @@ final class FeedView: BaseUIView {
         }
     }
     
-    func configure(profileImageURL: String? = nil) {
-
-        if let urlString = profileImageURL?.trimmingCharacters(in: .whitespacesAndNewlines),
+    func updateProfileImage(_ urlString: String?) {
+        if let urlString = urlString?.trimmingCharacters(in: .whitespacesAndNewlines),
            !urlString.isEmpty,
            let url = URL(string: urlString) {
             profileImageView.kf.setImage(
