@@ -55,7 +55,8 @@ final class MypageView: BaseUIView {
     let profileImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.backgroundColor = .gray200
-        imageView.layer.cornerRadius = 32
+        imageView.layer.cornerRadius = 30
+        imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         imageView.layer.borderWidth = 1
         imageView.layer.borderColor = UIColor.gray200.cgColor
