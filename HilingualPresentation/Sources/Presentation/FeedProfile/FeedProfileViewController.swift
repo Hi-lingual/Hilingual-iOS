@@ -166,6 +166,12 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
         }
     }
     
+    public func resetScrollPosition() {
+        let tableView = feedCellView.tableView
+        tableView.setContentOffset(.zero, animated: false)
+        onScroll?(0)
+    }
+    
     public func refresh() {
         input.reload.send(())
     }
