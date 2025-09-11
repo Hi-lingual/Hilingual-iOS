@@ -49,11 +49,11 @@ public final class DefaultAuthRepository: AuthRepository {
     }
 
     public func logout() -> AnyPublisher<Void, Error> {
-        return Future<Void, Error> { [weak self] promise in
-            self?.tokenStore.clear()
-            promise(.success(()))
-        }
-        .eraseToAnyPublisher()
+        return authService.logout()
+            .handleEvents(receiveOutput: { [weak self] in
+                self?.tokenStore.clear()
+            })
+            .eraseToAnyPublisher()
     }
 
     public func withdraw() -> AnyPublisher<Void, Error> {
