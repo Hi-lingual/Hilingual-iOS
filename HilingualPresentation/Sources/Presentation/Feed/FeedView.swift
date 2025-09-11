@@ -16,6 +16,9 @@ final class FeedView: BaseUIView {
     var onSegmentChanged: ((Int) -> Void)?
 
     // MARK: - UI Components
+    
+    private var segmentedControl: SegmentedControl?
+    private let toast = ToastMessage()
 
     private let headerStack: UIStackView = {
         let stack = UIStackView()
@@ -60,17 +63,13 @@ final class FeedView: BaseUIView {
         return imageView
     }()
 
-    private var segmentedControl: SegmentedControl?
-    
-    private let toast = ToastMessage()
-
     // MARK: - Setup
 
     override func setUI() {
         addSubviews(headerStack, toast)
         headerStack.addArrangedSubviews(titleLabel, searchStack)
         searchStack.addArrangedSubviews(searchButton, profileImageView)
-
+        
         toast.isHidden = true
 
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(didTapProfileImage))
@@ -78,6 +77,7 @@ final class FeedView: BaseUIView {
     }
 
     override func setLayout() {
+                
         headerStack.snp.makeConstraints {
             $0.top.equalTo(safeAreaLayoutGuide).offset(9)
             $0.horizontalEdges.equalToSuperview().inset(16)
@@ -93,20 +93,6 @@ final class FeedView: BaseUIView {
     }
 
     // MARK: - Public Method
-    
-    func configure(profileImageURL: String? = nil) {
-        if let urlString = profileImageURL,
-           !urlString.isEmpty,
-           let url = URL(string: urlString) {
-            profileImageView.kf.setImage(with: url)
-        } else {
-            profileImageView.image = UIImage(
-                named: "img_profile_normal_ios",
-                in: .module,
-                compatibleWith: nil
-            )
-        }
-    }
 
     func configureSegmentedControl(
         parentVC: UIViewController,
@@ -152,6 +138,29 @@ final class FeedView: BaseUIView {
             }, completion: { _ in
                 self.toast.isHidden = true
             })
+        }
+    }
+    
+    func configure(profileImageURL: String? = nil) {
+
+        if let urlString = profileImageURL?.trimmingCharacters(in: .whitespacesAndNewlines),
+           !urlString.isEmpty,
+           let url = URL(string: urlString) {
+            profileImageView.kf.setImage(
+                with: url,
+                placeholder: UIImage(
+                    named: "img_profile_normal_ios",
+                    in: .module,
+                    compatibleWith: nil
+                ),
+                options: [.transition(.fade(0.2)), .cacheOriginalImage]
+            )
+        } else {
+            profileImageView.image = UIImage(
+                named: "img_profile_normal_ios",
+                in: .module,
+                compatibleWith: nil
+            )
         }
     }
 

@@ -93,9 +93,15 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
         super.viewDidLoad()
         
         if let viewModel = viewModel {
-            _ = viewModel.transform(input: input)
-        }
+            let output = viewModel.transform(input: input)
 
+            output.userInfo
+                .compactMap { $0?.profileImg }
+                .sink { [weak self] profileImageURL in
+                    self?.feedView.configure(profileImageURL: profileImageURL)
+                }
+                .store(in: &cancellables)
+        }
     }
 
     //MARK: - Action

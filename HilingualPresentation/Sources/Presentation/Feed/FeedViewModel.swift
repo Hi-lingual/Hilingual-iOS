@@ -31,6 +31,7 @@ public final class FeedViewModel: BaseViewModel, BaseViewModelType {
         let errorMessage: AnyPublisher<String?, Never>
         let publishResult: AnyPublisher<Bool, Never>
         let likeResult: AnyPublisher<(Int, Bool), Never>
+        let userInfo: AnyPublisher<UserInfoEntity?, Never>
     }
     
     // MARK: - Dependencies
@@ -38,6 +39,7 @@ public final class FeedViewModel: BaseViewModel, BaseViewModelType {
     private let feedUseCase: FeedUseCase
     private let publishDiaryUseCase: PublishDiaryUseCase
     private let toggleLikeUseCase: ToggleLikeUseCase
+    private let userInfoUseCase: HomeUseCase
     private let type: FeedListType?
     
     // MARK: - State
@@ -48,6 +50,7 @@ public final class FeedViewModel: BaseViewModel, BaseViewModelType {
     private let errorSubject = CurrentValueSubject<String?, Never>(nil)
     private let publishSubject = PassthroughSubject<Bool, Never>()
     private let likeSubject = PassthroughSubject<(Int, Bool), Never>()
+    private let userInfoSubject = CurrentValueSubject<UserInfoEntity?, Never>(nil)
     
     // MARK: - Init
     
@@ -55,11 +58,13 @@ public final class FeedViewModel: BaseViewModel, BaseViewModelType {
         feedUseCase: FeedUseCase,
         publishDiaryUseCase: PublishDiaryUseCase,
         toggleLikeUseCase: ToggleLikeUseCase,
+        userInfoUseCase: HomeUseCase,
         type: FeedListType? = nil
     ) {
         self.feedUseCase = feedUseCase
         self.publishDiaryUseCase = publishDiaryUseCase
         self.toggleLikeUseCase = toggleLikeUseCase
+        self.userInfoUseCase = userInfoUseCase
         self.type = type
         super.init()
     }
@@ -117,6 +122,22 @@ public final class FeedViewModel: BaseViewModel, BaseViewModelType {
                     self?.feedsSubject.send(items)
                 }
                 .store(in: &cancellables)
+            
+            trigger
+                .flatMap { [weak self] _ -> AnyPublisher<UserInfoEntity?, Never> in
+                    guard let self else { return Just(nil).eraseToAnyPublisher() }
+                    return self.userInfoUseCase.fetchUserInfo()
+                        .map { Optional($0) }
+                        .catch { [weak self] error -> Just<UserInfoEntity?> in
+                            self?.errorSubject.send(error.localizedDescription)
+                            return Just(nil)
+                        }
+                        .eraseToAnyPublisher()
+                }
+                .sink { [weak self] entity in
+                    self?.userInfoSubject.send(entity)
+                }
+                .store(in: &cancellables)
         }
         
         input.unpublish
@@ -137,8 +158,8 @@ public final class FeedViewModel: BaseViewModel, BaseViewModelType {
             isLoading: isLoadingSubject.eraseToAnyPublisher(),
             errorMessage: errorSubject.eraseToAnyPublisher(),
             publishResult: publishSubject.eraseToAnyPublisher(),
-            likeResult: likeSubject.eraseToAnyPublisher()
-
+            likeResult: likeSubject.eraseToAnyPublisher(),
+            userInfo: userInfoSubject.eraseToAnyPublisher()
         )
     }
     
@@ -168,4 +189,3 @@ public final class FeedViewModel: BaseViewModel, BaseViewModelType {
             .store(in: &cancellables)
     }
 }
-

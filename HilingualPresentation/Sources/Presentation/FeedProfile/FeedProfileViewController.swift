@@ -77,6 +77,21 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
             self?.onReportTapped?()
         }
         
+        feedCellView.onProfileTapped = { [weak self] row in
+            guard let self else { return }
+            let user = self.currentFeeds[row]
+
+            if user.isMine == true {
+                let myVC = self.diContainer.makeMyFeedProfileViewController()
+                myVC.hidesBottomBarWhenPushed = true
+                self.navigationController?.pushViewController(myVC, animated: true)
+            } else {
+                let vc = self.diContainer.makeUserFeedProfileViewController(userId: Int64(user.userID))
+                vc.hidesBottomBarWhenPushed = true
+                self.navigationController?.pushViewController(vc, animated: true)
+            }
+        }
+        
         feedCellView.onFeedTextTapped = { [weak self] row in
             guard let self else { return }
             let feed = self.currentFeeds[row]
