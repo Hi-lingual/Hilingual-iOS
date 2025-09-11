@@ -98,7 +98,7 @@ public final class VerificationCodeViewController: BaseUIViewController<Verifica
     // MARK: - Private Method
 
     private func policyButtonTapped() {
-        guard let url = URL(string: "https://pf.kakao.com/_kNTvn/chat") else { return }
+        guard let url = URL(string: "http://pf.kakao.com/_kNTvn/chat") else { return }
         let safariVC = SFSafariViewController(url: url)
         self.present(safariVC, animated: true, completion: nil)
     }
