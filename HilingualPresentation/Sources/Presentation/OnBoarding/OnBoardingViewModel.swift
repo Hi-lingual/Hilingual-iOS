@@ -19,7 +19,7 @@ public final class OnBoardingViewModel: BaseViewModel {
     }
 
     public struct Output {
-        let nicknameState: AnyPublisher<TextField.State, Never>
+        let nicknameState: AnyPublisher<nickNameTextField.State, Never>
         let startButtonEnabled: AnyPublisher<Bool, Never>
         let signUpResult: AnyPublisher<Void, Never>
     }
@@ -52,7 +52,7 @@ public final class OnBoardingViewModel: BaseViewModel {
             .share()
 
         let nicknameValidatoinState = nicknameChanged
-            .map { [weak self] nickname -> TextField.State in
+            .map { [weak self] nickname -> nickNameTextField.State in
                 guard let self else { return .normal }
 
                 switch useCase.validate(nickname) {
@@ -74,9 +74,9 @@ public final class OnBoardingViewModel: BaseViewModel {
                 self.useCase.checkDuplicate(nickname)
                     .map { (isAvailable, message) in
                         if isAvailable {
-                            return (nickname, TextField.State.success(message ?? "사용 가능한 닉네임이에요"))
+                            return (nickname, nickNameTextField.State.success(message ?? "사용 가능한 닉네임이에요"))
                         } else {
-                            return (nickname, TextField.State.error(message ?? "이미 사용 중인 닉네임이에요."))
+                            return (nickname, nickNameTextField.State.error(message ?? "이미 사용 중인 닉네임이에요."))
                         }
                     }
                     .eraseToAnyPublisher()

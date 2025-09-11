@@ -8,7 +8,7 @@
 import UIKit
 import SnapKit
 
-final class TextField: BaseUIView {
+final class nickNameTextField: BaseUIView {
 
     public enum State {
         case normal
@@ -207,8 +207,10 @@ final class TextField: BaseUIView {
     @objc
     private func textDidChange() {
         let current = textField.text ?? ""
-        let trimmed = current.count > maxLength ? String(current.prefix(maxLength)) : current
+        let noSpaces = current.replacingOccurrences(of: " ", with: "")
+        let trimmed = noSpaces.count > maxLength ? String(noSpaces.prefix(maxLength)) : noSpaces
         textField.attributedText = .suit(.body_sb_16, text: trimmed)
         updateCharacterCount()
     }
+
 }
