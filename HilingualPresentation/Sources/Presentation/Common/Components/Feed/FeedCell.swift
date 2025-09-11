@@ -237,7 +237,8 @@ final class FeedCell: UITableViewCell {
         }
         
         likeView.snp.makeConstraints {
-            $0.width.greaterThanOrEqualTo(45)
+            $0.width.equalTo(45)
+            $0.height.equalTo(24)
         }
         
         profileImageView.snp.makeConstraints { $0.size.equalTo(42) }
@@ -421,7 +422,6 @@ final class FeedCell: UITableViewCell {
         let feedImageTap = UITapGestureRecognizer(target: self, action: #selector(feedImageTapped))
         diaryImageView.addGestureRecognizer(feedImageTap)
     }
-
 }
 
 // MARK: - Extensions
