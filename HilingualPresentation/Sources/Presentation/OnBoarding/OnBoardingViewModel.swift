@@ -72,13 +72,12 @@ public final class OnBoardingViewModel: BaseViewModel {
             .debounce(for: .milliseconds(1000), scheduler: RunLoop.main)
             .map { nickname in
                 self.useCase.checkDuplicate(nickname)
-                    .map { isAvailable in
-                        (nickname, isAvailable
-                         ? TextField.State.success("사용 가능한 닉네임이에요")
-                         : .error("이미 사용 중인 닉네임이에요."))
-                    }
-                    .catch { _ in
-                        Just((nickname, .error("중복 확인 중 오류가 발생했어요.")))
+                    .map { (isAvailable, message) in
+                        if isAvailable {
+                            return (nickname, TextField.State.success(message ?? "사용 가능한 닉네임이에요"))
+                        } else {
+                            return (nickname, TextField.State.error(message ?? "이미 사용 중인 닉네임이에요."))
+                        }
                     }
                     .eraseToAnyPublisher()
             }
@@ -88,6 +87,7 @@ public final class OnBoardingViewModel: BaseViewModel {
                 let (responseNickname, state) = response
                 return responseNickname == currentNickname ? state : nil
             }
+
 
         let nicknameState = Publishers.Merge(nicknameValidatoinState, nicknameDupicateState)
             .share()

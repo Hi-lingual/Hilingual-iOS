@@ -9,7 +9,7 @@ import Foundation
 import Combine
 
 public protocol OnBoardingRepository {
-    func isNicknameAvailable(_ nickname: String) -> AnyPublisher<Bool, Error>
+    func isNicknameAvailable(_ nickname: String) -> AnyPublisher<(Bool, String?), Never>
     func registerProfile(profile: ProfileEntity) -> AnyPublisher<Void, Error>
 }
 
