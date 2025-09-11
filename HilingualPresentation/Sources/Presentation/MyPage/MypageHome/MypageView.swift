@@ -23,6 +23,7 @@ final class MypageView: BaseUIView {
     // MARK: - Public
 
     var onMenuTap: ((MenuItem) -> Void)?
+    var onEditProfileTap: (() -> Void)?
 
     // MARK: - UI Components
 
@@ -147,6 +148,8 @@ final class MypageView: BaseUIView {
             menuCardView.addSubview(row)
             menuRows.append(row)
         }
+
+        addGesture()
     }
 
     override func setLayout() {
@@ -271,7 +274,25 @@ final class MypageView: BaseUIView {
         container.addAction(UIAction { _ in action() }, for: .touchUpInside)
         return container
     }
+
+    private func addGesture() {
+        let imageTapGesture = UITapGestureRecognizer(target: self, action: #selector(handleEditProfileTap))
+        profileImageView.isUserInteractionEnabled = true
+        profileImageView.addGestureRecognizer(imageTapGesture)
+
+        let nicknameTapGesture = UITapGestureRecognizer(target: self, action: #selector(handleEditProfileTap))
+        nicknameLabel.isUserInteractionEnabled = true
+        nicknameLabel.addGestureRecognizer(nicknameTapGesture)
+    }
+
+    //MARK: - Actions
+
+    @objc private func handleEditProfileTap() {
+        onEditProfileTap?()
+    }
 }
+
+//MARK: - Extension
 
 extension MypageView {
     public func configure(nickname: String, profileImageURL: String?) {

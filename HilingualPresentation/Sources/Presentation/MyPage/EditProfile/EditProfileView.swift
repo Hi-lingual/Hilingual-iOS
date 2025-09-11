@@ -29,14 +29,6 @@ final class EditProfileView: BaseUIView {
         return modal
     }()
 
-    private let titleLabel: UILabel = {
-        let label = UILabel()
-        label.text = "내 정보 수정"
-        label.textColor = .black
-        label.font = .suit(.head_b_18)
-        return label
-    }()
-
     let profileImageView = EditableProfileImageView()
 
     let nicknameRow = ProfileRow(title: "닉네임", value: "sereal")
@@ -54,7 +46,7 @@ final class EditProfileView: BaseUIView {
 
     override func setUI() {
         backgroundColor = .white
-        addSubviews(backButton, titleLabel, profileImageView, nicknameRow, socialRow, withdrawButton, modal)
+        addSubviews(backButton, profileImageView, nicknameRow, socialRow, withdrawButton, modal)
         configureModal()
     }
 
@@ -67,11 +59,6 @@ final class EditProfileView: BaseUIView {
             $0.top.equalToSuperview().inset(16)
             $0.leading.equalToSuperview().inset(16)
             $0.size.equalTo(24)
-        }
-
-        titleLabel.snp.makeConstraints {
-            $0.centerY.equalTo(backButton)
-            $0.centerX.equalToSuperview()
         }
 
         profileImageView.snp.makeConstraints {
