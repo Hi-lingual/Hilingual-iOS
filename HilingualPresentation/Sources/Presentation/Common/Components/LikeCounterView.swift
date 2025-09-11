@@ -78,8 +78,9 @@ final class LikeCounterView: UIView {
             countLabel.font = .suit(.body_sb_14)
 
             likeButton.snp.makeConstraints {
-                $0.top.bottom.leading.equalToSuperview()
-                $0.size.equalTo(24)
+                $0.leading.equalToSuperview()
+                $0.centerY.equalToSuperview()
+                $0.width.height.equalTo(24)
             }
             countLabel.snp.makeConstraints {
                 $0.leading.equalTo(likeButton.snp.trailing).offset(4)
@@ -90,8 +91,9 @@ final class LikeCounterView: UIView {
             countLabel.font = .suit(.caption_m_12)
             
             likeButton.snp.makeConstraints {
-                $0.top.leading.trailing.equalToSuperview()
-                $0.size.equalTo(24)
+                $0.top.equalToSuperview()
+                $0.centerX.equalToSuperview()
+                $0.width.height.equalTo(24)
             }
             countLabel.snp.makeConstraints {
                 $0.top.equalTo(likeButton.snp.bottom).offset(3)

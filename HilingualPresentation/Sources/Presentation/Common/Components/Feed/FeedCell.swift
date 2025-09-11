@@ -175,6 +175,7 @@ final class FeedCell: UITableViewCell {
     }()
     
     private let spacer1 = UIView()
+
     private let spacer2 = UIView()
     
     private let divider: UIView = {
@@ -222,6 +223,7 @@ final class FeedCell: UITableViewCell {
     }
 
     private func setLayout() {
+        
         containerStack.snp.makeConstraints {
             $0.top.equalTo(20)
             $0.horizontalEdges.equalToSuperview().inset(16)
@@ -235,8 +237,7 @@ final class FeedCell: UITableViewCell {
         }
         
         likeView.snp.makeConstraints {
-            $0.height.equalTo(24)
-            $0.width.equalTo(45)
+            $0.width.greaterThanOrEqualTo(45)
         }
         
         profileImageView.snp.makeConstraints { $0.size.equalTo(42) }
@@ -244,7 +245,6 @@ final class FeedCell: UITableViewCell {
         moreImageView.snp.makeConstraints { $0.size.equalTo(24) }
         
         diaryImageView.snp.makeConstraints {
-            $0.height.equalTo(182)
             $0.width.equalToSuperview()
         }
 
@@ -256,8 +256,8 @@ final class FeedCell: UITableViewCell {
         divider.snp.makeConstraints {
             $0.top.equalTo(containerStack.snp.bottom).offset(20)
             $0.horizontalEdges.equalToSuperview()
-            $0.bottom.equalToSuperview()
             $0.height.equalTo(1)
+            $0.bottom.equalToSuperview().priority(.low)
         }
     }
 
@@ -318,7 +318,7 @@ final class FeedCell: UITableViewCell {
             profileImageView.kf.setImage(
                 with: url,
                 placeholder: UIImage(named: "img_profile_normal_ios"),
-                    options: [.transition(.fade(0.2)), .cacheOriginalImage]
+                options: [.transition(.fade(0.2)), .cacheOriginalImage]
             )
         } else {
             profileImageView.image = UIImage(
@@ -331,15 +331,21 @@ final class FeedCell: UITableViewCell {
         if let urlString = diaryImageURL,
            !urlString.isEmpty,
            let url = URL(string: urlString) {
-            diaryImageView.kf.setImage(
-                with: url,
-                placeholder: UIImage(named: "img_load_fail_large_ios"),
-                    options: [.transition(.fade(0.2)), .cacheOriginalImage]
-            )
             diaryImageView.isHidden = false
+            diaryImageView.kf.setImage(with: url,
+                placeholder: UIImage(named: "img_load_fail_large_ios"),
+                options: [.transition(.fade(0.2)), .cacheOriginalImage]
+            )
+            diaryImageView.snp.remakeConstraints {
+                $0.width.equalToSuperview()
+                $0.height.equalTo(182)
+            }
         } else {
-            diaryImageView.image = nil
             diaryImageView.isHidden = true
+            diaryImageView.snp.remakeConstraints {
+                $0.width.equalToSuperview()
+                $0.height.equalTo(0)
+            }
         }
         
         likeView.configure(likeCount: likeCount, isLiked: isLiked)
@@ -353,6 +359,10 @@ final class FeedCell: UITableViewCell {
         diaryLabel.attributedText = .suit(.body_r_16, text: "")
         diaryImageView.kf.cancelDownloadTask()
         diaryImageView.isHidden = false
+        diaryImageView.snp.remakeConstraints {
+            $0.width.equalToSuperview()
+            $0.height.equalTo(182)
+        }
         likeView.configure(likeCount: 0, isLiked: false)
         divider.isHidden = false
         streakStack.isHidden = false
