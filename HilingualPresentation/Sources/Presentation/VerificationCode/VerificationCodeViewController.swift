@@ -82,6 +82,7 @@ public final class VerificationCodeViewController: BaseUIViewController<Verifica
         }
 
         verificationCodeView.submitButton.addTarget(self, action: #selector(submitTapped), for: .touchUpInside)
+        verificationCodeView.notReceivedButton.addTarget(self, action: #selector(policyButtonTapped), for: .touchUpInside)
     }
 
     // MARK: - Action
@@ -90,18 +91,17 @@ public final class VerificationCodeViewController: BaseUIViewController<Verifica
         let code = verificationCodeView.codeView.text
         viewModel?.submit(code: code)
     }
+    @objc private func policyButtonTapped() {
+        guard let url = URL(string: "http://pf.kakao.com/_kNTvn/chat") else { return }
+        let safariVC = SFSafariViewController(url: url)
+        self.present(safariVC, animated: true, completion: nil)
+    }
 
     private func dialogConfigure() {
 
     }
 
     // MARK: - Private Method
-
-    private func policyButtonTapped() {
-        guard let url = URL(string: "http://pf.kakao.com/_kNTvn/chat") else { return }
-        let safariVC = SFSafariViewController(url: url)
-        self.present(safariVC, animated: true, completion: nil)
-    }
 
     private func exitApp() {
         UIApplication.shared.perform(#selector(NSXPCConnection.suspend))
