@@ -16,6 +16,7 @@ public enum NetworkError: Error {
     case networkFail
     case timeout
     case unknown
+    case refreshFailed 
 }
 
 public struct ServerError: Decodable, Error {
