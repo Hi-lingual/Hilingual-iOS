@@ -269,25 +269,27 @@ public final class FeedProfileViewModel: BaseViewModel, BaseViewModelType {
     
     private func unpublishDiary(diaryId: Int) {
         publishDiaryUseCase.unpublishDiary(diaryId: diaryId)
-            .sink(receiveCompletion: { [weak self] completion in
-                if case let .failure(error) = completion {
-                    self?.errorSubject.send("공개 상태 변경 실패: \(error.localizedDescription)")
-                }
-            }, receiveValue: { [weak self] _ in
-                self?.publishSubject.send(false)
-            })
+            .map { _ in false }
+            .catch { [weak self] error -> Just<Bool> in
+                self?.errorSubject.send("공개 상태 변경 실패: \(error.localizedDescription)")
+                return Just(false)
+            }
+            .sink { [weak self] result in
+                self?.publishSubject.send(result)
+            }
             .store(in: &cancellables)
     }
-    
+
     private func toggleLike(diaryId: Int, isLiked: Bool) {
         toggleLikeUseCase.toggleLike(diaryId: diaryId, isLiked: isLiked)
-            .sink(receiveCompletion: { [weak self] completion in
-                if case let .failure(error) = completion {
-                    self?.errorSubject.send("공감하기 실패: \(error.localizedDescription)")
-                }
-            }, receiveValue: { [weak self] _ in
-                self?.likeSubject.send((diaryId, !isLiked))
-            })
+            .map { _ in (diaryId, !isLiked) }
+            .catch { [weak self] error -> Just<(Int, Bool)> in
+                self?.errorSubject.send("공감하기 실패: \(error.localizedDescription)")
+                return Just((diaryId, isLiked))
+            }
+            .sink { [weak self] result in
+                self?.likeSubject.send(result)
+            }
             .store(in: &cancellables)
     }
 }
