@@ -198,7 +198,6 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
         }
         else if contentHeightWithoutFooter > fixedSafeAreaHeight - 195 {
             let footer = UIView()
-            footer.backgroundColor = .red
             footer.frame.size.height = 120
             tableView.tableFooterView = footer
         }
