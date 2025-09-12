@@ -49,6 +49,9 @@ public final class NotificationListViewController: BaseUIViewController<Notifica
     public override func setDelegate() {
         tableView.delegate = self
         tableView.dataSource = self
+        tableView.separatorStyle = .singleLine
+        tableView.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0) // 좌우 여백
+        tableView.separatorColor = .gray200
     }
 
     // MARK: - Bind
