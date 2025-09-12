@@ -339,13 +339,12 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                             toast.configure(
                                 type: .withButton,
                                 message: "일기가 게시되었어요!",
-                                actionTitle: "피드 보러가기"
+                                actionTitle: "보러가기"
                             )
                             
                             toast.action = { [weak self] in
                                 guard let self else { return }
-                                let vc = self.diContainer.makeSharedDiaryViewController(diaryId: diaryId)
-                                self.navigationController?.pushViewController(vc, animated: true)
+                                tabBarController?.selectedIndex = 2
                             }
                         })
                         .store(in: &self.viewModel!.cancellables)
