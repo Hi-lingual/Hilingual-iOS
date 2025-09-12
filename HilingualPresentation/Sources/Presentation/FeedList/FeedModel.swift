@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct FeedModel {
+public struct FeedModel {
     let diaryID: Int
     let userID: Int 
     let nickname: String

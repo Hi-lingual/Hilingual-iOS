@@ -126,9 +126,9 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
             }
         }
         
-        userFeedProfileView.setFollowSectionTappedAction { [weak self] in
-            self?.pushFollowListViewController()
-        }
+//        userFeedProfileView.setFollowSectionTappedAction { [weak self] in
+//            self?.pushFollowListViewController()
+//        }
         
         bind()
     }

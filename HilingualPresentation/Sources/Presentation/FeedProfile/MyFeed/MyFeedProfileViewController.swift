@@ -54,13 +54,15 @@ public final class MyFeedProfileViewController: BaseUIViewController<FeedProfile
         )
         
         myFeedProfileView.onSegmentChanged = { [weak self] index in
-                guard let self else { return }
-                if index == 0 {
-                    self.sharedVC.refresh()
-                } else {
-                    self.likedVC.refresh()
-                }
+            guard let self else { return }
+            if index == 0 {
+                self.sharedVC.resetScrollPosition()
+                self.sharedVC.refresh()
+            } else {
+                self.likedVC.resetScrollPosition()
+                self.likedVC.refresh()
             }
+        }
         
         view.addSubview(dialog)
         dialog.isHidden = true
@@ -69,37 +71,25 @@ public final class MyFeedProfileViewController: BaseUIViewController<FeedProfile
         sharedVC.onScroll = { [weak self] offsetY in
             self?.myFeedProfileView.updateHeader(offsetY: offsetY)
         }
+        sharedVC.onHideTapped = { [weak self] row in
+            self?.showHideDialog(listVC: self?.sharedVC, row: row)
+        }
+        sharedVC.onReportTapped = { [weak self] in
+            self?.showReportDialog()
+        }
+        sharedVC.onLikeTapped = { [weak self] diaryId, isLiked in
+            self?.input.likeTapped.send((diaryId, isLiked))
+        }
 
         likedVC.onScroll = { [weak self] offsetY in
             self?.myFeedProfileView.updateHeader(offsetY: offsetY)
         }
-        
-        /// 공유 - 게시글 비공개하기
-        sharedVC.onHideTapped = { [weak self] row in
-            self?.showHideDialog(listVC: self?.sharedVC, row: row)
-        }
-        
-        /// 공유 - 게시글 신고하기
-        sharedVC.onReportTapped = { [weak self] in
-            self?.showReportDialog()
-        }
-        
-        /// 공유 - 공감하기
-        sharedVC.onLikeTapped = { [weak self] diaryId, isLiked in
-            self?.input.likeTapped.send((diaryId, isLiked))
-        }
-        
-        /// 공감 - 게시글 비공개하기
         likedVC.onHideTapped = { [weak self] row in
             self?.showHideDialog(listVC: self?.likedVC, row: row)
         }
-        
-        /// 공감 - 게시글 신고하기
         likedVC.onReportTapped = { [weak self] in
             self?.showReportDialog()
         }
-        
-        /// 공감 - 공감하기
         likedVC.onLikeTapped = { [weak self] diaryId, isLiked in
             self?.input.likeTapped.send((diaryId, isLiked))
         }
@@ -205,7 +195,8 @@ public final class MyFeedProfileViewController: BaseUIViewController<FeedProfile
     private func pushFollowListViewController() {
         guard let viewModel = self.viewModel else { return }
         
-        let followVC = self.diContainer.makeFollowListViewController(targetUserId: Int(viewModel.targetUserId))
+        let followVC =
+        self.diContainer.makeFollowListViewController(targetUserId: Int(viewModel.targetUserId))
         self.navigationController?.pushViewController(followVC, animated: true)
     }
 }

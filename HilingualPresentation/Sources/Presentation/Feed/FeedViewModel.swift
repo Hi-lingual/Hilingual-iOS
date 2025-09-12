@@ -31,6 +31,7 @@ public final class FeedViewModel: BaseViewModel, BaseViewModelType {
         let errorMessage: AnyPublisher<String?, Never>
         let publishResult: AnyPublisher<Bool, Never>
         let likeResult: AnyPublisher<(Int, Bool), Never>
+        let userProfileImage: AnyPublisher<String?, Never>
     }
     
     // MARK: - Dependencies
@@ -38,6 +39,7 @@ public final class FeedViewModel: BaseViewModel, BaseViewModelType {
     private let feedUseCase: FeedUseCase
     private let publishDiaryUseCase: PublishDiaryUseCase
     private let toggleLikeUseCase: ToggleLikeUseCase
+    private let homeUseCase: HomeUseCase
     private let type: FeedListType?
     
     // MARK: - State
@@ -48,18 +50,21 @@ public final class FeedViewModel: BaseViewModel, BaseViewModelType {
     private let errorSubject = CurrentValueSubject<String?, Never>(nil)
     private let publishSubject = PassthroughSubject<Bool, Never>()
     private let likeSubject = PassthroughSubject<(Int, Bool), Never>()
-    
+    private let userProfileImageSubject = CurrentValueSubject<String?, Never>(nil)
+
     // MARK: - Init
     
     public init(
         feedUseCase: FeedUseCase,
         publishDiaryUseCase: PublishDiaryUseCase,
         toggleLikeUseCase: ToggleLikeUseCase,
+        homeUseCase: HomeUseCase,
         type: FeedListType? = nil
     ) {
         self.feedUseCase = feedUseCase
         self.publishDiaryUseCase = publishDiaryUseCase
         self.toggleLikeUseCase = toggleLikeUseCase
+        self.homeUseCase = homeUseCase
         self.type = type
         super.init()
     }
@@ -67,51 +72,23 @@ public final class FeedViewModel: BaseViewModel, BaseViewModelType {
     // MARK: - Transform
     
     public func transform(input: Input) -> Output {
+        let trigger = Publishers.Merge(viewDidLoad, input.reload.eraseToAnyPublisher())
+        
+        trigger
+            .flatMap { [weak self] _ -> AnyPublisher<String?, Never> in
+                guard let self else { return Just(nil).eraseToAnyPublisher() }
+                return self.fetchUserProfileImage()
+            }
+            .sink { [weak self] url in
+                self?.userProfileImageSubject.send(url)
+            }
+            .store(in: &cancellables)
+        
         if let type = type {
-            let trigger = Publishers.Merge(viewDidLoad, input.reload.eraseToAnyPublisher())
-            
             trigger
                 .flatMap { [weak self] _ -> AnyPublisher<[FeedModel], Never> in
                     guard let self else { return Just([]).eraseToAnyPublisher() }
-                    self.isLoadingSubject.send(true)
-                    self.errorSubject.send(nil)
-                    
-                    let useCaseType: FeedType = (type == .recommended) ? .recommend : .following
-                    
-                    return self.feedUseCase.execute(type: useCaseType)
-                        .map { (entities, haveFollowing) -> [FeedModel] in
-                            let items = entities.map { e in
-                                FeedModel(
-                                    diaryID: e.diary.diaryId,
-                                    userID: e.profile.userId,
-                                    nickname: e.profile.nickname,
-                                    profileImg: e.profile.profileImg,
-                                    isMine: e.profile.isMine,
-                                    streak: e.profile.streak,
-                                    sharedDateMinutes: e.diary.sharedDate,
-                                    diaryPreviewText: e.diary.originalText,
-                                    diaryImageUrl: e.diary.diaryImg,
-                                    isLiked: e.diary.isLiked,
-                                    likeCount: e.diary.likeCount
-                                )
-                            }
-                            
-                            if type == .following {
-                                self.haveFollowingSubject.send(haveFollowing ?? false)
-                            } else {
-                                self.haveFollowingSubject.send(nil)
-                            }
-                            
-                            return items
-                        }
-                        .handleEvents(receiveCompletion: { [weak self] _ in
-                            self?.isLoadingSubject.send(false)
-                        })
-                        .catch { [weak self] error in
-                            self?.errorSubject.send(error.localizedDescription)
-                            return Just<[FeedModel]>([])
-                        }
-                        .eraseToAnyPublisher()
+                    return self.fetchFeeds(type: type)
                 }
                 .sink { [weak self] items in
                     self?.feedsSubject.send(items)
@@ -121,51 +98,115 @@ public final class FeedViewModel: BaseViewModel, BaseViewModelType {
         
         input.unpublish
             .sink { [weak self] diaryId in
-                self?.unpublishDiary(diaryId: diaryId)
+                _ = self?.unpublishDiary(diaryId: diaryId)
             }
             .store(in: &cancellables)
         
         input.likeTapped
             .sink { [weak self] (diaryId, isLiked) in
-                self?.toggleLike(diaryId: diaryId, isLiked: isLiked)
+                _ = self?.toggleLike(diaryId: diaryId, isLiked: isLiked)
             }
             .store(in: &cancellables)
-        
+
         return Output(
             feeds: feedsSubject.eraseToAnyPublisher(),
             haveFollowing: haveFollowingSubject.eraseToAnyPublisher(),
             isLoading: isLoadingSubject.eraseToAnyPublisher(),
             errorMessage: errorSubject.eraseToAnyPublisher(),
             publishResult: publishSubject.eraseToAnyPublisher(),
-            likeResult: likeSubject.eraseToAnyPublisher()
-
+            likeResult: likeSubject.eraseToAnyPublisher(),
+            userProfileImage: userProfileImageSubject.eraseToAnyPublisher()
         )
     }
     
-    // MARK: - Private
-
-    private func unpublishDiary(diaryId: Int) {
-        publishDiaryUseCase.unpublishDiary(diaryId: diaryId)
-            .sink(receiveCompletion: { [weak self] completion in
-                if case let .failure(error) = completion {
-                    self?.errorSubject.send("공개 상태 변경 실패: \(error.localizedDescription)")
+    // MARK: - Public Methods
+    
+    public func fetchFeeds(type: FeedListType) -> AnyPublisher<[FeedModel], Never> {
+        isLoadingSubject.send(true)
+        errorSubject.send(nil)
+        
+        let useCaseType: FeedType = (type == .recommended) ? .recommend : .following
+        
+        return feedUseCase.execute(type: useCaseType)
+            .map { [weak self] (entities, haveFollowing) -> [FeedModel] in
+                let items = entities.map { e in
+                    FeedModel(
+                        diaryID: e.diary.diaryId,
+                        userID: e.profile.userId,
+                        nickname: e.profile.nickname,
+                        profileImg: e.profile.profileImg,
+                        isMine: e.profile.isMine,
+                        streak: e.profile.streak,
+                        sharedDateMinutes: e.diary.sharedDate,
+                        diaryPreviewText: e.diary.originalText,
+                        diaryImageUrl: e.diary.diaryImg,
+                        isLiked: e.diary.isLiked,
+                        likeCount: e.diary.likeCount
+                    )
                 }
-            }, receiveValue: { [weak self] _ in
-                self?.publishSubject.send(false)
+                
+                if type == .following {
+                    self?.haveFollowingSubject.send(haveFollowing ?? false)
+                } else {
+                    self?.haveFollowingSubject.send(nil)
+                }
+                return items
+            }
+            .handleEvents(receiveCompletion: { [weak self] _ in
+                self?.isLoadingSubject.send(false)
             })
-            .store(in: &cancellables)
+            .catch { [weak self] error in
+                self?.errorSubject.send(error.localizedDescription)
+                return Just<[FeedModel]>([])
+            }
+            .eraseToAnyPublisher()
     }
     
-    private func toggleLike(diaryId: Int, isLiked: Bool) {
-        toggleLikeUseCase.toggleLike(diaryId: diaryId, isLiked: isLiked)
-            .sink(receiveCompletion: { [weak self] completion in
-                if case let .failure(error) = completion {
-                    self?.errorSubject.send("공감하기 실패: \(error.localizedDescription)")
-                }
-            }, receiveValue: { [weak self] _ in
-                self?.likeSubject.send((diaryId, !isLiked))
+    public func fetchUserProfileImage() -> AnyPublisher<String?, Never> {
+        return homeUseCase.fetchUserInfo()
+            .map { userInfo in
+                return userInfo.profileImg
+            }
+            .catch { [weak self] error -> Just<String?> in
+                self?.errorSubject.send(error.localizedDescription)
+                return Just(nil)
+            }
+            .eraseToAnyPublisher()
+    }
+    
+    public func publishDiary(diaryId: Int) -> AnyPublisher<Bool, Never> {
+        return publishDiaryUseCase.publishDiary(diaryId: diaryId)
+            .map { _ in true }
+            .catch { [weak self] error -> Just<Bool> in
+                self?.errorSubject.send("공개 실패: \(error.localizedDescription)")
+                return Just(false)
+            }
+            .eraseToAnyPublisher()
+    }
+
+    public func unpublishDiary(diaryId: Int) -> AnyPublisher<Bool, Never> {
+        return publishDiaryUseCase.unpublishDiary(diaryId: diaryId)
+            .map { _ in false }
+            .catch { [weak self] error -> Just<Bool> in
+                self?.errorSubject.send("비공개 실패: \(error.localizedDescription)")
+                return Just(false)
+            }
+            .handleEvents(receiveOutput: { [weak self] result in
+                self?.publishSubject.send(result)
             })
-            .store(in: &cancellables)
+            .eraseToAnyPublisher()
+    }
+    
+    public func toggleLike(diaryId: Int, isLiked: Bool) -> AnyPublisher<(Int, Bool), Never> {
+        return toggleLikeUseCase.toggleLike(diaryId: diaryId, isLiked: isLiked)
+            .map { _ in (diaryId, !isLiked) }
+            .catch { [weak self] error -> Just<(Int, Bool)> in
+                self?.errorSubject.send("공감하기 실패: \(error.localizedDescription)")
+                return Just((diaryId, isLiked))
+            }
+            .handleEvents(receiveOutput: { [weak self] result in
+                self?.likeSubject.send(result)
+            })
+            .eraseToAnyPublisher()
     }
 }
-
