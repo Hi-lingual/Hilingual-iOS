@@ -7,15 +7,29 @@
 
 import Foundation
 
-public struct DiaryWritingRequestDTO {
+public struct DiaryWritingRequestDTO: Encodable {
     public let originalText: String
     public let date: String
-    public let imageFile: Data
+    public let image: ImageFile?
+    
+    public struct ImageFile: Encodable {
+        public let fileKey: String
+        public let purpose: String
 
-    public init(originalText: String, date: String, imageFile: Data) {
+        public init(fileKey: String, purpose: String = "DIARY_IMAGE") {
+            self.fileKey = fileKey
+            self.purpose = purpose
+        }
+    }
+
+    public init(originalText: String, date: String, fileKey: String?) {
         self.originalText = originalText
         self.date = date
-        self.imageFile = imageFile
+        if let fileKey {
+            self.image = ImageFile(fileKey: fileKey)
+        } else {
+            self.image = nil
+        }
     }
 }
 
@@ -26,5 +40,5 @@ public struct DiaryWritingResponseDTO: Decodable {
 }
 
 public struct DiaryIdDTO: Decodable {
-    public let id: Int
+    public let diaryId: Int
 }

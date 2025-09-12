@@ -80,7 +80,7 @@ final class AppDIContainer: ViewControllerFactory {
     ) -> DiaryWritingViewController {
         
         let useCase = DummyDiaryWritingUseCase()
-        let viewModel = DiaryWritingViewModel(diaryWritingUseCase: useCase)
+        let viewModel = DiaryWritingViewModel(diaryWritingUseCase: makeDiaryWritingUseCase(), uploadImageUseCase: makeUploadImageUseCase())
         
         return DiaryWritingViewController(
             viewModel: viewModel,
@@ -305,7 +305,7 @@ extension AppDIContainer {
     }
 
     private func makeDiaryWritingViewModel() -> DiaryWritingViewModel {
-        return DiaryWritingViewModel(diaryWritingUseCase: makeDiaryWritingUseCase())
+        return DiaryWritingViewModel(diaryWritingUseCase: makeDiaryWritingUseCase(), uploadImageUseCase: makeUploadImageUseCase())
     }
 }
 
@@ -410,7 +410,7 @@ extension AppDIContainer {
 
 extension AppDIContainer {
     private func makeLoadingViewModel() -> LoadingViewModel {
-        return LoadingViewModel(diaryWritingUseCase: makeDiaryWritingUseCase())
+        return LoadingViewModel(diaryWritingUseCase: makeDiaryWritingUseCase(), uploadImageUseCase: makeUploadImageUseCase())
     }
 }
 

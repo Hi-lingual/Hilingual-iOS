@@ -15,12 +15,24 @@ public final class DiaryWritingViewModel: BaseViewModel {
     // MARK: - Dependencies
     
     private let diaryWritingUseCase: DiaryWritingUseCase
+    private let uploadImageUseCase: UploadImageUseCase
     
     // MARK: - State
     
     private let isLoadingSubject = CurrentValueSubject<Bool, Never>(false)
     private let errorSubject = PassthroughSubject<Error, Never>()
     private let successDiaryIdSubject = PassthroughSubject<Int, Never>()
+    
+    public var diaryResultPublisher: AnyPublisher<Result<Int, Error>, Never> {
+        let success = successDiaryIdSubject
+            .map { Result<Int, Error>.success($0) }
+        
+        let failure = errorSubject
+            .map { Result<Int, Error>.failure($0) }
+        
+        return Publishers.Merge(success, failure)
+            .eraseToAnyPublisher()
+    }
     
     public var isLoading: AnyPublisher<Bool, Never> {
         isLoadingSubject.eraseToAnyPublisher()
@@ -36,8 +48,9 @@ public final class DiaryWritingViewModel: BaseViewModel {
     
     // MARK: - Init
     
-    public init(diaryWritingUseCase: DiaryWritingUseCase) {
+    public init(diaryWritingUseCase: DiaryWritingUseCase, uploadImageUseCase: UploadImageUseCase) {
         self.diaryWritingUseCase = diaryWritingUseCase
+        self.uploadImageUseCase = uploadImageUseCase
         super.init()
     }
     
@@ -60,26 +73,5 @@ public final class DiaryWritingViewModel: BaseViewModel {
             .eraseToAnyPublisher()
         
         return Output(buttonActive: buttonActive)
-    }
-    
-    public func postDiary(originalText: String, date: String, imageFile: Data?) {
-        isLoadingSubject.send(true)
-        
-        let entity = DiaryWritingEntity(originalText: originalText, date: date, imageFile: imageFile)
-        
-        diaryWritingUseCase.postDiaryWriting(entity)
-            .receive(on: DispatchQueue.main)
-            .sink(receiveCompletion: { [weak self] completion in
-                self?.isLoadingSubject.send(false)
-                switch completion {
-                case .finished:
-                    break
-                case .failure(let err):
-                    self?.errorSubject.send(err)
-                }
-            }, receiveValue: { [weak self] response in
-                self?.successDiaryIdSubject.send(response.diaryId)
-            })
-            .store(in: &cancellables)
     }
 }
