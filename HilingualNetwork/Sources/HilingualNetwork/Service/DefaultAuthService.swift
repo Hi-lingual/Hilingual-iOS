@@ -13,33 +13,25 @@ public protocol AuthService {
     func loginWithApple(token: String) -> AnyPublisher<LoginResponseDTO, Error>
     func refreshToken(token: String) -> AnyPublisher<TokenRefreshResponseDTO, Error>
     func withdraw() -> AnyPublisher<Void, Error>
+    func logout() -> AnyPublisher<Void, Error>
 }
 
 public final class DefaultAuthService: BaseService<AuthAPI>, AuthService {
 
+    //TODO: - Uikit 의존성 제거하기
     public func loginWithApple(token: String) -> AnyPublisher<LoginResponseDTO, Error> {
-//        #if DEBUG
-//        let dummyResponse = LoginResponseDTO(
-//            accessToken: "debug_access_token",
-//            refreshToken: "debug_refresh_token",
-//            isProfileCompleted: false
-//        )
-//        return Just(dummyResponse)
-//            .setFailureType(to: Error.self)
-//            .eraseToAnyPublisher()
-//        #else
         let body = AuthLoginRequestDTO(
             provider: "APPLE",
             role: "USER",
             deviceName: UIDevice.current.name,
             deviceType: {
-                #if targetEnvironment(macCatalyst)
+#if targetEnvironment(macCatalyst)
                 return "DESKTOP"
-                #elseif os(iOS)
+#elseif os(iOS)
                 return UIDevice.current.userInterfaceIdiom == .pad ? "TABLET" : "PHONE"
-                #else
+#else
                 return "UNKNOWN"
-                #endif
+#endif
             }(),
             osType: UIDevice.current.systemName,
             osVersion: UIDevice.current.systemVersion,
@@ -54,19 +46,9 @@ public final class DefaultAuthService: BaseService<AuthAPI>, AuthService {
             }
             .mapError { $0 as Error }
             .eraseToAnyPublisher()
-//        #endif
     }
 
     public func refreshToken(token: String) -> AnyPublisher<TokenRefreshResponseDTO, Error> {
-//        #if DEBUG
-//        let dummyResponse = TokenRefreshResponseDTO(
-//            accessToken: "debug_refreshed_access_token",
-//            refreshToken: "debug_refreshed_refresh_token"
-//        )
-//        return Just(dummyResponse)
-//            .setFailureType(to: Error.self)
-//            .eraseToAnyPublisher()
-//        #else
         let target = AuthAPI.refreshToken(refreshToken: token)
         return request(target, as: BaseAPIResponse<TokenRefreshResponseDTO>.self)
             .tryMap { response in
@@ -74,10 +56,17 @@ public final class DefaultAuthService: BaseService<AuthAPI>, AuthService {
             }
             .mapError { $0 as Error }
             .eraseToAnyPublisher()
-//        #endif
     }
+
     public func withdraw() -> AnyPublisher<Void, Error> {
         return requestPlain(.withdraw)
+            .map { _ in }
+            .mapError { $0 as Error }
+            .eraseToAnyPublisher()
+    }
+
+    public func logout() -> AnyPublisher<Void, Error> {
+        return requestPlain(.logout)
             .map { _ in }
             .mapError { $0 as Error }
             .eraseToAnyPublisher()

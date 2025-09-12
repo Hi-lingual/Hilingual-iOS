@@ -7,7 +7,6 @@
 
 import Combine
 import Foundation
-import UIKit
 import SafariServices
 
 public final class MypageViewController: BaseUIViewController<MypageViewModel> {
@@ -43,6 +42,10 @@ public final class MypageViewController: BaseUIViewController<MypageViewModel> {
         mypageView.logoutButton.addTarget(self, action: #selector(presentLogoutDialog), for: .touchUpInside)
         mypageView.editButton.addTarget(self, action: #selector(editButtonTapped), for: .touchUpInside)
         mypageView.feedButton.addTarget(self, action: #selector(myFeedProfileButtonTapped), for: .touchUpInside)
+
+        mypageView.onEditProfileTap = { [weak self] in
+            self?.editButtonTapped()
+        }
 
         mypageView.onMenuTap = { [weak self] menu in
             guard let self else { return }

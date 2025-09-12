@@ -7,6 +7,7 @@
 
 import UIKit
 import SnapKit
+import SafariServices
 
 final class AgreementModalView: UIView {
 
@@ -125,19 +126,22 @@ final class AgreementModalView: UIView {
             self?.setAllAgreement(to: isChecked)
         }
 
-        serviceAgree.onTapLink = {
-            if let url = URL(string: "https://hilingual.com/terms/service") {
-                UIApplication.shared.open(url)
-            }
+        serviceAgree.onTapLink = { [weak self] in
+            guard let url = URL(string: "https://hilingual.notion.site/230829677ebf817a8091f49423cbbb11"),
+                  let vc = self?.parentViewController() else { return }
+            let safariVC = SFSafariViewController(url: url)
+            vc.present(safariVC, animated: true)
         }
 
-        privacyAgree.onTapLink = {
-            if let url = URL(string: "https://hilingual.com/terms/privacy") {
-                UIApplication.shared.open(url)
-            }
+        privacyAgree.onTapLink = { [weak self] in
+            guard let url = URL(string: "https://hilingual.notion.site/230829677ebf8104b52ce74c65c27607"),
+                  let vc = self?.parentViewController() else { return }
+            let safariVC = SFSafariViewController(url: url)
+            vc.present(safariVC, animated: true)
         }
 
         marketingAgree.onTapLink = nil
+
         [serviceAgree, privacyAgree, marketingAgree].forEach {
             $0.onToggle = { [weak self] _ in
                 self?.updateAgreementState()
@@ -147,8 +151,7 @@ final class AgreementModalView: UIView {
         updateAgreementState()
     }
 
-
-    // MARK: - Logic
+    // MARK: - Private Methods
 
     private func setAllAgreement(to checked: Bool) {
         [serviceAgree, privacyAgree, marketingAgree].forEach { $0.isChecked = checked }
