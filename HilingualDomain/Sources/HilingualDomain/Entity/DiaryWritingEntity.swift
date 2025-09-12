@@ -10,12 +10,22 @@ import Foundation
 public struct DiaryWritingEntity {
     public let originalText: String
     public let date: String
-    public let imageFile: Data?
+    public let image: ImageFile?
 
-    public init(originalText: String, date: String, imageFile: Data?) {
+    public init(originalText: String, date: String, fileKey: String?) {
         self.originalText = originalText
         self.date = date
-        self.imageFile = imageFile
+        self.image = fileKey.map { ImageFile(fileKey: $0) }
+    }
+    
+    public struct ImageFile {
+        public let fileKey: String
+        public let purpose: String
+
+        public init(fileKey: String, purpose: String = "DIARY_IMAGE") {
+            self.fileKey = fileKey
+            self.purpose = purpose
+        }
     }
 }
 

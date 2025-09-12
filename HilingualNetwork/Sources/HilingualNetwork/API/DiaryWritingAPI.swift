@@ -31,30 +31,15 @@ extension DiaryWritingAPI: TargetType {
 
     public var task: Task {
         switch self {
-        case .postDiaryWriting(let dto):
-            var formData = [MultipartFormData]()
-
-            if let textData = dto.originalText.data(using: .utf8) {
-                formData.append(MultipartFormData(provider: .data(textData), name: "originalText"))
-            }
-
-            if let dateData = dto.date.data(using: .utf8) {
-                formData.append(MultipartFormData(provider: .data(dateData), name: "date"))
-            }
-
-            formData.append(MultipartFormData(provider: .data(dto.imageFile),
-                                              name: "imageFile",
-                                              fileName: "image.jpg",
-                                              mimeType: "image/jpeg"))
-
-            return .uploadMultipart(formData)
+        case .postDiaryWriting(let requestDTO):
+            return .requestJSONEncodable(requestDTO)
         }
     }
 
     public var headers: [String: String]? {
         return [
+            "Content-Type": "application/json",
             "Authorization": "Bearer \(UserDefaultHandler.accessToken)"
-            // Moya가 Content-Type을 multipart/form-data로 자동 설정
         ]
     }
 

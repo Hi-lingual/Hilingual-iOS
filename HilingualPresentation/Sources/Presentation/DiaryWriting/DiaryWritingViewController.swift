@@ -101,21 +101,10 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
     
     @objc private func feedbackButtonTapped() {
         let text = diaryWritingView.textView.text
-
-        let imageData: Data?
-        if let image = diaryWritingView.selectedImageView.image {
-            imageData = image.jpegData(compressionQuality: 0.8)
-        } else {
-            imageData = nil
-        }
-
+        let imageData = diaryWritingView.selectedImageView.image?.jpegData(compressionQuality: 0.8)
         let dateString = selectedDate.toFormattedString("yyyy-MM-dd")
-        print("📤 postDiary 호출")
-
-        let entity = DiaryWritingEntity(originalText: text, date: dateString, imageFile: imageData)
-
-        let loadingVC = self.diContainer.makeLoadingViewController()
-        loadingVC.viewModel?.requestFeedback(with: entity)
+        let loadingVC = diContainer.makeLoadingViewController()
+        loadingVC.viewModel?.postDiary(originalText: text, date: dateString, imageFile: imageData)
         navigationController?.pushViewController(loadingVC, animated: true)
     }
     

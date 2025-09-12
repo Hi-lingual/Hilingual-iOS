@@ -14,6 +14,7 @@ public final class LoadingViewModel: BaseViewModel {
     // MARK: - Dependencies
 
     private let diaryWritingUseCase: DiaryWritingUseCase
+    private let uploadImageUseCase: UploadImageUseCase
     
     // MARK: - Properties
     
@@ -24,15 +25,21 @@ public final class LoadingViewModel: BaseViewModel {
     public var statePublisher: AnyPublisher<State, Never> { stateSubject.eraseToAnyPublisher() }
     public var diaryIdPublisher: AnyPublisher<Int?, Never> { diaryIdSubject.eraseToAnyPublisher() }
     
-    private var diaryEntity: DiaryWritingEntity?
+    private var originalText: String?
+    private var date: String?
+    private var imageFile: Data?
+    
     private var startTime: Date?
     private var errorCount = 0
     private let maxErrorCount = 2
 
     // MARK: - Init
-
-    public init(diaryWritingUseCase: DiaryWritingUseCase) {
+    public init(
+        diaryWritingUseCase: DiaryWritingUseCase,
+        uploadImageUseCase: UploadImageUseCase
+    ) {
         self.diaryWritingUseCase = diaryWritingUseCase
+        self.uploadImageUseCase = uploadImageUseCase
         super.init()
     }
 
@@ -57,7 +64,7 @@ public final class LoadingViewModel: BaseViewModel {
         let goToHome: AnyPublisher<Void, Never>
     }
 
-    // MARK: - Transform
+    // MARK: - Transfor
 
     @MainActor
     public func transform(input: Input) -> Output {
@@ -78,17 +85,19 @@ public final class LoadingViewModel: BaseViewModel {
     // MARK: - External API
 
     @MainActor
-    public func requestFeedback(with entity: DiaryWritingEntity) {
-        self.diaryEntity = entity
-        postDiary(entity: entity)
+    public func postDiary(originalText: String, date: String, imageFile: Data?) {
+        self.originalText = originalText
+        self.date = date
+        self.imageFile = imageFile
+        startDiaryRequest(originalText: originalText, date: date, imageFile: imageFile)
     }
 
     // MARK: - Internal
 
     @MainActor
     private func retryFeedback() {
-        guard let entity = diaryEntity else { return }
-        postDiary(entity: entity)
+        guard let originalText, let date else { return }
+        startDiaryRequest(originalText: originalText, date: date, imageFile: imageFile)
     }
 
     @MainActor
@@ -98,34 +107,71 @@ public final class LoadingViewModel: BaseViewModel {
     }
 
     @MainActor
-    private func postDiary(entity: DiaryWritingEntity) {
+    private func startDiaryRequest(originalText: String, date: String, imageFile: Data?) {
         startLoadingState()
-        
-        diaryWritingUseCase.postDiaryWriting(entity)
-            .sink { [weak self] completion in
-                guard let self = self else { return }
-                if case .failure = completion {
+        let contentType = "image/jpeg"
+
+        if let data = imageFile {
+            uploadImageUseCase
+                .execute(data: data, contentType: contentType, purpose: "DIARY_IMAGE")
+                    .receive(on: DispatchQueue.main)
+                    .flatMap { [weak self] fileKey -> AnyPublisher<DiaryWritingResponseEntity, Error> in
+                        guard let self else {
+                            return Empty<DiaryWritingResponseEntity, Error>().eraseToAnyPublisher()
+                        }
+                        let entity = DiaryWritingEntity(
+                            originalText: originalText,
+                            date: date,
+                            fileKey: fileKey
+                        )
+                        return self.diaryWritingUseCase.postDiaryWriting(entity)
+                    }
+                .receive(on: DispatchQueue.main)
+                .sink { [weak self] completion in
+                    guard let self else { return }
+                    if case .failure = completion {
+                        Task { @MainActor in
+                            await self.handleFeedbackCompleted(success: false)
+                        }
+                    }
+                } receiveValue: { [weak self] response in
+                    guard let self else { return }
+                    self.diaryIdSubject.send(response.diaryId)
                     Task { @MainActor in
-                        await self.handleFeedbackCompleted(success: false)
+                        await self.handleFeedbackCompleted(success: true)
                     }
                 }
-            } receiveValue: { [weak self] response in
-                guard let self = self else { return }
-                self.diaryIdSubject.send(response.diaryId)
-                Task { @MainActor in
-                    await self.handleFeedbackCompleted(success: true)
+                .store(in: &cancellables)
+            
+        } else {
+            let entity = DiaryWritingEntity(
+                originalText: originalText,
+                date: date,
+                fileKey: nil
+            )
+            
+            diaryWritingUseCase.postDiaryWriting(entity)
+                .receive(on: DispatchQueue.main)
+                .sink { [weak self] completion in
+                    guard let self else { return }
+                    if case .failure = completion {
+                        Task { @MainActor in
+                            await self.handleFeedbackCompleted(success: false)
+                        }
+                    }
+                } receiveValue: { [weak self] response in
+                    guard let self else { return }
+                    self.diaryIdSubject.send(response.diaryId)
+                    Task { @MainActor in
+                        await self.handleFeedbackCompleted(success: true)
+                    }
                 }
-            }
-            .store(in: &cancellables)
+                .store(in: &cancellables)
+        }
     }
 
     @MainActor
     private func handleFeedbackCompleted(success: Bool) async {
-        guard let startTime = startTime else { return }
-        let elapsed = Date().timeIntervalSince(startTime)
-        let delay = max(3 - elapsed, 0)
-        try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
-        
         if success {
             errorCount = 0
             stateSubject.send(.success)
