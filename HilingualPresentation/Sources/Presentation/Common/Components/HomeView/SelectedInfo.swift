@@ -308,7 +308,7 @@ final class SelectedInfo: UIView {
         let highlightText: String
 
         if remainingTime >= 60 {
-            let hours = remainingTime / 60
+            let hours = Int(ceil(Double(remainingTime) / 60.0))
             highlightText = "\(hours)"
             fullText = "\(highlightText)시간 남았어요"
         } else {

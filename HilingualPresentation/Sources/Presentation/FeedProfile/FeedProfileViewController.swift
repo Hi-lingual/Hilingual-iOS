@@ -57,14 +57,12 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
         view.addSubview(feedCellView)
         feedCellView.snp.makeConstraints { $0.edges.equalToSuperview() }
         
-        //위로 끌어당겼을 때 새로고침 추가
         let refreshControl = UIRefreshControl()
         refreshControl.addTarget(self, action: #selector(didTopScrollRefresh), for: .valueChanged)
-        feedCellView.tableView.refreshControl = refreshControl
         
+        feedCellView.tableView.refreshControl = refreshControl
         feedCellView.tableView.delegate = self
         feedCellView.tableView.dataSource = feedCellView
-        
         feedCellView.tableView.alwaysBounceVertical = false
         
         feedCellView.addTableTapGesture(target: self, action: #selector(didTapTableView))
@@ -77,6 +75,21 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
             self?.onReportTapped?()
         }
         
+        feedCellView.onProfileTapped = { [weak self] row in
+            guard let self else { return }
+            let user = self.currentFeeds[row]
+            
+            let targetId = self.viewModel?.targetUserId ?? 0
+            
+            if user.isMine || Int64(user.userID) == targetId {
+                return
+            }
+            
+            let vc = self.diContainer.makeUserFeedProfileViewController(userId: Int64(user.userID))
+            vc.hidesBottomBarWhenPushed = true
+            self.navigationController?.pushViewController(vc, animated: true)
+        }
+
         feedCellView.onFeedTextTapped = { [weak self] row in
             guard let self else { return }
             let feed = self.currentFeeds[row]
@@ -149,6 +162,12 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
         DispatchQueue.main.async {
             self.footerForStickyHeader()
         }
+    }
+    
+    public func resetScrollPosition() {
+        let tableView = feedCellView.tableView
+        tableView.setContentOffset(.zero, animated: false)
+        onScroll?(0)
     }
     
     public func refresh() {

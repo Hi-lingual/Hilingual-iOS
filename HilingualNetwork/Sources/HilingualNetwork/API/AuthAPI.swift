@@ -11,6 +11,7 @@ public enum AuthAPI {
     case socialLogin(body: AuthLoginRequestDTO, providerToken: String)
     case refreshToken(refreshToken: String)
     case withdraw
+    case logout
 }
 
 extension AuthAPI: NoAuthorizeTargetType {
@@ -22,6 +23,8 @@ extension AuthAPI: NoAuthorizeTargetType {
             return "/users/reissue"
         case .withdraw:
             return "/auth/leave"
+        case .logout:
+            return "/auth/logout"
         }
     }
 
@@ -33,6 +36,8 @@ extension AuthAPI: NoAuthorizeTargetType {
             return .post
         case .withdraw:
             return .post
+        case .logout:
+            return .post
         }
     }
 
@@ -43,6 +48,8 @@ extension AuthAPI: NoAuthorizeTargetType {
         case .refreshToken:
             return .requestPlain
         case .withdraw:
+            return .requestPlain
+        case .logout:
             return .requestPlain
         }
     }
@@ -60,6 +67,11 @@ extension AuthAPI: NoAuthorizeTargetType {
                 "Authorization": "Bearer \(refreshToken)"
             ]
         case .withdraw:
+            return [
+                "Content-Type": "application/json",
+                "Authorization": "Bearer \(UserDefaultHandler.accessToken)"
+            ]
+        case .logout:
             return [
                 "Content-Type": "application/json",
                 "Authorization": "Bearer \(UserDefaultHandler.accessToken)"

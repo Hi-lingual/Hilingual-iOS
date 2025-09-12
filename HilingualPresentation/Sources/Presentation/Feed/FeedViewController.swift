@@ -22,12 +22,7 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
     private lazy var recommendFeedVC: FeedListViewController = {
         let vc = diContainer.makeFeedListViewController(type: .recommended)
         vc.onHideTapped = { [weak self] row in
-            self?.showHideDialog(
-                listVC: vc,
-                row: row,
-                title: "영어 일기를 비공개 하시겠어요?",
-                content: "비공개로 전환 시,\n해당 일기의 피드 활동 내역은 모두 사라져요."
-            )
+            self?.showHideDialog(listVC: vc, row: row)
         }
         vc.onReportTapped = { [weak self] in
             self?.showReportDialog()
@@ -44,12 +39,7 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
     private lazy var followingFeedVC: FeedListViewController = {
         let vc = diContainer.makeFeedListViewController(type: .following)
         vc.onHideTapped = { [weak self] row in
-            self?.showHideDialog(
-                listVC: vc,
-                row: row,
-                title: "영어 일기를 비공개 하시겠어요?",
-                content: "비공개로 전환 시,\n해당 일기의 피드 활동 내역은 모두 사라져요."
-            )
+            self?.showHideDialog(listVC: vc, row: row)
         }
         vc.onReportTapped = { [weak self] in
             self?.showReportDialog()
@@ -71,10 +61,6 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
             viewControllers: [recommendFeedVC, followingFeedVC],
             titles: ["추천", "팔로잉"]
         )
-
-        view.addSubview(dialog)
-        dialog.isHidden = true
-        dialog.snp.makeConstraints { $0.edges.equalToSuperview() }
     }
     
     public override func loadView() {
@@ -84,14 +70,25 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: false)
+        
+        input.reload.send()
+
+        recommendFeedVC.refresh()
+        followingFeedVC.refresh()
     }
     
-    public override func viewDidLoad() {
-        super.viewDidLoad()
+    // MARK: - Binding
+    
+    public override func bind(viewModel: FeedViewModel) {
+        let output = viewModel.transform(input: input)
         
-        if let viewModel = viewModel {
-            _ = viewModel.transform(input: input)
-        }
+        
+        output.userProfileImage
+            .receive(on: RunLoop.main)
+            .sink { [weak self] url in
+                self?.feedView.updateProfileImage(url)
+            }
+            .store(in: &viewModel.cancellables)
     }
     
     public override func viewDidAppear(_ animated: Bool) {
@@ -138,11 +135,16 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
         feedView.showToast(message: message)
     }
 
-    func showHideDialog(listVC: FeedListViewController, row: Int, title: String, content: String) {
+    func showHideDialog(listVC: FeedListViewController, row: Int) {
+        guard let containerView = self.tabBarController?.view else { return }
+        
+        containerView.addSubview(dialog)
+        dialog.snp.remakeConstraints { $0.edges.equalTo(containerView) }
+        
         dialog.configure(
             style: .normal,
-            title: title,
-            content: content,
+            title: "영어 일기를 비공개 하시겠어요?",
+            content: "비공개로 전환 시,\n해당 일기의 피드 활동 내역은 모두 사라져요.",
             leftButtonTitle: "취소",
             rightButtonTitle: "확인",
             leftAction: { [weak self] in
@@ -158,10 +160,15 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
         )
         dialog.isHidden = false
         dialog.showAnimation()
-        view.bringSubviewToFront(dialog)
+        containerView.bringSubviewToFront(dialog)
     }
-    
+
     private func showReportDialog() {
+        guard let containerView = self.tabBarController?.view else { return }
+        
+        containerView.addSubview(dialog)
+        dialog.snp.remakeConstraints { $0.edges.equalTo(containerView) }
+        
         dialog.configure(
             style: .normal,
             title: "게시글을 신고하시겠어요?",
@@ -178,11 +185,13 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
         )
         dialog.isHidden = false
         dialog.showAnimation()
-        view.bringSubviewToFront(dialog)
+        containerView.bringSubviewToFront(dialog)
     }
 
     private func openReportPage() {
-        guard let url = URL(string: "https://hilingual.notion.site/230829677ebf801c965be24b0ef444e9") else { return }
+        guard let url =
+                URL(string: "https://hilingual.notion.site/230829677ebf801c965be24b0ef444e9")
+        else { return }
         let safariVC = SFSafariViewController(url: url)
         self.present(safariVC, animated: true)
     }

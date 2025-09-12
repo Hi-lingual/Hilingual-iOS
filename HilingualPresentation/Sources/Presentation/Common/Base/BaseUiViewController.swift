@@ -1,6 +1,6 @@
 //
 //  BaseUIViewController.swift
-//  Hilingual
+//  HilingualPresentation
 //
 //  Created by 성현주 on 7/2/25.
 //
@@ -11,19 +11,19 @@ import Combine
 public class BaseUIViewController<VM: BaseViewBindable>: UIViewController {
 
     // MARK: - Properties
-
+    
     public var cancellables = Set<AnyCancellable>()
     public var viewModel: VM?
     public let diContainer: any ViewControllerFactory
 
     // MARK: - Init
-
     public init(viewModel: VM, diContainer: any ViewControllerFactory) {
         self.viewModel = viewModel
         self.diContainer = diContainer
         super.init(nibName: nil, bundle: nil)
         bind(viewModel: viewModel)
         setupNavigationBar()
+        observeSessionExpired()
         HilingualLog.debug("[VC LifeCycle] \(Self.self) init")
     }
 
@@ -33,7 +33,6 @@ public class BaseUIViewController<VM: BaseViewBindable>: UIViewController {
     }
 
     // MARK: - Life Cycle
-
     public override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
@@ -46,33 +45,44 @@ public class BaseUIViewController<VM: BaseViewBindable>: UIViewController {
     }
 
     // MARK: - Custom Method
-
     open func setUI() {}
     open func setLayout() {}
     open func addTarget() {}
     open func setDelegate() {}
 
     //MARK: - Bind Method
-
     open func bind(viewModel: VM) {
         self.viewModel = viewModel
     }
 
     // MARK: - Navigation Method
+    open func navigationType() -> NavigationType? { nil }
+    @objc open func backButtonTapped() { navigationController?.popViewController(animated: true) }
+    @objc open func menuButtonTapped() {}
 
-    open func navigationType() -> NavigationType? {
-        return nil
+    // MARK: - Session Expired Handling
+    private func observeSessionExpired() {
+        NotificationCenter.default.publisher(for: Notification.Name("SessionExpired"))
+            .receive(on: RunLoop.main)
+            .sink { [weak self] _ in
+                self?.handleSessionExpired()
+            }
+            .store(in: &cancellables)
     }
 
-    @objc open func backButtonTapped() {
-        navigationController?.popViewController(animated: true)
-    }
+    private func handleSessionExpired() {
+        print("⚠️ 세션 만료 → Splash 화면으로 이동")
+        let splashVC = diContainer.makeSplashViewController()
+        let nav = UINavigationController(rootViewController: splashVC)
 
-    @objc open func menuButtonTapped() {
+        if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+           let window = scene.windows.first {
+            window.rootViewController = nav
+            window.makeKeyAndVisible()
+        }
     }
 
     // MARK: - Deinit
-
     deinit {
         HilingualLog.debug("[VC LifeCycle] \(Self.self) deinit")
     }

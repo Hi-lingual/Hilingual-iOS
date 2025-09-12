@@ -48,8 +48,8 @@ final class OnBoardingView: BaseUIView {
         return label
     }()
 
-    let nicknameTextField: TextField = {
-        let textfield = TextField()
+    let nicknameTextField: nickNameTextField = {
+        let textfield = nickNameTextField()
         textfield.setPlaceholder("한글, 영문, 숫자 조합만 가능")
         return textfield
     }()

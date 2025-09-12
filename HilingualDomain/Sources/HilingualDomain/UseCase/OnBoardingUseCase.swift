@@ -10,7 +10,7 @@ import Combine
 
 public protocol OnBoardingUseCase {
     func validate(_ nickname: String) -> NicknameValidationResult
-    func checkDuplicate(_ nickname: String) -> AnyPublisher<Bool, Error>
+    func checkDuplicate(_ nickname: String) -> AnyPublisher<(Bool, String?), Never>
     func registerProfile(nickname: String, adAlarmAgree: Bool, fileKey: String?) -> AnyPublisher<Void, Error>
 }
 
@@ -34,7 +34,7 @@ public final class DefaultOnBoardingUseCase: OnBoardingUseCase {
         }
     }
 
-    public func checkDuplicate(_ nickname: String) -> AnyPublisher<Bool, Error> {
+    public func checkDuplicate(_ nickname: String) -> AnyPublisher<(Bool, String?), Never> {
         return onBoardingRepository.isNicknameAvailable(nickname)
     }
 
