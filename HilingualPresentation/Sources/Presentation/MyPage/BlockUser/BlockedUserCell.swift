@@ -41,6 +41,7 @@ final class BlockedUserCell: UITableViewCell {
         setLayout()
         unblockButton.addTarget(self, action: #selector(didTapButton), for: .touchUpInside)
         addTapGestures()
+        selectionStyle = .none
     }
 
     required init?(coder: NSCoder) {

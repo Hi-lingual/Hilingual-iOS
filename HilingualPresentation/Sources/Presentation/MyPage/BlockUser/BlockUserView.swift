@@ -22,10 +22,17 @@ final class BlockUserView: BaseUIView {
         return tableView
     }()
 
+    let emptyView: EmptyView = {
+        let view = EmptyView()
+        view.isHidden = true
+        view.configure(message: "차단한 유저가 없어요.", imageName: "img_search_ios")
+        return view
+    }()
+
     // MARK: - UI Setup
 
     override func setUI() {
-        addSubview(tableView)
+        addSubviews(tableView,emptyView)
         tableView.refreshControl = refreshControl
     }
 
@@ -34,6 +41,10 @@ final class BlockUserView: BaseUIView {
             $0.top.equalTo(safeAreaLayoutGuide)
             $0.horizontalEdges.equalToSuperview()
             $0.bottom.equalToSuperview()
+        }
+
+        emptyView.snp.makeConstraints {
+            $0.center.equalToSuperview()
         }
     }
 }

@@ -57,9 +57,14 @@ public final class BlockUserViewController: BaseUIViewController<BlockUserViewMo
 
         output.blockedUsers
             .receive(on: RunLoop.main)
-            .sink { [weak self] _ in
-                self?.blockUserView.tableView.reloadData()
-                self?.blockUserView.refreshControl.endRefreshing()
+            .sink { [weak self] users in
+                guard let self else { return }
+                self.blockUserView.tableView.reloadData()
+                self.blockUserView.refreshControl.endRefreshing()
+
+                let isEmpty = users.isEmpty
+                self.blockUserView.emptyView.isHidden = !isEmpty
+                self.blockUserView.tableView.isHidden = isEmpty
             }
             .store(in: &cancellables)
     }
