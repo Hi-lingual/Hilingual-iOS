@@ -20,14 +20,15 @@ public final class LoginViewController: BaseUIViewController<LoginViewModel> {
     //MARK: - Life cycle
 
 
-    public override func viewDidAppear(_ animated: Bool) {
+    public override func viewWillAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        if !LoginViewController.hasShownSplash {
-            loginView.startSplashAnimation()
-            LoginViewController.hasShownSplash = true
-        }
+//        if !LoginViewController.hasShownSplash {
+//            loginView.startSplashAnimation()
+//            LoginViewController.hasShownSplash = true
+//        }
+        loginView.startSplashAnimation()
+        navigationController?.navigationBar.isHidden = true
     }
-
 
     // MARK: - Custom Layout
 
@@ -93,7 +94,8 @@ public final class LoginViewController: BaseUIViewController<LoginViewModel> {
                 guard let self else { return }
                 print("로그인 -> 온보딩(인증->닉네임)")
                 let verificationVC = self.diContainer.makeVerificationCodeViewController()
-                self.navigationController?.pushViewController(verificationVC, animated: true)
+//                self.navigationController?.pushViewController(verificationVC, animated: true)
+                changeRootVC(verificationVC)
             }
             .store(in: &cancellables)
 

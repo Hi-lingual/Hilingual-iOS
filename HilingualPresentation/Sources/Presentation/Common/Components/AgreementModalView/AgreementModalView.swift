@@ -33,7 +33,7 @@ final class AgreementModalView: UIView {
     private let allAgree = AgreementRow(title: "전체 동의", isBold: true)
     private let serviceAgree = AgreementRow(title: "하이링구얼 서비스 이용약관 동의 (필수)")
     private let privacyAgree = AgreementRow(title: "개인정보 수집 및 이용 동의 (필수)")
-    private let marketingAgree = AgreementRow(title: "광고성 정보 수신 동의 (선택)")
+    private let marketingAgree = AgreementRow(title: "앱 내 광고성 정보 수신 동의 (선택)")
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -74,7 +74,6 @@ final class AgreementModalView: UIView {
         allAgreeContainer.addSubview(allAgree)
 
         stackView.axis = .vertical
-        stackView.spacing = 12
         [serviceAgree, privacyAgree, marketingAgree].forEach {
             stackView.addArrangedSubview($0)
         }
@@ -95,12 +94,12 @@ final class AgreementModalView: UIView {
         }
 
         descriptionLabel.snp.makeConstraints {
-            $0.top.equalTo(titleLabel.snp.bottom).offset(6)
+            $0.top.equalTo(titleLabel.snp.bottom).offset(4)
             $0.leading.trailing.equalTo(titleLabel)
         }
 
         allAgreeContainer.snp.makeConstraints {
-            $0.top.equalTo(descriptionLabel.snp.bottom).offset(24)
+            $0.top.equalTo(descriptionLabel.snp.bottom).offset(32)
             $0.leading.trailing.equalTo(titleLabel)
             $0.height.equalTo(52)
         }
@@ -110,14 +109,14 @@ final class AgreementModalView: UIView {
         }
 
         stackView.snp.makeConstraints {
-            $0.top.equalTo(allAgreeContainer.snp.bottom).offset(16)
+            $0.top.equalTo(allAgreeContainer.snp.bottom).offset(12)
             $0.leading.trailing.equalTo(titleLabel)
         }
 
         startButton.snp.makeConstraints {
-            $0.top.equalTo(stackView.snp.bottom).offset(24)
+            $0.top.equalTo(stackView.snp.bottom).offset(74)
             $0.leading.trailing.equalTo(titleLabel)
-            $0.bottom.equalToSuperview().inset(36)
+            $0.bottom.equalToSuperview().inset(46)
         }
     }
 

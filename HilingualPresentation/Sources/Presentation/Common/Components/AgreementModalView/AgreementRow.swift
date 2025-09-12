@@ -75,12 +75,14 @@ final class AgreementRow: UIControl {
 
         updateAppearance()
     }
-
+    
     private func updateTitleUnderline() {
+        let textColor: UIColor = isBold ? .hilingualBlack : .gray400
+        
         if onTapLink != nil {
             let attributes: [NSAttributedString.Key: Any] = [
                 .font: isBold ? UIFont.suit(.body_sb_16) : UIFont.suit(.body_sb_14),
-                .foregroundColor: UIColor.gray400,
+                .foregroundColor: textColor,
                 .underlineStyle: NSUnderlineStyle.single.rawValue
             ]
             titleLabel.attributedText = NSAttributedString(string: title, attributes: attributes)
@@ -89,7 +91,7 @@ final class AgreementRow: UIControl {
                 string: title,
                 attributes: [
                     .font: isBold ? UIFont.suit(.body_sb_16) : UIFont.suit(.body_sb_14),
-                    .foregroundColor: UIColor.gray400
+                    .foregroundColor: textColor
                 ]
             )
         }

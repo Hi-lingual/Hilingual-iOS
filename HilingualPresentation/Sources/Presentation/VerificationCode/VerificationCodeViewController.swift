@@ -20,6 +20,7 @@ public final class VerificationCodeViewController: BaseUIViewController<Verifica
 
     public override func setUI() {
         view.addSubviews(verificationCodeView, dialog)
+        verificationCodeView.codeView.becomeFirstResponder()
     }
 
     public override func setLayout() {
@@ -30,7 +31,7 @@ public final class VerificationCodeViewController: BaseUIViewController<Verifica
     // MARK: - Navigation
 
     public override func navigationType() -> NavigationType? {
-        .backTitle("인증 번호 입력")
+        .titleOnly("인증 번호 입력")
     }
 
     // MARK: - Bind

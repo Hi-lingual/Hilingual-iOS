@@ -36,7 +36,7 @@ final class WordBookEmptyView: UIView {
         button.setTitleColor(.white, for: .normal)
         button.titleLabel?.font = .suit(.body_m_16)
         button.backgroundColor = .hilingualBlack
-        button.layer.cornerRadius = 12
+        button.layer.cornerRadius = 8
         button.clipsToBounds = true
         return button
     }()

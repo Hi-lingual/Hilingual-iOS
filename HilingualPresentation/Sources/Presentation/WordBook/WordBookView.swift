@@ -146,7 +146,7 @@ final class WordBookView: BaseUIView {
         }
 
         searchBar.snp.makeConstraints {
-            $0.top.equalTo(titleLabel.snp.bottom).offset(17)
+            $0.top.equalTo(titleLabel.snp.bottom).offset(7)
             $0.leading.trailing.equalToSuperview().inset(8)
         }
 

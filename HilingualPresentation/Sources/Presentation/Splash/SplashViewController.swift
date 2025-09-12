@@ -55,14 +55,9 @@ public final class SplashViewController: BaseUIViewController<SplashViewModel> {
             .sink { [weak self] in
                 guard let self else { return }
                 print("스플래시 → 온보딩(로그인 → 인증코드)")
-
-                let loginVC = self.diContainer.makeLoginViewController()
                 let verificationVC = self.diContainer.makeVerificationCodeViewController()
 
-                let nav = UINavigationController()
-                nav.setViewControllers([loginVC, verificationVC], animated: false)
-
-                changeRootVC(nav, animated: true)
+                changeRootVC(verificationVC, animated: true)
             }
             .store(in: &cancellables)
 

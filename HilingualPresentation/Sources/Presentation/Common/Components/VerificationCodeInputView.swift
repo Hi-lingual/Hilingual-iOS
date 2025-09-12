@@ -61,7 +61,8 @@ final class VerificationCodeInputView: BaseUIView, UIKeyInput, UITextInputTraits
         let label = UILabel()
         label.font = .suit(.caption_r_12)
         label.textColor = .alertRed
-        label.numberOfLines = 0
+        label.alpha = 0
+        label.numberOfLines = 1
         return label
     }()
 
@@ -97,6 +98,14 @@ final class VerificationCodeInputView: BaseUIView, UIKeyInput, UITextInputTraits
             $0.center.equalToSuperview()
         }
         mainStack.snp.makeConstraints { $0.edges.equalToSuperview() }
+
+        messageLabel.snp.makeConstraints {
+            $0.height.equalTo(16)
+        }
+
+        self.snp.makeConstraints {
+            $0.height.equalTo(88)
+        }
     }
 
     private func setAction() {
@@ -119,7 +128,7 @@ final class VerificationCodeInputView: BaseUIView, UIKeyInput, UITextInputTraits
                 label.textAlignment = .center
                 label.font = .suit(.head_sb_20)
                 label.textColor = .label
-                label.backgroundColor = .gray100   
+                label.backgroundColor = .gray100
                 label.layer.cornerRadius = 8
                 label.layer.masksToBounds = true
                 label.layer.borderWidth = 1
@@ -141,7 +150,7 @@ final class VerificationCodeInputView: BaseUIView, UIKeyInput, UITextInputTraits
         switch currentState {
         case .normal:
             messageLabel.text = nil
-            messageLabel.isHidden = true
+            messageLabel.alpha = 0
 
             for (idx, label) in boxViews.enumerated() {
                 let isFilled = idx < internalText.count
@@ -158,7 +167,7 @@ final class VerificationCodeInputView: BaseUIView, UIKeyInput, UITextInputTraits
 
         case .error(let message):
             messageLabel.text = message
-            messageLabel.isHidden = false
+            messageLabel.alpha = 1   
             for label in boxViews {
                 label.backgroundColor = .white
                 label.layer.borderColor = UIColor.alertRed.cgColor
@@ -195,21 +204,28 @@ final class VerificationCodeInputView: BaseUIView, UIKeyInput, UITextInputTraits
     }
 
     private func updateBox(_ label: UILabel, at index: Int, chars: [Character]) {
-        if case .error = currentState {
-            label.text = (index < chars.count) ? String(chars[index]) : ""
-            return
-        }
-
         if index < chars.count {
             label.text = String(chars[index])
-            label.backgroundColor = .white
-            label.layer.borderColor = UIColor.black.cgColor
-            label.layer.borderWidth = 1
         } else {
             label.text = ""
-            label.backgroundColor = .gray100
-            label.layer.borderColor = UIColor.gray100.cgColor
-            label.layer.borderWidth = 1
+        }
+
+        switch currentState {
+        case .error:
+            label.backgroundColor = .white
+            label.layer.borderColor = UIColor.alertRed.cgColor
+            label.textColor = .alertRed
+
+        case .normal:
+            if index < chars.count {
+                label.backgroundColor = .white
+                label.layer.borderColor = UIColor.black.cgColor
+                label.textColor = .black
+            } else {
+                label.backgroundColor = .gray100
+                label.layer.borderColor = UIColor.gray100.cgColor
+                label.textColor = .label
+            }
         }
     }
 
