@@ -78,13 +78,13 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
         feedCellView.onProfileTapped = { [weak self] row in
             guard let self else { return }
             let user = self.currentFeeds[row]
-
+            
             let targetId = self.viewModel?.targetUserId ?? 0
-
-            if Int64(user.userID) == targetId {
+            
+            if user.isMine || Int64(user.userID) == targetId {
                 return
             }
-
+            
             let vc = self.diContainer.makeUserFeedProfileViewController(userId: Int64(user.userID))
             vc.hidesBottomBarWhenPushed = true
             self.navigationController?.pushViewController(vc, animated: true)
