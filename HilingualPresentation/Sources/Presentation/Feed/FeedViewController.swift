@@ -84,9 +84,6 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: false)
-
-        recommendFeedVC.refresh()
-        followingFeedVC.refresh()
     }
     
     public override func viewDidLoad() {
@@ -95,7 +92,13 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
         if let viewModel = viewModel {
             _ = viewModel.transform(input: input)
         }
-
+    }
+    
+    public override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        recommendFeedVC.refresh()
+        followingFeedVC.refresh()
     }
 
     //MARK: - Action
