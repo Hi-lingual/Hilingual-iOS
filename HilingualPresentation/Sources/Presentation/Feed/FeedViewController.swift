@@ -90,6 +90,13 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
             }
             .store(in: &viewModel.cancellables)
     }
+    
+    public override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        recommendFeedVC.refresh()
+        followingFeedVC.refresh()
+    }
 
     //MARK: - Action
 

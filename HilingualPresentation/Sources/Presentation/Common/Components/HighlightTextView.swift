@@ -123,7 +123,7 @@ final class HighlightTextView: BaseUIView {
             highlightCorrections(textType: highlightText, diffRanges: diffRanges)
             textCountLabel.text = "\(highlightText.count)/1500"
         } else {
-            let attr = NSMutableAttributedString(attributedString: .suit(.body_r_16, text: originalText))
+            let attr = NSMutableAttributedString(attributedString: .suit(.body_r_16, text: originalText, lineBreakMode: .byWordWrapping, forceWrap: true))
             attr.addAttribute(.foregroundColor, value: UIColor.hilingualBlack, range: NSRange(location: 0, length: attr.length))
             textView.attributedText = attr
             textCountLabel.text = "\(originalText.count)/1000"

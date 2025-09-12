@@ -96,6 +96,7 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
     
     public override func viewWillAppear(_ animated: Bool) {
         navigationController?.setNavigationBarHidden(false, animated: false)
+        updateButtonTitle()
     }
     
     // MARK: - Custom Method
@@ -185,8 +186,8 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
                 if isPublished {
                     toast.configure(type: .withButton, message: "일기가 게시되었어요!")
                     toast.action = { [weak self] in
-                        let vc = self?.diContainer.makeSharedDiaryViewController(diaryId: self?.diaryId ?? 0)
-                        self?.navigationController?.pushViewController(vc!, animated: true)
+                        self?.tabBarController?.selectedIndex = 2
+                        self?.navigationController?.popToRootViewController(animated: false)
                     }
                 } else {
                     toast.configure(type: .basic, message: "일기가 비공개 되었어요.")
@@ -331,10 +332,10 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
             title: "앗! 일시적인 오류가 발생했어요.",
             rightButtonTitle: "확인",
             rightAction: { [weak self] in
-                self?.navigationController?.popViewController(animated: true)
+//                self?.navigationController?.popViewController(animated: true)
+                self?.dialog.dismiss()
             }
         )
-        
         dialog.showAnimation()
     }
 }

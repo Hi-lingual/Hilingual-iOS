@@ -84,7 +84,7 @@ final class FeedbackView: BaseUIView {
         separator.backgroundColor = .gray300
         
         let label = UILabel()
-        label.text = "완벽한 일기네요. 틀린 부분 하나 없이 잘 썼어요!"
+        label.text = "추가 설명이 필요 없는 일기네요!"
         label.font = .suit(.body_m_14)
         label.textColor = .hilingualBlack
 

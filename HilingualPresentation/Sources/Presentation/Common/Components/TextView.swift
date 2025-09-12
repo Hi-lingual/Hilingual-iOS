@@ -32,13 +32,17 @@ final class TextView: UIView {
         let textView = UITextView()
         textView.backgroundColor = .gray100
         textView.font = .suit(.body_r_16)
-        textView.attributedText = .suit(.body_r_16, text: "")
+        textView.attributedText = .suit(.body_r_16, text: "", lineBreakMode: .byWordWrapping, forceWrap: true)
+//        textView.attributedText = .suit(.body_r_16, text: "")
         textView.textColor = .black
         textView.isScrollEnabled = true
         textView.autocorrectionType = .no
         textView.spellCheckingType = .no
         textView.layer.borderWidth = 0
         textView.layer.borderColor = UIColor.hilingualBlack.cgColor
+//        textView.textContainer.lineBreakMode = .byWordWrapping
+//        textView.textContainer.widthTracksTextView = true
+//        textView.textContainer.lineFragmentPadding = 0
         return textView
     }()
     
@@ -130,7 +134,7 @@ final class TextView: UIView {
     
     // MARK: - Helper
     private func setTypingAttributesToSuitBodyR16() {
-        let probe = NSAttributedString.suit(.body_r_16, text: " ")
+        let probe = NSAttributedString.suit(.body_r_16, text: " ", lineBreakMode: .byWordWrapping, forceWrap: true)
         let attrs = probe.attributes(at: 0, effectiveRange: nil)
         textView.typingAttributes = attrs
     }
