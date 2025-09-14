@@ -11,7 +11,6 @@ import Combine
 public class BaseUIViewController<VM: BaseViewBindable>: UIViewController {
 
     // MARK: - Properties
-    
     public var cancellables = Set<AnyCancellable>()
     public var viewModel: VM?
     public let diContainer: any ViewControllerFactory
@@ -24,6 +23,7 @@ public class BaseUIViewController<VM: BaseViewBindable>: UIViewController {
         bind(viewModel: viewModel)
         setupNavigationBar()
         observeSessionExpired()
+        observeServerError()
         HilingualLog.debug("[VC LifeCycle] \(Self.self) init")
     }
 
@@ -36,7 +36,7 @@ public class BaseUIViewController<VM: BaseViewBindable>: UIViewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
-        self.hideKeyboardWhenTappedAround()
+        hideKeyboardWhenTappedAround()
 
         setUI()
         setLayout()
@@ -50,7 +50,7 @@ public class BaseUIViewController<VM: BaseViewBindable>: UIViewController {
     open func addTarget() {}
     open func setDelegate() {}
 
-    //MARK: - Bind Method
+    // MARK: - Bind Method
     open func bind(viewModel: VM) {
         self.viewModel = viewModel
     }
@@ -80,6 +80,18 @@ public class BaseUIViewController<VM: BaseViewBindable>: UIViewController {
             window.rootViewController = nav
             window.makeKeyAndVisible()
         }
+    }
+
+    // MARK: - Server Error Handling
+    
+    private func observeServerError() {
+        NotificationCenter.default.publisher(for: Notification.Name("ServerErrorOccurred"))
+            .compactMap { $0.userInfo?["message"] as? String }
+            .receive(on: RunLoop.main)
+            .sink { [weak self] message in
+                self?.showServerErrorDialog(message: message)
+            }
+            .store(in: &cancellables)
     }
 
     // MARK: - Deinit
