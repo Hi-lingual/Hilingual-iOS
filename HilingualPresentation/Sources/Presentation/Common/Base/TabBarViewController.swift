@@ -7,7 +7,7 @@
 
 import UIKit
 
-public final class TabBarViewController: UITabBarController {
+public final class TabBarViewController: UITabBarController, UITabBarControllerDelegate {
 
     // MARK: - Dependencies
 
@@ -28,6 +28,7 @@ public final class TabBarViewController: UITabBarController {
 
     public override func viewDidLoad() {
         super.viewDidLoad()
+        delegate = self
         setupTabBarAppearance()
         setupViewControllers()
     }
@@ -42,7 +43,6 @@ public final class TabBarViewController: UITabBarController {
             unselectedImageName: "ic_home_gray_24_ios"
         )
 
-    // TODO: - 실제 뷰컨으로 바꿔주세요.
         let vocabVC = makeTabItem(
             viewController: factory.makeWordBookViewController(),
             title: "단어장",
@@ -103,5 +103,18 @@ public final class TabBarViewController: UITabBarController {
                 .withRenderingMode(.alwaysOriginal)
         )
         return nav
+    }
+    
+    // MARK: - UITabBarControllerDelegate
+    
+    public func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
+        if selectedIndex == 2,
+           let nav = viewController as? UINavigationController,
+           let feedVC = nav.viewControllers.first as? FeedViewController {
+
+            if tabBarController.selectedViewController == viewController {
+                feedVC.resetScrollPosition()
+            }
+        }
     }
 }

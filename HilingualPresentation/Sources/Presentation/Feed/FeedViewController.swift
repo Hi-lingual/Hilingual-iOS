@@ -72,6 +72,7 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
         navigationController?.setNavigationBarHidden(true, animated: false)
         
         input.reload.send()
+        resetScrollPosition()
 
         recommendFeedVC.refresh()
         followingFeedVC.refresh()
@@ -194,5 +195,13 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
         else { return }
         let safariVC = SFSafariViewController(url: url)
         self.present(safariVC, animated: true)
+    }
+}
+
+// MARK: - Extension
+extension FeedViewController {
+    func resetScrollPosition() {
+        recommendFeedVC.resetScrollPosition()
+        followingFeedVC.resetScrollPosition()
     }
 }

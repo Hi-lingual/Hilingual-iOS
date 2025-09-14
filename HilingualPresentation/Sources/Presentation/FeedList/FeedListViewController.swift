@@ -147,3 +147,12 @@ public final class FeedListViewController: BaseUIViewController<FeedViewModel> {
         input.reload.send(())
     }
 }
+
+// MARK: - Extension
+
+extension FeedListViewController {
+    func resetScrollPosition() {
+        let tableView = feedCellView.tableView
+        tableView.setContentOffset(.zero, animated: true)
+    }
+}
