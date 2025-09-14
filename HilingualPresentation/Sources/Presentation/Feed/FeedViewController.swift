@@ -72,6 +72,8 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
         navigationController?.setNavigationBarHidden(true, animated: false)
         
         input.reload.send()
+        
+        feedView.segmentedControl?.selectedIndex = 0
         resetScrollPosition()
 
         recommendFeedVC.refresh()
@@ -199,6 +201,7 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
 }
 
 // MARK: - Extension
+
 extension FeedViewController {
     func resetScrollPosition() {
         recommendFeedVC.resetScrollPosition()
