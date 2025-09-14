@@ -130,12 +130,14 @@ final class WordCard: UIView {
             
             phraseLabel.snp.remakeConstraints {
                 $0.top.equalTo(chipStackView.snp.bottom).offset(4)
-                $0.leading.trailing.equalToSuperview().inset(24)
+                $0.leading.equalToSuperview().inset(24)
+                $0.trailing.equalToSuperview().inset(68)
             }
-            
+
             explanationLabel.snp.remakeConstraints {
                 $0.top.equalTo(phraseLabel.snp.bottom).offset(4)
-                $0.leading.trailing.equalToSuperview().inset(24)
+                $0.leading.equalToSuperview().inset(24)
+                $0.trailing.equalToSuperview().inset(68)
             }
             
             savedDateLabel.snp.remakeConstraints {

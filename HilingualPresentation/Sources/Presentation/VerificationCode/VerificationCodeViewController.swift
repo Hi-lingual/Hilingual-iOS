@@ -98,9 +98,6 @@ public final class VerificationCodeViewController: BaseUIViewController<Verifica
         self.present(safariVC, animated: true, completion: nil)
     }
 
-    private func dialogConfigure() {
-
-    }
 
     // MARK: - Private Method
 
