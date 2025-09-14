@@ -155,7 +155,7 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
     
     public func resetScrollPosition() {
         let tableView = feedCellView.tableView
-        tableView.setContentOffset(.zero, animated: false)
+        tableView.setContentOffset(.zero, animated: true)
         onScroll?(0)
     }
     
