@@ -63,6 +63,7 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
         feedCellView.tableView.delegate = self
         feedCellView.tableView.dataSource = feedCellView
         feedCellView.tableView.alwaysBounceVertical = false
+        feedCellView.tableView.bounces = false
         
         feedCellView.addTableTapGesture(target: self, action: #selector(didTapTableView))
         
@@ -198,7 +199,7 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
         }
         else if contentHeightWithoutFooter > fixedSafeAreaHeight - 195 {
             let footer = UIView()
-            footer.frame.size.height = 115
+            footer.frame.size.height = 120
             tableView.tableFooterView = footer
         }
         else {
