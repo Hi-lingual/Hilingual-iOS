@@ -48,7 +48,7 @@ final class MyFeedProfileView: BaseUIView {
             streak: streak
         )
     }
-
+    
     func configureSegmentedControl(
         parentVC: UIViewController,
         viewControllers: [UIViewController],
@@ -61,7 +61,7 @@ final class MyFeedProfileView: BaseUIView {
         )
         self.segmentedControl = control
         addSubview(control)
-
+        
         control.snp.makeConstraints {
             segmentedTopConstraint = $0.top.equalTo(myFeedView.snp.bottom).offset(20).constraint
             $0.horizontalEdges.equalToSuperview()
@@ -72,7 +72,7 @@ final class MyFeedProfileView: BaseUIView {
             self?.onSegmentChanged?(index)
         }
     }
-
+    
     func setFollowSectionTappedAction(_ action: @escaping () -> Void) {
         myFeedView.onFollowSectionTapped = action
     }
@@ -81,10 +81,17 @@ final class MyFeedProfileView: BaseUIView {
         guard let segmentedTopConstraint else { return }
         
         let progress = min(max(offsetY / 84, 0), 1)
-        myFeedView.alpha = 1 - progress
-        myFeedView.transform = CGAffineTransform(translationX: 0, y: -progress * 40)
-        
+        let alphaValue = 1 - progress * 1.4
+        let transformValue = CGAffineTransform(translationX: 0, y: -progress * 40)
         let newOffset = max(20 - offsetY, -84)
-        segmentedTopConstraint.update(offset: newOffset)
+        
+        UIView.animate(
+            withDuration: 0.15, delay: 0,
+            options: [.curveEaseOut, .allowUserInteraction]) {
+            self.myFeedView.alpha = alphaValue
+            self.myFeedView.transform = transformValue
+            segmentedTopConstraint.update(offset: newOffset)
+            self.layoutIfNeeded()
+        }
     }
 }
