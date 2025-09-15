@@ -44,7 +44,8 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                     nickname: entity.nickname,
                     profileImageURL: entity.profileImg,
                     totalDiaries: entity.totalDiaries,
-                    streak: entity.streak
+                    streak: entity.streak,
+                    newAlarm: entity.newAlarm
                 )
             })
             .store(in: &viewModel!.cancellables)
@@ -203,7 +204,8 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                     nickname: entity.nickname,
                     profileImageURL: entity.profileImg,
                     totalDiaries: entity.totalDiaries,
-                    streak: entity.streak
+                    streak: entity.streak,
+                    newAlarm: entity.newAlarm
                 )
             })
             .store(in: &viewModel.cancellables)
@@ -408,7 +410,8 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                                         nickname: entity.nickname,
                                         profileImageURL: entity.profileImg,
                                         totalDiaries: entity.totalDiaries,
-                                        streak: entity.streak
+                                        streak: entity.streak,
+                                        newAlarm: entity.newAlarm
                                     )
                                 })
                                 .store(in: &self.viewModel!.cancellables)
