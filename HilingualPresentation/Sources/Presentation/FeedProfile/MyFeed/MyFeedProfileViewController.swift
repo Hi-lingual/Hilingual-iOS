@@ -108,6 +108,7 @@ public final class MyFeedProfileViewController: BaseUIViewController<FeedProfile
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(false, animated: false)
+        input.reload.send(())
     }
     
     // MARK: - Bind
@@ -131,8 +132,6 @@ public final class MyFeedProfileViewController: BaseUIViewController<FeedProfile
                 )
             }
             .store(in: &viewModel.cancellables)
-
-        input.reload.send(())
     }
 
     // MARK: - Private Methods

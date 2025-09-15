@@ -272,13 +272,6 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
         present(safariVC, animated: true)
     }
     
-    private func pushFollowListViewController() {
-        guard let viewModel = self.viewModel else { return }
-        
-        let followVC = self.diContainer.makeFollowListViewController(targetUserId: Int(viewModel.targetUserId))
-        self.navigationController?.pushViewController(followVC, animated: true)
-    }
-    
     // MARK: - Public Method
     
     func showToastMessage(message: String, diaryId: Int) {
