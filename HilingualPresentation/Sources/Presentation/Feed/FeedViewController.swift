@@ -223,10 +223,10 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
 
 extension FeedViewController {
     func resetScrollPosition() {
-        recommendFeedVC.resetScrollPosition()
-        followingFeedVC.resetScrollPosition()
-        
         recommendFeedVC.refresh()
         followingFeedVC.refresh()
+        
+        recommendFeedVC.resetScrollPosition()
+        followingFeedVC.resetScrollPosition()
     }
 }
