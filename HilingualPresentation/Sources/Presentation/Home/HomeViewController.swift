@@ -68,20 +68,6 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
             self.homeView.selectedInfo.setSelectedDate(requestedDate)
             self.homeView.selectedInfo.currentDiaryId = nil
             
-            if selectedDay > today {
-                self.currentDateRequestCancellable?.cancel()
-                self.homeView.selectedInfo.updateView(
-                    for: requestedDate,
-                    diaryId: nil,
-                    isPublished: nil,
-                    remainingTime: 0,
-                    topicData: nil,
-                    diaryData: nil,
-                    imageURL: nil
-                )
-                return
-            }
-            
             // 1) 미래 날짜면 바로 Lock 상태로 보여주고 네트워크 호출하지 않음
             if selectedDay > today {
                 self.currentDateRequestCancellable?.cancel()
