@@ -284,8 +284,9 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
     func showToastMessage(message: String, diaryId: Int) {
         userFeedProfileView.onToastAction = { [weak self] in
             guard let self else { return }
-            let vc = diContainer.makeDiaryDetailViewController(diaryId: diaryId)
-            self.navigationController?.pushViewController(vc, animated: true)
+            let detailVC = diContainer.makeDiaryDetailViewController(diaryId: diaryId)
+            detailVC.hidesBottomBarWhenPushed = true
+            navigationController?.pushViewController(detailVC, animated: true)
         }
         userFeedProfileView.showToastMessage(message: message)
     }

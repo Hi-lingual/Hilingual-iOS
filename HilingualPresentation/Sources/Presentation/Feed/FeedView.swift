@@ -19,7 +19,7 @@ final class FeedView: BaseUIView {
 
     // MARK: - UI Components
     
-    public private(set) var segmentedControl: SegmentedControl?
+    private(set) var segmentedControl: SegmentedControl?
     private let toast = ToastMessage()
 
     private let headerStack: UIStackView = {

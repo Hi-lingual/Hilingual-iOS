@@ -151,8 +151,9 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
     func showToastMessage(message: String, diaryId: Int) {
         feedView.onToastAction = { [weak self] in
             guard let self else { return }
-            let vc = diContainer.makeDiaryDetailViewController(diaryId: diaryId)
-            self.navigationController?.pushViewController(vc, animated: true)
+            let detailVC = diContainer.makeDiaryDetailViewController(diaryId: diaryId)
+            detailVC.hidesBottomBarWhenPushed = true
+            navigationController?.pushViewController(detailVC, animated: true)
         }
         feedView.showToastMessage(message: message)
     }
