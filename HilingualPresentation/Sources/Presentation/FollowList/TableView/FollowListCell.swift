@@ -119,7 +119,8 @@ final class FollowListCell: UITableViewCell {
     // MARK: - Configure
     
     func configure(with user: UserDisplayable) {
-        if !user.profileImg.isEmpty, let profileURL = URL(string: user.profileImg) {
+        let trimmed = user.profileImg.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !trimmed.isEmpty, let profileURL = URL(string: trimmed) {
             profileImg.kf.setImage(with: profileURL, placeholder: UIImage(resource: .imgProfileNormalIos))
         } else {
             profileImg.image = UIImage(resource: .imgProfileNormalIos)
