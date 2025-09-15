@@ -123,6 +123,12 @@ final class CardPreview: UIView {
             originalText.attributedText = .suit(.body_m_16, text: display)
 
             previewImage.isHidden = false
+            previewImage.snp.remakeConstraints {
+                $0.trailing.equalToSuperview().inset(16)
+                $0.size.equalTo(74)
+                $0.centerY.equalToSuperview()
+            }
+            
             if let urlString = imageUrl, let url = URL(string: urlString) {
                 previewImage.kf.setImage(with: url)
             } else {
