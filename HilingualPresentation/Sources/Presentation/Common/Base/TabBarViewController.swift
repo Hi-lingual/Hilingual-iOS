@@ -113,13 +113,10 @@ extension TabBarViewController: UITabBarControllerDelegate {
         _ tabBarController: UITabBarController,
         didSelect viewController: UIViewController
     ) {
-        if selectedIndex == 2,
+        if tabBarController.selectedIndex == 2,
            let nav = viewController as? UINavigationController,
            let feedVC = nav.viewControllers.first as? FeedViewController {
-            
-            if tabBarController.selectedViewController == viewController {
-                feedVC.resetScrollPosition()
-            }
+            feedVC.resetScrollPosition()
         }
     }
 }

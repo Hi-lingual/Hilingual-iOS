@@ -84,8 +84,7 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
         input.reload.send()
         
         feedView.segmentedControl?.selectedIndex = 0
-        resetScrollPosition()
-
+        
         recommendFeedVC.refresh()
         followingFeedVC.refresh()
     }
@@ -226,5 +225,8 @@ extension FeedViewController {
     func resetScrollPosition() {
         recommendFeedVC.resetScrollPosition()
         followingFeedVC.resetScrollPosition()
+        
+        recommendFeedVC.refresh()
+        followingFeedVC.refresh()
     }
 }
