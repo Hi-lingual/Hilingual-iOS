@@ -77,7 +77,12 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
         
         // 게시글 공감하기
         sharedVC.onLikeTapped = { [weak self] diaryId, isLiked in
-            self?.input.likeTapped.send((diaryId, isLiked))
+            guard let self else { return }
+            self.input.likeTapped.send((diaryId, isLiked))
+
+            if isLiked {
+                self.showToastMessage(message: "일기를 공감했습니다.", diaryId: diaryId)
+            }
         }
         
         // 유저 차단 모달 띄우기
@@ -125,10 +130,6 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
                 break
             }
         }
-        
-//        userFeedProfileView.setFollowSectionTappedAction { [weak self] in
-//            self?.pushFollowListViewController()
-//        }
         
         bind()
     }
@@ -276,5 +277,16 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
         
         let followVC = self.diContainer.makeFollowListViewController(targetUserId: Int(viewModel.targetUserId))
         self.navigationController?.pushViewController(followVC, animated: true)
+    }
+    
+    // MARK: - Public Method
+    
+    func showToastMessage(message: String, diaryId: Int) {
+        userFeedProfileView.onToastAction = { [weak self] in
+            guard let self else { return }
+            let vc = diContainer.makeDiaryDetailViewController(diaryId: diaryId)
+            self.navigationController?.pushViewController(vc, animated: true)
+        }
+        userFeedProfileView.showToastMessage(message: message)
     }
 }

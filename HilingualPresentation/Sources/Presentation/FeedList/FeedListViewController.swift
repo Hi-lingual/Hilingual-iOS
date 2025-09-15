@@ -35,7 +35,6 @@ public final class FeedListViewController: BaseUIViewController<FeedViewModel> {
         bindViewModel()
         input.reload.send(())
         
-        // 위로 끌어당겼을 때 새로고침 추가
         let refreshControl = UIRefreshControl()
         refreshControl.addTarget(self, action: #selector(didTopScrollRefresh), for: .valueChanged)
         feedCellView.tableView.refreshControl = refreshControl

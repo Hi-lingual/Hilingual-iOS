@@ -31,7 +31,12 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
             self?.showToast(message: "피드의 일기를 모두 확인했어요.")
         }
         vc.onLikeTapped = { [weak self] diaryId, isLiked in
-            self?.input.likeTapped.send((diaryId, isLiked))
+            guard let self else { return }
+            self.input.likeTapped.send((diaryId, isLiked))
+
+            if isLiked {
+                self.showToastMessage(message: "일기를 공감했습니다.", diaryId: diaryId)
+            }
         }
         return vc
     }()
@@ -48,7 +53,12 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
             self?.showToast(message: "피드의 일기를 모두 확인했어요.")
         }
         vc.onLikeTapped = { [weak self] diaryId, isLiked in
-            self?.input.likeTapped.send((diaryId, isLiked))
+            guard let self else { return }
+            self.input.likeTapped.send((diaryId, isLiked))
+
+            if isLiked {
+                self.showToastMessage(message: "일기를 공감했습니다.", diaryId: diaryId)
+            }
         }
         return vc
     }()
@@ -136,6 +146,15 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
     
     func showToast(message: String) {
         feedView.showToast(message: message)
+    }
+    
+    func showToastMessage(message: String, diaryId: Int) {
+        feedView.onToastAction = { [weak self] in
+            guard let self else { return }
+            let vc = diContainer.makeDiaryDetailViewController(diaryId: diaryId)
+            self.navigationController?.pushViewController(vc, animated: true)
+        }
+        feedView.showToastMessage(message: message)
     }
 
     func showHideDialog(listVC: FeedListViewController, row: Int) {
