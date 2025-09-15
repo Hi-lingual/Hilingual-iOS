@@ -8,7 +8,7 @@
 import UIKit
 import Combine
 
-public class BaseUIViewController<VM: BaseViewBindable>: UIViewController {
+public class BaseUIViewController<VM: BaseViewBindable>: UIViewController, UIGestureRecognizerDelegate {
 
     // MARK: - Properties
     public var cancellables = Set<AnyCancellable>()
@@ -37,11 +37,11 @@ public class BaseUIViewController<VM: BaseViewBindable>: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .white
         hideKeyboardWhenTappedAround()
-
         setUI()
         setLayout()
         addTarget()
         setDelegate()
+        navigationController?.interactivePopGestureRecognizer?.delegate = self
     }
 
     // MARK: - Custom Method
@@ -59,6 +59,9 @@ public class BaseUIViewController<VM: BaseViewBindable>: UIViewController {
     open func navigationType() -> NavigationType? { nil }
     @objc open func backButtonTapped() { navigationController?.popViewController(animated: true) }
     @objc open func menuButtonTapped() {}
+    public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+        return navigationController?.viewControllers.count ?? 0 > 1
+    }
 
     // MARK: - Session Expired Handling
     private func observeSessionExpired() {
