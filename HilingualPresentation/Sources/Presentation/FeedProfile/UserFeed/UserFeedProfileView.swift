@@ -11,6 +11,7 @@ import SnapKit
 final class UserFeedProfileView: BaseUIView {
     
     // MARK: - Callbacks
+    
     var onFollowTapped: ((FollowButtonState) -> Void)?
     var onBlockTapped: (() -> Void)?
     var onBlockConfirmTapped: (() -> Void)?
@@ -18,6 +19,7 @@ final class UserFeedProfileView: BaseUIView {
     var onUnblockTapped: (() -> Void)?
 
     // MARK: - UI Components
+    
     private let userFeedView = FeedUserProfile()
     private(set) var button = FollowButton()
     private var feedTopConstraint: Constraint?
@@ -55,6 +57,7 @@ final class UserFeedProfileView: BaseUIView {
     private let blockModal = BlockModal()
     
     // MARK: - Setup
+    
     override func setUI() {
         addSubviews(userFeedView, button, feedContainer, blockedStack, modal)
         blockedStack.isHidden = true
@@ -124,8 +127,16 @@ final class UserFeedProfileView: BaseUIView {
     }
     
     func updateFeedContainer(offsetY: CGFloat) {
-        let newOffset = max(133 - offsetY, 0)
-        feedTopConstraint?.update(offset: newOffset)
+        let newOffset = max(133 - offsetY * 1.3, 0)
+
+        UIView.animate(withDuration: 0.3,
+                       delay: 0,
+                       usingSpringWithDamping: 0.85,
+                       initialSpringVelocity: 0.5,
+                       options: [.allowUserInteraction]) {
+            self.feedTopConstraint?.update(offset: newOffset)
+            self.layoutIfNeeded()
+        }
     }
     
     func showModal() {
@@ -192,6 +203,7 @@ final class UserFeedProfileView: BaseUIView {
     }
     
     // MARK: - Private
+    
     @objc private func buttonTapped() {
         switch button.currentState {
         case .unblock:

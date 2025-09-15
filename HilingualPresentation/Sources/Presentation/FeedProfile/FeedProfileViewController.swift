@@ -31,7 +31,6 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
     private let type: FeedProfileListType
     
     private(set) var currentFeeds: [FeedModel] = []
-    private var isFooterApplied = false
     
     var onHideTapped: ((Int) -> Void)?
     var onReportTapped: (() -> Void)?
@@ -59,37 +58,32 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
         
         let refreshControl = UIRefreshControl()
         refreshControl.addTarget(self, action: #selector(didTopScrollRefresh), for: .valueChanged)
-        
         feedCellView.tableView.refreshControl = refreshControl
+        
         feedCellView.tableView.delegate = self
         feedCellView.tableView.dataSource = feedCellView
         feedCellView.tableView.alwaysBounceVertical = false
+        feedCellView.tableView.bounces = false
         
         feedCellView.addTableTapGesture(target: self, action: #selector(didTapTableView))
         
         feedCellView.onHideTapped = { [weak self] row in
             self?.onHideTapped?(row)
         }
-        
         feedCellView.onReportTapped = { [weak self] in
             self?.onReportTapped?()
         }
-        
         feedCellView.onProfileTapped = { [weak self] row in
             guard let self else { return }
             let user = self.currentFeeds[row]
             
             let targetId = self.viewModel?.targetUserId ?? 0
-            
-            if user.isMine || Int64(user.userID) == targetId {
-                return
-            }
+            if user.isMine || Int64(user.userID) == targetId { return }
             
             let vc = self.diContainer.makeUserFeedProfileViewController(userId: Int64(user.userID))
             vc.hidesBottomBarWhenPushed = true
             self.navigationController?.pushViewController(vc, animated: true)
         }
-
         feedCellView.onFeedTextTapped = { [weak self] row in
             guard let self else { return }
             let feed = self.currentFeeds[row]
@@ -97,7 +91,6 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
             vc.hidesBottomBarWhenPushed = true
             self.navigationController?.pushViewController(vc, animated: true)
         }
-        
         feedCellView.onFeedImageTapped = { [weak self] row in
             guard let self else { return }
             let feed = self.currentFeeds[row]
@@ -105,7 +98,6 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
             vc.hidesBottomBarWhenPushed = true
             self.navigationController?.pushViewController(vc, animated: true)
         }
-
         feedCellView.onDetailTapped = { [weak self] row in
             guard let self else { return }
             let feed = self.currentFeeds[row]
@@ -113,6 +105,11 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
             vc.hidesBottomBarWhenPushed = true
             self.navigationController?.pushViewController(vc, animated: true)
         }
+    }
+    
+    public override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        footerForStickyHeader()
     }
     
     // MARK: - Bind
@@ -140,10 +137,6 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
                         }
                     }
                 }
-
-                DispatchQueue.main.async {
-                    self.footerForStickyHeader()
-                }
             }
             .store(in: &cancellables)
     }
@@ -158,10 +151,6 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
             emptyMessage: type.emptyMessage,
             type: type
         )
-        
-        DispatchQueue.main.async {
-            self.footerForStickyHeader()
-        }
     }
     
     public func resetScrollPosition() {
@@ -188,11 +177,12 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
     // MARK: - Private Method
     
     private func footerForStickyHeader() {
-        guard !isFooterApplied else { return }
         
         let tableView = feedCellView.tableView
         tableView.layoutIfNeeded()
-        let contentHeight = tableView.contentSize.height
+        
+        let contentHeightWithoutFooter =
+        tableView.contentSize.height - (tableView.tableFooterView?.frame.height ?? 0)
         
         guard let window = UIApplication.shared.connectedScenes
             .compactMap({ $0 as? UIWindowScene })
@@ -203,20 +193,18 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
         let topInset = window.safeAreaInsets.top
         let bottomInset = window.safeAreaInsets.bottom
         let fixedSafeAreaHeight = screenHeight - topInset - bottomInset
-                
-        if contentHeight > fixedSafeAreaHeight - 100 {
+        
+        if contentHeightWithoutFooter > fixedSafeAreaHeight - 100 {
             tableView.tableFooterView = nil
         }
-        else if contentHeight > fixedSafeAreaHeight - 195 {
+        else if contentHeightWithoutFooter > fixedSafeAreaHeight - 195 {
             let footer = UIView()
-            footer.backgroundColor = .red
-            footer.frame.size.height = 110
+            footer.frame.size.height = 120
             tableView.tableFooterView = footer
         }
         else {
             tableView.tableFooterView = nil
         }
-        isFooterApplied = true
     }
 }
 
