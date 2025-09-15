@@ -13,9 +13,12 @@ extension UIViewController {
     /// 서버 오류 다이얼로그
     func showServerErrorDialog(message: String) {
         guard let topVC = UIApplication.shared.topViewController(),
-              topVC == self else { return }
+              topVC == self,
+              let window = UIApplication.shared.connectedScenes
+                  .compactMap({ ($0 as? UIWindowScene)?.keyWindow })
+                  .first else { return }
 
-        let dialog = Dialog(frame: view.bounds)
+        let dialog = Dialog(frame: window.bounds)
 
         dialog.configure(
             style: .error,
@@ -31,7 +34,7 @@ extension UIViewController {
             }
         )
 
-        view.addSubview(dialog)
+        window.addSubview(dialog)
         dialog.snp.makeConstraints { $0.edges.equalToSuperview() }
         dialog.showAnimation()
     }
