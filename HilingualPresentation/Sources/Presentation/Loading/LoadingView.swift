@@ -254,17 +254,23 @@ final class LoadingView: BaseUIView {
     @MainActor
     private func applyContent(at index: Int) {
         let content = loadingContents[index]
+
+        self.titleLabel.text = content.title
+
         UIView.animate(withDuration: 0.3, animations: {
             self.subtitleLabel.alpha = 0
+            self.animationView.alpha = 0
         }, completion: { _ in
             self.subtitleLabel.text = content.subtitle
+
+            self.animationView.animation = LottieAnimation.named(content.animation, bundle: .module)
+            self.animationView.play()
+
             UIView.animate(withDuration: 0.3) {
                 self.subtitleLabel.alpha = 1
+                self.animationView.alpha = 1
             }
         })
-        self.titleLabel.text = content.title
-        self.animationView.animation = LottieAnimation.named(content.animation, bundle: .module)
-        self.animationView.play()
     }
 
     @objc private func closeIconTapped() {
