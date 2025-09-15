@@ -73,6 +73,11 @@ final class MyFeedProfileView: BaseUIView {
         }
     }
     
+    func setSelectedIndex(_ index: Int) {
+        segmentedControl?.selectedIndex = index
+        onSegmentChanged?(index)
+    }
+
     func setFollowSectionTappedAction(_ action: @escaping () -> Void) {
         myFeedView.onFollowSectionTapped = action
     }

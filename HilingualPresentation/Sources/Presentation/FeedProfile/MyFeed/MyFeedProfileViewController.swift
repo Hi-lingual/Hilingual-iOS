@@ -20,6 +20,7 @@ public final class MyFeedProfileViewController: BaseUIViewController<FeedProfile
     private let sharedVC: FeedProfileViewController
     private let dialog = Dialog()
     private var pendingDeleteRow: (listVC: FeedProfileViewController, row: Int)?
+    var initialSelectedIndex: Int?
 
     // MARK: - Init
     
@@ -62,6 +63,10 @@ public final class MyFeedProfileViewController: BaseUIViewController<FeedProfile
                 self.likedVC.resetScrollPosition()
                 self.likedVC.refresh()
             }
+        }
+        
+        if let index = initialSelectedIndex {
+            myFeedProfileView.setSelectedIndex(index)
         }
         
         view.addSubview(dialog)
