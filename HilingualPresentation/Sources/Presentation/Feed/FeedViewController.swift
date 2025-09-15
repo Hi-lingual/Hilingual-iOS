@@ -35,7 +35,7 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
             self.input.likeTapped.send((diaryId, isLiked))
 
             if isLiked {
-                self.showToastMessage(message: "일기를 공감했습니다.", diaryId: diaryId)
+                self.showToastMessage(message: "공감한 일기에 추가되었어요.", diaryId: diaryId)
             }
         }
         return vc
@@ -57,7 +57,7 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
             self.input.likeTapped.send((diaryId, isLiked))
 
             if isLiked {
-                self.showToastMessage(message: "일기를 공감했습니다.", diaryId: diaryId)
+                self.showToastMessage(message: "공감한 일기에 추가되었어요.", diaryId: diaryId)
             }
         }
         return vc
