@@ -17,11 +17,13 @@ final class UserFeedProfileView: BaseUIView {
     var onBlockConfirmTapped: (() -> Void)?
     var onReportTapped: (() -> Void)?
     var onUnblockTapped: (() -> Void)?
+    var onToastAction: (() -> Void)?
 
     // MARK: - UI Components
     
     private let userFeedView = FeedUserProfile()
     private(set) var button = FollowButton()
+    private let toast = ToastMessage()
     private var feedTopConstraint: Constraint?
     let feedContainer = UIView()
     
@@ -136,6 +138,30 @@ final class UserFeedProfileView: BaseUIView {
                        options: [.allowUserInteraction]) {
             self.feedTopConstraint?.update(offset: newOffset)
             self.layoutIfNeeded()
+        }
+    }
+    
+    func showToastMessage(message: String) {
+        if toast.superview == nil {
+            addSubview(toast)
+        }
+        
+        toast.configure(type: .withButton, message: message, actionTitle: "보러가기")
+        toast.action = { [weak self] in self?.onToastAction?()}
+        toast.isHidden = false
+        toast.alpha = 0
+        bringSubviewToFront(toast)
+        
+        UIView.animate(withDuration: 0.3) {
+            self.toast.alpha = 1
+        }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+            UIView.animate(withDuration: 0.3, animations: {
+                self.toast.alpha = 0
+            }, completion: { _ in
+                self.toast.isHidden = true
+            })
         }
     }
     

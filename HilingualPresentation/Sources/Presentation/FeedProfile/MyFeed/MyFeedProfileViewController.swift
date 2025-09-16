@@ -20,6 +20,7 @@ public final class MyFeedProfileViewController: BaseUIViewController<FeedProfile
     private let sharedVC: FeedProfileViewController
     private let dialog = Dialog()
     private var pendingDeleteRow: (listVC: FeedProfileViewController, row: Int)?
+    var initialSelectedIndex: Int?
 
     // MARK: - Init
     
@@ -62,6 +63,10 @@ public final class MyFeedProfileViewController: BaseUIViewController<FeedProfile
                 self.likedVC.resetScrollPosition()
                 self.likedVC.refresh()
             }
+        }
+        
+        if let index = initialSelectedIndex {
+            myFeedProfileView.setSelectedIndex(index)
         }
         
         view.addSubview(dialog)
@@ -108,6 +113,7 @@ public final class MyFeedProfileViewController: BaseUIViewController<FeedProfile
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(false, animated: false)
+        input.reload.send(())
     }
     
     // MARK: - Bind
@@ -131,8 +137,6 @@ public final class MyFeedProfileViewController: BaseUIViewController<FeedProfile
                 )
             }
             .store(in: &viewModel.cancellables)
-
-        input.reload.send(())
     }
 
     // MARK: - Private Methods
@@ -154,7 +158,7 @@ public final class MyFeedProfileViewController: BaseUIViewController<FeedProfile
             rightAction: { [weak self] in
                 guard let self else { return }
                 self.dialog.dismiss()
-                let diaryId = listVC.currentFeeds[row].diaryID
+                let diaryId = listVC.feedCellView.feeds[row].diaryID
                 listVC.removeDiary(at: row)
                 self.input.unpublish.send(diaryId)
             }

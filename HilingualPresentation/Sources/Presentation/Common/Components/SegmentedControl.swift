@@ -17,6 +17,12 @@ final class SegmentedControl: UIView {
     
     // 외부에 탭 전환 알려주는 콜백
     var onIndexChanged: ((Int) -> Void)?
+    
+    // 현재 선택된 인덱스
+    var selectedIndex: Int {
+        get { segmentedControl.selectedIndex }
+        set { segmentedControl.selectedIndex = newValue }
+    }
 
     private let segmentedControl: UnderlineSegmentedControl
     private let pageViewController: UIPageViewController

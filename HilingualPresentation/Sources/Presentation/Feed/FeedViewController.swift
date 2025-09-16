@@ -31,7 +31,12 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
             self?.showToast(message: "피드의 일기를 모두 확인했어요.")
         }
         vc.onLikeTapped = { [weak self] diaryId, isLiked in
-            self?.input.likeTapped.send((diaryId, isLiked))
+            guard let self else { return }
+            self.input.likeTapped.send((diaryId, isLiked))
+
+            if isLiked {
+                self.showToastMessage(message: "공감한 일기에 추가되었어요.", diaryId: diaryId)
+            }
         }
         return vc
     }()
@@ -48,7 +53,12 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
             self?.showToast(message: "피드의 일기를 모두 확인했어요.")
         }
         vc.onLikeTapped = { [weak self] diaryId, isLiked in
-            self?.input.likeTapped.send((diaryId, isLiked))
+            guard let self else { return }
+            self.input.likeTapped.send((diaryId, isLiked))
+
+            if isLiked {
+                self.showToastMessage(message: "공감한 일기에 추가되었어요.", diaryId: diaryId)
+            }
         }
         return vc
     }()
@@ -72,7 +82,7 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
         navigationController?.setNavigationBarHidden(true, animated: false)
         
         input.reload.send()
-
+                
         recommendFeedVC.refresh()
         followingFeedVC.refresh()
     }
@@ -81,7 +91,6 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
     
     public override func bind(viewModel: FeedViewModel) {
         let output = viewModel.transform(input: input)
-        
         
         output.userProfileImage
             .receive(on: RunLoop.main)
@@ -134,6 +143,17 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
     func showToast(message: String) {
         feedView.showToast(message: message)
     }
+    
+    func showToastMessage(message: String, diaryId: Int) {
+        feedView.onToastAction = { [weak self] in
+            guard let self else { return }
+            let myVC = self.diContainer.makeMyFeedProfileViewController()
+            myVC.initialSelectedIndex = 1
+            myVC.hidesBottomBarWhenPushed = true
+            self.navigationController?.pushViewController(myVC, animated: true)
+        }
+        feedView.showToastMessage(message: message)
+    }
 
     func showHideDialog(listVC: FeedListViewController, row: Int) {
         guard let containerView = self.tabBarController?.view else { return }
@@ -153,7 +173,7 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
             rightAction: { [weak self] in
                 guard let self else { return }
                 self.dialog.dismiss()
-                let diaryId = listVC.currentFeeds[row].diaryID
+                let diaryId = listVC.feedCellView.feeds[row].diaryID
                 listVC.removeDiary(at: row)
                 self.input.unpublish.send(diaryId)
             }
@@ -194,5 +214,32 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
         else { return }
         let safariVC = SFSafariViewController(url: url)
         self.present(safariVC, animated: true)
+    }
+}
+
+// MARK: - Extensions
+
+extension FeedViewController {
+    func resetRecommendFeed() {
+        recommendFeedVC.refresh()
+        recommendFeedVC.resetScrollPosition()
+    }
+    
+    func resetFollowingFeed() {
+        followingFeedVC.refresh()
+        followingFeedVC.resetScrollPosition()
+    }
+    
+    public func handleFeedTabSelected(isReSelected: Bool) {
+        if isReSelected {
+            if feedView.segmentedControl?.selectedIndex == 0 {
+                resetRecommendFeed()
+            } else {
+                resetFollowingFeed()
+            }
+        } else {
+            feedView.segmentedControl?.selectedIndex = 0
+            resetRecommendFeed()
+        }
     }
 }
