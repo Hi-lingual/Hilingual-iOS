@@ -34,6 +34,7 @@ final class HighlightTextView: BaseUIView {
         imageView.contentMode = .scaleAspectFill
         imageView.layer.cornerRadius = 8
         imageView.clipsToBounds = true
+        imageView.image = UIImage(resource: .imgLoadFailLargeIos)
         return imageView
     }()
     
