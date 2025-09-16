@@ -31,7 +31,7 @@ final class FeedbackView: BaseUIView {
         let label = UILabel()
         label.font = .suit(.caption_r_14)
         label.textColor = .gray500
-        label.text = "AI가 쓴 일기"
+        label.text = "교정된 일기"
         return label
     }()
     
@@ -39,14 +39,6 @@ final class FeedbackView: BaseUIView {
         let toggle = CustomToggle(frame: CGRect(x: 0, y: 0, width: 52, height: 28))
         toggle.addTarget(self, action: #selector(toggleButtonTapped), for: .valueChanged)
         return toggle
-    }()
-    
-    private let trailingSpacerView: UIView = {
-        let view = UIView()
-        view.snp.makeConstraints {
-            $0.width.equalTo(16)
-        }
-        return view
     }()
     
     let headerStackView: UIStackView = {
@@ -127,7 +119,7 @@ final class FeedbackView: BaseUIView {
         scrollView.addSubview(contentView)
         contentView.axis = .vertical
         contentView.addArrangedSubviews(headerStackView, diaryTextView, feedbackStackView)
-        headerStackView.addArrangedSubviews(dateLabel, AILabel, controlSwitch, trailingSpacerView)
+        headerStackView.addArrangedSubviews(dateLabel, AILabel, controlSwitch)
         feedbackStackView.addArrangedSubview(feedbackLabel)
         
         backgroundColor = .gray100
