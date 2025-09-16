@@ -32,12 +32,19 @@ final class NotificationDetailView: BaseUIView {
         return view
     }()
 
-    private let contentLabel: UILabel = {
-        let label = UILabel()
-        label.font = .suit(.body_m_16)
-        label.textColor = .gray850
-        label.numberOfLines = 0
-        return label
+    private let contentTextView: UITextView = {
+        let textView = UITextView()
+        textView.isEditable = false
+        textView.isScrollEnabled = false
+        textView.backgroundColor = .clear
+        textView.textContainerInset = .zero
+        textView.textContainer.lineFragmentPadding = 0
+        textView.dataDetectorTypes = [.link]
+        textView.linkTextAttributes = [
+            .foregroundColor: UIColor.blue,
+            .underlineStyle: NSUnderlineStyle.single.rawValue
+        ]
+        return textView
     }()
 
     // MARK: - Init
@@ -55,7 +62,7 @@ final class NotificationDetailView: BaseUIView {
     // MARK: - Setup
 
     override func setUI() {
-        addSubviews(titleLabel, dateLabel, contentLabel,separatorView)
+        addSubviews(titleLabel, dateLabel, separatorView, contentTextView)
     }
 
     override func setLayout() {
@@ -70,12 +77,12 @@ final class NotificationDetailView: BaseUIView {
         }
 
         separatorView.snp.makeConstraints {
-              $0.top.equalTo(dateLabel.snp.bottom).offset(16)
-              $0.leading.trailing.equalToSuperview()
-              $0.height.equalTo(1)
-          }
+            $0.top.equalTo(dateLabel.snp.bottom).offset(16)
+            $0.leading.trailing.equalToSuperview()
+            $0.height.equalTo(1)
+        }
 
-        contentLabel.snp.makeConstraints {
+        contentTextView.snp.makeConstraints {
             $0.top.equalTo(separatorView.snp.bottom).offset(10)
             $0.leading.trailing.equalToSuperview().inset(20)
             $0.bottom.lessThanOrEqualToSuperview().inset(20)
@@ -87,6 +94,6 @@ final class NotificationDetailView: BaseUIView {
     func configure(with model: NotificationDetailModel) {
         titleLabel.text = model.title
         dateLabel.text = model.date
-        contentLabel.text = model.content
+        contentTextView.attributedText = model.content.toMarkdownAttributedString()
     }
 }
