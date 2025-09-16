@@ -105,9 +105,6 @@ final class Dialog: UIView {
     private func setStyle() {
         backgroundColor = .dim2
         self.isHidden = true
-        
-        let tap = UITapGestureRecognizer(target: self, action: #selector(dismiss(_:)))
-        self.addGestureRecognizer(tap)
     }
     
     private func setUI() {
@@ -266,9 +263,28 @@ extension Dialog {
         
         rightButton.addAction(UIAction { [weak self] _ in
             self?.rightAction?()
-            self?.dismiss()
+            //self?.dismiss()
         }, for: .touchUpInside)
-        
+
+        self.gestureRecognizers?.forEach { self.removeGestureRecognizer($0) }
+        if style == .normal {
+            let tap = UITapGestureRecognizer(target: self, action: #selector(dismiss(_:)))
+            self.addGestureRecognizer(tap)
+        }
+
         setLayout(for: style)
+    }
+}
+
+
+extension Dialog {
+    func disableOutsideTapDismiss() {
+        self.gestureRecognizers?.forEach { self.removeGestureRecognizer($0) }
+    }
+
+    func enableOutsideTapDismiss() {
+        self.gestureRecognizers?.forEach { self.removeGestureRecognizer($0) }
+        let tap = UITapGestureRecognizer(target: self, action: #selector(dismiss(_:)))
+        self.addGestureRecognizer(tap)
     }
 }

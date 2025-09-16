@@ -46,11 +46,6 @@ public final class NotificationDetailViewModel: BaseViewModel {
 
     private func fetchDetail() {
         useCase.fetchNotificationDetail(notiId: notiId)
-            .handleEvents(receiveOutput: { [weak self] _ in
-                self?.useCase.markNotificationAsRead(notiId: self?.notiId ?? -1)
-                    .sink(receiveCompletion: { _ in }, receiveValue: { })
-                    .store(in: &self!.cancellables)
-            })
             .map {
                 NotificationDetailModel(
                     title: $0.title,

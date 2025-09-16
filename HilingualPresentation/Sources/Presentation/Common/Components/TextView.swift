@@ -35,6 +35,7 @@ final class TextView: UIView {
         textView.attributedText = .suit(.body_r_16, text: "", lineBreakMode: .byWordWrapping, forceWrap: true)
         textView.textColor = .black
         textView.isScrollEnabled = true
+        textView.textContainer.lineBreakMode = .byWordWrapping
         textView.autocorrectionType = .no
         textView.spellCheckingType = .no
         textView.layer.borderWidth = 0

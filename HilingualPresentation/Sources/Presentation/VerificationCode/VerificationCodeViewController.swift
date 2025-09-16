@@ -62,6 +62,7 @@ public final class VerificationCodeViewController: BaseUIViewController<Verifica
                     leftAction: { [weak self] in self?.exitApp() },
                     rightAction: { [weak self] in self?.policyButtonTapped() }
                 )
+                self.dialog.disableOutsideTapDismiss()
                 self.dialog.showAnimation()
             }
             .store(in: &cancellables)
@@ -98,9 +99,6 @@ public final class VerificationCodeViewController: BaseUIViewController<Verifica
         self.present(safariVC, animated: true, completion: nil)
     }
 
-    private func dialogConfigure() {
-
-    }
 
     // MARK: - Private Method
 

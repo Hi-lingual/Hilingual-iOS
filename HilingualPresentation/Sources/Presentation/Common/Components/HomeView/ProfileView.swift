@@ -139,7 +139,8 @@ final class ProfileView: UIView {
         nickname: String = "닉네임을 입력해주세요",
         profileImageURL: String? = nil,
         totalDiaries: Int = 0,
-        streak: Int = 0
+        streak: Int = 0,
+        newAlarm: Bool = false
     ) {
         nameLabel.text = nickname
         totalLabel.text = "총 \(totalDiaries)편"
@@ -167,6 +168,17 @@ final class ProfileView: UIView {
             }
         } else {
             profileImageView.image = defaultImage
+        }
+        if newAlarm {
+            alarmButton.setImage(
+                UIImage(named: "ic_newAlarm_28_ios", in: .module, compatibleWith: nil),
+                for: .normal
+            )
+        } else {
+            alarmButton.setImage(
+                UIImage(named: "ic_alarm_28_ios", in: .module, compatibleWith: nil),
+                for: .normal
+            )
         }
     }
 }

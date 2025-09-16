@@ -11,19 +11,18 @@ import Moya
 public enum OnBoardingAPI {
     case checkNickname(nickname: String)
     case registerProfile(requestDTO: RegisterProfileRequestDTO)
+    case verifyCode(requestDTO: VerifyCodeRequestDTO)
 }
 
-extension OnBoardingAPI: TargetType {
-    public var baseURL: URL {
-        return NetworkEnvironment.shared.baseURL
-    }
-
+extension OnBoardingAPI: BaseTargetType {
     public var path: String {
         switch self {
         case .checkNickname:
             return "/users/profile/check"
         case .registerProfile:
             return "/users/profile"
+        case .verifyCode:
+            return "/auth/verify"
         }
     }
 
@@ -31,7 +30,7 @@ extension OnBoardingAPI: TargetType {
         switch self {
         case .checkNickname:
             return .get
-        case .registerProfile:
+        case .registerProfile, .verifyCode:
             return .post
         }
     }
@@ -45,6 +44,8 @@ extension OnBoardingAPI: TargetType {
             )
 
         case .registerProfile(let requestDTO):
+            return .requestJSONEncodable(requestDTO)
+        case .verifyCode(let requestDTO):
             return .requestJSONEncodable(requestDTO)
         }
     }

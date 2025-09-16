@@ -30,7 +30,8 @@ public final class DefaultHomeRepository: HomeRepository {
                     nickname: data.nickname,
                     profileImg: data.profileImg,
                     totalDiaries: data.totalDiaries,
-                    streak: data.streak
+                    streak: data.streak,
+                    newAlarm: data.newAlarm
                 )
             }
             .eraseToAnyPublisher()

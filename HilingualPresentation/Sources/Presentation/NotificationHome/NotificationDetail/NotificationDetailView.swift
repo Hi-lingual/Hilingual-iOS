@@ -13,7 +13,7 @@ final class NotificationDetailView: BaseUIView {
 
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.font = .suit(.head_b_16)
+        label.font = .suit(.head_b_20)
         label.textColor = .black
         label.numberOfLines = 0
         return label
@@ -21,15 +21,21 @@ final class NotificationDetailView: BaseUIView {
 
     private let dateLabel: UILabel = {
         let label = UILabel()
-        label.font = .suit(.caption_r_12)
+        label.font = .suit(.caption_r_14)
         label.textColor = .gray300
         return label
     }()
 
+    private let separatorView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .gray100
+        return view
+    }()
+
     private let contentLabel: UILabel = {
         let label = UILabel()
-        label.font = .suit(.head_b_16)
-        label.textColor = .gray500
+        label.font = .suit(.body_m_16)
+        label.textColor = .gray850
         label.numberOfLines = 0
         return label
     }()
@@ -49,22 +55,28 @@ final class NotificationDetailView: BaseUIView {
     // MARK: - Setup
 
     override func setUI() {
-        addSubviews(titleLabel, dateLabel, contentLabel)
+        addSubviews(titleLabel, dateLabel, contentLabel,separatorView)
     }
 
     override func setLayout() {
         titleLabel.snp.makeConstraints {
-            $0.top.equalTo(safeAreaLayoutGuide).inset(24)
+            $0.top.equalTo(safeAreaLayoutGuide).inset(16)
             $0.leading.trailing.equalToSuperview().inset(20)
         }
 
         dateLabel.snp.makeConstraints {
-            $0.top.equalTo(titleLabel.snp.bottom).offset(8)
+            $0.top.equalTo(titleLabel.snp.bottom).offset(12)
             $0.leading.trailing.equalToSuperview().inset(20)
         }
 
+        separatorView.snp.makeConstraints {
+              $0.top.equalTo(dateLabel.snp.bottom).offset(16)
+              $0.leading.trailing.equalToSuperview()
+              $0.height.equalTo(1)
+          }
+
         contentLabel.snp.makeConstraints {
-            $0.top.equalTo(dateLabel.snp.bottom).offset(16)
+            $0.top.equalTo(separatorView.snp.bottom).offset(10)
             $0.leading.trailing.equalToSuperview().inset(20)
             $0.bottom.lessThanOrEqualToSuperview().inset(20)
         }

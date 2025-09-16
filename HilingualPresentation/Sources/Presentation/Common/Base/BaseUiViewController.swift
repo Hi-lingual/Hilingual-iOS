@@ -7,14 +7,17 @@
 
 import UIKit
 import Combine
+import Network
 
-public class BaseUIViewController<VM: BaseViewBindable>: UIViewController {
+public class BaseUIViewController<VM: BaseViewBindable>: UIViewController, UIGestureRecognizerDelegate {
 
     // MARK: - Properties
-    
     public var cancellables = Set<AnyCancellable>()
     public var viewModel: VM?
     public let diContainer: any ViewControllerFactory
+
+    private let networkMonitor = NWPathMonitor()
+    private let networkQueue = DispatchQueue(label: "NetworkMonitor")
 
     // MARK: - Init
     public init(viewModel: VM, diContainer: any ViewControllerFactory) {
@@ -24,6 +27,8 @@ public class BaseUIViewController<VM: BaseViewBindable>: UIViewController {
         bind(viewModel: viewModel)
         setupNavigationBar()
         observeSessionExpired()
+        observeServerError()
+        observeNetworkStatus()
         HilingualLog.debug("[VC LifeCycle] \(Self.self) init")
     }
 
@@ -36,12 +41,12 @@ public class BaseUIViewController<VM: BaseViewBindable>: UIViewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
-        self.hideKeyboardWhenTappedAround()
-
+        hideKeyboardWhenTappedAround()
         setUI()
         setLayout()
         addTarget()
         setDelegate()
+        navigationController?.interactivePopGestureRecognizer?.delegate = self
     }
 
     // MARK: - Custom Method
@@ -50,17 +55,20 @@ public class BaseUIViewController<VM: BaseViewBindable>: UIViewController {
     open func addTarget() {}
     open func setDelegate() {}
 
-    //MARK: - Bind Method
+    // MARK: - Bind Method
     open func bind(viewModel: VM) {
         self.viewModel = viewModel
     }
 
-    // MARK: - Navigation Method
+    // MARK: - Navigation
     open func navigationType() -> NavigationType? { nil }
     @objc open func backButtonTapped() { navigationController?.popViewController(animated: true) }
     @objc open func menuButtonTapped() {}
+    public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+        return navigationController?.viewControllers.count ?? 0 > 1
+    }
 
-    // MARK: - Session Expired Handling
+    // MARK: - Session Expired
     private func observeSessionExpired() {
         NotificationCenter.default.publisher(for: Notification.Name("SessionExpired"))
             .receive(on: RunLoop.main)
@@ -71,7 +79,6 @@ public class BaseUIViewController<VM: BaseViewBindable>: UIViewController {
     }
 
     private func handleSessionExpired() {
-        print("⚠️ 세션 만료 → Splash 화면으로 이동")
         let splashVC = diContainer.makeSplashViewController()
         let nav = UINavigationController(rootViewController: splashVC)
 
@@ -82,8 +89,46 @@ public class BaseUIViewController<VM: BaseViewBindable>: UIViewController {
         }
     }
 
+    // MARK: - Server Error
+    
+    private func observeServerError() {
+        NotificationCenter.default.publisher(for: Notification.Name("ServerErrorOccurred"))
+            .compactMap { $0.userInfo?["message"] as? String }
+            .debounce(for: .milliseconds(300), scheduler: RunLoop.main)
+            .receive(on: RunLoop.main)
+            .sink { message in
+                DialogManager.shared.show(
+                    message: message,
+                    style: .error,
+                    popOnConfirm: true
+                )
+            }
+            .store(in: &cancellables)
+    }
+
+    // MARK: - Network Error
+
+    private func observeNetworkStatus() {
+        networkMonitor.pathUpdateHandler = { [weak self] path in
+            guard let self else { return }
+            if path.status == .unsatisfied {
+                DispatchQueue.main.async {
+                    self.handleNetworkDisconnected()
+                }
+            }
+        }
+        networkMonitor.start(queue: networkQueue)
+    }
+
+    @MainActor
+    private func handleNetworkDisconnected() {
+        DialogManager.shared.showNetworkError(
+            using: networkMonitor)
+    }
+
     // MARK: - Deinit
     deinit {
         HilingualLog.debug("[VC LifeCycle] \(Self.self) deinit")
+        networkMonitor.cancel()
     }
 }
