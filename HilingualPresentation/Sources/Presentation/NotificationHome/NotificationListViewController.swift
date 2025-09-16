@@ -144,18 +144,20 @@ extension NotificationListViewController: UITableViewDelegate {
 
         let selectedItem = notificationView.notificationListModel.items[indexPath.row]
 
+        if selectedItem.isRead == false {
+            markAsReadTrigger.send(selectedItem.id)
+        }
+
         switch selectedItem.type {
         case .feed(let rawType):
             switch rawType {
             case "LIKE_DIARY":
                 guard let diaryId = selectedItem.targetId else {return}
-                markAsReadTrigger.send(selectedItem.id)
                 let vc = self.diContainer.makeSharedDiaryViewController(diaryId: diaryId)
                 navigationController?.pushViewController(vc, animated: true)
 
             case "FOLLOW_USER":
                 guard let userId = selectedItem.targetId else {return}
-                markAsReadTrigger.send(selectedItem.id)
                 let vc = self.diContainer.makeUserFeedProfileViewController(userId: Int64(userId))
                 navigationController?.pushViewController(vc, animated: true)
 
@@ -164,7 +166,6 @@ extension NotificationListViewController: UITableViewDelegate {
             }
 
         case .notice(let rawType):
-            markAsReadTrigger.send(selectedItem.id);
             let detailVC = self.diContainer.makeNotificationDetailViewController(notiId: selectedItem.id)
             navigationController?.pushViewController(detailVC, animated: true)
         }
