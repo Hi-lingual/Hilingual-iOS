@@ -63,7 +63,7 @@ public final class BlockUserViewController: BaseUIViewController<BlockUserViewMo
                 self.blockUserView.refreshControl.endRefreshing()
 
                 let isEmpty = users.isEmpty
-                self.blockUserView.emptyView.isHidden = !isEmpty
+                self.blockUserView.updateEmptyView(isHidden: !isEmpty)
                 self.blockUserView.tableView.isHidden = isEmpty
             }
             .store(in: &cancellables)
