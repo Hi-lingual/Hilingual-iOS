@@ -72,6 +72,19 @@ public final class SharedDiaryViewController: BaseUIViewController<SharedDiaryVi
         sharedDiaryView.onLikeAction = { [weak self] isLiked in
             guard let self else { return }
             self.likeToggleSubject.send((self.diaryId, isLiked))
+            if isLiked {
+                let toast = ToastMessage()
+                self.view.addSubview(toast)
+                toast.configure(type: .withButton, message: "공감한 일기에 추가되었어요.", actionTitle: "보러가기")
+                toast.action = { [weak self] in
+                    guard let self else { return }
+                    
+                    let myVC = self.diContainer.makeMyFeedProfileViewController()
+                    myVC.initialSelectedIndex = 1
+                    myVC.hidesBottomBarWhenPushed = true
+                    self.navigationController?.pushViewController(myVC, animated: true)
+                }
+            }
         }
         
         viewDidLoadSubject.send(())
