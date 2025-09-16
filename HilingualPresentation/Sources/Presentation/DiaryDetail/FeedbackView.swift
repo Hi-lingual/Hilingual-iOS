@@ -31,7 +31,7 @@ final class FeedbackView: BaseUIView {
         let label = UILabel()
         label.font = .suit(.caption_r_14)
         label.textColor = .gray500
-        label.text = "AI가 쓴 일기"
+        label.text = "교정된 일기"
         return label
     }()
     
