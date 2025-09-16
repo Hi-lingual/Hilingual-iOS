@@ -187,8 +187,8 @@ final class FeedbackView: BaseUIView {
         feedbackStackView.arrangedSubviews.dropFirst().forEach { $0.removeFromSuperview() }
         
         if data.isEmpty {
-            feedbackLabel.font = .suit(.body_m_14)
-            feedbackLabel.text = "일기에서 발견된 피드백이 없어요!"
+            feedbackLabel.font = .suit(.body_sb_16)
+            feedbackLabel.attributedText = .suit(.body_sb_16, text: "일기에서 발견된 피드백이 없어요!")
             feedbackStackView.addArrangedSubview(emptyFeedbackView)
             emptyFeedbackView.snp.makeConstraints {
                 $0.horizontalEdges.equalToSuperview()
