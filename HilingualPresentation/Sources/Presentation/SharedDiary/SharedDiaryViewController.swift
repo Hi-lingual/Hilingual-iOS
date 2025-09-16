@@ -167,6 +167,18 @@ public final class SharedDiaryViewController: BaseUIViewController<SharedDiaryVi
                 }
             )
             .store(in: &cancellables)
+        
+        output.blockSuccess
+            .receive(on: RunLoop.main)
+            .sink { [weak self] in
+                guard let self, let userId = self.userId else { return }
+                let vc = diContainer.makeUserFeedProfileViewController(userId: userId)
+                if let nav = self.navigationController {
+                    nav.popViewController(animated: false)
+                    nav.pushViewController(vc, animated: true)
+                }
+            }
+            .store(in: &cancellables)
     }
 
     // MARK: - Public Methods
@@ -226,8 +238,6 @@ public final class SharedDiaryViewController: BaseUIViewController<SharedDiaryVi
         blockModal.onApplyTapped = { [weak self] in
             guard let self, let userId = self.userId else { return }
             self.blockUserSubject.send(userId)
-            let vc = diContainer.makeUserFeedProfileViewController(userId: userId)
-            self.navigationController?.pushViewController(vc, animated: true)
         }
     }
     

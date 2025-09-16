@@ -80,7 +80,7 @@ final class Dropdown: UIView {
         let label = UILabel()
         label.attributedText = .suit(.body_sb_16, text: "What surprised you today?")
         label.textColor = .gray700
-        label.numberOfLines = 2
+        label.numberOfLines = 3
         return label
     }()
     
