@@ -109,6 +109,9 @@ public final class TabBarViewController: UITabBarController {
 // MARK: - Extension
 
 extension TabBarViewController: UITabBarControllerDelegate {
+    
+    private static var lastSelectedIndex: Int = 0
+    
     public func tabBarController(
         _ tabBarController: UITabBarController,
         didSelect viewController: UIViewController
@@ -116,7 +119,12 @@ extension TabBarViewController: UITabBarControllerDelegate {
         if tabBarController.selectedIndex == 2,
            let nav = viewController as? UINavigationController,
            let feedVC = nav.viewControllers.first as? FeedViewController {
-            feedVC.resetScrollPosition()
+            
+            let isReSelected = (TabBarViewController.lastSelectedIndex == 2)
+            
+            feedVC.handleFeedTabSelected(isReSelected: isReSelected)
         }
+        
+        TabBarViewController.lastSelectedIndex = tabBarController.selectedIndex
     }
 }

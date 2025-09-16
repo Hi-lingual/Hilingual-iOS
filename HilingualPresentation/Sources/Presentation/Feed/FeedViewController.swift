@@ -82,9 +82,7 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
         navigationController?.setNavigationBarHidden(true, animated: false)
         
         input.reload.send()
-        
-        feedView.segmentedControl?.selectedIndex = 0
-        
+                
         recommendFeedVC.refresh()
         followingFeedVC.refresh()
     }
@@ -220,14 +218,29 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
     }
 }
 
-// MARK: - Extension
+// MARK: - Extensions
 
 extension FeedViewController {
-    func resetScrollPosition() {
+    func resetRecommendFeed() {
         recommendFeedVC.refresh()
-        followingFeedVC.refresh()
-        
         recommendFeedVC.resetScrollPosition()
+    }
+    
+    func resetFollowingFeed() {
+        followingFeedVC.refresh()
         followingFeedVC.resetScrollPosition()
+    }
+    
+    public func handleFeedTabSelected(isReSelected: Bool) {
+        if isReSelected {
+            if feedView.segmentedControl?.selectedIndex == 0 {
+                resetRecommendFeed()
+            } else {
+                resetFollowingFeed()
+            }
+        } else {
+            feedView.segmentedControl?.selectedIndex = 0
+            resetRecommendFeed()
+        }
     }
 }
