@@ -42,7 +42,7 @@ final class WordDetailDialog: UIView {
     // MARK: - Setup
 
     private func setStyle() {
-        backgroundColor = .dim
+        backgroundColor = .dim2
         self.isHidden = true
 
         let tap = UITapGestureRecognizer(target: self, action: #selector(dismiss(_:)))
