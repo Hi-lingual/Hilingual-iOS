@@ -89,7 +89,8 @@ final class WordCard: UIView {
             }
             phraseLabel.snp.remakeConstraints {
                 $0.top.equalTo(chipStackView.snp.bottom).offset(4)
-                $0.leading.trailing.equalToSuperview().inset(12)
+                $0.leading.equalToSuperview().inset(12)
+                $0.trailing.equalToSuperview().inset(40)
                 $0.bottom.equalToSuperview().inset(12)
             }
 
@@ -122,6 +123,7 @@ final class WordCard: UIView {
             explanationLabel.font = .suit(.body_m_14)
             savedDateLabel.font = .suit(.caption_m_12)
             
+            phraseLabel.numberOfLines = 2
             reasonLabel.isHidden = true
             
             chipStackView.snp.remakeConstraints {
@@ -130,7 +132,8 @@ final class WordCard: UIView {
             
             phraseLabel.snp.remakeConstraints {
                 $0.top.equalTo(chipStackView.snp.bottom).offset(4)
-                $0.leading.trailing.equalToSuperview().inset(24)
+                $0.leading.equalToSuperview().inset(24)
+                $0.trailing.equalToSuperview().inset(68)
             }
             
             explanationLabel.snp.remakeConstraints {
