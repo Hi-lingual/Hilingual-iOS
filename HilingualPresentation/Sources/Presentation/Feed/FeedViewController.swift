@@ -92,7 +92,6 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
     public override func bind(viewModel: FeedViewModel) {
         let output = viewModel.transform(input: input)
         
-        
         output.userProfileImage
             .receive(on: RunLoop.main)
             .sink { [weak self] url in
@@ -174,7 +173,7 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
             rightAction: { [weak self] in
                 guard let self else { return }
                 self.dialog.dismiss()
-                let diaryId = listVC.currentFeeds[row].diaryID
+                let diaryId = listVC.feedCellView.feeds[row].diaryID
                 listVC.removeDiary(at: row)
                 self.input.unpublish.send(diaryId)
             }

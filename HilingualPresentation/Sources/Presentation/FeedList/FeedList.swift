@@ -19,8 +19,10 @@ final class FeedList: BaseUIView {
     var onDetailTapped: ((Int) -> Void)?
     var onFeedTextTapped: ((Int) -> Void)?
     var onFeedImageTapped: ((Int) -> Void)?
+    var onLikeTapped: ((Int, Bool) -> Void)?
 
     // MARK: - Properties
+    
     private var items: [FeedModel] = [] {
         didSet {
             tableView.reloadData()
@@ -34,6 +36,7 @@ final class FeedList: BaseUIView {
     private let noFeedView = EmptyView()
 
     // MARK: - Setup Methods
+    
     override func setUI() {
         addSubviews(tableView, noFeedView)
 
@@ -52,7 +55,6 @@ final class FeedList: BaseUIView {
         refreshControl.addTarget(self, action: #selector(handleTopRefresh), for: .valueChanged)
         tableView.refreshControl = refreshControl
                 
-        /// 테이블뷰 아래 32 여백 주기 위해
         tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 32, right: 0)
 
         noFeedView.isHidden = true
@@ -72,12 +74,14 @@ final class FeedList: BaseUIView {
     }
     
     // MARK: - Actions
+    
     @objc private func handleTopRefresh() {
         tableView.refreshControl?.endRefreshing()
     }
 }
 
 // MARK: - Public API
+
 extension FeedList {
     func apply(items: [FeedModel], followingState haveFollowing: Bool? = nil) {
         self.items = items
@@ -114,9 +118,14 @@ extension FeedList {
             noFeedView.isHidden = true
         }
     }
+    
+    var feeds: [FeedModel] {
+        return items
+    }
 }
 
-// MARK: - UITableViewDataSource
+// MARK: - Extensions
+
 extension FeedList: UITableViewDataSource {
     func tableView(_ tableView: UITableView,
                    numberOfRowsInSection section: Int) -> Int { items.count }
@@ -145,25 +154,27 @@ extension FeedList: UITableViewDataSource {
             isLast: indexPath.row == items.count - 1,
             type: type
         )
+        
+        cell.onLikeToggled = { [weak self] isLiked in
+            self?.onLikeTapped?(indexPath.row, isLiked)
+        }
+        
         return cell
     }
 }
 
-// MARK: - UITableViewDelegate
 extension FeedList: UITableViewDelegate {
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
         let offsetY = scrollView.contentOffset.y
         let contentHeight = scrollView.contentSize.height
         let frameHeight = scrollView.frame.size.height
 
-        /// 50만큼 끌어당기면 토스트 호출
         if offsetY > contentHeight - frameHeight + 50 {
             onRefresh?()
         }
     }
 }
 
-// MARK: - Helpers
 private extension FeedList {
     func updateEmptyState() {
         noFeedView.isHidden = !items.isEmpty
@@ -171,7 +182,6 @@ private extension FeedList {
     }
 }
 
-// MARK: - Extra
 extension FeedList {
     func closeAllMenus() {
         for cell in tableView.visibleCells {
@@ -190,8 +200,6 @@ extension FeedList {
         tableView.deleteRows(at: [IndexPath(row: row, section: 0)], with: .automatic)
     }
 }
-
-// MARK: - FeedCellDelegate
 
 extension FeedList: FeedCell.FeedCellDelegate {
     func feedCellDidTapProfile(_ cell: FeedCell) {

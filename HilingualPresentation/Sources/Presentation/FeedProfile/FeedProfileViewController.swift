@@ -26,11 +26,9 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
     
     // MARK: - Properties
     
-    private let feedCellView = FeedList()
+    private(set) var feedCellView = FeedList()
     private let input = FeedProfileViewModel.Input()
     private let type: FeedProfileListType
-    
-    private(set) var currentFeeds: [FeedModel] = []
     
     var onHideTapped: ((Int) -> Void)?
     var onReportTapped: (() -> Void)?
@@ -75,7 +73,7 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
         }
         feedCellView.onProfileTapped = { [weak self] row in
             guard let self else { return }
-            let user = self.currentFeeds[row]
+            let user = self.feedCellView.feeds[row]
             
             let targetId = self.viewModel?.targetUserId ?? 0
             if user.isMine || Int64(user.userID) == targetId { return }
@@ -86,21 +84,21 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
         }
         feedCellView.onFeedTextTapped = { [weak self] row in
             guard let self else { return }
-            let feed = self.currentFeeds[row]
+            let feed = self.feedCellView.feeds[row]
             let vc = self.diContainer.makeSharedDiaryViewController(diaryId: feed.diaryID)
             vc.hidesBottomBarWhenPushed = true
             self.navigationController?.pushViewController(vc, animated: true)
         }
         feedCellView.onFeedImageTapped = { [weak self] row in
             guard let self else { return }
-            let feed = self.currentFeeds[row]
+            let feed = self.feedCellView.feeds[row]
             let vc = self.diContainer.makeSharedDiaryViewController(diaryId: feed.diaryID)
             vc.hidesBottomBarWhenPushed = true
             self.navigationController?.pushViewController(vc, animated: true)
         }
         feedCellView.onDetailTapped = { [weak self] row in
             guard let self else { return }
-            let feed = self.currentFeeds[row]
+            let feed = self.feedCellView.feeds[row]
             let vc = self.diContainer.makeSharedDiaryViewController(diaryId: feed.diaryID)
             vc.hidesBottomBarWhenPushed = true
             self.navigationController?.pushViewController(vc, animated: true)
@@ -121,21 +119,17 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
             .receive(on: RunLoop.main)
             .sink { [weak self] feeds in
                 guard let self else { return }
-                self.currentFeeds = feeds
                 self.feedCellView.apply(
                     items: feeds,
                     emptyMessage: type.emptyMessage,
                     type: type
                 )
                 
-                for (index, cell) in self.feedCellView.tableView.visibleCells.enumerated() {
-                    if let feedCell = cell as? FeedCell {
-                        feedCell.onLikeToggled = { [weak self] isLiked in
-                            guard let self else { return }
-                            let diaryId = self.currentFeeds[index].diaryID
-                            self.onLikeTapped?(diaryId, isLiked)
-                        }
-                    }
+                self.feedCellView.onLikeTapped = { [weak self] row, isLiked in
+                    guard let self = self,
+                          row < self.feedCellView.feeds.count else { return }
+                    let diaryId = self.feedCellView.feeds[row].diaryID
+                    self.onLikeTapped?(diaryId, isLiked)
                 }
             }
             .store(in: &cancellables)
@@ -144,13 +138,7 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
     // MARK: - Public Methods
     
     public func removeDiary(at row: Int) {
-        guard row < currentFeeds.count else { return }
-        currentFeeds.remove(at: row)
-        feedCellView.apply(
-            items: currentFeeds,
-            emptyMessage: type.emptyMessage,
-            type: type
-        )
+        feedCellView.removeDiary(at: row)
     }
     
     public func resetScrollPosition() {

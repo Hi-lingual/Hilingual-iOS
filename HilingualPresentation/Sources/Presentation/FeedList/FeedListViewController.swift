@@ -14,7 +14,7 @@ public final class FeedListViewController: BaseUIViewController<FeedViewModel> {
 
     // MARK: - Properties
     
-    private let feedCellView = FeedList()
+    private(set) var feedCellView = FeedList()
     private let input = FeedViewModel.Input()
     
     var onHideTapped: ((Int) -> Void)?
@@ -58,7 +58,7 @@ public final class FeedListViewController: BaseUIViewController<FeedViewModel> {
             guard let self else { return }
             let user = self.currentFeeds[row]
 
-            if user.isMine == true {
+            if user.isMine {
                 let myVC = self.diContainer.makeMyFeedProfileViewController()
                 myVC.hidesBottomBarWhenPushed = true
                 self.navigationController?.pushViewController(myVC, animated: true)
@@ -92,9 +92,16 @@ public final class FeedListViewController: BaseUIViewController<FeedViewModel> {
             vc.hidesBottomBarWhenPushed = true
             self.navigationController?.pushViewController(vc, animated: true)
         }
+
+        feedCellView.onLikeTapped = { [weak self] row, isLiked in
+            guard let self,
+                  row < self.currentFeeds.count else { return }
+            let diaryId = self.currentFeeds[row].diaryID
+            self.onLikeTapped?(diaryId, isLiked)
+        }
     }
 
-    // MARK: - Bindings
+    // MARK: - Binding
     
     private func bindViewModel() {
         guard let output = viewModel?.transform(input: input) else { return }
@@ -108,16 +115,6 @@ public final class FeedListViewController: BaseUIViewController<FeedViewModel> {
                     items: feeds,
                     followingState: haveFollowing
                 )
-
-                for (index, cell) in self.feedCellView.tableView.visibleCells.enumerated() {
-                    if let feedCell = cell as? FeedCell {
-                        feedCell.onLikeToggled = { [weak self] isLiked in
-                            guard let self else { return }
-                            let diaryId = self.currentFeeds[index].diaryID
-                            self.onLikeTapped?(diaryId, isLiked)
-                        }
-                    }
-                }
             }
             .store(in: &cancellables)
     }
