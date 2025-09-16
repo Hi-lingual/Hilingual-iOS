@@ -26,8 +26,8 @@ final class BlockedUserCell: UITableViewCell {
 
     private let nicknameLabel: UILabel = {
         let label = UILabel()
-        label.font = .suit(.body_b_14)
-        label.textColor = .gray400
+        label.font = .suit(.head_b_16)
+        label.textColor = .black
         label.isUserInteractionEnabled = true
         return label
     }()
