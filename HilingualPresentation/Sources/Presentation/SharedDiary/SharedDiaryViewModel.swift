@@ -28,6 +28,7 @@ public final class SharedDiaryViewModel: BaseViewModel {
     struct Output {
         let fetchDiaryResult: AnyPublisher<SharedDiaryEntity, Never>
         let errorMessage: AnyPublisher<String, Never>
+        let blockSuccess: AnyPublisher<Void, Never>
     }
     
     // MARK: - Properties
@@ -39,6 +40,7 @@ public final class SharedDiaryViewModel: BaseViewModel {
     
     private let sharedDiarySubject = PassthroughSubject<SharedDiaryEntity, Never>()
     private let errorSubject = PassthroughSubject<String, Never>()
+    private let blockSuccessSubject = PassthroughSubject<Void, Never>()
     
     public init(diaryId: Int,
                 sharedDiaryUseCase: SharedDiaryUseCase, toggleLikeUseCase: ToggleLikeUseCase, publishDiaryUseCase: PublishDiaryUseCase, blockUserUseCase: BlockUserUseCase) {
@@ -96,7 +98,8 @@ public final class SharedDiaryViewModel: BaseViewModel {
         
         return Output(
             fetchDiaryResult: sharedDiarySubject.eraseToAnyPublisher(),
-            errorMessage: errorSubject.eraseToAnyPublisher()
+            errorMessage: errorSubject.eraseToAnyPublisher(),
+            blockSuccess: blockSuccessSubject.eraseToAnyPublisher()
         )
     }
     
@@ -142,8 +145,8 @@ public final class SharedDiaryViewModel: BaseViewModel {
                 if case let .failure(error) = completion {
                     self?.errorSubject.send("차단 실패: \(error.localizedDescription)")
                 }
-            }, receiveValue: { _ in
-                
+            }, receiveValue: { [weak self] _ in
+                self?.blockSuccessSubject.send(())
             })
             .store(in: &cancellables)
     }
