@@ -12,11 +12,7 @@ public enum DiaryWritingAPI {
     case postDiaryWriting(DiaryWritingRequestDTO)
 }
 
-extension DiaryWritingAPI: TargetType {
-
-    public var baseURL: URL {
-        return NetworkEnvironment.shared.baseURL
-    }
+extension DiaryWritingAPI: BaseTargetType {
 
     public var path: String {
         switch self {
@@ -34,13 +30,6 @@ extension DiaryWritingAPI: TargetType {
         case .postDiaryWriting(let requestDTO):
             return .requestJSONEncodable(requestDTO)
         }
-    }
-
-    public var headers: [String: String]? {
-        return [
-            "Content-Type": "application/json",
-            "Authorization": "Bearer \(UserDefaultHandler.accessToken)"
-        ]
     }
 
     public var sampleData: Data {

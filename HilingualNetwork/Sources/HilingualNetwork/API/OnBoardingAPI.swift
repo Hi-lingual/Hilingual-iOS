@@ -13,11 +13,7 @@ public enum OnBoardingAPI {
     case registerProfile(requestDTO: RegisterProfileRequestDTO)
 }
 
-extension OnBoardingAPI: TargetType {
-    public var baseURL: URL {
-        return NetworkEnvironment.shared.baseURL
-    }
-
+extension OnBoardingAPI: BaseTargetType {
     public var path: String {
         switch self {
         case .checkNickname:

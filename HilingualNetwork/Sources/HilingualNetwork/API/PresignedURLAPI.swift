@@ -13,10 +13,7 @@ public enum PresignedURLAPI {
     case getPresignedURL(request: PresignedURLRequestDTO)
 }
 
-extension PresignedURLAPI: TargetType {
-    public var baseURL: URL {
-        return NetworkEnvironment.shared.baseURL
-    }
+extension PresignedURLAPI: BaseTargetType {
 
     public var path: String {
         return "/presigned-urls"
@@ -32,13 +29,6 @@ extension PresignedURLAPI: TargetType {
                return .requestJSONEncodable(request)
            }
        }
-
-    public var headers: [String: String]? {
-        return [
-            "Content-Type": "application/json",
-            "Authorization": "Bearer \(UserDefaultHandler.accessToken)"
-        ]
-    }
 
     public var sampleData: Data {
         return Data()

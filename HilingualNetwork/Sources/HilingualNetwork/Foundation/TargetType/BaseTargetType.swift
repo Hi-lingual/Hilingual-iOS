@@ -32,4 +32,8 @@ extension BaseTargetType {
     public var sampleData: Data {
         return Data()
     }
+
+    public var validationType: ValidationType {
+        return .successCodes
+    }
 }
