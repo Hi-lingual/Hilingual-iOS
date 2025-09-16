@@ -263,7 +263,7 @@ extension Dialog {
         
         rightButton.addAction(UIAction { [weak self] _ in
             self?.rightAction?()
-            self?.dismiss()
+            //self?.dismiss()
         }, for: .touchUpInside)
 
         self.gestureRecognizers?.forEach { self.removeGestureRecognizer($0) }
