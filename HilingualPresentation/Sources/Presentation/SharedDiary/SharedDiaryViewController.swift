@@ -99,8 +99,9 @@ public final class SharedDiaryViewController: BaseUIViewController<SharedDiaryVi
         dialog.isHidden = true
         bottomSafeAreaBackgroundView.backgroundColor = .gray100
         
-        view.bringSubviewToFront(modal)
         view.bringSubviewToFront(bottomSafeAreaBackgroundView)
+        view.bringSubviewToFront(dialog)
+        view.bringSubviewToFront(modal)
     }
     
     public override func setLayout() {
