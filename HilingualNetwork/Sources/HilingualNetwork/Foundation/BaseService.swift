@@ -89,6 +89,11 @@ public class BaseService<API: TargetType> {
         }
         .handleEvents(receiveCompletion: { completion in
             if case .failure(let error) = completion {
+                NotificationCenter.default.post(
+                    name: Notification.Name("ServerErrorOccurred"),
+                    object: nil,
+                    userInfo: ["message": "앗 일시적인 오류가 발생했어요."]
+                )
                 print("❌ [네트워크에러] \(API.self) - \(target.path): \(error)에러 발생 ㅠ")
             }
         })
