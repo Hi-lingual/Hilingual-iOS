@@ -13,6 +13,13 @@ final class MonthPickerModal: UIView {
     // MARK: - Properties
 
     public var onDateSelected: ((Date) -> Void)?
+    public var initialDate: Date? {
+        didSet {
+            if let date = initialDate {
+                datePicker.date = date
+            }
+        }
+    }
 
     private let modalSheetView: UIView = {
         let view = UIView()

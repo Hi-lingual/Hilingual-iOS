@@ -129,7 +129,9 @@ final class CalendarHeaderView: UIView {
 
     @objc private func monthButtonTapped() {
         let monthPicker = MonthPickerModal()
+        monthPicker.initialDate = currentDate
         monthPicker.onDateSelected = { [weak self] selectedDate in
+            self?.setCurrentDate(selectedDate)
             self?.onMonthChanged?(selectedDate)
         }
 
