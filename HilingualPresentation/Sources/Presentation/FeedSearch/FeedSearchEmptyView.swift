@@ -13,7 +13,7 @@ final class FeedSearchEmptyView: BaseUIView {
     
     private let emptyLabel: UILabel = {
         let label = UILabel()
-        label.text = "검색 결과가 없습니다."
+        label.text = "검색 결과가 없어요."
         label.font = .suit(.head_m_18)
         label.textColor = .gray500
         label.textAlignment = .center
