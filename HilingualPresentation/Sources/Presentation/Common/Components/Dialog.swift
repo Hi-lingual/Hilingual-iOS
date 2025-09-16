@@ -275,3 +275,16 @@ extension Dialog {
         setLayout(for: style)
     }
 }
+
+
+extension Dialog {
+    func disableOutsideTapDismiss() {
+        self.gestureRecognizers?.forEach { self.removeGestureRecognizer($0) }
+    }
+
+    func enableOutsideTapDismiss() {
+        self.gestureRecognizers?.forEach { self.removeGestureRecognizer($0) }
+        let tap = UITapGestureRecognizer(target: self, action: #selector(dismiss(_:)))
+        self.addGestureRecognizer(tap)
+    }
+}

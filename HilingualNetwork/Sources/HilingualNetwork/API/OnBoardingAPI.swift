@@ -11,6 +11,7 @@ import Moya
 public enum OnBoardingAPI {
     case checkNickname(nickname: String)
     case registerProfile(requestDTO: RegisterProfileRequestDTO)
+    case verifyCode(requestDTO: VerifyCodeRequestDTO)
 }
 
 extension OnBoardingAPI: BaseTargetType {
@@ -20,6 +21,8 @@ extension OnBoardingAPI: BaseTargetType {
             return "/users/profile/check"
         case .registerProfile:
             return "/users/profile"
+        case .verifyCode:
+            return "/auth/verify"
         }
     }
 
@@ -27,7 +30,7 @@ extension OnBoardingAPI: BaseTargetType {
         switch self {
         case .checkNickname:
             return .get
-        case .registerProfile:
+        case .registerProfile, .verifyCode:
             return .post
         }
     }
@@ -41,6 +44,8 @@ extension OnBoardingAPI: BaseTargetType {
             )
 
         case .registerProfile(let requestDTO):
+            return .requestJSONEncodable(requestDTO)
+        case .verifyCode(let requestDTO):
             return .requestJSONEncodable(requestDTO)
         }
     }

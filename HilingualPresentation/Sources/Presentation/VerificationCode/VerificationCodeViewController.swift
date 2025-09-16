@@ -62,6 +62,7 @@ public final class VerificationCodeViewController: BaseUIViewController<Verifica
                     leftAction: { [weak self] in self?.exitApp() },
                     rightAction: { [weak self] in self?.policyButtonTapped() }
                 )
+                self.dialog.disableOutsideTapDismiss()
                 self.dialog.showAnimation()
             }
             .store(in: &cancellables)
