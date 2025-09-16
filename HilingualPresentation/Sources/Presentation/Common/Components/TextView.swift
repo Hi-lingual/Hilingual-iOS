@@ -33,16 +33,12 @@ final class TextView: UIView {
         textView.backgroundColor = .gray100
         textView.font = .suit(.body_r_16)
         textView.attributedText = .suit(.body_r_16, text: "", lineBreakMode: .byWordWrapping, forceWrap: true)
-//        textView.attributedText = .suit(.body_r_16, text: "")
         textView.textColor = .black
         textView.isScrollEnabled = true
         textView.autocorrectionType = .no
         textView.spellCheckingType = .no
         textView.layer.borderWidth = 0
         textView.layer.borderColor = UIColor.hilingualBlack.cgColor
-//        textView.textContainer.lineBreakMode = .byWordWrapping
-//        textView.textContainer.widthTracksTextView = true
-//        textView.textContainer.lineFragmentPadding = 0
         return textView
     }()
     
@@ -126,7 +122,7 @@ final class TextView: UIView {
     
     func configure(text: String) {
         let limitedText = String(text.prefix(maxCharacterCount))
-        textView.attributedText = .suit(.body_r_16, text: limitedText)
+        textView.attributedText = .suit(.body_r_16, text: limitedText, lineBreakMode: .byWordWrapping, forceWrap: true)
         setTypingAttributesToSuitBodyR16()
         updateUI()
         scrollToTop()
