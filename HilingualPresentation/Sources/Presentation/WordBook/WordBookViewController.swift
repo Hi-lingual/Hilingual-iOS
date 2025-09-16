@@ -18,6 +18,7 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
     private var filteredWordList: [(String, [PhraseData])] = []
 
     private var selectedSortIndex: Int = 0
+    private var isSearching: Bool = false
 
     // MARK: - Inputs
 
@@ -158,7 +159,8 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
     }
 
     private func filterWords(for keyword: String) {
-        let isSearching = !keyword.isEmpty
+        isSearching = !keyword.isEmpty 
+
         wordBookView.showHeaderView(!isSearching)
         wordBookView.tableView.contentInset.top = isSearching ? 16 : 0
 
@@ -169,21 +171,28 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
             return
         }
 
-        filteredWordList = fullWordList.compactMap { (date, items) in
-            let filtered = items.filter {
-                $0.phrase.lowercased().contains(keyword.lowercased())
-            }
-            return filtered.isEmpty ? nil : (date, filtered)
+        let flattenedItems = fullWordList.flatMap { $0.1 }
+        let filtered = flattenedItems.filter {
+            $0.phrase.lowercased().contains(keyword.lowercased())
         }
+        let sorted = filtered.sorted { $0.phrase.lowercased() < $1.phrase.lowercased() }
+        filteredWordList = sorted.isEmpty ? [] : [("", sorted)]
 
         wordBookView.tableView.reloadData()
         updateViewState()
     }
 
-    //MARK: - Action Method
+    // MARK: - Action Method
 
     @objc
     private func didPullToRefresh() {
+        guard !isSearching else {
+            DispatchQueue.main.async { [weak self] in
+                self?.wordBookView.refreshControl.endRefreshing()
+            }
+            return
+        }
+
         refreshSubject.send(())
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { [weak self] in
             self?.wordBookView.refreshControl.endRefreshing()
@@ -236,7 +245,6 @@ extension WordBookViewController: UITableViewDataSource, UITableViewDelegate {
     }
 
     public func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        let isSearching = !(wordBookView.searchBar.text ?? "").isEmpty
         if isSearching { return nil }
 
         guard let header = tableView.dequeueReusableHeaderFooterView(
@@ -249,17 +257,15 @@ extension WordBookViewController: UITableViewDataSource, UITableViewDelegate {
         return header
     }
 
+    public func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return isSearching ? CGFloat.leastNonzeroMagnitude : UITableView.automaticDimension
+    }
+
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let item = filteredWordList[indexPath.section].1[indexPath.row]
         selectedWordIdSubject.send(Int(item.phraseId))
     }
-
-    public func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        let isSearching = !(wordBookView.searchBar.text ?? "").isEmpty
-        return isSearching ? 0 : UITableView.automaticDimension
-    }
 }
-
 
 // MARK: - UISearchBarDelegate
 
@@ -268,6 +274,8 @@ extension WordBookViewController: UISearchBarDelegate {
         filterWords(for: searchText)
     }
 }
+
+// MARK: - UITextFieldDelegate
 
 extension WordBookViewController: UITextFieldDelegate {
     public func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
@@ -289,5 +297,4 @@ extension WordBookViewController: UITextFieldDelegate {
         textField.resignFirstResponder()
         return true
     }
-
 }
