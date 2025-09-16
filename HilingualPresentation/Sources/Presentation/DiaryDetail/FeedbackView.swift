@@ -41,14 +41,6 @@ final class FeedbackView: BaseUIView {
         return toggle
     }()
     
-    private let trailingSpacerView: UIView = {
-        let view = UIView()
-        view.snp.makeConstraints {
-            $0.width.equalTo(16)
-        }
-        return view
-    }()
-    
     let headerStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .horizontal
@@ -127,7 +119,7 @@ final class FeedbackView: BaseUIView {
         scrollView.addSubview(contentView)
         contentView.axis = .vertical
         contentView.addArrangedSubviews(headerStackView, diaryTextView, feedbackStackView)
-        headerStackView.addArrangedSubviews(dateLabel, AILabel, controlSwitch, trailingSpacerView)
+        headerStackView.addArrangedSubviews(dateLabel, AILabel, controlSwitch)
         feedbackStackView.addArrangedSubview(feedbackLabel)
         
         backgroundColor = .gray100
