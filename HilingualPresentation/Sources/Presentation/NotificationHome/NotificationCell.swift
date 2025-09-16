@@ -7,8 +7,6 @@
 
 import UIKit
 
-import UIKit
-
 final class NotificationCell: UITableViewCell {
 
     static let identifier = "NotificationCell"
@@ -17,7 +15,7 @@ final class NotificationCell: UITableViewCell {
 
     private let messageLabel: UILabel = {
         let label = UILabel()
-        label.font = .suit(.body_sb_14)
+        label.font = .suit(.body_m_16)
         label.textColor = .hilingualBlack
         label.numberOfLines = 2
         return label
@@ -53,7 +51,7 @@ final class NotificationCell: UITableViewCell {
     // MARK: - Configure
 
     func configure(with model: NotificationModel) {
-        messageLabel.text = model.title
+        messageLabel.attributedText = makeBoldUserNameText(from: model.title)
         dateLabel.text = model.publishedAt
         contentView.backgroundColor = model.isRead ? .white : .gray100
     }
@@ -82,5 +80,16 @@ final class NotificationCell: UITableViewCell {
             $0.trailing.equalToSuperview().inset(12)
             $0.size.equalTo(24)
         }
+    }
+
+    // MARK: - Private Methods
+
+    private func makeBoldUserNameText(from text: String) -> NSAttributedString {
+        let attributed = NSMutableAttributedString(string: text)
+        if let range = text.range(of: "이 당신") {
+            let nameRange = NSRange(text.startIndex..<range.lowerBound, in: text)
+            attributed.addAttribute(.font, value: UIFont.suit(.body_sb_16), range: nameRange)
+        }
+        return attributed
     }
 }
