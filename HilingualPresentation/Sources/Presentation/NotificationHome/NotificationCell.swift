@@ -23,7 +23,7 @@ final class NotificationCell: UITableViewCell {
 
     private let dateLabel: UILabel = {
         let label = UILabel()
-        label.font = .suit(.caption_r_12)
+        label.font = .suit(.caption_r_14)
         label.textColor = .gray300
         return label
     }()
