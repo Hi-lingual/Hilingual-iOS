@@ -90,9 +90,11 @@ public class BaseUIViewController<VM: BaseViewBindable>: UIViewController, UIGes
     private func observeServerError() {
         NotificationCenter.default.publisher(for: Notification.Name("ServerErrorOccurred"))
             .compactMap { $0.userInfo?["message"] as? String }
+            .debounce(for: .milliseconds(300), scheduler: RunLoop.main)
             .receive(on: RunLoop.main)
             .sink { [weak self] message in
-                self?.showServerErrorDialog(message: message)
+                guard let self else { return }
+                self.showServerErrorDialog(message: message)
             }
             .store(in: &cancellables)
     }
