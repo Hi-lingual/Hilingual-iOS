@@ -80,7 +80,6 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: false)
-        
         input.reload.send()
     }
 
@@ -228,14 +227,14 @@ extension FeedViewController {
     
     public func handleFeedTabSelected(isReSelected: Bool) {
         if isReSelected {
-            if feedView.segmentedControl?.selectedIndex == 0 {
+            if feedView.segmentedControl?.setSelectedIndexWithAPI == 0 {
                 resetRecommendFeed()
             } else {
                 resetFollowingFeed()
             }
         } else {
-            feedView.segmentedControl?.selectedIndex = 0
-            resetRecommendFeed()
+            feedView.setSelectedIndexUIOnly(0)
+            recommendFeedVC.resetScrollPosition()
         }
     }
 }

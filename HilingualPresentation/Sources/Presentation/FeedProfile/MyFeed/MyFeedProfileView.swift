@@ -74,7 +74,7 @@ final class MyFeedProfileView: BaseUIView {
     }
     
     func setSelectedIndex(_ index: Int) {
-        segmentedControl?.selectedIndex = index
+        segmentedControl?.setSelectedIndexWithAPI = index
         onSegmentChanged?(index)
     }
 
