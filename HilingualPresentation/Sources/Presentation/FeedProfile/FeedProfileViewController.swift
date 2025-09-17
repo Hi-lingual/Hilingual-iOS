@@ -49,7 +49,6 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
     public override func viewDidLoad() {
         super.viewDidLoad()
         bindViewModel()
-        input.reload.send(())
         
         view.addSubview(feedCellView)
         feedCellView.snp.makeConstraints { $0.edges.equalToSuperview() }

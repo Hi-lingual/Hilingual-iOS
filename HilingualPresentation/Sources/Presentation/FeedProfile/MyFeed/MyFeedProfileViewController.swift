@@ -114,12 +114,12 @@ public final class MyFeedProfileViewController: BaseUIViewController<FeedProfile
         input.reload.send(())
     }
     
-//    public override func viewDidAppear(_ animated: Bool) {
-//        super.viewDidAppear(animated)
-//        
-//        sharedVC.refresh()
-//        likedVC.refresh()
-//    }
+    public override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        sharedVC.refresh()
+        likedVC.refresh()
+    }
     
     // MARK: - Bind
     
