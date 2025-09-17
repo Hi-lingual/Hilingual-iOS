@@ -30,26 +30,12 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         navigationController?.setNavigationBarHidden(true, animated: false)
         
         let selectedDate = homeView.calendarView.selectedDate ?? Date()
-        
         fetchAndShowDateInfo(for: selectedDate)
         
         let calendar = Calendar.current
         let year = calendar.component(.year, from: selectedDate)
         let month = calendar.component(.month, from: selectedDate)
         input.monthChange.send((year, month))
-        
-        viewModel?.fetchUserInfo()
-            .receive(on: RunLoop.main)
-            .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] entity in
-                self?.homeView.profileView.updateView(
-                    nickname: entity.nickname,
-                    profileImageURL: entity.profileImg,
-                    totalDiaries: entity.totalDiaries,
-                    streak: entity.streak,
-                    newAlarm: entity.newAlarm
-                )
-            })
-            .store(in: &viewModel!.cancellables)
     }
     
     // MARK: - Bind
@@ -59,8 +45,6 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         homeView.calendarView.selectedDate = today
         homeView.calendarView.reload(for: today)
         homeView.selectedInfo.setSelectedDate(today)
-        
-        self.fetchAndShowDateInfo(for: today)
         
         homeView.calendarView.onDateSelected = { [weak self] date in
             self?.fetchAndShowDateInfo(for: date)
