@@ -82,11 +82,14 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
         navigationController?.setNavigationBarHidden(true, animated: false)
         
         input.reload.send()
-                
+    }
+
+    public override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
         recommendFeedVC.refresh()
         followingFeedVC.refresh()
     }
-    
+
     // MARK: - Binding
     
     public override func bind(viewModel: FeedViewModel) {
@@ -98,13 +101,6 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
                 self?.feedView.updateProfileImage(url)
             }
             .store(in: &viewModel.cancellables)
-    }
-    
-    public override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        
-        recommendFeedVC.refresh()
-        followingFeedVC.refresh()
     }
 
     //MARK: - Action
