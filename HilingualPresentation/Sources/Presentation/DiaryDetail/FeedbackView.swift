@@ -14,6 +14,7 @@ final class FeedbackView: BaseUIView {
     
     private let scrollView = UIScrollView()
     private let contentView = UIStackView()
+    private let bottomSpacingView = UIView()
     private let detailImageView = DetailImageView(image: UIImage(resource: .imgLoadFailLargeIos))
     
     private var currentDiaryData: DiaryViewData?
@@ -118,7 +119,7 @@ final class FeedbackView: BaseUIView {
         addSubview(scrollView)
         scrollView.addSubview(contentView)
         contentView.axis = .vertical
-        contentView.addArrangedSubviews(headerStackView, diaryTextView, feedbackStackView)
+        contentView.addArrangedSubviews(headerStackView, diaryTextView, feedbackStackView, bottomSpacingView)
         headerStackView.addArrangedSubviews(dateLabel, AILabel, controlSwitch)
         feedbackStackView.addArrangedSubview(feedbackLabel)
         
@@ -156,6 +157,10 @@ final class FeedbackView: BaseUIView {
             $0.leading.trailing.equalToSuperview()
         }
         
+        bottomSpacingView.snp.makeConstraints {
+            $0.height.equalTo(30)
+        }
+        
         contentView.setCustomSpacing(40, after: diaryTextView)
     }
     
@@ -182,8 +187,8 @@ final class FeedbackView: BaseUIView {
         feedbackStackView.arrangedSubviews.dropFirst().forEach { $0.removeFromSuperview() }
         
         if data.isEmpty {
-            feedbackLabel.font = .suit(.body_m_14)
-            feedbackLabel.text = "일기에서 발견된 피드백이 없어요!"
+            feedbackLabel.font = .suit(.body_sb_16)
+            feedbackLabel.attributedText = .suit(.body_sb_16, text: "일기에서 발견된 피드백이 없어요!")
             feedbackStackView.addArrangedSubview(emptyFeedbackView)
             emptyFeedbackView.snp.makeConstraints {
                 $0.horizontalEdges.equalToSuperview()
