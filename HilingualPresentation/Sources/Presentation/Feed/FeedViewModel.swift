@@ -23,7 +23,7 @@ public final class FeedViewModel: BaseViewModel, BaseViewModelType {
         let unpublish = PassthroughSubject<Int, Never>()
         let likeTapped = PassthroughSubject<(Int, Bool), Never>()
     }
-
+    
     public struct Output {
         let feeds: AnyPublisher<[FeedModel], Never>
         let haveFollowing: AnyPublisher<Bool?, Never>
@@ -51,7 +51,7 @@ public final class FeedViewModel: BaseViewModel, BaseViewModelType {
     private let publishSubject = PassthroughSubject<Bool, Never>()
     private let likeSubject = PassthroughSubject<(Int, Bool), Never>()
     private let userProfileImageSubject = CurrentValueSubject<String?, Never>(nil)
-
+    
     // MARK: - Init
     
     public init(
@@ -107,7 +107,7 @@ public final class FeedViewModel: BaseViewModel, BaseViewModelType {
                 _ = self?.toggleLike(diaryId: diaryId, isLiked: isLiked)
             }
             .store(in: &cancellables)
-
+        
         return Output(
             feeds: feedsSubject.eraseToAnyPublisher(),
             haveFollowing: haveFollowingSubject.eraseToAnyPublisher(),
@@ -155,9 +155,9 @@ public final class FeedViewModel: BaseViewModel, BaseViewModelType {
             .handleEvents(receiveCompletion: { [weak self] _ in
                 self?.isLoadingSubject.send(false)
             })
-            .catch { [weak self] error in
+            .catch { [weak self] error -> AnyPublisher<[FeedModel], Never> in
                 self?.errorSubject.send("피드 불러오기 실패: \(error.localizedDescription)")
-                return Just<[FeedModel]>([])
+                return Empty<[FeedModel], Never>().eraseToAnyPublisher()
             }
             .eraseToAnyPublisher()
     }
@@ -167,29 +167,19 @@ public final class FeedViewModel: BaseViewModel, BaseViewModelType {
             .map { userInfo in
                 return userInfo.profileImg
             }
-            .catch { [weak self] error -> Just<String?> in
+            .catch { [weak self] error -> AnyPublisher<String?, Never> in
                 self?.errorSubject.send("프로필 이미지 불러오기 실패: \(error.localizedDescription)")
-                return Just(nil)
+                return Empty<String?, Never>().eraseToAnyPublisher()
             }
             .eraseToAnyPublisher()
     }
     
-    public func publishDiary(diaryId: Int) -> AnyPublisher<Bool, Never> {
-        return publishDiaryUseCase.publishDiary(diaryId: diaryId)
-            .map { _ in true }
-            .catch { [weak self] error -> Just<Bool> in
-                self?.errorSubject.send("공개 실패: \(error.localizedDescription)")
-                return Just(false)
-            }
-            .eraseToAnyPublisher()
-    }
-
     public func unpublishDiary(diaryId: Int) -> AnyPublisher<Bool, Never> {
         return publishDiaryUseCase.unpublishDiary(diaryId: diaryId)
             .map { _ in false }
-            .catch { [weak self] error -> Just<Bool> in
+            .catch { [weak self] error -> AnyPublisher<Bool, Never> in
                 self?.errorSubject.send("비공개 실패: \(error.localizedDescription)")
-                return Just(false)
+                return Empty<Bool, Never>().eraseToAnyPublisher()
             }
             .handleEvents(receiveOutput: { [weak self] result in
                 self?.publishSubject.send(result)
@@ -200,9 +190,9 @@ public final class FeedViewModel: BaseViewModel, BaseViewModelType {
     public func toggleLike(diaryId: Int, isLiked: Bool) -> AnyPublisher<(Int, Bool), Never> {
         return toggleLikeUseCase.toggleLike(diaryId: diaryId, isLiked: isLiked)
             .map { _ in (diaryId, !isLiked) }
-            .catch { [weak self] error -> Just<(Int, Bool)> in
+            .catch { [weak self] error -> AnyPublisher<(Int, Bool), Never> in
                 self?.errorSubject.send("공감하기 실패: \(error.localizedDescription)")
-                return Just((diaryId, isLiked))
+                return Empty<(Int, Bool), Never>().eraseToAnyPublisher()
             }
             .handleEvents(receiveOutput: { [weak self] result in
                 self?.likeSubject.send(result)

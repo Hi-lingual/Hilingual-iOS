@@ -85,7 +85,6 @@ public final class FeedProfileViewModel: BaseViewModel, BaseViewModelType {
         let trigger = Publishers.Merge(viewDidLoad, input.reload.eraseToAnyPublisher())
             .eraseToAnyPublisher()
         
-        // 프로필 정보
         trigger
             .flatMap { [weak self] _ -> AnyPublisher<FeedProfileInfoEntity?, Never> in
                 guard let self else { return Just(nil).eraseToAnyPublisher() }
@@ -106,7 +105,6 @@ public final class FeedProfileViewModel: BaseViewModel, BaseViewModelType {
             }
             .store(in: &cancellables)
         
-        // 피드
         trigger
             .flatMap { [weak self] _ -> AnyPublisher<[FeedModel], Never> in
                 guard let self else { return Just([]).eraseToAnyPublisher() }
@@ -146,28 +144,25 @@ public final class FeedProfileViewModel: BaseViewModel, BaseViewModelType {
             }
             .store(in: &cancellables)
         
-        // 일기 비공개하기
         input.unpublish
             .sink { [weak self] diaryId in
                 self?.unpublishDiary(diaryId: diaryId)
             }
             .store(in: &cancellables)
         
-        // 공감하기
         input.likeTapped
             .sink { [weak self] (diaryId, isLiked) in
                 self?.toggleLike(diaryId: diaryId, isLiked: isLiked)
             }
             .store(in: &cancellables)
         
-        // 팔로우하기
         input.follow
             .flatMap { [weak self] _ -> AnyPublisher<Void, Never> in
                 guard let self else { return Empty().eraseToAnyPublisher() }
                 return self.followUseCase.follow(userId: Int(self.targetUserId))
-                    .catch { [weak self] error -> Just<Void> in
+                    .catch { [weak self] error -> AnyPublisher<Void, Never> in
                         self?.errorSubject.send("팔로우 실패: \(error.localizedDescription)")
-                        return Just(())
+                        return Empty<Void, Never>().eraseToAnyPublisher()
                     }
                     .eraseToAnyPublisher()
             }
@@ -177,14 +172,13 @@ public final class FeedProfileViewModel: BaseViewModel, BaseViewModelType {
             }
             .store(in: &cancellables)
 
-        // 언팔로우하기
         input.unfollow
             .flatMap { [weak self] _ -> AnyPublisher<Bool, Never> in
                 guard let self else { return Empty().eraseToAnyPublisher() }
                 return self.followUseCase.unfollow(userId: Int(self.targetUserId))
-                    .catch { [weak self] error -> Just<Bool> in
+                    .catch { [weak self] error -> AnyPublisher<Bool, Never> in
                         self?.errorSubject.send("언팔로우 실패: \(error.localizedDescription)")
-                        return Just(false)
+                        return Empty<Bool, Never>().eraseToAnyPublisher()
                     }
                     .eraseToAnyPublisher()
             }
@@ -192,15 +186,14 @@ public final class FeedProfileViewModel: BaseViewModel, BaseViewModelType {
                 self?.reloadProfile()
             }
             .store(in: &cancellables)
-        
-        // 차단하기
+
         input.block
             .flatMap { [weak self] _ -> AnyPublisher<Void, Never> in
                 guard let self else { return Empty().eraseToAnyPublisher() }
                 return self.blockUserUseCase.blockUser(id: Int(self.targetUserId))
-                    .catch { [weak self] error -> Just<Void> in
+                    .catch { [weak self] error -> AnyPublisher<Void, Never> in
                         self?.errorSubject.send("차단 실패: \(error.localizedDescription)")
-                        return Just(())
+                        return Empty<Void, Never>().eraseToAnyPublisher()
                     }
                     .eraseToAnyPublisher()
             }
@@ -208,15 +201,14 @@ public final class FeedProfileViewModel: BaseViewModel, BaseViewModelType {
                 self?.buttonStateSubject.send(.unblock)
             }
             .store(in: &cancellables)
-        
-        // 차단 해제하기
+
         input.unblock
             .flatMap { [weak self] _ -> AnyPublisher<Void, Never> in
                 guard let self else { return Empty().eraseToAnyPublisher() }
                 return self.blockUserUseCase.unblockUser(id: Int(self.targetUserId))
-                    .catch { [weak self] error -> Just<Void> in
+                    .catch { [weak self] error -> AnyPublisher<Void, Never> in
                         self?.errorSubject.send("차단 해제 실패: \(error.localizedDescription)")
-                        return Just(())
+                        return Empty<Void, Never>().eraseToAnyPublisher()
                     }
                     .eraseToAnyPublisher()
             }
@@ -239,20 +231,6 @@ public final class FeedProfileViewModel: BaseViewModel, BaseViewModelType {
     
     // MARK: - Private
     
-    private func reloadProfile() {
-        profileInfoUseCase.execute(targetUserId: targetUserId)
-            .sink(receiveCompletion: { [weak self] completion in
-                if case .failure(let error) = completion {
-                    self?.errorSubject.send(error.localizedDescription)
-                }
-            }, receiveValue: { [weak self] entity in
-                self?.profileSubject.send(entity)
-                let state = self?.followButtonState(entity: entity)
-                self?.buttonStateSubject.send(state)
-            })
-            .store(in: &cancellables)
-    }
-    
     private func followButtonState(entity: FeedProfileInfoEntity) -> FollowButtonState? {
         let isMine = entity.isMine
         let isBlocked = entity.isBlocked ?? false
@@ -267,15 +245,34 @@ public final class FeedProfileViewModel: BaseViewModel, BaseViewModelType {
         return .follow
     }
     
+    private func reloadProfile() {
+        profileInfoUseCase.execute(targetUserId: targetUserId)
+            .map { Optional($0) }
+            .catch { [weak self] error -> AnyPublisher<FeedProfileInfoEntity?, Never> in
+                self?.errorSubject.send("프로필 정보 갱신 실패: \(error.localizedDescription)")
+                return Empty().eraseToAnyPublisher()
+            }
+            .sink { [weak self] entity in
+                self?.profileSubject.send(entity)
+                let state = entity.flatMap { self?.followButtonState(entity: $0) }
+                self?.buttonStateSubject.send(state)
+            }
+            .store(in: &cancellables)
+    }
+    
     private func unpublishDiary(diaryId: Int) {
         publishDiaryUseCase.unpublishDiary(diaryId: diaryId)
-            .map { _ in false }
-            .catch { [weak self] error -> Just<Bool> in
+            .map { _ in diaryId }
+            .catch { [weak self] error -> AnyPublisher<Int, Never> in
                 self?.errorSubject.send("공개 상태 변경 실패: \(error.localizedDescription)")
-                return Just(false)
+                return Empty().eraseToAnyPublisher()
             }
-            .sink { [weak self] result in
-                self?.publishSubject.send(result)
+            .sink { [weak self] deletedId in
+                guard let self else { return }
+                var current = self.feedsSubject.value
+                current.removeAll { $0.diaryID == deletedId }
+                self.feedsSubject.send(current)
+                self.publishSubject.send(true)
             }
             .store(in: &cancellables)
     }
@@ -283,9 +280,9 @@ public final class FeedProfileViewModel: BaseViewModel, BaseViewModelType {
     private func toggleLike(diaryId: Int, isLiked: Bool) {
         toggleLikeUseCase.toggleLike(diaryId: diaryId, isLiked: isLiked)
             .map { _ in (diaryId, !isLiked) }
-            .catch { [weak self] error -> Just<(Int, Bool)> in
+            .catch { [weak self] error -> AnyPublisher<(Int, Bool), Never> in
                 self?.errorSubject.send("공감하기 실패: \(error.localizedDescription)")
-                return Just((diaryId, isLiked))
+                return Empty<(Int, Bool), Never>().eraseToAnyPublisher()
             }
             .sink { [weak self] result in
                 self?.likeSubject.send(result)
