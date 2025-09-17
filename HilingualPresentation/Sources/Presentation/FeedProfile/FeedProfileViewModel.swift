@@ -92,7 +92,7 @@ public final class FeedProfileViewModel: BaseViewModel, BaseViewModelType {
                 return self.profileInfoUseCase.execute(targetUserId: self.targetUserId)
                     .map { Optional($0) }
                     .catch { [weak self] error -> Just<FeedProfileInfoEntity?> in
-                        self?.errorSubject.send(error.localizedDescription)
+                        self?.errorSubject.send("프로필 정보 불러오기 실패: \(error.localizedDescription)")
                         return Just(nil)
                     }
                     .eraseToAnyPublisher()
@@ -135,7 +135,7 @@ public final class FeedProfileViewModel: BaseViewModel, BaseViewModelType {
                         self?.isLoadingSubject.send(false)
                     })
                     .catch { [weak self] error in
-                        self?.errorSubject.send(error.localizedDescription)
+                        self?.errorSubject.send("피드 불러오기 실패: \(error.localizedDescription)")
                         return Just<[FeedModel]>([])
                     }
                     .eraseToAnyPublisher()

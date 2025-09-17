@@ -156,7 +156,7 @@ public final class FeedViewModel: BaseViewModel, BaseViewModelType {
                 self?.isLoadingSubject.send(false)
             })
             .catch { [weak self] error in
-                self?.errorSubject.send(error.localizedDescription)
+                self?.errorSubject.send("피드 불러오기 실패: \(error.localizedDescription)")
                 return Just<[FeedModel]>([])
             }
             .eraseToAnyPublisher()
@@ -168,7 +168,7 @@ public final class FeedViewModel: BaseViewModel, BaseViewModelType {
                 return userInfo.profileImg
             }
             .catch { [weak self] error -> Just<String?> in
-                self?.errorSubject.send(error.localizedDescription)
+                self?.errorSubject.send("프로필 이미지 불러오기 실패: \(error.localizedDescription)")
                 return Just(nil)
             }
             .eraseToAnyPublisher()
