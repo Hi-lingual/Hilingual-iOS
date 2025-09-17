@@ -47,6 +47,9 @@ public final class FeedSearchViewController: BaseUIViewController<FeedSearchView
     
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        if let query = searchBar.text, !query.isEmpty {
+            viewModel?.input.searchTrigger.send(query)
+        }
     }
     
     // MARK: - Setup Methods
