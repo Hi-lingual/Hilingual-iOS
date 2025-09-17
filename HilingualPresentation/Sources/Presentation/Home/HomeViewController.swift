@@ -29,6 +29,8 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: false)
         
+        refreshUserInfo()
+        homeView.selectedInfo.reset()
         let selectedDate = homeView.calendarView.selectedDate ?? Date()
         let calendar = Calendar.current
         let year = calendar.component(.year, from: selectedDate)
@@ -497,5 +499,22 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         let myFeedProfileVC = diContainer.makeMyFeedProfileViewController()
         myFeedProfileVC.hidesBottomBarWhenPushed = true
         navigationController?.pushViewController(myFeedProfileVC, animated: true)
+    }
+    
+    // MARK: - Recall
+    
+    private func refreshUserInfo() {
+        viewModel?.fetchUserInfo()
+            .receive(on: RunLoop.main)
+            .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] entity in
+                self?.homeView.profileView.updateView(
+                    nickname: entity.nickname,
+                    profileImageURL: entity.profileImg,
+                    totalDiaries: entity.totalDiaries,
+                    streak: entity.streak,
+                    newAlarm: entity.newAlarm
+                )
+            })
+            .store(in: &viewModel!.cancellables)
     }
 }
