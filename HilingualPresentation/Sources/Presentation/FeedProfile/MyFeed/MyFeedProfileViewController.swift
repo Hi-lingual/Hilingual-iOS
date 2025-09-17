@@ -158,7 +158,9 @@ public final class MyFeedProfileViewController: BaseUIViewController<FeedProfile
             rightAction: { [weak self] in
                 guard let self else { return }
                 self.dialog.dismiss()
+                
                 let diaryId = listVC.feedCellView.feeds[row].diaryID
+                listVC.removeDiary(at: row)
                 self.input.unpublish.send(diaryId)
             }
         )
