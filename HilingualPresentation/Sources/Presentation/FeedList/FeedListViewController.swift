@@ -33,7 +33,7 @@ public final class FeedListViewController: BaseUIViewController<FeedViewModel> {
     public override func viewDidLoad() {
         super.viewDidLoad()
         bindViewModel()
-        input.reload.send(())
+//        input.reload.send(())
         
         let refreshControl = UIRefreshControl()
         refreshControl.addTarget(self, action: #selector(didTopScrollRefresh), for: .valueChanged)
