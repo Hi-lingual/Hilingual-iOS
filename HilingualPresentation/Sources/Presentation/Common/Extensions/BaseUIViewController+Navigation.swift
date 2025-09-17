@@ -92,9 +92,9 @@ public extension BaseUIViewController {
         button.setImage(image, for: .normal)
         button.tintColor = .black
         button.addTarget(self, action: action, for: .touchUpInside)
-        button.frame = CGRect(x: 0, y: 0, width: 24, height: 24)
-        button.contentHorizontalAlignment = .fill
-        button.contentVerticalAlignment = .fill
+//        button.frame = CGRect(x: 0, y: 0, width: 24, height: 24)
+//        button.contentHorizontalAlignment = .fill
+//        button.contentVerticalAlignment = .fill
 
         return UIBarButtonItem(customView: button)
     }

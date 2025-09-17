@@ -14,9 +14,13 @@ public final class AuthInterceptor: RequestInterceptor {
     public static let shared = AuthInterceptor()
     private init() {}
 
+    // MARK: - Properties
     private var cancellables = Set<AnyCancellable>()
+    private var isRefreshing = false
+    private var requestsToRetry: [(RetryResult) -> Void] = []
 
     // MARK: - 요청 시 토큰 헤더 주입
+    
     public func adapt(_ urlRequest: URLRequest,
                       for session: Session,
                       completion: @escaping (Result<URLRequest, Error>) -> Void) {
@@ -37,6 +41,7 @@ public final class AuthInterceptor: RequestInterceptor {
     }
 
     // MARK: - 401 발생 시 토큰 재발급 후 재시도
+
     public func retry(_ request: Request,
                       for session: Session,
                       dueTo error: Error,
@@ -49,35 +54,56 @@ public final class AuthInterceptor: RequestInterceptor {
 
         print("[AuthInterceptor] 🔄 401 감지 → 토큰 리프레시 시도")
 
+        requestsToRetry.append(completion)
+
+        guard !isRefreshing else { return }
+        isRefreshing = true
+
         let refreshToken = UserDefaultHandler.refreshToken
         if refreshToken.isEmpty {
+            completeAllWithFailure(NetworkError.refreshFailed)
             notifySessionExpired()
-            completion(.doNotRetryWithError(NetworkError.refreshFailed))
             return
         }
 
-        let authService = DefaultAuthService()
-        authService.refreshToken(token: refreshToken)
+        DefaultAuthService().refreshToken(token: refreshToken)
             .sink { [weak self] result in
                 switch result {
                 case .failure(let err):
                     print("[AuthInterceptor] ❌ 토큰 재발급 실패: \(err)")
+                    self?.completeAllWithFailure(err)
                     self?.notifySessionExpired()
-                    completion(.doNotRetryWithError(err))
                 case .finished:
                     break
                 }
-            } receiveValue: { dto in
+            } receiveValue: { [weak self] dto in
+                guard let self else { return }
                 UserDefaultHandler.accessToken = dto.accessToken
                 UserDefaultHandler.refreshToken = dto.refreshToken
                 print("[AuthInterceptor] ✅ 토큰 재발급 성공 → 요청 재시도")
-                completion(.retry)
+                self.completeAllWithRetry()
             }
             .store(in: &cancellables)
     }
 
+    // MARK: - Pending 요청 처리
+
+    private func completeAllWithRetry() {
+        isRefreshing = false
+        let completions = requestsToRetry
+        requestsToRetry.removeAll()
+        completions.forEach { $0(.retry) }
+    }
+
+    private func completeAllWithFailure(_ error: Error) {
+        isRefreshing = false
+        let completions = requestsToRetry
+        requestsToRetry.removeAll()
+        completions.forEach { $0(.doNotRetryWithError(error)) }
+    }
+
     // MARK: - 세션 만료 이벤트 발행
-    
+
     private func notifySessionExpired() {
         NotificationCenter.default.post(
             name: Notification.Name("SessionExpired"),
