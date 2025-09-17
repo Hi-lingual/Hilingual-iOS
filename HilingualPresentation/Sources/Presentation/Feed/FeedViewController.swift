@@ -102,6 +102,9 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
     
     public override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        
+        recommendFeedVC.refresh()
+        followingFeedVC.refresh()
     }
 
     //MARK: - Action
