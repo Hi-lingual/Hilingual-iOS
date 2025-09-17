@@ -197,7 +197,7 @@ extension FeedList {
     func removeDiary(at row: Int) {
         guard row < items.count else { return }
         items.remove(at: row)
-        tableView.deleteRows(at: [IndexPath(row: row, section: 0)], with: .automatic)
+        tableView.reloadData()
     }
 }
 
