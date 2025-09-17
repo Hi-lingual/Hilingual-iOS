@@ -82,8 +82,7 @@ public final class FeedProfileViewModel: BaseViewModel, BaseViewModelType {
     // MARK: - Transform
     
     public func transform(input: Input) -> Output {
-        let trigger = Publishers.Merge(viewDidLoad, input.reload.eraseToAnyPublisher())
-            .eraseToAnyPublisher()
+        let trigger = input.reload.eraseToAnyPublisher()
         
         trigger
             .flatMap { [weak self] _ -> AnyPublisher<FeedProfileInfoEntity?, Never> in

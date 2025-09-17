@@ -126,7 +126,6 @@ public final class MyFeedProfileViewController: BaseUIViewController<FeedProfile
     // MARK: - Bind
     
     private func bind() {
-        let input = FeedProfileViewModel.Input()
         guard let viewModel else { return }
 
         let output = viewModel.transform(input: input)
