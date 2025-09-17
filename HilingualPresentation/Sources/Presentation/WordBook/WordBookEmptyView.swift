@@ -95,7 +95,7 @@ final class WordBookEmptyView: UIView {
         case .noSearchResult:
             emptyImageView.image = UIImage(named: "img_search_ios", in: .module, compatibleWith: nil)
             emptyImageView.isHidden = false
-            emptyLabel.text = "검색 결과가 없습니다."
+            emptyLabel.text = "검색 결과가 없어요."
             emptyButton.isHidden = true
         }
     }

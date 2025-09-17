@@ -26,7 +26,42 @@ final class LoginView: BaseUIView {
         return imageView
     }()
 
-    let appleLoginButton = ASAuthorizationAppleIDButton()
+    let appleLoginButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.backgroundColor = UIColor(named: "gray900") ?? .black
+        button.layer.cornerRadius = 8
+        button.clipsToBounds = true
+
+        let iconImageView = UIImageView()
+        iconImageView.image = UIImage(
+            named: "ic_apple_20_ios",
+            in: .module,
+            compatibleWith: nil
+        )?.withRenderingMode(.alwaysOriginal)
+        iconImageView.contentMode = .scaleAspectFit
+
+        let titleLabel = UILabel()
+        titleLabel.text = "Apple로 계속하기"
+        titleLabel.font = .suit(.body_sb_16)
+        titleLabel.textColor = .white
+        titleLabel.textAlignment = .center
+
+        button.addSubview(iconImageView)
+        button.addSubview(titleLabel)
+
+        iconImageView.snp.makeConstraints {
+            $0.leading.equalToSuperview().inset(16)
+            $0.centerY.equalToSuperview()
+            $0.width.height.equalTo(20)
+        }
+
+        titleLabel.snp.makeConstraints {
+            $0.center.equalToSuperview()
+        }
+
+        return button
+    }()
+
 
     let privacyPolicyButton: UIButton = {
         let button = UIButton(type: .system)
@@ -70,12 +105,12 @@ final class LoginView: BaseUIView {
 
     override func setLayout() {
         logoImageView.snp.makeConstraints {
-            $0.top.equalTo(safeAreaLayoutGuide.snp.top).offset(180)
+            $0.top.equalTo(safeAreaLayoutGuide.snp.top).offset(252)
             $0.centerX.equalToSuperview()
         }
 
         appleLoginButton.snp.makeConstraints {
-            $0.bottom.equalToSuperview().inset(120)
+            $0.bottom.equalTo(privacyPolicyButton.snp.top).offset(-16)
             $0.centerX.equalToSuperview()
             $0.leading.trailing.equalToSuperview().inset(16)
             $0.height.equalTo(58)
@@ -87,7 +122,7 @@ final class LoginView: BaseUIView {
         }
 
         privacyPolicyButton.snp.makeConstraints {
-            $0.top.equalTo(appleLoginButton.snp.bottom).offset(16)
+            $0.bottom.equalTo(safeAreaLayoutGuide).inset(16)
             $0.centerX.equalToSuperview()
         }
     }
@@ -109,7 +144,7 @@ extension LoginView {
         // 1
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.4) {
             UIView.animate(withDuration: 0.3, delay: 0, options: [.curveEaseOut], animations: {
-                self.logoImageView.transform = CGAffineTransform(translationX: 0, y: -60)
+                self.logoImageView.transform = CGAffineTransform(translationX: 0, y: -72)
             })
         }
 

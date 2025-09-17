@@ -22,29 +22,58 @@ final class BlockUserView: BaseUIView {
         return tableView
     }()
 
-    let emptyView: EmptyView = {
-        let view = EmptyView()
-        view.isHidden = true
-        view.configure(message: "차단한 유저가 없어요.", imageName: "img_search_ios")
-        return view
+    private let emptyImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.image = UIImage(named: "img_search_ios", in: .module, compatibleWith: nil)
+        imageView.contentMode = .scaleAspectFit
+        return imageView
+    }()
+
+    private let messageLabel: UILabel = {
+        let label = UILabel()
+        label.text = "차단된 계정이 없어요."
+        label.font = .suit(.head_m_18)
+        label.textColor = .gray500
+        label.textAlignment = .center
+        return label
+    }()
+
+    private lazy var emptyStackView: UIStackView = {
+        let stack = UIStackView(arrangedSubviews: [emptyImageView, messageLabel])
+        stack.axis = .vertical
+        stack.spacing = 8
+        stack.alignment = .center
+        stack.isHidden = true
+        return stack
     }()
 
     // MARK: - UI Setup
 
     override func setUI() {
-        addSubviews(tableView,emptyView)
+        addSubviews(tableView, emptyStackView)
         tableView.refreshControl = refreshControl
     }
 
     override func setLayout() {
         tableView.snp.makeConstraints {
             $0.top.equalTo(safeAreaLayoutGuide)
-            $0.horizontalEdges.equalToSuperview()
-            $0.bottom.equalToSuperview()
+            $0.leading.trailing.bottom.equalToSuperview()
         }
 
-        emptyView.snp.makeConstraints {
-            $0.center.equalToSuperview()
+        emptyStackView.snp.makeConstraints {
+            $0.top.equalTo(safeAreaLayoutGuide).offset(140)
+            $0.centerX.equalToSuperview()
         }
+
+        emptyImageView.snp.makeConstraints {
+            $0.width.equalTo(210)
+            $0.height.equalTo(140)
+        }
+    }
+
+    // MARK: - Public Method
+
+    func updateEmptyView(isHidden: Bool) {
+        emptyStackView.isHidden = isHidden
     }
 }

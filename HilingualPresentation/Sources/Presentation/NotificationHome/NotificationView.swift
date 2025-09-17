@@ -51,14 +51,17 @@ final class NotificationView: BaseUIView {
 
     override func setLayout() {
         tableView.snp.makeConstraints { $0.edges.equalToSuperview() }
-        emptyView.snp.makeConstraints { $0.center.equalToSuperview() }
+        emptyView.snp.makeConstraints {
+            $0.centerX.equalToSuperview()
+            $0.top.equalToSuperview().offset(160)
+        }
     }
 
     // MARK: - Private
 
     private func updateView() {
         let items = notificationListModel.items
-        let message = "아직 알림이 없어요"
+        let message = "아직 알림이 없어요."
         emptyView.configure(message: message)
 
         tableView.isHidden = items.isEmpty

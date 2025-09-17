@@ -28,7 +28,7 @@ final class SplashView: BaseUIView {
 
     override func setLayout() {
         logoImageView.snp.makeConstraints {
-            $0.top.equalTo(safeAreaLayoutGuide.snp.top).offset(180)
+            $0.top.equalTo(safeAreaLayoutGuide.snp.top).offset(252)
             $0.centerX.equalToSuperview()
         }
     }

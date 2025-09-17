@@ -36,11 +36,17 @@ final class EditProfileView: BaseUIView {
 
     let withdrawButton: UIButton = {
         let button = UIButton()
-        button.setTitle("회원탈퇴", for: .normal)
-        button.setTitleColor(.gray400, for: .normal)
-        button.titleLabel?.font = .suit(.caption_m_12)
+        let title = "회원탈퇴"
+        let attributes: [NSAttributedString.Key: Any] = [
+            .foregroundColor: UIColor.gray400,
+            .font: UIFont.suit(.body_m_14),
+            .underlineStyle: NSUnderlineStyle.single.rawValue
+        ]
+        let attributedTitle = NSAttributedString(string: title, attributes: attributes)
+        button.setAttributedTitle(attributedTitle, for: .normal)
         return button
     }()
+
 
     // MARK: - UI Setup
 

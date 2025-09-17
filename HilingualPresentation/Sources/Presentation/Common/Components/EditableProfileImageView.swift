@@ -30,7 +30,7 @@ final class EditableProfileImageView: UIView {
         let button = UIButton()
         button.setImage(UIImage(named: "ic_camera_20_ios", in: .module, compatibleWith: nil), for: .normal)
         button.backgroundColor = .gray100
-        button.layer.cornerRadius = 24 / 2
+        button.layer.cornerRadius = 16
         button.clipsToBounds = true
         button.layer.shadowColor = UIColor.black.cgColor
         button.layer.shadowOpacity = 0.1
