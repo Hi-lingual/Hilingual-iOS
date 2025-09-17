@@ -14,7 +14,8 @@ public final class FeedProfileViewModel: BaseViewModel, BaseViewModelType {
     // MARK: - Input/Output
     
     public struct Input {
-        let reload = PassthroughSubject<Void, Never>()
+        let reloadProfile = PassthroughSubject<Void, Never>()
+        let reloadFeeds = PassthroughSubject<Void, Never>()
         let follow = PassthroughSubject<Void, Never>()
         let unfollow = PassthroughSubject<Void, Never>()
         let block = PassthroughSubject<Void, Never>()
@@ -82,9 +83,8 @@ public final class FeedProfileViewModel: BaseViewModel, BaseViewModelType {
     // MARK: - Transform
     
     public func transform(input: Input) -> Output {
-        let trigger = input.reload.eraseToAnyPublisher()
-        
-        trigger
+        /// 프로필
+        input.reloadProfile
             .flatMap { [weak self] _ -> AnyPublisher<FeedProfileInfoEntity?, Never> in
                 guard let self else { return Just(nil).eraseToAnyPublisher() }
                 return self.profileInfoUseCase.execute(targetUserId: self.targetUserId)
@@ -104,7 +104,8 @@ public final class FeedProfileViewModel: BaseViewModel, BaseViewModelType {
             }
             .store(in: &cancellables)
         
-        trigger
+        /// 피드
+        input.reloadFeeds
             .flatMap { [weak self] _ -> AnyPublisher<[FeedModel], Never> in
                 guard let self else { return Just([]).eraseToAnyPublisher() }
                 self.isLoadingSubject.send(true)

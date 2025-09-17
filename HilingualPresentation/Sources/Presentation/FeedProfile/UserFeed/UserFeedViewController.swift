@@ -51,7 +51,7 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(false, animated: false)
 
-        input.reload.send(())
+        input.reloadProfile.send(())
 
         sharedVC.refresh()
     }

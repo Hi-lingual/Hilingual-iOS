@@ -111,7 +111,7 @@ public final class MyFeedProfileViewController: BaseUIViewController<FeedProfile
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(false, animated: false)
-        input.reload.send(())
+        input.reloadProfile.send(())
     }
     
     public override func viewDidAppear(_ animated: Bool) {
