@@ -30,6 +30,9 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         navigationController?.setNavigationBarHidden(true, animated: false)
         
         let selectedDate = homeView.calendarView.selectedDate ?? Date()
+        
+        fetchAndShowDateInfo(for: selectedDate)
+        
         let calendar = Calendar.current
         let year = calendar.component(.year, from: selectedDate)
         let month = calendar.component(.month, from: selectedDate)
