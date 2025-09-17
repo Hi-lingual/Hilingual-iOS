@@ -29,26 +29,13 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: false)
         
-        // 월 정보 다시 요청 (최초에도!)
+        refreshUserInfo()
+        homeView.selectedInfo.reset()
         let selectedDate = homeView.calendarView.selectedDate ?? Date()
         let calendar = Calendar.current
         let year = calendar.component(.year, from: selectedDate)
         let month = calendar.component(.month, from: selectedDate)
         input.monthChange.send((year, month))
-        
-        // 사용자 정보도 다시 요청
-        viewModel?.fetchUserInfo()
-            .receive(on: RunLoop.main)
-            .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] entity in
-                self?.homeView.profileView.updateView(
-                    nickname: entity.nickname,
-                    profileImageURL: entity.profileImg,
-                    totalDiaries: entity.totalDiaries,
-                    streak: entity.streak,
-                    newAlarm: entity.newAlarm
-                )
-            })
-            .store(in: &viewModel!.cancellables)
     }
     
     // MARK: - Bind
@@ -58,127 +45,42 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         homeView.calendarView.selectedDate = today
         homeView.calendarView.reload(for: today)
         homeView.selectedInfo.setSelectedDate(today)
-        
+
         homeView.calendarView.onDateSelected = { [weak self] date in
-            guard let self else { return }
-            
-            let requestedDate = date
-            let today = Calendar.current.startOfDay(for: Date())
-            let selectedDay = Calendar.current.startOfDay(for: requestedDate)
-            
-            self.homeView.selectedInfo.setSelectedDate(requestedDate)
-            self.homeView.selectedInfo.currentDiaryId = nil
-            
-            // 1) 미래 날짜면 바로 Lock 상태로 보여주고 네트워크 호출하지 않음
-            if selectedDay > today {
-                self.currentDateRequestCancellable?.cancel()
-                self.homeView.selectedInfo.updateView(
-                    for: requestedDate,
-                    diaryId: nil,
-                    isPublished: nil,
-                    remainingTime: 0,
-                    topicData: nil,
-                    diaryData: nil,
-                    imageURL: nil
-                )
-                return
-            }
-            
-            // 2) 미래가 아니면 네트워크 처리 (기존 요청 취소)
-            self.currentDateRequestCancellable?.cancel()
-            
-            let isDiaryDate = self.homeView.calendarView.filledDates.contains {
-                Calendar.current.isDate($0, inSameDayAs: requestedDate)
-            }
-            
-            if isDiaryDate {
-                self.currentDateRequestCancellable = self.viewModel?.fetchDiary(for: requestedDate)
-                    .receive(on: RunLoop.main)
-                    .sink(receiveCompletion: { completion in
-                    }, receiveValue: { [weak self] diary in
-                        guard let self else { return }
-                        self.homeView.selectedInfo.updateView(
-                            for: requestedDate,
-                            diaryId: diary?.diaryId,
-                            isPublished: diary?.isPublished,
-                            remainingTime: 0,
-                            topicData: nil,
-                            diaryData: diary?.originalText,
-                            imageURL: diary?.imageUrl
-                        )
-                    })
-            } else {
-                self.currentDateRequestCancellable = self.viewModel?.fetchTopic(for: requestedDate)
-                    .receive(on: RunLoop.main)
-                    .sink(receiveCompletion: { completion in
-                        if case .failure = completion {
-                            self.homeView.selectedInfo.updateView(
-                                for: requestedDate,
-                                diaryId: nil,
-                                isPublished: nil,
-                                remainingTime: 0,
-                                topicData: nil,
-                                diaryData: nil,
-                                imageURL: nil
-                            )
-                        }
-                    }, receiveValue: { [weak self] topic in
-                        guard let self else { return }
-                        let remaining = max(0, topic?.remainingTime ?? 0)
-                        let topicData = self.homeView.calendarView.filledDates.contains(where: {
-                            Calendar.current.isDate($0, inSameDayAs: requestedDate)
-                        }) ? nil : topic.map { ($0.topicKor, $0.topicEn) }
-                        
-                        self.homeView.selectedInfo.updateView(
-                            for: requestedDate,
-                            diaryId: nil,
-                            isPublished: nil,
-                            remainingTime: remaining,
-                            topicData: topicData,
-                            diaryData: nil,
-                            imageURL: nil
-                        )
-                    })
-            }
-            self.currentDateRequestCancellable?.store(in: &self.viewModel!.cancellables)
+            self?.fetchAndShowDateInfo(for: date)
         }
         
         homeView.onMonthChanged = { [weak self] year, month in
-            guard self != nil else { return }
-            self?.homeView.selectedInfo.reset()
+            guard let self = self else { return }
             
             let calendar = Calendar.current
             let today = Date()
-            
-            let todayYear = calendar.component(.year, from: today)
-            let todayMonth = calendar.component(.month, from: today)
-            
             let selectedDate: Date
-            if year == todayYear && month == todayMonth {
+            if year == calendar.component(.year, from: today) &&
+               month == calendar.component(.month, from: today) {
                 selectedDate = today
             } else {
                 selectedDate = calendar.date(from: DateComponents(year: year, month: month, day: 1))!
             }
             
-            self?.homeView.calendarView.select(date: selectedDate)
-            self?.input.monthChange.send((year, month))
-            
-            self?.viewModel?.fetchUserInfo()
-                .receive(on: RunLoop.main)
-                .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] entity in
-                    self?.homeView.profileView.updateView(
-                        nickname: entity.nickname,
-                        profileImageURL: entity.profileImg,
-                        totalDiaries: entity.totalDiaries,
-                        streak: entity.streak
-                    )
-                })
-                .store(in: &self!.viewModel!.cancellables)
+            self.homeView.selectedInfo.updateView(
+                for: selectedDate,
+                diaryId: nil,
+                isPublished: nil,
+                remainingTime: 0,
+                topicData: nil,
+                diaryData: nil,
+                imageURL: nil
+            )
+            self.homeView.selectedInfo.reset()
+            self.homeView.calendarView.select(date: selectedDate)
+            self.fetchAndShowDateInfo(for: selectedDate)
+            self.input.monthChange.send((year, month))
         }
+
         
         let output = viewModel.transform(input: input)
         
-        // 사용자 정보 바인딩
         output.userInfo
             .receive(on: RunLoop.main)
             .sink(receiveCompletion: { completion in
@@ -196,15 +98,12 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
             })
             .store(in: &viewModel.cancellables)
         
-        // filledDates를 calendarView에 반영 + 선택한 날짜 일기/주제 보여줌
         output.filledDates
             .receive(on: RunLoop.main)
             .sink { [weak self] dates in
                 guard let self else { return }
                 self.homeView.calendarView.filledDates = dates
-                
-                let selected = self.homeView.calendarView.selectedDate ?? Date()
-                self.homeView.calendarView.onDateSelected?(selected)
+                self.fetchAndShowDateInfo(for: self.homeView.calendarView.selectedDate ?? Date())
             }
             .store(in: &viewModel.cancellables)
     }
@@ -265,6 +164,115 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     }
     
     //MARK: - Private Methods
+    
+    private func fetchAndShowDateInfo(for date: Date) {
+        self.currentDateRequestCancellable?.cancel()
+        
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date())
+        let yesterday = calendar.date(byAdding: .day, value: -1, to: today)!
+        let selectedDay = calendar.startOfDay(for: date)
+        
+        // 선택 날짜 초기화
+        self.homeView.selectedInfo.setSelectedDate(date)
+        self.homeView.selectedInfo.currentDiaryId = nil
+        
+        // 미래 날짜는 바로 리턴
+        if selectedDay > today {
+            self.homeView.selectedInfo.updateView(
+                for: date,
+                diaryId: nil,
+                isPublished: nil,
+                remainingTime: 0,
+                topicData: nil,
+                diaryData: nil,
+                imageURL: nil
+            )
+            return
+        }
+        
+        let isDiaryDate = self.homeView.calendarView.filledDates.contains {
+            calendar.isDate($0, inSameDayAs: date)
+        }
+        
+        if isDiaryDate {
+            self.currentDateRequestCancellable = self.viewModel?.fetchDiary(for: date)
+                .receive(on: RunLoop.main)
+                .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] diary in
+                    guard let self else { return }
+                    
+                    if let diary {
+                        self.homeView.selectedInfo.updateView(
+                            for: date,
+                            diaryId: diary.diaryId,
+                            isPublished: diary.isPublished,
+                            remainingTime: 0,
+                            topicData: nil,
+                            diaryData: diary.originalText,
+                            imageURL: diary.imageUrl
+                        )
+                    } else {
+                        self.fetchTopicIfNeeded(for: date, today: today, yesterday: yesterday)
+                    }
+                })
+        } else {
+            self.fetchTopicIfNeeded(for: date, today: today, yesterday: yesterday)
+        }
+        
+        self.currentDateRequestCancellable?.store(in: &self.viewModel!.cancellables)
+    }
+
+    // MARK: - Topic 조회 로직 분리
+    
+    private func fetchTopicIfNeeded(for date: Date, today: Date, yesterday: Date) {
+        let calendar = Calendar.current
+        let selectedDay = calendar.startOfDay(for: date)
+        
+        guard calendar.isDate(selectedDay, inSameDayAs: today) || calendar.isDate(selectedDay, inSameDayAs: yesterday) else {
+            self.homeView.selectedInfo.updateView(
+                for: date,
+                diaryId: nil,
+                isPublished: nil,
+                remainingTime: 0,
+                topicData: nil,
+                diaryData: nil,
+                imageURL: nil
+            )
+            return
+        }
+        
+        self.currentDateRequestCancellable = self.viewModel?.fetchTopic(for: date)
+            .receive(on: RunLoop.main)
+            .sink(receiveCompletion: { [weak self] completion in
+                if case .failure = completion {
+                    self?.homeView.selectedInfo.updateView(
+                        for: date,
+                        diaryId: nil,
+                        isPublished: nil,
+                        remainingTime: 0,
+                        topicData: nil,
+                        diaryData: nil,
+                        imageURL: nil
+                    )
+                }
+            }, receiveValue: { [weak self] topic in
+                guard let self else { return }
+                let remaining = max(0, topic?.remainingTime ?? 0)
+                let topicData = remaining > 0 ? topic.map { ($0.topicKor, $0.topicEn) } : nil
+                
+                self.homeView.selectedInfo.updateView(
+                    for: date,
+                    diaryId: nil,
+                    isPublished: nil,
+                    remainingTime: remaining,
+                    topicData: topicData,
+                    diaryData: nil,
+                    imageURL: nil
+                )
+            })
+        
+        self.currentDateRequestCancellable?.store(in: &self.viewModel!.cancellables)
+    }
     
     private func showOverlay() {
         guard let containerView = tabBarController?.view ?? view else { return }
@@ -491,5 +499,22 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         let myFeedProfileVC = diContainer.makeMyFeedProfileViewController()
         myFeedProfileVC.hidesBottomBarWhenPushed = true
         navigationController?.pushViewController(myFeedProfileVC, animated: true)
+    }
+    
+    // MARK: - Recall
+    
+    private func refreshUserInfo() {
+        viewModel?.fetchUserInfo()
+            .receive(on: RunLoop.main)
+            .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] entity in
+                self?.homeView.profileView.updateView(
+                    nickname: entity.nickname,
+                    profileImageURL: entity.profileImg,
+                    totalDiaries: entity.totalDiaries,
+                    streak: entity.streak,
+                    newAlarm: entity.newAlarm
+                )
+            })
+            .store(in: &viewModel!.cancellables)
     }
 }
