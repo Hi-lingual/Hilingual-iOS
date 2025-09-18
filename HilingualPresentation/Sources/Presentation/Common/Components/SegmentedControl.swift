@@ -19,7 +19,7 @@ final class SegmentedControl: UIView {
     var onIndexChanged: ((Int) -> Void)?
     
     // 현재 선택된 인덱스
-    var selectedIndex: Int {
+    var setSelectedIndexWithAPI: Int {
         get { segmentedControl.selectedIndex }
         set { segmentedControl.selectedIndex = newValue }
     }

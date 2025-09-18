@@ -102,8 +102,6 @@ public final class MyFeedProfileViewController: BaseUIViewController<FeedProfile
         myFeedProfileView.setFollowSectionTappedAction { [weak self] in
             self?.pushFollowListViewController()
         }
-
-        bind()
     }
     
     public override func navigationType() -> NavigationType? {
@@ -113,7 +111,7 @@ public final class MyFeedProfileViewController: BaseUIViewController<FeedProfile
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(false, animated: false)
-        input.reload.send(())
+        input.reloadProfile.send(())
     }
     
     public override func viewDidAppear(_ animated: Bool) {
@@ -125,10 +123,8 @@ public final class MyFeedProfileViewController: BaseUIViewController<FeedProfile
     
     // MARK: - Bind
     
-    private func bind() {
+    public override func bind(viewModel: FeedProfileViewModel) {
         let input = FeedProfileViewModel.Input()
-        guard let viewModel else { return }
-
         let output = viewModel.transform(input: input)
 
         output.profile

@@ -50,6 +50,10 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(false, animated: false)
+
+        input.reloadProfile.send(())
+
+        sharedVC.refresh()
     }
     
     public override func viewDidLoad() {
@@ -130,7 +134,6 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
                 break
             }
         }
-        
         bind()
     }
     
@@ -193,8 +196,6 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
                 self?.userFeedProfileView.followButtonState(state)
             }
             .store(in: &cancellables)
-
-        self.input.reload.send(())
     }
         
     // MARK: - Private Methods

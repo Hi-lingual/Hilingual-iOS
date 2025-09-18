@@ -15,7 +15,7 @@ final class MyFeedProfileView: BaseUIView {
     // MARK: - UI Components
     
     private let myFeedView = FeedUserProfile()
-    private var segmentedControl: SegmentedControl?
+    private(set) var segmentedControl: SegmentedControl?
     private var segmentedTopConstraint: Constraint?
     
     // MARK: - Setup
@@ -74,7 +74,7 @@ final class MyFeedProfileView: BaseUIView {
     }
     
     func setSelectedIndex(_ index: Int) {
-        segmentedControl?.selectedIndex = index
+        segmentedControl?.setSelectedIndexWithAPI = index
         onSegmentChanged?(index)
     }
 

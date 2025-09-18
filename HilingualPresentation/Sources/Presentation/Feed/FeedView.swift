@@ -190,8 +190,17 @@ final class FeedView: BaseUIView {
     }
     
     func setSelectedIndex(_ index: Int) {
-        segmentedControl?.selectedIndex = index
+        segmentedControl?.setSelectedIndexWithAPI = index
         onSegmentChanged?(index)
+    }
+    
+    func setSelectedIndexUIOnly(_ index: Int) {
+        guard let control = segmentedControl else { return }
+        
+        let original = control.onIndexChanged
+        control.onIndexChanged = nil
+        control.setSelectedIndexWithAPI = index
+        control.onIndexChanged = original
     }
 
     //MARK: - Actions

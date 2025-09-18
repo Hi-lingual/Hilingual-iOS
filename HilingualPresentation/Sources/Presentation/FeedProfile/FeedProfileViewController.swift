@@ -49,7 +49,6 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
     public override func viewDidLoad() {
         super.viewDidLoad()
         bindViewModel()
-        input.reload.send(())
         
         view.addSubview(feedCellView)
         feedCellView.snp.makeConstraints { $0.edges.equalToSuperview() }
@@ -148,7 +147,7 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
     }
     
     public func refresh() {
-        input.reload.send(())
+        input.reloadFeeds.send(())
     }
     
     // MARK: - Actions
@@ -158,7 +157,7 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
     }
     
     @objc private func didTopScrollRefresh() {
-        self.input.reload.send(())
+        self.input.reloadFeeds.send(())
         feedCellView.tableView.refreshControl?.endRefreshing()
     }
     
