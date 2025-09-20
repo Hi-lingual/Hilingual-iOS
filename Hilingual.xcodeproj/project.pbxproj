@@ -249,8 +249,8 @@
 				DEVELOPMENT_TEAM = C9XX799UJH;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Hilingual/Info.plist;
-				INFOPLIST_KEY_NSCameraUsageDescription = "카메라 사용을 위해 권한이 필요합니다.";
-				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "기기에서 사진을 선택하기 위해 사진 접근 권한이 필요합니다.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Hilingual에서 제공하는 일기 텍스트 스캔기능을 위해 카메라 접근 권한이 필요합니다. 설정에서 이를 변경할 수 있습니다.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "프로필 사진 첨부, 게시글 사진 첨부, 일기 텍스트 스캔 기능 사용을 위해 사진 라이브러리 접근권한 동의가 필요합니다. 설정에서 이를 변경할 수 있습니다.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -283,8 +283,8 @@
 				DEVELOPMENT_TEAM = C9XX799UJH;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Hilingual/Info.plist;
-				INFOPLIST_KEY_NSCameraUsageDescription = "카메라 사용을 위해 권한이 필요합니다.";
-				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "기기에서 사진을 선택하기 위해 사진 접근 권한이 필요합니다.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Hilingual에서 제공하는 일기 텍스트 스캔기능을 위해 카메라 접근 권한이 필요합니다. 설정에서 이를 변경할 수 있습니다.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "프로필 사진 첨부, 게시글 사진 첨부, 일기 텍스트 스캔 기능 사용을 위해 사진 라이브러리 접근권한 동의가 필요합니다. 설정에서 이를 변경할 수 있습니다.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
