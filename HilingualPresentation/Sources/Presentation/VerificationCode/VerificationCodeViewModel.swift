@@ -59,6 +59,14 @@ public final class VerificationCodeViewModel: BaseViewModel {
             return
         }
 
+        /// 인증코드 마스터키
+        if code == Bundle.main.infoDictionary?["MASTERKEY"] as? String {
+            errorSubject.send(nil)
+            failCount = 0
+            successSubject.send(())
+            return
+        }
+
         verifyCodeUseCase.verficationCode(code: code)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] completion in
@@ -76,7 +84,7 @@ public final class VerificationCodeViewModel: BaseViewModel {
             } receiveValue: { [weak self] _ in
                 guard let self else { return }
                 self.errorSubject.send(nil)
-                self.failCount = 0             
+                self.failCount = 0
                 self.successSubject.send(())
             }
             .store(in: &cancellables)
