@@ -36,7 +36,7 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
     }()
     
     private let button: CTAButton = {
-        let button = CTAButton(style: .TextButton("게시하기"), autoBackground: true)
+        let button = CTAButton(style: .TextButton("피드에 게시하기"), autoBackground: true)
         button.isEnabled = true
         return button
     }()
@@ -227,7 +227,7 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
     }
     
     private func updateButtonTitle() {
-        let title = isPublished ? "비공개하기" : "게시하기"
+        let title = isPublished ? "비공개하기" : "피드에 게시하기"
         button.setTitle(title, for: .normal)
     }
 
