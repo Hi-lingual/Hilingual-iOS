@@ -293,7 +293,7 @@ final class SelectedInfo: UIView {
                 notWrittenLabel.text = "비공개 일기"
                 notWrittenLabel.textColor = .gray400
                 menu.configure(items: [
-                    ("게시하기", UIImage(named: "ic_upload_24_ios", in: .module, compatibleWith: nil), .gray700),
+                    ("피드에 게시하기", UIImage(named: "ic_upload_24_ios", in: .module, compatibleWith: nil), .gray700),
                     ("삭제하기", UIImage(named: "ic_delete_24_ios", in: .module, compatibleWith: nil), .alertRed)
                 ])
             }

@@ -135,6 +135,30 @@ final class TextView: UIView {
         let attrs = probe.attributes(at: 0, effectiveRange: nil)
         textView.typingAttributes = attrs
     }
+
+    // MARK: - Toolbar
+
+    override var inputAccessoryView: UIView? {
+        let toolbar = UIToolbar()
+        toolbar.sizeToFit()
+
+        let flex = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
+
+        let done = UIBarButtonItem(
+            title: "완료",
+            style: .plain,
+            target: self,
+            action: #selector(dismissKeyboard)
+        )
+
+        toolbar.items = [flex, done]
+
+        return toolbar
+    }
+
+    @objc private func dismissKeyboard() {
+        textView.resignFirstResponder()
+    }
 }
 
 // MARK: - Extensions
