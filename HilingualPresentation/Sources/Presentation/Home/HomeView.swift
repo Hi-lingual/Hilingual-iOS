@@ -36,13 +36,22 @@ final class HomeView: BaseUIView {
         return view
     }()
     
+    private let scrollView = UIScrollView()
+    private let contentView = UIView()
+    
     // MARK: - Custom Method
     
     override func setUI() {
         
         backgroundColor = .hilingualBlack
         
-        addSubviews(
+        scrollView.showsVerticalScrollIndicator = false
+        scrollView.bounces = false
+        
+        addSubview(scrollView)
+        scrollView.addSubview(contentView)
+        
+        contentView.addSubviews(
             profileView,
             calendarView,
             spacer,
@@ -57,8 +66,17 @@ final class HomeView: BaseUIView {
     
     override func setLayout() {
         
+        scrollView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
+        
+        contentView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+            $0.width.equalToSuperview()
+        }
+        
         profileView.snp.makeConstraints {
-            $0.top.equalTo(safeAreaLayoutGuide).inset(8)
+            $0.top.equalTo(contentView.safeAreaLayoutGuide).inset(8)
             $0.horizontalEdges.equalToSuperview()
             $0.height.equalTo(46)
         }
