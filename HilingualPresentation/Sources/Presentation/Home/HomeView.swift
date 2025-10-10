@@ -99,7 +99,7 @@ final class HomeView: BaseUIView {
         selectedInfo.snp.makeConstraints {
             $0.top.equalTo(divider.snp.bottom)
             $0.horizontalEdges.equalToSuperview()
-            $0.bottom.equalToSuperview().inset(16)
+            $0.bottom.equalToSuperview().inset(30)
         }
         
         bottomBackground.snp.makeConstraints {
