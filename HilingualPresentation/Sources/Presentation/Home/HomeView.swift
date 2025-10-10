@@ -33,16 +33,22 @@ final class HomeView: BaseUIView {
     private let scrollView = UIScrollView()
     private let contentView = UIView()
     
+    private let bottomBackground: UIView = {
+        let view = UIView()
+        view.backgroundColor = .white
+        return view
+    }()
+    
     // MARK: - Custom Method
     
     override func setUI() {
-        
         backgroundColor = .hilingualBlack
         
         scrollView.showsVerticalScrollIndicator = false
         scrollView.bounces = false
         
-        addSubview(scrollView)
+        addSubviews(bottomBackground, scrollView)
+        
         scrollView.addSubview(contentView)
         
         contentView.addSubviews(
@@ -54,7 +60,6 @@ final class HomeView: BaseUIView {
         )
         
         bindCalendar()
-        
     }
     
     override func setLayout() {
@@ -94,7 +99,12 @@ final class HomeView: BaseUIView {
         selectedInfo.snp.makeConstraints {
             $0.top.equalTo(divider.snp.bottom)
             $0.horizontalEdges.equalToSuperview()
-            $0.bottom.equalToSuperview()
+            $0.bottom.equalToSuperview().inset(16)
+        }
+        
+        bottomBackground.snp.makeConstraints {
+            $0.top.equalTo(divider.snp.bottom)
+            $0.leading.trailing.bottom.equalToSuperview()
         }
     }
     
