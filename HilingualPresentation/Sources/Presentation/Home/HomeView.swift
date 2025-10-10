@@ -23,13 +23,7 @@ final class HomeView: BaseUIView {
         view.backgroundColor = .white
         return view
     }()
-    
-    private let spacer2: UIView = {
-        let view = UIView()
-        view.backgroundColor = .white
-        return view
-    }()
-    
+
     private let divider: UIView = {
         let view = UIView()
         view.backgroundColor = .gray100
@@ -56,8 +50,7 @@ final class HomeView: BaseUIView {
             calendarView,
             spacer,
             divider,
-            selectedInfo,
-            spacer2
+            selectedInfo
         )
         
         bindCalendar()
@@ -100,11 +93,6 @@ final class HomeView: BaseUIView {
         
         selectedInfo.snp.makeConstraints {
             $0.top.equalTo(divider.snp.bottom)
-            $0.horizontalEdges.equalToSuperview()
-        }
-        
-        spacer2.snp.makeConstraints {
-            $0.top.equalTo(selectedInfo.snp.bottom)
             $0.horizontalEdges.equalToSuperview()
             $0.bottom.equalToSuperview()
         }
