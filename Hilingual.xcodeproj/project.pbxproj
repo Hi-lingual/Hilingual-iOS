@@ -238,7 +238,7 @@
 /* Begin XCBuildConfiguration section */
 		E5C79B222E15281B00E461C3 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 3A3B2FEB2E98F3A800552487 /* Release.xcconfig */;
+			baseConfigurationReference = 3A3B2FE92E98F39600552487 /* Debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon$(BUNDLE_ID_SUFFIX)";
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;

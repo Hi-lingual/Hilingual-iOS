@@ -50,7 +50,7 @@ public final class NotificationListViewController: BaseUIViewController<Notifica
         tableView.delegate = self
         tableView.dataSource = self
         tableView.separatorStyle = .singleLine
-        tableView.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0) // 좌우 여백
+        tableView.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
         tableView.separatorColor = .gray200
     }
 
@@ -153,11 +153,41 @@ extension NotificationListViewController: UITableViewDelegate {
             switch rawType {
             case "LIKE_DIARY":
                 guard let diaryId = selectedItem.targetId else {return}
+
+                AmplitudeManager.shared.logEvent(
+                    "viewe_profile_user",
+                    properties: [
+                        "profile_user_id": String(selectedItem.targetId ?? 0),
+                        "entry_source": "notification",
+                        "entry_id": String(diaryId),
+                        "page": "notification"
+                    ]
+                )
+
+                AmplitudeManager.shared.logEvent(
+                    "pageview",
+                    properties: [
+                        "entry_id": String(diaryId),
+                        "tab_name": "posted_diary"
+                    ]
+                )
+
                 let vc = self.diContainer.makeSharedDiaryViewController(diaryId: diaryId)
                 navigationController?.pushViewController(vc, animated: true)
 
             case "FOLLOW_USER":
                 guard let userId = selectedItem.targetId else {return}
+
+                AmplitudeManager.shared.logEvent(
+                    "viewe_profile_user",
+                    properties: [
+                        "profile_user_id": String(userId),
+                        "entry_source": "notification",
+                        "entry_id": String(selectedItem.id),
+                        "page": "notification"
+                    ]
+                )
+
                 let vc = self.diContainer.makeUserFeedProfileViewController(userId: Int64(userId))
                 navigationController?.pushViewController(vc, animated: true)
 
