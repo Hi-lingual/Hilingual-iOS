@@ -11,44 +11,50 @@ import UIKit
 import Combine
 
 public final class RecommendedExpressionViewController: BaseUIViewController<RecommendedExpressionViewModel>, ScrollControllable {
-    
+
     // MARK: - Properties
-    
+
     private let recommendedExpressionView = RecommendedExpressionView()
     private let dialog = Dialog()
     private var pendingDate: String?
-    
+
+    // 북마크 토글 콜백
+    var onBookmarkToggle: ((Int64, Bool) -> Void)?
+
     // MARK: - LifeCycle
-    
+
     public override func viewDidLoad() {
         super.viewDidLoad()
     }
-    
+
     // MARK: Custom Method
-    
+
     public override func setUI() {
         view.addSubviews(recommendedExpressionView, dialog)
         view.backgroundColor = .gray100
         view.bringSubviewToFront(dialog)
-        
+
         if let date = pendingDate {
             recommendedExpressionView.setDate(date)
         }
     }
-    
+
     public override func setLayout() {
         recommendedExpressionView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
     }
-    
+
     // MARK: - Binding
-    
+
     private let bookmarkToggleSubject = PassthroughSubject<(Int, Bool), Never>()
 
     public override func bind(viewModel: RecommendedExpressionViewModel) {
         recommendedExpressionView.onBookmarkToggle = { [weak self] phraseId, isBookmarked in
             self?.bookmarkToggleSubject.send((Int(phraseId), isBookmarked))
+
+            // 부모 ViewController에 북마크 토글 전달
+            self?.onBookmarkToggle?(phraseId, isBookmarked)
         }
 
         let input = RecommendedExpressionViewModel.Input(
@@ -76,7 +82,6 @@ public final class RecommendedExpressionViewController: BaseUIViewController<Rec
             .sink(
                 receiveCompletion: { [weak self] completion in
                     if case let .failure(error) = completion {
-                        // 에러 처리
                         self?.showErrorDialog(message: error.localizedDescription)
                     }
                 },
@@ -85,7 +90,7 @@ public final class RecommendedExpressionViewController: BaseUIViewController<Rec
                 }
             )
             .store(in: &cancellables)
-        
+
         output.errorMessage
             .receive(on: RunLoop.main)
             .sink { [weak self] message in
@@ -94,13 +99,12 @@ public final class RecommendedExpressionViewController: BaseUIViewController<Rec
                 self.view.addSubview(toast)
                 toast.configure(type: .withButton, message: "단어장이 모두 찼어요!", actionTitle: "비우러가기")
                 toast.action = { [weak self] in
-//                    let vc = self?.diContainer.makeTabBarViewController()
                     self?.navigationController?.popToRootViewController(animated: true)
                 }
             }
             .store(in: &cancellables)
     }
-    
+
     private func showErrorDialog(message: String) {
         dialog.configure(
             style: .error,
@@ -111,14 +115,14 @@ public final class RecommendedExpressionViewController: BaseUIViewController<Rec
                 self?.navigationController?.popViewController(animated: true)
             }
         )
-        
+
         dialog.showAnimation()
     }
-    
+
     func scrollToTop() {
         recommendedExpressionView.scrollToTop()
     }
-    
+
     func setDate(_ date: String) {
         pendingDate = date
         recommendedExpressionView.setDate(date)
