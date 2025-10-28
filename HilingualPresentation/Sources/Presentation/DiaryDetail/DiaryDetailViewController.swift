@@ -247,7 +247,7 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
                         self?.navigationController?.popToRootViewController(animated: false)
                     }
 
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) { [weak self] in
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) { [weak self] in
                         AmplitudeManager.shared.logEvent(
                             "toast_action",
                             properties: [
