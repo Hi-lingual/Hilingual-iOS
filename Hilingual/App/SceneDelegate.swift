@@ -16,6 +16,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                willConnectTo session: UISceneSession,
                options connectionOptions: UIScene.ConnectionOptions) {
 
+        if let apiKey = Bundle.main.infoDictionary?["AMPLITUDE_API_KEY"] as? String {
+            AmplitudeManager.shared.initialize(apiKey: apiKey)
+        } else {
+            print("[Amplitude] API Key not found in Info.plist")
+        }
+
         guard let windowScene = scene as? UIWindowScene else { return }
 
         let window = UIWindow(windowScene: windowScene)

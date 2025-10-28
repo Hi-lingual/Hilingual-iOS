@@ -13,10 +13,10 @@ import SafariServices
 public final class FeedListViewController: BaseUIViewController<FeedViewModel> {
 
     // MARK: - Properties
-    
+
     private(set) var feedCellView = FeedList()
     private let input = FeedViewModel.Input()
-    
+
     var onHideTapped: ((Int) -> Void)?
     var onReportTapped: (() -> Void)?
     var onRefresh: (() -> Void)?
@@ -25,7 +25,7 @@ public final class FeedListViewController: BaseUIViewController<FeedViewModel> {
     private(set) var currentFeeds: [FeedModel] = []
 
     // MARK: - Lifecycle
-    
+
     public override func loadView() {
         self.view = feedCellView
     }
@@ -33,29 +33,52 @@ public final class FeedListViewController: BaseUIViewController<FeedViewModel> {
     public override func viewDidLoad() {
         super.viewDidLoad()
         bindViewModel()
-        
+
         let refreshControl = UIRefreshControl()
         refreshControl.addTarget(self, action: #selector(didTopScrollRefresh), for: .valueChanged)
         feedCellView.tableView.refreshControl = refreshControl
 
         feedCellView.addTableTapGesture(target: self, action: #selector(didTapTableView))
-        
+
         feedCellView.onHideTapped = { [weak self] row in
             self?.onHideTapped?(row)
         }
-        
+
         feedCellView.onReportTapped = { [weak self] in
             self?.onReportTapped?()
         }
-        
+
         feedCellView.onRefresh = { [weak self] in
             guard let self else { return }
+
+            if let firstFeed = self.currentFeeds.first {
+                AmplitudeManager.shared.logEvent(
+                    "refresh_triggered",
+                    properties: [
+                        "entry_id": String(firstFeed.diaryID),
+                        "refresh_method": "auto"
+                    ]
+                )
+            }
+
             self.onRefresh?()
         }
 
         feedCellView.onProfileTapped = { [weak self] row in
             guard let self else { return }
             let user = self.currentFeeds[row]
+
+            if !user.isMine {
+                AmplitudeManager.shared.logEvent(
+                    "viewe_profile_user",
+                    properties: [
+                        "profile_user_id": String(user.userID),
+                        "entry_source": "feed",
+                        "entry_id": String(user.diaryID),
+                        "page": "feed"
+                    ]
+                )
+            }
 
             if user.isMine {
                 let myVC = self.diContainer.makeMyFeedProfileViewController()
@@ -67,18 +90,36 @@ public final class FeedListViewController: BaseUIViewController<FeedViewModel> {
                 self.navigationController?.pushViewController(vc, animated: true)
             }
         }
-        
+
         feedCellView.onFeedTextTapped = { [weak self] row in
             guard let self else { return }
             let feed = self.currentFeeds[row]
+
+            AmplitudeManager.shared.logEvent(
+                "pageview",
+                properties: [
+                    "entry_id": String(feed.diaryID),
+                    "tab_name": "feed"
+                ]
+            )
+
             let vc = self.diContainer.makeSharedDiaryViewController(diaryId: feed.diaryID)
             vc.hidesBottomBarWhenPushed = true
             self.navigationController?.pushViewController(vc, animated: true)
         }
-        
+
         feedCellView.onFeedImageTapped = { [weak self] row in
             guard let self else { return }
             let feed = self.currentFeeds[row]
+
+            AmplitudeManager.shared.logEvent(
+                "pageview",
+                properties: [
+                    "entry_id": String(feed.diaryID),
+                    "tab_name": "feed"
+                ]
+            )
+
             let vc = self.diContainer.makeSharedDiaryViewController(diaryId: feed.diaryID)
             vc.hidesBottomBarWhenPushed = true
             self.navigationController?.pushViewController(vc, animated: true)
@@ -87,6 +128,15 @@ public final class FeedListViewController: BaseUIViewController<FeedViewModel> {
         feedCellView.onDetailTapped = { [weak self] row in
             guard let self else { return }
             let feed = self.currentFeeds[row]
+
+            AmplitudeManager.shared.logEvent(
+                "pageview",
+                properties: [
+                    "entry_id": String(feed.diaryID),
+                    "tab_name": "feed"
+                ]
+            )
+
             let vc = self.diContainer.makeSharedDiaryViewController(diaryId: feed.diaryID)
             vc.hidesBottomBarWhenPushed = true
             self.navigationController?.pushViewController(vc, animated: true)
@@ -95,13 +145,22 @@ public final class FeedListViewController: BaseUIViewController<FeedViewModel> {
         feedCellView.onLikeTapped = { [weak self] row, isLiked in
             guard let self,
                   row < self.currentFeeds.count else { return }
-            let diaryId = self.currentFeeds[row].diaryID
-            self.onLikeTapped?(diaryId, isLiked)
+            let feed = self.currentFeeds[row]
+
+            AmplitudeManager.shared.logEvent(
+                "click_empathy_action",
+                properties: [
+                    "entry_id": String(feed.diaryID),
+                    "empathy_action": isLiked ? "add" : "remove"
+                ]
+            )
+
+            self.onLikeTapped?(feed.diaryID, isLiked)
         }
     }
 
     // MARK: - Binding
-    
+
     private func bindViewModel() {
         guard let output = viewModel?.transform(input: input) else { return }
 
@@ -117,27 +176,37 @@ public final class FeedListViewController: BaseUIViewController<FeedViewModel> {
             }
             .store(in: &cancellables)
     }
-    
+
     // MARK: - Actions
-    
+
     @objc private func didTapTableView() {
         feedCellView.closeAllMenus()
     }
-    
+
     @objc private func didTopScrollRefresh() {
+        if let firstFeed = currentFeeds.first {
+            AmplitudeManager.shared.logEvent(
+                "refresh_triggered",
+                properties: [
+                    "entry_id": String(firstFeed.diaryID),
+                    "refresh_method": "pull_to_refresh"
+                ]
+            )
+        }
+
         self.input.reload.send(())
         feedCellView.tableView.refreshControl?.endRefreshing()
     }
-    
+
     // MARK: - Public
-    
+
     func removeDiary(at row: Int) {
         guard row < currentFeeds.count else { return }
-        
+
         currentFeeds.remove(at: row)
         feedCellView.apply(items: currentFeeds)
     }
-    
+
     public func refresh() {
         input.reload.send(())
     }

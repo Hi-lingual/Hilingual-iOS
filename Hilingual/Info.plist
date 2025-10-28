@@ -17,6 +17,8 @@
 	<string>$(TOKEN)</string>
 	<key>MASTERKEY</key>
 	<string>$(MASTERKEY)</string>
+	<key>AMPLITUDE_API_KEY</key>
+	<string>$(AMPLITUDE_API_KEY)</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

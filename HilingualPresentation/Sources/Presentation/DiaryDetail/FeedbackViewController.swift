@@ -28,54 +28,61 @@ struct FeedbackItem {
 }
 
 public final class FeedbackViewController: BaseUIViewController<FeedbackViewModel>, ScrollControllable {
-    
+
     // MARK: - Properties
-    
+
     var onDateLoaded: ((String) -> Void)?
     var publishedInfoLoaded: ((Bool) -> Void)?
+    var onToggleChanged: ((Bool) -> Void)?
+
     private var date: String = ""
-    
+
     private let feedbackView = FeedbackView()
     private let dialog = Dialog()
-    
+
     private let viewDidLoadSubject = PassthroughSubject<Void, Never>()
-    
+
     // MARK: - LifeCycle
-    
+
     public override func viewDidLoad() {
         super.viewDidLoad()
         viewDidLoadSubject.send(())
+
+        // 토글 콜백 연결
+        feedbackView.onToggleChanged = { [weak self] isEnabled in
+            self?.onToggleChanged?(isEnabled)
+        }
     }
-    
+
     // MARK: - Custom Method
-    
+
     public override func setUI() {
         view.addSubviews(feedbackView, dialog)
         view.backgroundColor = .gray100
         view.bringSubviewToFront(dialog)
     }
-    
+
     public override func setLayout() {
         feedbackView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
     }
-    
+
     public override func bind(viewModel: FeedbackViewModel) {
         super.bind(viewModel: viewModel)
-        
+
         let input = makeInput()
         let output = viewModel.transform(input: input)
-        
+
         bindOutput(output)
     }
-    
+
     private func makeInput() -> FeedbackViewModel.Input {
         return FeedbackViewModel.Input(
             viewDidLoad: viewDidLoadSubject.eraseToAnyPublisher()
         )
     }
-    
+
     private func bindOutput(_ output: FeedbackViewModel.Output) {
         output.fetchFeedbackResult
             .receive(on: RunLoop.main)
@@ -93,7 +100,7 @@ public final class FeedbackViewController: BaseUIViewController<FeedbackViewMode
                 }
             )
             .store(in: &cancellables)
-        
+
         output.fetchDiaryResult
             .receive(on: RunLoop.main)
             .sink(
@@ -110,7 +117,7 @@ public final class FeedbackViewController: BaseUIViewController<FeedbackViewMode
                             end: $0.end
                         )
                     }
-                    
+
                     let diaryViewData = DiaryViewData(
                         imageURL: entity.image,
                         date: entity.date,
@@ -123,14 +130,14 @@ public final class FeedbackViewController: BaseUIViewController<FeedbackViewMode
                     self?.date = entity.date
                     self?.onDateLoaded?(entity.date)
                     self?.publishedInfoLoaded?(entity.isPublished)
-                    
+
                     self?.feedbackView.configureDiary(data: diaryViewData)
                 }
             )
             .store(in: &cancellables)
     }
 
-    
+
     private func showErrorDialog(message: String) {
         dialog.configure(
             style: .error,
@@ -141,10 +148,10 @@ public final class FeedbackViewController: BaseUIViewController<FeedbackViewMode
                 self?.navigationController?.popViewController(animated: true)
             }
         )
-        
+
         dialog.showAnimation()
     }
-    
+
     func scrollToTop() {
         feedbackView.scrollToTop()
     }
