@@ -26,6 +26,9 @@ let package = Package(
             dependencies: [
                 "HilingualDomain",
                 "HilingualNetwork"
+            ],
+            resources: [
+                .process("Resources")
             ]
         )
     ]
