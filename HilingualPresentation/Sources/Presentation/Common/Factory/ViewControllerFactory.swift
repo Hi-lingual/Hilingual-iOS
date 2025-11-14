@@ -21,7 +21,8 @@ public protocol ViewControllerFactory {
     func makeRecommendedExpressionViewController(diaryId: Int) -> RecommendedExpressionViewController
     func makeDiaryWritingViewController(
         topicData: (String, String)?,
-        selectedDate: Date
+        selectedDate: Date,
+        shouldLoadDraft: Bool
     ) -> DiaryWritingViewController
     func makeVerificationCodeViewController() -> VerificationCodeViewController
     func makeFollowListViewController(targetUserId:Int) -> FollowListViewController

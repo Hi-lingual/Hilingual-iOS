@@ -22,4 +22,16 @@ extension DiaryWritingViewController: DiaryWritingViewDelegate {
         presentImagePicker(mode: .ocr)  // OCR용 이미지 선택기
         self.diaryWritingView.modal.isHidden = true
     }
+    
+    func didTapTemporarySave(text: String) {
+        
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmed.isEmpty {
+            self.showToast(message: "내용을 입력하세요.")
+            return
+        }
+        
+        saveDraft(text: text)
+    }
+
 }

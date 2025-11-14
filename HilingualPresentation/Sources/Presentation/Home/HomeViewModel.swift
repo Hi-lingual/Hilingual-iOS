@@ -19,6 +19,7 @@ public final class HomeViewModel: BaseViewModel {
 
     public struct Input {
         let monthChange = PassthroughSubject<(Int, Int), Never>()
+        let checkDraft = PassthroughSubject<Date, Never>()
     }
 
     // MARK: - Output
@@ -31,11 +32,18 @@ public final class HomeViewModel: BaseViewModel {
     // MARK: - Properties
 
     private let useCase: HomeUseCase
+    private let fetchTemporaryDiaryUseCase: FetchTemporaryDiaryUseCase
+
+    public let hasDraft = PassthroughSubject<Bool, Never>()
 
     // MARK: - Init
 
-    public init(useCase: HomeUseCase) {
+    public init(
+        useCase: HomeUseCase,
+        fetchTemporaryDiaryUseCase: FetchTemporaryDiaryUseCase
+    ) {
         self.useCase = useCase
+        self.fetchTemporaryDiaryUseCase = fetchTemporaryDiaryUseCase
     }
 
     // MARK: - Transform
@@ -51,12 +59,23 @@ public final class HomeViewModel: BaseViewModel {
                     .catch { _ in Just([]) }
             }
             .eraseToAnyPublisher()
+        
+        input.checkDraft
+            .flatMap { date in
+                self.fetchTemporaryDiaryUseCase.execute(date)
+                    .catch { _ in Just(nil) }
+            }
+            .sink { [weak self] draft in
+                self?.hasDraft.send(draft != nil)
+            }
+            .store(in: &cancellables)
 
         return Output(
             userInfo: userInfoPublisher,
             filledDates: filledDatesPublisher
         )
     }
+
 
     // MARK: - Additional Fetch Methods
 

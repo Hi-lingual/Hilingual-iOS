@@ -23,10 +23,12 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
     private(set) var diaryWritingView = DiaryWritingView()
     private(set) var visionKitManager = VisionKitManager()
     private let dialog = Dialog()
+    private let saveModal = Modal()
     private let textCountSubject = PassthroughSubject<Int, Never>()
     private let topicData: (String, String)?
-    private let selectedDate: Date
+    public let selectedDate: Date
     var currentPickerMode: PickerMode?
+    private let shouldLoadDraft: Bool
 
     // Amplitude Tracking Properties
     private var entryId: String = UUID().uuidString
@@ -39,7 +41,9 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
     public override func viewDidLoad() {
         super.viewDidLoad()
         visionKitManager.delegate = self
+        diaryWritingView.delegate = self
         writingStartTime = Date()
+        
 
         // 1️⃣ [Amplitude] 페이지 진입 (pageview)
         AmplitudeManager.shared.logEvent(
@@ -59,6 +63,14 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(false, animated: false)
+        if shouldLoadDraft {
+            print("shouldLoadDraft is true")
+            viewModel?.loadDraftIfExists(for: selectedDate)
+        } else {
+            print("shouldLoadDraft is false")
+            diaryWritingView.textView.text = ""
+            diaryWritingView.selectedImageView.image = nil
+        }
     }
 
     public override func viewWillDisappear(_ animated: Bool) {
@@ -70,17 +82,20 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
         diContainer: any ViewControllerFactory,
         topicData: (String, String)?,
         selectedDate: Date,
-        backSource: String = "ui_button"
+        backSource: String = "ui_button",
+        shouldLoadDraft: Bool = true
     ) {
         self.topicData = topicData
         self.selectedDate = selectedDate
+        self.shouldLoadDraft = shouldLoadDraft
         self.backSource = backSource
         super.init(viewModel: viewModel, diContainer: diContainer)
     }
 
     // MARK: - Setup
     public override func setUI() {
-        view.addSubviews(diaryWritingView, dialog)
+        saveModal.isHidden = true
+        view.addSubviews(diaryWritingView, dialog, saveModal)
         diaryWritingView.updateView(for: selectedDate)
 
         if let topic = topicData {
@@ -91,6 +106,7 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
     public override func setLayout() {
         diaryWritingView.snp.makeConstraints { $0.edges.equalToSuperview() }
         dialog.snp.makeConstraints { $0.edges.equalToSuperview() }
+        saveModal.snp.makeConstraints { $0.edges.equalToSuperview() }
     }
 
     public override func addTarget() {
@@ -111,6 +127,27 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
             title: "앗! 일시적인 오류가 발생했어요.",
             rightButtonTitle: "확인",
             rightAction: { [weak self] in
+                self?.navigationController?.popViewController(animated: true)
+            }
+        )
+        dialog.showAnimation()
+    }
+    
+    func showDraftDialog() {
+        dialog.configure(
+            title: "이미 임시저장한 일기가 있어요.",
+            content: "일자 당 하나의 일기만 임시저장할 수 있어요.\n임시저장한 일기에 덮어쓰시겠어요?",
+            leftButtonTitle: "아니요",
+            rightButtonTitle: "덮어쓰기",
+            leftAction: { [weak self] in
+                self?.navigationController?.popViewController(animated: true)
+            },
+            rightAction: { [weak self] in
+                self?.diaryWritingView.delegate?.didTapTemporarySave(text: self?.diaryWritingView.textView.text ?? "")
+                if let previousVC = self?.navigationController?
+                    .viewControllers.dropLast().last as? HomeViewController {
+                    previousVC.showToast(message: "임시저장이 완료되었어요")
+                }
                 self?.navigationController?.popViewController(animated: true)
             }
         )
@@ -172,22 +209,39 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
     }
 
     // 2️⃣ [Amplitude] 뒤로가기 버튼 클릭 (click_back_diary)
-    private func showDialog() {
-        dialog.configure(
-            style: .normal,
-            title: "일기 작성을 취소하시겠어요?",
-            content: "지금 나가면 작성한 내용이 모두 사라져요!",
-            leftButtonTitle: "아니요",
-            rightButtonTitle: "취소하기",
-            entryId: entryId,
-            leftAction: { [weak self] in
-                self?.dialog.dismiss()
-            },
-            rightAction: { [weak self] in
+    private func showModal() {
+        
+        diaryWritingView.endEditing(true)
+        
+        let items: [(String, UIImage, () -> Void)] = [
+            ("작성취소", UIImage(resource: .icCancel24Ios), { [weak self] in
+                self?.saveModal.dismissModal()
                 self?.navigationController?.popViewController(animated: true)
-            }
+            }),
+            ("임시저장", UIImage(resource: .icSave24Ios), { [weak self] in
+                if self?.shouldLoadDraft != nil {
+                    self?.saveModal.dismissModal()
+                    self?.showDraftDialog()
+                } else {
+                    self?.diaryWritingView.delegate?.didTapTemporarySave(text: self?.diaryWritingView.textView.text ?? "")
+                    self?.saveModal.dismissModal()
+                    if let previousVC = self?.navigationController?
+                        .viewControllers.dropLast().last as? HomeViewController {
+                        previousVC.showToast(message: "임시저장이 완료되었어요")
+                    }
+                    self?.navigationController?.popViewController(animated: true)
+                }
+                
+            })
+        ]
+
+        saveModal.configure(
+            title: "일기 작성을 취소하시겠어요?",
+            items: items
         )
-        dialog.showAnimation()
+        
+        saveModal.isHidden = false
+        saveModal.showAnimation()
     }
 
     public override func navigationType() -> NavigationType? {
@@ -203,15 +257,34 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
                 "back_source": "ui_button"
             ]
         )
-        showDialog()
+        if diaryWritingView.textView.text == "" {
+            self.navigationController?.popViewController(animated: true)
+        } else {
+            showModal()
+        }
     }
 
     // MARK: - Bind
+    
     public override func bind(viewModel: DiaryWritingViewModel) {
         super.bind(viewModel: viewModel)
         diaryWritingView.delegate = self
         diaryWritingView.textView.delegate = self
-
+        
+        viewModel.draftLoaded
+            .receive(on: RunLoop.main)
+            .sink { [weak self] draft in
+                guard let self else { return }
+                guard self.shouldLoadDraft else { return }
+                guard let draft else { return }
+                self.diaryWritingView.textView.text = draft.text
+                
+                if let data = draft.image {
+                    self.diaryWritingView.selectedImageView.image = UIImage(data: data)
+                }
+            }
+            .store(in: &cancellables)
+        
         let input = DiaryWritingViewModel.Input(textCount: textCountSubject.eraseToAnyPublisher())
         let output = viewModel.transform(input: input)
         bindOutput(output)
@@ -229,6 +302,12 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
         viewModel?.error
             .sink { [weak self] error in
                 self?.notifyLoadingVC(.failure(error))
+            }
+            .store(in: &cancellables)
+        viewModel?.didTemporarySaveComplete
+            .sink { [weak self] _ in
+                guard let self else { return }
+                self.showToast(message: "임시저장이 완료되었어요")
             }
             .store(in: &cancellables)
     }
@@ -257,5 +336,16 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
 
     func textView(_ textView: TextView, didChangeTextCount count: Int) {
         textCountSubject.send(count)
+    }
+    
+    func showToast(message: String) {
+        let toast = ToastMessage()
+        
+        view.addSubview(toast)
+        toast.snp.makeConstraints {
+            $0.bottom.equalToSuperview().inset(340)
+        }
+        
+        toast.configure(type: .basic, message: message)
     }
 }
