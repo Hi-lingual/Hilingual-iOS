@@ -249,10 +249,6 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         toast.configure(type: .basic, message: message)
     }
     
-    func didSelectDate(_ date: Date) {
-        input.checkDraft.send(date)
-    }
-    
     private func showDraftDialog(selectedDate: Date, topicData: (String, String)?) {
         guard let containerView = self.tabBarController?.view else { return }
 
