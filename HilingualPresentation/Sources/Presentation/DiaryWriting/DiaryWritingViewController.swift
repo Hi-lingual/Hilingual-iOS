@@ -60,17 +60,15 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
                 ]
             ]
         )
+        
+        if shouldLoadDraft {
+            viewModel?.loadDraftIfExists(for: selectedDate)
+        }
     }
 
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(false, animated: false)
-        if shouldLoadDraft {
-            viewModel?.loadDraftIfExists(for: selectedDate)
-        } else {
-            diaryWritingView.textView.text = ""
-            diaryWritingView.selectedImageView.image = nil
-        }
     }
 
     public override func viewWillDisappear(_ animated: Bool) {
