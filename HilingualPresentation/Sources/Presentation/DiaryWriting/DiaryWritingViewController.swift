@@ -23,12 +23,14 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
     private(set) var diaryWritingView = DiaryWritingView()
     private(set) var visionKitManager = VisionKitManager()
     private let dialog = Dialog()
-    private let saveModal = Modal()
+    let saveModal = Modal()
     private let textCountSubject = PassthroughSubject<Int, Never>()
     private let topicData: (String, String)?
     public let selectedDate: Date
     var currentPickerMode: PickerMode?
-    private let shouldLoadDraft: Bool
+    let shouldLoadDraft: Bool
+    var initialText: String = ""
+    var imageData: Data?
 
     // Amplitude Tracking Properties
     private var entryId: String = UUID().uuidString
@@ -64,10 +66,8 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(false, animated: false)
         if shouldLoadDraft {
-            print("shouldLoadDraft is true")
             viewModel?.loadDraftIfExists(for: selectedDate)
         } else {
-            print("shouldLoadDraft is false")
             diaryWritingView.textView.text = ""
             diaryWritingView.selectedImageView.image = nil
         }
@@ -146,9 +146,27 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
                 self?.diaryWritingView.delegate?.didTapTemporarySave(text: self?.diaryWritingView.textView.text ?? "")
                 if let previousVC = self?.navigationController?
                     .viewControllers.dropLast().last as? HomeViewController {
-                    previousVC.showToast(message: "임시저장이 완료되었어요")
+                    previousVC.showToast(message: "임시저장이 완료되었어요.")
                 }
                 self?.navigationController?.popViewController(animated: true)
+            }
+        )
+        dialog.showAnimation()
+    }
+    
+    func showDraftDialogIfBarTap() {
+        dialog.configure(
+            title: "이미 임시저장한 일기가 있어요.",
+            content: "일자 당 하나의 일기만 임시저장할 수 있어요.\n임시저장한 일기에 덮어쓰시겠어요?",
+            leftButtonTitle: "아니요",
+            rightButtonTitle: "덮어쓰기",
+            leftAction: { [weak self] in
+                self?.navigationController?.popViewController(animated: true)
+            },
+            rightAction: { [weak self] in
+                self?.diaryWritingView.delegate?.didTapTemporarySave(text: self?.diaryWritingView.textView.text ?? "")
+                self?.diaryWritingView.showToast(message: "임시저장이 완료되었어요.")
+                self?.dialog.dismiss()
             }
         )
         dialog.showAnimation()
@@ -190,7 +208,7 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
     // 7️⃣ [Amplitude] 일기 피드백 요청 (submitted_entry_diary)
     @objc private func feedbackButtonTapped() {
         let text = diaryWritingView.textView.text ?? ""
-        let imageData = diaryWritingView.selectedImageView.image?.jpegData(compressionQuality: 0.8)
+        imageData = diaryWritingView.selectedImageView.image?.jpegData(compressionQuality: 0.8)
         let dateString = selectedDate.toFormattedString("yyyy-MM-dd")
 
         AmplitudeManager.shared.logEvent(
@@ -213,35 +231,34 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
         
         diaryWritingView.endEditing(true)
         
-        let items: [(String, UIImage, () -> Void)] = [
-            ("작성취소", UIImage(resource: .icCancel24Ios), { [weak self] in
-                self?.saveModal.dismissModal()
-                self?.navigationController?.popViewController(animated: true)
-            }),
-            ("임시저장", UIImage(resource: .icSave24Ios), { [weak self] in
-                if self?.shouldLoadDraft != nil {
+        if self.initialText == self.diaryWritingView.textView.text {
+            self.navigationController?.popViewController(animated: true)
+        } else {
+            
+            let items: [(String, UIImage, () -> Void)] = [
+                ("작성취소", UIImage(resource: .icCancel24Ios), { [weak self] in
                     self?.saveModal.dismissModal()
-                    self?.showDraftDialog()
-                } else {
-                    self?.diaryWritingView.delegate?.didTapTemporarySave(text: self?.diaryWritingView.textView.text ?? "")
-                    self?.saveModal.dismissModal()
-                    if let previousVC = self?.navigationController?
-                        .viewControllers.dropLast().last as? HomeViewController {
-                        previousVC.showToast(message: "임시저장이 완료되었어요")
-                    }
                     self?.navigationController?.popViewController(animated: true)
-                }
-                
-            })
-        ]
-
-        saveModal.configure(
-            title: "일기 작성을 취소하시겠어요?",
-            items: items
-        )
-        
-        saveModal.isHidden = false
-        saveModal.showAnimation()
+                }),
+                ("임시저장", UIImage(resource: .icSave24Ios), { [weak self] in
+                    if self?.initialText == self?.diaryWritingView.textView.text {
+                        self?.navigationController?.popViewController(animated: true)
+                    } else {
+                        self?.diaryWritingView.delegate?.didTapTemporarySave(text: self?.diaryWritingView.textView.text ?? "")
+                        self?.saveModal.dismissModal()
+                        self?.showDraftDialog()
+                    }
+                })
+            ]
+            
+            saveModal.configure(
+                title: "일기 작성을 취소하시겠어요?",
+                items: items
+            )
+            
+            saveModal.isHidden = false
+            saveModal.showAnimation()
+        }
     }
 
     public override func navigationType() -> NavigationType? {
@@ -257,7 +274,9 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
                 "back_source": "ui_button"
             ]
         )
-        if diaryWritingView.textView.text == "" {
+        if self.diaryWritingView.textView.text.isEmpty {
+            self.navigationController?.popViewController(animated: true)
+        } else if self.initialText == self.diaryWritingView.textView.text {
             self.navigationController?.popViewController(animated: true)
         } else {
             showModal()
@@ -278,6 +297,7 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
                 guard self.shouldLoadDraft else { return }
                 guard let draft else { return }
                 self.diaryWritingView.textView.text = draft.text
+                self.initialText = diaryWritingView.textView.text
                 
                 if let data = draft.image {
                     self.diaryWritingView.selectedImageView.image = UIImage(data: data)
@@ -307,7 +327,6 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
         viewModel?.didTemporarySaveComplete
             .sink { [weak self] _ in
                 guard let self else { return }
-                self.showToast(message: "임시저장이 완료되었어요")
             }
             .store(in: &cancellables)
     }
@@ -338,14 +357,14 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
         textCountSubject.send(count)
     }
     
-    func showToast(message: String) {
-        let toast = ToastMessage()
-        
-        view.addSubview(toast)
-        toast.snp.makeConstraints {
-            $0.bottom.equalToSuperview().inset(340)
-        }
-        
-        toast.configure(type: .basic, message: message)
-    }
+//    func showToast(message: String) {
+//        let toast = ToastMessage()
+//        
+//        view.addSubview(toast)
+//        toast.snp.makeConstraints {
+//            $0.bottom.equalToSuperview().inset(340)
+//        }
+//        
+//        toast.configure(type: .basic, message: message)
+//    }
 }

@@ -266,8 +266,22 @@ final class DiaryWritingView: BaseUIView {
     private func bindTextView() {
         textView.onTemporarySaveButtonTapped = { [weak self] in
             guard let self else { return }
+            print("asdf")
             self.delegate?.didTapTemporarySave(text: self.textView.text)
         }
+    }
+    
+    // MARK: - Public Methods
+    
+    func showToast(message: String) {
+        let toast = ToastMessage()
+        
+        self.addSubview(toast)
+        toast.snp.makeConstraints {
+            $0.bottom.equalToSuperview().inset(340)
+        }
+        
+        toast.configure(type: .basic, message: message)
     }
     
     // MARK: - Binding

@@ -268,7 +268,6 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
             leftAction: { [weak self] in
                 guard let self else { return }
                 self.dialog.dismiss()
-                print("shouldLoadDraft: false")
 
                 // 새로쓰기 → 그냥 작성 화면으로 이동
                 self.goToDiaryWritingView(
@@ -554,7 +553,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     
     // MARK: - Navigation
     
-    private func goToDiaryWritingView(topicData: (String, String)? = nil, selectedDate: Date? = nil, shouldLoadDraft: Bool = true) {
+    private func goToDiaryWritingView(topicData: (String, String)? = nil, selectedDate: Date? = nil, shouldLoadDraft: Bool = false) {
         let diaryWritingVC = diContainer.makeDiaryWritingViewController(
             topicData: topicData,
             selectedDate: selectedDate ?? Date(),

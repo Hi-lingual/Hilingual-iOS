@@ -9,17 +9,23 @@ import UIKit
 
 extension DiaryWritingViewController {
     func saveDraft(text: String) {
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+
         let image = diaryWritingView.selectedImageView.image
-
-        if text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && image == nil {
-            print("내용을 입력하세요")
-            return
-        }
-
-        viewModel?.didTapTemporarySave(
-            text: text,
-            date: selectedDate,
-            imageData: image?.jpegData(compressionQuality: 0.8)
-        )
+        
+        if trimmed == "" {
+           self.diaryWritingView.showToast(message: "내용을 입력하세요.")
+       } else if self.shouldLoadDraft {
+           self.showDraftDialogIfBarTap()
+       } else if self.initialText == self.diaryWritingView.textView.text {
+           self.diaryWritingView.showToast(message: "내용을 입력하세요.")
+       } else {
+           viewModel?.didTapTemporarySave(
+               text: text,
+               date: selectedDate,
+               imageData: imageData
+           )
+           self.diaryWritingView.showToast(message: "임시저장이 완료되었어요.")
+       }
     }
 }

@@ -24,14 +24,8 @@ extension DiaryWritingViewController: DiaryWritingViewDelegate {
     }
     
     func didTapTemporarySave(text: String) {
-        
-        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
-        if trimmed.isEmpty {
-            self.showToast(message: "내용을 입력하세요.")
-            return
-        }
-        
         saveDraft(text: text)
+        self.initialText = text
     }
 
 }
