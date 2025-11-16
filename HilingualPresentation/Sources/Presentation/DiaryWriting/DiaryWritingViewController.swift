@@ -162,9 +162,18 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
                 self?.navigationController?.popViewController(animated: true)
             },
             rightAction: { [weak self] in
-                self?.diaryWritingView.delegate?.didTapTemporarySave(text: self?.diaryWritingView.textView.text ?? "")
-                self?.diaryWritingView.showToast(message: "임시저장이 완료되었어요.")
-                self?.dialog.dismiss()
+                guard let self else { return }
+                let image = self.diaryWritingView.selectedImageView.image
+                let imageData = image?.jpegData(compressionQuality: 0.8)
+                
+                self.viewModel?.didTapTemporarySave(
+                    text: self.diaryWritingView.textView.text,
+                    date: self.selectedDate,
+                    imageData: imageData
+                )
+                self.initialText = self.diaryWritingView.textView.text
+                self.diaryWritingView.showToast(message: "임시저장이 완료되었어요.")
+                self.dialog.dismiss()
             }
         )
         dialog.showAnimation()
