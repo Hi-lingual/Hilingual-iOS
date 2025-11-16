@@ -94,7 +94,7 @@ final class ToastMessage: UIView {
 
         self.snp.makeConstraints {
             $0.centerX.equalToSuperview()
-            $0.bottom.equalToSuperview().inset(116).priority(250)
+            $0.bottom.equalToSuperview().inset(116).priority(400)
         }
     }
     
@@ -121,7 +121,7 @@ final class ToastMessage: UIView {
             messageTrailingToSuperview?.deactivate()
             messageTrailingToButton?.activate()
 
-            self.snp.remakeConstraints {
+            self.snp.updateConstraints {
                 $0.height.equalTo(52)
             }
 

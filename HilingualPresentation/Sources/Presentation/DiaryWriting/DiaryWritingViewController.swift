@@ -363,15 +363,4 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
     func textView(_ textView: TextView, didChangeTextCount count: Int) {
         textCountSubject.send(count)
     }
-    
-//    func showToast(message: String) {
-//        let toast = ToastMessage()
-//        
-//        view.addSubview(toast)
-//        toast.snp.makeConstraints {
-//            $0.bottom.equalToSuperview().inset(340)
-//        }
-//        
-//        toast.configure(type: .basic, message: message)
-//    }
 }
