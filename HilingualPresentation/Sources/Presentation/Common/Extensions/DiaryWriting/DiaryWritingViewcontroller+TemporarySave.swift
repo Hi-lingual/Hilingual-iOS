@@ -15,11 +15,12 @@ extension DiaryWritingViewController {
         
         if trimmed == "" {
            self.diaryWritingView.showToast(message: "내용을 입력하세요.")
-       } else if self.shouldLoadDraft {
-           self.showDraftDialogIfBarTap()
        } else if self.initialText == self.diaryWritingView.textView.text {
            self.diaryWritingView.showToast(message: "내용을 입력하세요.")
-       } else {
+       } else if self.shouldLoadDraft {
+           diaryWritingView.endEditing(true)
+           self.showDraftDialogIfBarTap()
+       }  else {
            viewModel?.didTapTemporarySave(
                text: text,
                date: selectedDate,
