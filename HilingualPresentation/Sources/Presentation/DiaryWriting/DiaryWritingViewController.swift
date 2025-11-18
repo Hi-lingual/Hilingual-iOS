@@ -264,9 +264,11 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
         
         saveModal.configure(
             title: "일기 작성을 취소하시겠어요?",
+            subtitle: "임시저장하지 않은 내용은 모두 사라져요!",
             items: items
         )
         
+        saveModal.applyStyle(to: 0, titleColor: .alertRed)
         saveModal.isHidden = false
         saveModal.showAnimation()
     }

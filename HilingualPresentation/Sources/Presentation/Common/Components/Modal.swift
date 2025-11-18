@@ -32,6 +32,16 @@ final class Modal: UIView {
         return label
     }()
     
+    private let subtitleLabel: UILabel = {
+        let label = UILabel()
+        label.font = .suit(.caption_r_14)
+        label.textColor = .gray400
+        label.textAlignment = .center
+        label.numberOfLines = 0
+        label.isHidden = true
+        return label
+    }()
+    
     private let stackView: UIStackView = {
         let stackView = UIStackView()
         stackView.backgroundColor = .white
@@ -42,6 +52,7 @@ final class Modal: UIView {
     
     private var stackTopToLabel: Constraint?
     private var stackTopToSheet: Constraint?
+    private var stackTopToSubtitle: Constraint?
     
     // MARK: - LifeCycle
     
@@ -65,7 +76,7 @@ final class Modal: UIView {
     
     private func setUI() {
         addSubview(modalSheetView)
-        modalSheetView.addSubviews(modalLabel, stackView)
+        modalSheetView.addSubviews(modalLabel, subtitleLabel, stackView)
     }
     
     private func setLayout() {
@@ -78,31 +89,51 @@ final class Modal: UIView {
             $0.horizontalEdges.equalTo(modalSheetView).inset(16)
         }
         
+        subtitleLabel.snp.makeConstraints {
+            $0.top.equalTo(modalLabel.snp.bottom).offset(8)
+            $0.horizontalEdges.equalTo(modalSheetView).inset(16)
+        }
+        
         stackView.snp.makeConstraints {
             self.stackTopToLabel = $0.top.equalTo(modalLabel.snp.bottom).offset(24).constraint
+            self.stackTopToSubtitle = $0.top.equalTo(subtitleLabel.snp.bottom).offset(24).constraint
             self.stackTopToSheet = $0.top.equalTo(modalSheetView).offset(24).constraint
+
             $0.horizontalEdges.equalTo(modalSheetView).inset(16)
             $0.bottom.equalTo(modalSheetView).inset(62)
         }
-        
+
+        stackTopToSubtitle?.deactivate()
         stackTopToSheet?.deactivate()
         stackTopToLabel?.activate()
     }
     
     // MARK: - Public Methods
     
-    public func setTitle(_ text: String?) {
+    public func setTitle(_ text: String?, subtitle: String? = nil) {
         modalLabel.text = text
         modalLabel.isHidden = (text == nil)
         
-        if text == nil {
+        subtitleLabel.text = subtitle
+        subtitleLabel.isHidden = (subtitle == nil)
+        
+        if text == nil && subtitle == nil {
             stackTopToLabel?.deactivate()
+            stackTopToSubtitle?.deactivate()
             stackTopToSheet?.activate()
+            
+        } else if subtitle == nil {
+            stackTopToSheet?.deactivate()
+            stackTopToSubtitle?.deactivate()
+            stackTopToLabel?.activate()
+            
         } else {
             stackTopToSheet?.deactivate()
-            stackTopToLabel?.activate()
+            stackTopToLabel?.deactivate()
+            stackTopToSubtitle?.activate()
         }
     }
+
     
     public func configure(title: String?, items: [(String, UIImage?, () -> Void)]) {
         setTitle(title)
@@ -130,6 +161,40 @@ final class Modal: UIView {
             buttons.append(button)
         }
     }
+    
+    public func configure(
+        title: String?,
+        subtitle: String?,
+        items: [(String, UIImage?, () -> Void)]
+    ) {
+        setTitle(title, subtitle: subtitle)
+        
+        stackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
+        buttons.removeAll()
+        
+        items.forEach { (title, image, action) in
+            let button = UIButton(type: .system)
+            var config = UIButton.Configuration.plain()
+            
+            let attributedTitle = AttributedString(title, attributes: AttributeContainer([
+                .font: UIFont.suit(.body_sb_14),
+                .foregroundColor: UIColor.gray700
+            ]))
+            
+            config.attributedTitle = attributedTitle
+            config.image = image
+            config.imagePadding = 8
+            config.baseForegroundColor = .black
+            config.contentInsets = NSDirectionalEdgeInsets(top: 12, leading: 12, bottom: 12, trailing: 12)
+            button.configuration = config
+            button.contentHorizontalAlignment = .leading
+            button.addAction(UIAction { _ in action() }, for: .touchUpInside)
+            
+            stackView.addArrangedSubview(button)
+            buttons.append(button)
+        }
+    }
+
 
     public func applyStyle(to index: Int, titleColor: UIColor, font: UIFont = .suit(.body_sb_14)) {
         guard buttons.indices.contains(index) else { return }
