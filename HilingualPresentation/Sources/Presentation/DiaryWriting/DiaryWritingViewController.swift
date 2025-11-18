@@ -149,7 +149,7 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
                 )
                 self?.navigationController?.popViewController(animated: true)
                 if let previousVC = self?.navigationController?
-                    .viewControllers.dropLast().last as? HomeViewController {
+                    .viewControllers.last as? HomeViewController {
                     previousVC.showToast(message: "임시저장이 완료되었어요.")
                 }
                 
@@ -259,7 +259,7 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
                     )
                     self?.navigationController?.popViewController(animated: true)
                     if let previousVC = self?.navigationController?
-                        .viewControllers.dropLast().last as? HomeViewController {
+                        .viewControllers.last as? HomeViewController{
                         previousVC.showToast(message: "임시저장이 완료되었어요.")
                     }
                     self?.shouldLoadDraft = true
