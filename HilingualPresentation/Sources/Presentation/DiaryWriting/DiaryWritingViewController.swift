@@ -139,10 +139,12 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
                 self?.navigationController?.popViewController(animated: true)
             },
             rightAction: { [weak self] in
+                let image = self?.diaryWritingView.selectedImageView.image
+                let imageData = image?.jpegData(compressionQuality: 0.8)
                 self?.viewModel?.didTapTemporarySave(
                     text: self?.diaryWritingView.textView.text ?? "",
                     date: self?.selectedDate ?? Date(),
-                    imageData: self?.imageData
+                    imageData: imageData
                 )
                 self?.navigationController?.popViewController(animated: true)
                 if let previousVC = self?.navigationController?
@@ -245,10 +247,12 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
             }),
             ("임시저장", UIImage(resource: .icSave24Ios), { [weak self] in
                 if self?.shouldLoadDraft == nil {
+                    let image = self?.diaryWritingView.selectedImageView.image
+                    let imageData = image?.jpegData(compressionQuality: 0.8)
                     self?.viewModel?.didTapTemporarySave(
                         text: self?.diaryWritingView.textView.text ?? "",
                         date: self?.selectedDate ?? Date(),
-                        imageData: self?.imageData
+                        imageData: imageData
                     )
                     self?.navigationController?.popViewController(animated: true)
                     if let previousVC = self?.navigationController?
@@ -311,9 +315,10 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
                     self.diaryWritingView.textView.text = draft.text
                     self.initialText = diaryWritingView.textView.text
                     
-                    if let data = draft.image {
-                        self.diaryWritingView.selectedImageView.image = UIImage(data: data)
-                    }
+                    if let data = draft.image,
+                               let image = UIImage(data: data) {
+                                self.diaryWritingView.setImage(image)
+                            }
                 }
             }
             .store(in: &cancellables)

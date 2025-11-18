@@ -8,10 +8,13 @@
 import UIKit
 
 extension DiaryWritingViewController {
-    func saveDraft(text: String) {
-        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+    func saveDraft() {
 
-//        let image = diaryWritingView.selectedImageView.image
+        let text = diaryWritingView.textView.text
+        let imageData = diaryWritingView.selectedImageView.image?.jpegData(compressionQuality: 0.8)
+        self.imageData = imageData
+
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
         
         if trimmed == "" || self.initialText == self.diaryWritingView.textView.text {
            self.diaryWritingView.showToast(message: "내용을 입력하세요.")
