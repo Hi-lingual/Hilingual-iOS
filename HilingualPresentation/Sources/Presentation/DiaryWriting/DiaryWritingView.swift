@@ -283,6 +283,14 @@ final class DiaryWritingView: BaseUIView {
         toast.configure(type: .basic, message: message)
     }
     
+    func showBottomToast(message: String) {
+        let toast = ToastMessage()
+        
+        self.addSubview(toast)
+        
+        toast.configure(type: .basic, message: message)
+    }
+    
     // MARK: - Binding
     
     func setSelectedDate(_ date: Date) {

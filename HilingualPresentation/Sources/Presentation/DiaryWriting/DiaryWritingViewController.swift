@@ -165,15 +165,15 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
                 guard let self else { return }
                 let image = self.diaryWritingView.selectedImageView.image
                 let imageData = image?.jpegData(compressionQuality: 0.8)
-                
+                self.dialog.dismiss()
                 self.viewModel?.didTapTemporarySave(
                     text: self.diaryWritingView.textView.text,
                     date: self.selectedDate,
                     imageData: imageData
                 )
+                print("showDraftDialogIfBarTap")
                 self.initialText = self.diaryWritingView.textView.text
-                self.diaryWritingView.showToast(message: "임시저장이 완료되었어요.")
-                self.dialog.dismiss()
+                self.diaryWritingView.showBottomToast(message: "임시저장이 완료되었어요.")
             }
         )
         dialog.showAnimation()
@@ -235,7 +235,6 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
 
     // 2️⃣ [Amplitude] 뒤로가기 버튼 클릭 (click_back_diary)
     private func showModal() {
-        
         diaryWritingView.endEditing(true)
         
         if self.initialText == self.diaryWritingView.textView.text {

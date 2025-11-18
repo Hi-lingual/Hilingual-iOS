@@ -11,16 +11,14 @@ extension DiaryWritingViewController {
     func saveDraft(text: String) {
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
 
-        let image = diaryWritingView.selectedImageView.image
+//        let image = diaryWritingView.selectedImageView.image
         
-        if trimmed == "" {
-           self.diaryWritingView.showToast(message: "내용을 입력하세요.")
-       } else if self.initialText == self.diaryWritingView.textView.text {
+        if trimmed == "" || self.initialText == self.diaryWritingView.textView.text {
            self.diaryWritingView.showToast(message: "내용을 입력하세요.")
        } else if self.shouldLoadDraft {
            diaryWritingView.endEditing(true)
            self.showDraftDialogIfBarTap()
-       }  else {
+       } else {
            viewModel?.didTapTemporarySave(
                text: text,
                date: selectedDate,
