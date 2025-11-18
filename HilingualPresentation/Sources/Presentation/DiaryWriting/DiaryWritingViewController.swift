@@ -30,6 +30,7 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
     var currentPickerMode: PickerMode?
     let shouldLoadDraft: Bool
     var initialText: String = ""
+    var initialImageData: Data? = nil
     var imageData: Data?
 
     // Amplitude Tracking Properties
@@ -158,6 +159,7 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
     }
     
     func showDraftDialogIfBarTap() {
+        diaryWritingView.endEditing(true)
         dialog.configure(
             title: "이미 임시저장한 일기가 있어요.",
             content: "일자 당 하나의 일기만 임시저장할 수 있어요.\n임시저장한 일기에 덮어쓰시겠어요?",
@@ -177,6 +179,7 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
                     imageData: imageData
                 )
                 self.initialText = self.diaryWritingView.textView.text
+                self.initialImageData = imageData
                 self.diaryWritingView.showBottomToast(message: "임시저장이 완료되었어요.")
             }
         )
@@ -218,7 +221,7 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
 
     // 7️⃣ [Amplitude] 일기 피드백 요청 (submitted_entry_diary)
     @objc private func feedbackButtonTapped() {
-        let text = diaryWritingView.textView.text ?? ""
+        let text = diaryWritingView.textView.text
         imageData = diaryWritingView.selectedImageView.image?.jpegData(compressionQuality: 0.8)
         let dateString = selectedDate.toFormattedString("yyyy-MM-dd")
 
@@ -290,8 +293,9 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
                 "back_source": "ui_button"
             ]
         )
-        
-        if self.diaryWritingView.textView.text.isEmpty || self.initialText == self.diaryWritingView.textView.text {
+        if isImageChanged() == true {
+            showModal()
+        } else if self.diaryWritingView.textView.text.isEmpty || self.initialText == self.diaryWritingView.textView.text  || isImageChanged() {
             self.navigationController?.popViewController(animated: true)
         } else {
             showModal()
@@ -316,9 +320,10 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
                     self.initialText = diaryWritingView.textView.text
                     
                     if let data = draft.image,
-                               let image = UIImage(data: data) {
-                                self.diaryWritingView.setImage(image)
-                            }
+                       let image = UIImage(data: data) {
+                        self.initialImageData = data
+                        self.diaryWritingView.setImage(image)
+                    }
                 }
             }
             .store(in: &cancellables)
@@ -369,6 +374,11 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
                 ]
             )
         }
+    }
+    
+    func isImageChanged() -> Bool {
+        let current = diaryWritingView.selectedImageView.image?.jpegData(compressionQuality: 0.8)
+        return current != initialImageData
     }
 
     func textView(_ textView: TextView, didChangeTextCount count: Int) {
