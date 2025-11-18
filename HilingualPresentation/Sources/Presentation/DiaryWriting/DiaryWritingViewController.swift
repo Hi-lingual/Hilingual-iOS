@@ -61,9 +61,7 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
             ]
         )
         
-        if shouldLoadDraft {
-            viewModel?.loadDraftIfExists(for: selectedDate)
-        }
+        viewModel?.loadDraftIfExists(for: selectedDate)
     }
 
     public override func viewWillAppear(_ animated: Bool) {
@@ -141,12 +139,17 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
                 self?.navigationController?.popViewController(animated: true)
             },
             rightAction: { [weak self] in
-                self?.diaryWritingView.delegate?.didTapTemporarySave(text: self?.diaryWritingView.textView.text ?? "")
+                self?.viewModel?.didTapTemporarySave(
+                    text: self?.diaryWritingView.textView.text ?? "",
+                    date: self?.selectedDate ?? Date(),
+                    imageData: self?.imageData
+                )
+                self?.navigationController?.popViewController(animated: true)
                 if let previousVC = self?.navigationController?
                     .viewControllers.dropLast().last as? HomeViewController {
                     previousVC.showToast(message: "임시저장이 완료되었어요.")
                 }
-                self?.navigationController?.popViewController(animated: true)
+                
             }
         )
         dialog.showAnimation()
@@ -171,7 +174,6 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
                     date: self.selectedDate,
                     imageData: imageData
                 )
-                print("showDraftDialogIfBarTap")
                 self.initialText = self.diaryWritingView.textView.text
                 self.diaryWritingView.showBottomToast(message: "임시저장이 완료되었어요.")
             }
@@ -236,35 +238,37 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
     // 2️⃣ [Amplitude] 뒤로가기 버튼 클릭 (click_back_diary)
     private func showModal() {
         diaryWritingView.endEditing(true)
-        
-        if self.initialText == self.diaryWritingView.textView.text {
-            self.navigationController?.popViewController(animated: true)
-        } else {
-            
-            let items: [(String, UIImage, () -> Void)] = [
-                ("작성취소", UIImage(resource: .icCancel24Ios), { [weak self] in
-                    self?.saveModal.dismissModal()
+        let items: [(String, UIImage, () -> Void)] = [
+            ("작성취소", UIImage(resource: .icCancel24Ios), { [weak self] in
+                self?.saveModal.dismissModal()
+                self?.navigationController?.popViewController(animated: true)
+            }),
+            ("임시저장", UIImage(resource: .icSave24Ios), { [weak self] in
+                if self?.shouldLoadDraft == nil {
+                    self?.viewModel?.didTapTemporarySave(
+                        text: self?.diaryWritingView.textView.text ?? "",
+                        date: self?.selectedDate ?? Date(),
+                        imageData: self?.imageData
+                    )
                     self?.navigationController?.popViewController(animated: true)
-                }),
-                ("임시저장", UIImage(resource: .icSave24Ios), { [weak self] in
-                    if self?.initialText == self?.diaryWritingView.textView.text {
-                        self?.navigationController?.popViewController(animated: true)
-                    } else {
-                        self?.diaryWritingView.delegate?.didTapTemporarySave(text: self?.diaryWritingView.textView.text ?? "")
-                        self?.saveModal.dismissModal()
-                        self?.showDraftDialog()
+                    if let previousVC = self?.navigationController?
+                        .viewControllers.dropLast().last as? HomeViewController {
+                        previousVC.showToast(message: "임시저장이 완료되었어요.")
                     }
-                })
-            ]
-            
-            saveModal.configure(
-                title: "일기 작성을 취소하시겠어요?",
-                items: items
-            )
-            
-            saveModal.isHidden = false
-            saveModal.showAnimation()
-        }
+                } else {
+                    self?.saveModal.dismissModal()
+                    self?.showDraftDialog()
+                }
+            })
+        ]
+        
+        saveModal.configure(
+            title: "일기 작성을 취소하시겠어요?",
+            items: items
+        )
+        
+        saveModal.isHidden = false
+        saveModal.showAnimation()
     }
 
     public override func navigationType() -> NavigationType? {
@@ -280,9 +284,8 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
                 "back_source": "ui_button"
             ]
         )
-        if self.diaryWritingView.textView.text.isEmpty {
-            self.navigationController?.popViewController(animated: true)
-        } else if self.initialText == self.diaryWritingView.textView.text {
+        
+        if self.diaryWritingView.textView.text.isEmpty || self.initialText == self.diaryWritingView.textView.text {
             self.navigationController?.popViewController(animated: true)
         } else {
             showModal()
@@ -302,11 +305,13 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
                 guard let self else { return }
                 guard self.shouldLoadDraft else { return }
                 guard let draft else { return }
-                self.diaryWritingView.textView.text = draft.text
-                self.initialText = diaryWritingView.textView.text
-                
-                if let data = draft.image {
-                    self.diaryWritingView.selectedImageView.image = UIImage(data: data)
+                if shouldLoadDraft {
+                    self.diaryWritingView.textView.text = draft.text
+                    self.initialText = diaryWritingView.textView.text
+                    
+                    if let data = draft.image {
+                        self.diaryWritingView.selectedImageView.image = UIImage(data: data)
+                    }
                 }
             }
             .store(in: &cancellables)

@@ -15,7 +15,7 @@ extension DiaryWritingViewController {
         
         if trimmed == "" || self.initialText == self.diaryWritingView.textView.text {
            self.diaryWritingView.showToast(message: "내용을 입력하세요.")
-       } else if self.shouldLoadDraft {
+        } else if self.initialText != self.diaryWritingView.textView.text {
            diaryWritingView.endEditing(true)
            self.showDraftDialogIfBarTap()
        } else {
