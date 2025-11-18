@@ -16,11 +16,11 @@ extension DiaryWritingViewController {
 
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
         
-        if isImageChanged() == true {
+        if isImageChanged() {
             self.showDraftDialogIfBarTap()
         } else if trimmed == "" || self.initialText == self.diaryWritingView.textView.text {
             self.diaryWritingView.showToast(message: "내용을 입력하세요.")
-        } else if self.initialText != self.diaryWritingView.textView.text {
+        } else if self.initialText != self.diaryWritingView.textView.text && shouldLoadDraft {
             self.showDraftDialogIfBarTap()
         } else {
             viewModel?.didTapTemporarySave(
@@ -29,6 +29,7 @@ extension DiaryWritingViewController {
                 imageData: imageData
             )
             self.diaryWritingView.showToast(message: "임시저장이 완료되었어요.")
+            shouldLoadDraft = true
         }
     }
 }

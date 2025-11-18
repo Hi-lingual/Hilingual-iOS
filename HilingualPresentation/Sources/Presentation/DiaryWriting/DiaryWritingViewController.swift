@@ -28,7 +28,7 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
     private let topicData: (String, String)?
     public let selectedDate: Date
     var currentPickerMode: PickerMode?
-    let shouldLoadDraft: Bool
+    var shouldLoadDraft: Bool
     var initialText: String = ""
     var initialImageData: Data? = nil
     var imageData: Data?
@@ -249,7 +249,7 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
                 self?.navigationController?.popViewController(animated: true)
             }),
             ("임시저장", UIImage(resource: .icSave24Ios), { [weak self] in
-                if self?.shouldLoadDraft == nil {
+                if self?.shouldLoadDraft == false {
                     let image = self?.diaryWritingView.selectedImageView.image
                     let imageData = image?.jpegData(compressionQuality: 0.8)
                     self?.viewModel?.didTapTemporarySave(
@@ -262,6 +262,7 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
                         .viewControllers.dropLast().last as? HomeViewController {
                         previousVC.showToast(message: "임시저장이 완료되었어요.")
                     }
+                    self?.shouldLoadDraft = true
                 } else {
                     self?.saveModal.dismissModal()
                     self?.showDraftDialog()
@@ -293,9 +294,9 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
                 "back_source": "ui_button"
             ]
         )
-        if isImageChanged() == true {
+        if isImageChanged() {
             showModal()
-        } else if self.diaryWritingView.textView.text.isEmpty || self.initialText == self.diaryWritingView.textView.text  || isImageChanged() {
+        } else if self.diaryWritingView.textView.text.isEmpty || self.initialText == self.diaryWritingView.textView.text {
             self.navigationController?.popViewController(animated: true)
         } else {
             showModal()
