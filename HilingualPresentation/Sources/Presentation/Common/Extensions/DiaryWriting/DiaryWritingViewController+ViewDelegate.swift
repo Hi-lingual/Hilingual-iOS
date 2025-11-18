@@ -25,7 +25,6 @@ extension DiaryWritingViewController: DiaryWritingViewDelegate {
     
     func didTapTemporarySave(text: String) {
         saveDraft()
-        self.initialText = text
     }
 
 }

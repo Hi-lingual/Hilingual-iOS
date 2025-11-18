@@ -152,7 +152,6 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
                     .viewControllers.last as? HomeViewController {
                     previousVC.showToast(message: "임시저장이 완료되었어요.")
                 }
-                
             }
         )
         dialog.showAnimation()
@@ -166,7 +165,7 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
             leftButtonTitle: "아니요",
             rightButtonTitle: "덮어쓰기",
             leftAction: { [weak self] in
-                self?.navigationController?.popViewController(animated: true)
+                self?.dialog.dismiss()
             },
             rightAction: { [weak self] in
                 guard let self else { return }
