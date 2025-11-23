@@ -256,7 +256,7 @@
 				BUNDLE_NAME = "Hilingual-Dev";
 				CODE_SIGN_ENTITLEMENTS = Hilingual/Hilingual.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2025112401;
+				CURRENT_PROJECT_VERSION = 2025112402;
 				DEVELOPMENT_TEAM = C9XX799UJH;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Hilingual/Info.plist;
@@ -272,7 +272,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1.0;
+				MARKETING_VERSION = 1.1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.Hilingual$(BUNDLE_ID_SUFFIX)";
 				PRODUCT_NAME = "Hilingual-Dev";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -293,7 +293,7 @@
 				BUNDLE_NAME = Hilingual;
 				CODE_SIGN_ENTITLEMENTS = Hilingual/Hilingual.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2025112401;
+				CURRENT_PROJECT_VERSION = 2025112402;
 				DEVELOPMENT_TEAM = C9XX799UJH;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Hilingual/Info.plist;
@@ -309,7 +309,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1.0;
+				MARKETING_VERSION = 1.1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.Hilingual$(BUNDLE_ID_SUFFIX)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";

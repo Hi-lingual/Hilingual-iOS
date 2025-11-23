@@ -47,13 +47,12 @@ public final class SplashViewController: BaseUIViewController<SplashViewModel> {
         let defaults: [String: NSObject] = [
             "minimumVersion": "1.0.0" as NSObject,
             "latestVersion": "1.0.0" as NSObject,
-            "update_title": "업데이트 안내" as NSObject,
-            "update_message": "최신 버전으로 업데이트 해주세요." as NSObject,
+            "update_title": "새로운 버전이 업데이트 되었어요!" as NSObject,
+            "update_message": "안정적인 서비스 사용을 위해 \n최신 버전으로 업데이트 해주세요." as NSObject,
             "update_link": "https://apps.apple.com/kr/app/id6752608763" as NSObject
         ]
         remoteConfig.setDefaults(defaults)
 
-        // fetch
         remoteConfig.fetch(withExpirationDuration: 0) { [weak self] status, error in
             guard let self = self else { return }
 
@@ -70,11 +69,11 @@ public final class SplashViewController: BaseUIViewController<SplashViewModel> {
     }
 
     private func evaluateVersion() {
-        let minimumVersion = remoteConfig["minimum_version_iOS"].stringValue ?? "1.0.0"
-        let latestVersion = remoteConfig["latestVersion"].stringValue ?? "1.0.0"
-        let title = remoteConfig["update_title"].stringValue ?? "업데이트 안내"
-        let message = remoteConfig["update_message"].stringValue ?? "최신 버전으로 업데이트 해주세요."
-        let link = remoteConfig["update_link"].stringValue ?? ""
+        let minimumVersion = remoteConfig["minimum_version_iOS"].stringValue
+        let latestVersion = remoteConfig["latestVersion"].stringValue
+        let title = remoteConfig["update_title"].stringValue
+        let message = remoteConfig["update_message"].stringValue
+        let link = remoteConfig["update_link"].stringValue
 
         guard let currentVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String else {
             print("현재 버전 정보를 가져오지 못했습니다.")
@@ -86,19 +85,16 @@ public final class SplashViewController: BaseUIViewController<SplashViewModel> {
         print("최소 지원 버전: \(minimumVersion)")
         print("최신 버전: \(latestVersion)")
 
-        // 강제 업데이트 조건 (현재 버전 < minimumVersion)
         if currentVersion.compare(minimumVersion, options: .numeric) == .orderedAscending {
             DispatchQueue.main.async {
                 self.showUpdateAlert(title: title, message: message, link: link, isForce: true)
             }
         }
-        // 선택 업데이트 조건 (현재 버전 < latestVersion)
         else if currentVersion.compare(latestVersion, options: .numeric) == .orderedAscending {
             DispatchQueue.main.async {
                 self.showUpdateAlert(title: title, message: message, link: link, isForce: false)
             }
         }
-        // 최신 버전이면 로그인 로직 진행
         else {
             DispatchQueue.main.async {
                 self.viewDidAppearSubject.send(())
@@ -108,24 +104,23 @@ public final class SplashViewController: BaseUIViewController<SplashViewModel> {
 
     private func showUpdateAlert(title: String, message: String, link: String, isForce: Bool) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        let updateAction = UIAlertAction(title: "업데이트", style: .default) { _ in
+        let updateAction = UIAlertAction(title: "업데이트 하러가기", style: .default) { _ in
             if let url = URL(string: link), UIApplication.shared.canOpenURL(url) {
                 UIApplication.shared.open(url)
             }
         }
         alert.addAction(updateAction)
 
-        // 선택 업데이트만 '나중에' 버튼 표시
         if !isForce {
             alert.addAction(UIAlertAction(title: "나중에", style: .cancel) { [weak self] _ in
-                self?.viewDidAppearSubject.send(()) // 로그인 진행
+                self?.viewDidAppearSubject.send(())
             })
         }
 
         present(alert, animated: true)
     }
 
-    // MARK: - ViewModel 바인딩
+    // MARK: - Bind
 
     public override func bind(viewModel: SplashViewModel) {
         let output = viewModel.transform(input: .init(
