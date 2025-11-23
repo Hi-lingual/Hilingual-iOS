@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import HilingualData
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -17,7 +18,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 //        for key in UserDefaults.standard.dictionaryRepresentation().keys {
 //            UserDefaults.standard.removeObject(forKey: key.description)
 //        }
-//        
+        _ = CoreDataStorage.shared
+
+//
         return true
     }
 

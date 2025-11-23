@@ -34,6 +34,7 @@ final class AppDIContainer: ViewControllerFactory {
         return SplashViewController(viewModel: makeSplashViewModel(), diContainer: self)
     }
 
+    @MainActor
     public func makeHomeViewController() -> HomeViewController {
         return HomeViewController(viewModel: makeHomeViewModel(), diContainer: self)
     }
@@ -74,27 +75,21 @@ final class AppDIContainer: ViewControllerFactory {
         return OnBoardingViewController(viewModel: makeOnBoardingViewModel(), diContainer: self)
     }
     
+    @MainActor
     func makeDiaryWritingViewController(
-        topicData: (String, String)? = ("테스트 주제", "Test Topic"), // 임의 주제
-        selectedDate: Date
+        topicData: (String, String)?,
+        selectedDate: Date,
+        shouldLoadDraft: Bool
     ) -> DiaryWritingViewController {
         
-        let useCase = DummyDiaryWritingUseCase()
-        let viewModel = DiaryWritingViewModel(diaryWritingUseCase: makeDiaryWritingUseCase(), uploadImageUseCase: makeUploadImageUseCase())
-        
+        let viewModel = makeDiaryWritingViewModel()
         return DiaryWritingViewController(
             viewModel: viewModel,
             diContainer: self,
             topicData: topicData,
-            selectedDate: selectedDate
+            selectedDate: selectedDate,
+            shouldLoadDraft: shouldLoadDraft
         )
-        
-//        return DiaryWritingViewController(
-//            viewModel: makeDiaryWritingViewModel(),
-//            diContainer: self,
-//            topicData: topicData,
-//            selectedDate: selectedDate
-//        )
     }
 
     func makeLoadingViewController() -> HilingualPresentation.LoadingViewController {
@@ -302,11 +297,45 @@ extension AppDIContainer {
     private func makeDiaryWritingUseCase() -> DiaryWritingUseCase {
         return DefaultDiaryWritingUseCase(repository: makeDiaryWritingRepository())
     }
+}
+
+// MARK: - TemporaryDiaryDIContainer
+@MainActor
+extension AppDIContainer {
+
+    private func makeDiaryDraftLocalDataSource() -> DiaryDraftLocalDataSource {
+        return DefaultDiaryDraftLocalDataSource(
+            viewContext: CoreDataStorage.shared.viewContext,
+            backgroundContext: CoreDataStorage.shared.backgroundContext
+        )
+    }
+
+    private func makeTemporaryDiaryRepository() -> TemporaryDiaryRepository {
+        return DefaultTemporaryDiaryRepository(localDataSource: makeDiaryDraftLocalDataSource())
+    }
+
+    private func makeSaveTemporaryDiaryUseCase() -> SaveTemporaryDiaryUseCase {
+        return DefaultSaveTemporaryDiaryUseCase(
+            temporaryDiaryRepository: makeTemporaryDiaryRepository()
+        )
+    }
+    
+    private func makeFetchTemporaryDiaryUseCase() -> FetchTemporaryDiaryUseCase {
+        return DefaultFetchTemporaryDiaryUseCase(
+            temporaryDiaryRepository: makeTemporaryDiaryRepository()
+            )
+    }
 
     private func makeDiaryWritingViewModel() -> DiaryWritingViewModel {
-        return DiaryWritingViewModel(diaryWritingUseCase: makeDiaryWritingUseCase(), uploadImageUseCase: makeUploadImageUseCase())
+        return DiaryWritingViewModel(
+            diaryWritingUseCase: makeDiaryWritingUseCase(),
+            uploadImageUseCase: makeUploadImageUseCase(),
+            saveTemporaryDiaryUseCase: makeSaveTemporaryDiaryUseCase(),
+            fetchTemporaryDiaryUseCase: makeFetchTemporaryDiaryUseCase()
+        )
     }
 }
+
 
 // MARK: - DiaryDetailDIContainer
 
@@ -399,9 +428,10 @@ extension AppDIContainer {
     private func makeHomeUseCase() -> HomeUseCase {
         return DefaultHomeUseCase(repository: makeHomeRepository())
     }
-
+    
+    @MainActor
     private func makeHomeViewModel() -> HomeViewModel {
-        return HomeViewModel(useCase: makeHomeUseCase())
+        return HomeViewModel(useCase: makeHomeUseCase(), fetchTemporaryDiaryUseCase: makeFetchTemporaryDiaryUseCase())
     }
 }
 
@@ -736,3 +766,4 @@ extension AppDIContainer {
     }
 
 }
+

@@ -26,6 +26,8 @@ final class TextView: UIView {
         set { configure(text: newValue) }
     }
     
+    var onTemporarySaveButtonTapped: (() -> Void)?
+    
     // MARK: - UI Components
     
     private let textView: UITextView = {
@@ -144,6 +146,13 @@ final class TextView: UIView {
 
         let flex = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
 
+        let save = UIBarButtonItem(
+            title: "임시저장",
+            style: .plain,
+            target: self,
+            action: #selector(saveButtonDidTap)
+        )
+        
         let done = UIBarButtonItem(
             title: "완료",
             style: .plain,
@@ -151,13 +160,17 @@ final class TextView: UIView {
             action: #selector(dismissKeyboard)
         )
 
-        toolbar.items = [flex, done]
+        toolbar.items = [save, flex, done]
 
         return toolbar
     }
 
     @objc private func dismissKeyboard() {
         textView.resignFirstResponder()
+    }
+    
+    @objc private func saveButtonDidTap() {
+        onTemporarySaveButtonTapped?()
     }
 }
 

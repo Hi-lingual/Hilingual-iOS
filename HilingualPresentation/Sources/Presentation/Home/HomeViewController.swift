@@ -11,6 +11,8 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     let dialog = Dialog()
     private let input = HomeViewModel.Input()
     private var currentDateRequestCancellable: AnyCancellable?
+    private var pendingDraftDate: Date?
+    private var pendingDraftTopic: (String, String)?
     
     // MARK: - Life Cycle
     
@@ -106,6 +108,19 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                 self.fetchAndShowDateInfo(for: self.homeView.calendarView.selectedDate ?? Date())
             }
             .store(in: &viewModel.cancellables)
+        viewModel.hasDraft
+            .receive(on: RunLoop.main)
+            .sink { [weak self] hasDraft in
+                guard let self else { return }
+                let date = self.pendingDraftDate ?? self.homeView.calendarView.selectedDate ?? Date()
+                let topic = self.pendingDraftTopic
+                if hasDraft {
+                    self.showDraftDialog(selectedDate: date, topicData: topic)
+                } else {
+                    self.goToDiaryWritingView(topicData: topic, selectedDate: date, shouldLoadDraft: false)
+                }
+            }
+            .store(in: &viewModel.cancellables)
     }
     
     // MARK: - Action
@@ -115,9 +130,13 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         // 주제 카드 눌렀을 때, 일기 작성화면으로 이동
         homeView.selectedInfo.cardTopicView.onTapWriteDiary = { [weak self] in
             guard let self else { return }
-            let selectedDate = self.homeView.calendarView.selectedDate
+            guard let selectedDate = self.homeView.calendarView.selectedDate else { return }
             let topic = self.homeView.selectedInfo.topicData
-            self.goToDiaryWritingView(topicData: topic, selectedDate: selectedDate)
+
+            self.pendingDraftDate = selectedDate
+            self.pendingDraftTopic = topic
+
+            self.input.checkDraft.send(selectedDate)
         }
         
         // 일기 프리뷰 눌렀을 때, 상세화면으로 이동
@@ -221,6 +240,56 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         
         self.currentDateRequestCancellable?.store(in: &self.viewModel!.cancellables)
     }
+    
+    func showToast(message: String) {
+        let toast = ToastMessage()
+        
+        view.addSubview(toast)
+        
+        toast.configure(type: .basic, message: message)
+    }
+    
+    private func showDraftDialog(selectedDate: Date, topicData: (String, String)?) {
+        guard let containerView = self.tabBarController?.view else { return }
+
+        containerView.addSubview(dialog)
+        dialog.snp.remakeConstraints { $0.edges.equalTo(containerView) }
+
+        dialog.configure(
+            style: .normal,
+            title: "작성 중인 일기가 있어요.",
+            content: "임시저장한 일기를 이어 쓰시겠어요?",
+            leftButtonTitle: "새로 쓰기",
+            rightButtonTitle: "이어 쓰기",
+            leftAction: { [weak self] in
+                guard let self else { return }
+                self.dialog.dismiss()
+
+                // 새로쓰기 → 그냥 작성 화면으로 이동
+                self.goToDiaryWritingView(
+                    topicData: topicData,
+                    selectedDate: selectedDate,
+                    shouldLoadDraft: false
+                )
+            },
+            rightAction: { [weak self] in
+                guard let self else { return }
+                self.dialog.dismiss()
+
+                // 이어쓰기 → 작성 화면으로 이동 → 작성 화면이 알아서 draft load
+                self.goToDiaryWritingView(
+                    topicData: topicData,
+                    selectedDate: selectedDate,
+                    shouldLoadDraft: true
+                )
+            }
+        )
+
+        dialog.showAnimation()
+    }
+
+
+
 
     // MARK: - Topic 조회 로직 분리
     
@@ -480,10 +549,11 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     
     // MARK: - Navigation
     
-    private func goToDiaryWritingView(topicData: (String, String)? = nil, selectedDate: Date? = nil) {
+    private func goToDiaryWritingView(topicData: (String, String)? = nil, selectedDate: Date? = nil, shouldLoadDraft: Bool = false) {
         let diaryWritingVC = diContainer.makeDiaryWritingViewController(
             topicData: topicData,
-            selectedDate: selectedDate ?? Date()
+            selectedDate: selectedDate ?? Date(),
+            shouldLoadDraft: shouldLoadDraft
         )
         diaryWritingVC.hidesBottomBarWhenPushed = true
         navigationController?.pushViewController(diaryWritingVC, animated: true)

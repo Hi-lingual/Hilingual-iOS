@@ -13,6 +13,7 @@ protocol DiaryWritingViewDelegate: AnyObject {
     func didTapCamera()
     func didTapGallery()
     func didTapOCRGallery()
+    func didTapTemporarySave(text: String)
 }
 
 final class DiaryWritingView: BaseUIView {
@@ -133,6 +134,7 @@ final class DiaryWritingView: BaseUIView {
         setUI()
         setLayout()
         addTarget()
+        bindTextView()
     }
     
     required init?(coder: NSCoder) {
@@ -259,6 +261,34 @@ final class DiaryWritingView: BaseUIView {
         for date: Date
     ) {
         setSelectedDate(date)
+    }
+    
+    private func bindTextView() {
+        textView.onTemporarySaveButtonTapped = { [weak self] in
+            guard let self else { return }
+            self.delegate?.didTapTemporarySave(text: self.textView.text)
+        }
+    }
+    
+    // MARK: - Public Methods
+    
+    func showToast(message: String) {
+        let toast = ToastMessage()
+        
+        self.addSubview(toast)
+        toast.snp.makeConstraints {
+            $0.bottom.equalToSuperview().inset(340).priority(500)
+        }
+        
+        toast.configure(type: .basic, message: message)
+    }
+    
+    func showBottomToast(message: String) {
+        let toast = ToastMessage()
+        
+        self.addSubview(toast)
+        
+        toast.configure(type: .basic, message: message)
     }
     
     // MARK: - Binding

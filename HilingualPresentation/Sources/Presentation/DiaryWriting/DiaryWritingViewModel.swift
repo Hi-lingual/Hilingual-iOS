@@ -16,12 +16,19 @@ public final class DiaryWritingViewModel: BaseViewModel {
     
     private let diaryWritingUseCase: DiaryWritingUseCase
     private let uploadImageUseCase: UploadImageUseCase
+    private let saveTemporaryDiaryUseCase: SaveTemporaryDiaryUseCase
+    private let fetchTemporaryDiaryUseCase: FetchTemporaryDiaryUseCase
     
     // MARK: - State
     
     private let isLoadingSubject = CurrentValueSubject<Bool, Never>(false)
     private let errorSubject = PassthroughSubject<Error, Never>()
     private let successDiaryIdSubject = PassthroughSubject<Int, Never>()
+    private let temporarySaveCompleted = PassthroughSubject<Void, Never>()
+    let draftLoaded = PassthroughSubject<TemporaryDiaryEntity?, Never>()
+    
+    
+    private var temporarySaveCancellables = Set<AnyCancellable>()
     
     public var diaryResultPublisher: AnyPublisher<Result<Int, Error>, Never> {
         let success = successDiaryIdSubject
@@ -32,6 +39,10 @@ public final class DiaryWritingViewModel: BaseViewModel {
         
         return Publishers.Merge(success, failure)
             .eraseToAnyPublisher()
+    }
+    
+    var didTemporarySaveComplete: AnyPublisher<Void, Never> {
+        temporarySaveCompleted.eraseToAnyPublisher()
     }
     
     public var isLoading: AnyPublisher<Bool, Never> {
@@ -48,9 +59,17 @@ public final class DiaryWritingViewModel: BaseViewModel {
     
     // MARK: - Init
     
-    public init(diaryWritingUseCase: DiaryWritingUseCase, uploadImageUseCase: UploadImageUseCase) {
+    public init(
+        diaryWritingUseCase: DiaryWritingUseCase,
+        uploadImageUseCase: UploadImageUseCase,
+        saveTemporaryDiaryUseCase: SaveTemporaryDiaryUseCase,
+        fetchTemporaryDiaryUseCase: FetchTemporaryDiaryUseCase
+
+    ) {
         self.diaryWritingUseCase = diaryWritingUseCase
         self.uploadImageUseCase = uploadImageUseCase
+        self.saveTemporaryDiaryUseCase = saveTemporaryDiaryUseCase
+        self.fetchTemporaryDiaryUseCase = fetchTemporaryDiaryUseCase
         super.init()
     }
     
@@ -73,5 +92,40 @@ public final class DiaryWritingViewModel: BaseViewModel {
             .eraseToAnyPublisher()
         
         return Output(buttonActive: buttonActive)
+    }
+    
+    // MARK: - Temporary Save
+    
+    public func didTapTemporarySave(text: String, date: Date, imageData: Data?) {
+        guard !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || imageData != nil else {
+            return
+        }
+        
+        let entity = TemporaryDiaryEntity(
+            text: text,
+            date: date,
+            image: imageData
+        )
+        
+        saveTemporaryDiaryUseCase.execute(entity)
+            .sink { [weak self] completion in
+                if case .failure(let error) = completion {
+                    self?.errorSubject.send(error)
+                }
+            } receiveValue: { [weak self] _ in
+                self?.temporarySaveCompleted.send(())
+            }
+            .store(in: &temporarySaveCancellables)
+    }
+    
+    public func loadDraftIfExists(for date: Date) {
+        fetchTemporaryDiaryUseCase.execute(date)
+            .sink(
+                receiveCompletion: { _ in },
+                receiveValue: { [weak self] draft in
+                    self?.draftLoaded.send(draft)
+                }
+            )
+            .store(in: &cancellables)
     }
 }
