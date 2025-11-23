@@ -121,7 +121,7 @@ final class ToastMessage: UIView {
             messageTrailingToSuperview?.deactivate()
             messageTrailingToButton?.activate()
 
-            self.snp.updateConstraints {
+            self.snp.makeConstraints {
                 $0.height.equalTo(52)
             }
 
