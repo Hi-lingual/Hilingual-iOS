@@ -104,7 +104,7 @@ final class CardPreview: UIView {
         switch type {
         case .textOnly(let text):
             let display = text ?? "일기를 불러오지 못했습니다."
-            originalText.attributedText = .pretendard(.body_m_16, text: display)
+            originalText.attributedText = .pretendard(.body_r_15, text: display)
 
             previewImage.isHidden = true
 
@@ -120,7 +120,7 @@ final class CardPreview: UIView {
 
         case .textWithImage(let text, let imageUrl):
             let display = text ?? "일기를 불러오지 못했습니다."
-            originalText.attributedText = .pretendard(.body_m_16, text: display)
+            originalText.attributedText = .pretendard(.body_r_15, text: display)
 
             previewImage.isHidden = false
             previewImage.snp.remakeConstraints {
