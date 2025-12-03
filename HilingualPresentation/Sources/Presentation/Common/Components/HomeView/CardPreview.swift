@@ -21,7 +21,7 @@ final class CardPreview: UIView {
 
     private let originalText: UILabel = {
         let label = UILabel()
-        label.font = .pretendard(.body_r_16)
+        label.font = .pretendard(.body_r_15)
         label.textColor = .black
         label.numberOfLines = 3
         label.lineBreakMode = .byTruncatingTail

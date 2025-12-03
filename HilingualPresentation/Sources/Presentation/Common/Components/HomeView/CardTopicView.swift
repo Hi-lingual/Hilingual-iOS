@@ -48,7 +48,7 @@ final class CardTopicView: UIView {
 
     private let topicKorLabel: UILabel = {
         let label = UILabel()
-        label.font = .pretendard(.body_m_16)
+        label.font = .pretendard(.body_m_15)
         label.textColor = .gray700
         label.numberOfLines = 2
         return label
@@ -56,7 +56,7 @@ final class CardTopicView: UIView {
 
     private let topicEnLabel: UILabel = {
         let label = UILabel()
-        label.font = .pretendard(.body_m_16)
+        label.font = .pretendard(.body_m_15)
         label.textColor = .gray700
         label.numberOfLines = 2
         return label
