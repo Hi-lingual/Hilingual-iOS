@@ -34,7 +34,7 @@ final class TextView: UIView {
         let textView = UITextView()
         textView.backgroundColor = .gray100
         textView.font = .pretendard(.body_r_16)
-        textView.attributedText = .pretendard(.body_r_16, text: "", lineBreakMode: .byWordWrapping, forceWrap: true)
+        textView.attributedText = .pretendard(.body_r_15, text: "", lineBreakMode: .byWordWrapping, forceWrap: true)
         textView.textColor = .black
         textView.isScrollEnabled = true
         textView.textContainer.lineBreakMode = .byWordWrapping
@@ -47,7 +47,7 @@ final class TextView: UIView {
     
     private var placeholderLabel: UILabel = {
         let label = UILabel()
-        label.attributedText = .pretendard(.body_r_16, text: "What’s been going on today?")
+        label.attributedText = .pretendard(.body_r_15, text: "What’s been going on today?")
         label.textColor = .gray400
         return label
     }()
