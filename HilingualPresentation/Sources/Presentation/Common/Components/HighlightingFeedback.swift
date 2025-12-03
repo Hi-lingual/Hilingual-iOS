@@ -17,7 +17,7 @@ final class HighlightingFeedback: UIView {
     
     let originalLabel: UILabel = {
         let label = UILabel()
-        label.font = .pretendard(.body_r_16)
+        label.font = .pretendard(.body_m_15)
         label.textColor = .gray700
         label.numberOfLines = 0
         label.textAlignment = .left
@@ -27,7 +27,7 @@ final class HighlightingFeedback: UIView {
     
     let rewriteLabel: UILabel = {
         let label = UILabel()
-        label.font = .pretendard(.body_r_16)
+        label.font = .pretendard(.body_m_15)
         label.textColor = .hilingualOrange
         label.numberOfLines = 0
         label.textAlignment = .left

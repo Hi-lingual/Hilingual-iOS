@@ -106,12 +106,12 @@ final class HighlightTextView: BaseUIView {
     }
     
     func highlightCorrections(textType: String, diffRanges: [DiffRange]) {
-        let attributed = NSMutableAttributedString(attributedString: .pretendard(.body_r_16, text: textType, lineBreakMode: .byWordWrapping))
+        let attributed = NSMutableAttributedString(attributedString: .pretendard(.body_r_15, text: textType, lineBreakMode: .byWordWrapping))
         attributed.addAttribute(.foregroundColor, value: UIColor.hilingualBlack, range: NSRange(location: 0, length: attributed.length))
         
         for range in diffRanges {
             let nsRange = NSRange(location: range.start, length: range.end - range.start)
-            attributed.addAttributes([.font: UIFont.pretendard(.body_m_16),
+            attributed.addAttributes([.font: UIFont.pretendard(.body_m_15),
                                       .foregroundColor: UIColor.hilingualOrange],
                                      range: nsRange)
         }
@@ -124,7 +124,7 @@ final class HighlightTextView: BaseUIView {
             highlightCorrections(textType: highlightText, diffRanges: diffRanges)
             textCountLabel.text = "\(highlightText.count)/1500"
         } else {
-            let attr = NSMutableAttributedString(attributedString: .pretendard(.body_r_16, text: originalText, lineBreakMode: .byWordWrapping, forceWrap: true))
+            let attr = NSMutableAttributedString(attributedString: .pretendard(.body_r_15, text: originalText, lineBreakMode: .byWordWrapping, forceWrap: true))
             attr.addAttribute(.foregroundColor, value: UIColor.hilingualBlack, range: NSRange(location: 0, length: attr.length))
             textView.attributedText = attr
             textCountLabel.text = "\(originalText.count)/1000"
