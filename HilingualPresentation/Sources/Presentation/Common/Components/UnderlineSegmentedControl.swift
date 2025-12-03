@@ -78,7 +78,7 @@ final class UnderlineSegmentedControl: UIView {
             button.setTitleColor(isSelected ? .black : .gray500, for: .normal)
             button.titleLabel?.font = isSelected
                 ? UIFont.pretendard(.head_sb_18)
-                : UIFont.pretendard(.head_r_18)
+                : UIFont.pretendard(.head_m_18)
         }
 
         let selectedButton = buttons[selectedIndex]
