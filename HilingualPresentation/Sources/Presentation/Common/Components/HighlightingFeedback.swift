@@ -124,8 +124,8 @@ final class HighlightingFeedback: UIView {
     }
     
     func configure(original: String, rewrite: String, explanation: String) {
-        originalLabel.attributedText = .pretendard(.body_r_16, text: original)
-        rewriteLabel.attributedText = .pretendard(.body_m_16, text: rewrite)
+        originalLabel.attributedText = .pretendard(.body_r_15, text: original)
+        rewriteLabel.attributedText = .pretendard(.body_m_15, text: rewrite)
         explainLabel.attributedText = .pretendard(.body_m_14, text: explanation)
     }
 }

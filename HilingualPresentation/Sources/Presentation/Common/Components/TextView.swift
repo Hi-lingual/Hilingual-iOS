@@ -107,7 +107,7 @@ final class TextView: UIView {
     
     private func setDelegate() {
         textView.delegate = self
-        setTypingAttributesToPretendardBodyR16()
+        setTypingAttributesToPretendardBodyR15()
         updateUI()
     }
     
@@ -125,15 +125,15 @@ final class TextView: UIView {
     
     func configure(text: String) {
         let limitedText = String(text.prefix(maxCharacterCount))
-        textView.attributedText = .pretendard(.body_r_16, text: limitedText, lineBreakMode: .byWordWrapping, forceWrap: true)
-        setTypingAttributesToPretendardBodyR16()
+        textView.attributedText = .pretendard(.body_r_15, text: limitedText, lineBreakMode: .byWordWrapping, forceWrap: true)
+        setTypingAttributesToPretendardBodyR15()
         updateUI()
         scrollToTop()
     }
     
     // MARK: - Helper
-    private func setTypingAttributesToPretendardBodyR16() {
-        let probe = NSAttributedString.pretendard(.body_r_16, text: " ", lineBreakMode: .byWordWrapping, forceWrap: true)
+    private func setTypingAttributesToPretendardBodyR15() {
+        let probe = NSAttributedString.pretendard(.body_r_15, text: " ", lineBreakMode: .byWordWrapping, forceWrap: true)
         let attrs = probe.attributes(at: 0, effectiveRange: nil)
         textView.typingAttributes = attrs
     }

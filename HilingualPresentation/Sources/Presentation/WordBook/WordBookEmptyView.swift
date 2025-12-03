@@ -34,7 +34,7 @@ final class WordBookEmptyView: UIView {
     public let emptyButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitleColor(.white, for: .normal)
-        button.titleLabel?.font = .pretendard(.body_r_16)
+        button.titleLabel?.font = .pretendard(.body_m_16)
         button.backgroundColor = .hilingualBlack
         button.layer.cornerRadius = 8
         button.clipsToBounds = true

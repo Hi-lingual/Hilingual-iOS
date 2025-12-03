@@ -310,7 +310,7 @@ final class FeedCell: UITableViewCell {
         sharedDateLabel.text = sharedDateMinutes.timeToText
 
         if let preview = diaryPreviewText {
-            diaryLabel.attributedText = .pretendard(.body_r_16, text: preview)
+            diaryLabel.attributedText = .pretendard(.body_r_15, text: preview)
         }
 
         if let urlString = profileImageURL?.trimmingCharacters(in: .whitespacesAndNewlines),
@@ -357,7 +357,7 @@ final class FeedCell: UITableViewCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         profileImageView.kf.cancelDownloadTask()
-        diaryLabel.attributedText = .pretendard(.body_r_16, text: "")
+        diaryLabel.attributedText = .pretendard(.body_r_15, text: "")
         diaryImageView.kf.cancelDownloadTask()
         diaryImageView.isHidden = false
         diaryImageView.snp.remakeConstraints {
