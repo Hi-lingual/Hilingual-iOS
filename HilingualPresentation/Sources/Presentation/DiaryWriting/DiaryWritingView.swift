@@ -29,7 +29,7 @@ final class DiaryWritingView: BaseUIView {
     
     let dateLabel: UILabel = {
         let label = UILabel()
-        label.attributedText = .suit(.body_sb_16, text: "")
+        label.attributedText = .pretendard(.body_m_16, text: "")
         label.textAlignment = .center
         label.textColor = .gray850
         return label
@@ -40,7 +40,7 @@ final class DiaryWritingView: BaseUIView {
         var config = UIButton.Configuration.plain()
         
         let attrTitle = AttributedString("텍스트 스캔하기", attributes: AttributeContainer([
-            .font: UIFont.suit(.caption_r_14)
+            .font: UIFont.pretendard(.body_r_14)
         ]))
         config.attributedTitle = attrTitle
         config.image = UIImage(resource: .icScan16Ios)
@@ -297,7 +297,7 @@ final class DiaryWritingView: BaseUIView {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "ko_KR")
         formatter.dateFormat = "M월 d일 EEEE"
-        dateLabel.attributedText = .suit(.body_sb_16, text: formatter.string(from: date))
+        dateLabel.attributedText = .pretendard(.body_m_16, text: formatter.string(from: date))
     }
     
     // MARK: - Keyboard Handling

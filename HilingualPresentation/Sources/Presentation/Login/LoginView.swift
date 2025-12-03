@@ -42,7 +42,7 @@ final class LoginView: BaseUIView {
 
         let titleLabel = UILabel()
         titleLabel.text = "Apple로 계속하기"
-        titleLabel.font = .suit(.body_sb_16)
+        titleLabel.font = .pretendard(.body_m_16)
         titleLabel.textColor = .white
         titleLabel.textAlignment = .center
 
@@ -72,7 +72,7 @@ final class LoginView: BaseUIView {
             attributes: [
                 .underlineStyle: NSUnderlineStyle.single.rawValue,
                 .foregroundColor: UIColor.white,
-                .font: UIFont.suit(.body_m_14)
+                .font: UIFont.pretendard(.body_r_14)
             ]
         )
 

@@ -32,7 +32,7 @@ final class BlockUserView: BaseUIView {
     private let messageLabel: UILabel = {
         let label = UILabel()
         label.text = "차단된 계정이 없어요."
-        label.font = .suit(.head_m_18)
+        label.font = .pretendard(.head_r_18)
         label.textColor = .gray500
         label.textAlignment = .center
         return label

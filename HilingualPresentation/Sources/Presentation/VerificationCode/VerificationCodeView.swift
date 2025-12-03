@@ -21,7 +21,7 @@ final class VerificationCodeView: BaseUIView {
     let titleLabel: UILabel = {
         let label = UILabel()
         label.text = "인증번호 입력"
-        label.font = .suit(.head_b_18)
+        label.font = .pretendard(.head_sb_18)
         label.textColor = .black
         label.textAlignment = .center
         return label
@@ -45,7 +45,7 @@ final class VerificationCodeView: BaseUIView {
     let questionTitleLabel: UILabel = {
         let label = UILabel()
         label.text = "Q. 인증 번호란?"
-        label.font = .suit(.head_b_16)
+        label.font = .pretendard(.head_sb_16)
         label.textColor = .label
         return label
     }()
@@ -53,7 +53,7 @@ final class VerificationCodeView: BaseUIView {
     let guideLabel: UILabel = {
         let label = UILabel()
         label.text = "사전 예약을 신청한 분들을 대상으로 가입 인증 번호가 발급되었어요. 인증 번호를 보유하신 경우에만 가입이 가능해요.\n\n알림을 신청한 이메일을 확인해주세요."
-        label.font = .suit(.body_m_14)
+        label.font = .pretendard(.body_r_14)
         label.textColor = .gray500
         label.numberOfLines = 0
         return label
@@ -66,7 +66,7 @@ final class VerificationCodeView: BaseUIView {
         let attr = NSAttributedString(
             string: title,
             attributes: [
-                .font: UIFont.suit(.body_m_14),
+                .font: UIFont.pretendard(.body_r_14),
                 .foregroundColor: color,
                 .underlineStyle: NSUnderlineStyle.single.rawValue,
                 .underlineColor: color

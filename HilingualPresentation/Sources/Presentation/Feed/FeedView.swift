@@ -32,7 +32,7 @@ final class FeedView: BaseUIView {
 
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.font = .suit(.head_b_18)
+        label.font = .pretendard(.head_sb_18)
         label.text = "피드"
         return label
     }()

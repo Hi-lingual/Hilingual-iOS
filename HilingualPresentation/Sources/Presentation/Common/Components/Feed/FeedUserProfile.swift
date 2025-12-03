@@ -51,7 +51,7 @@ final class FeedUserProfile: UIView {
     
     private let nameLabel: UILabel = {
         let label = UILabel()
-        label.font = .suit(.head_b_18)
+        label.font = .pretendard(.head_sb_18)
         label.textColor = .black
         label.textAlignment = .left
         return label
@@ -67,7 +67,7 @@ final class FeedUserProfile: UIView {
 
     private let followerCountLabel: UILabel = {
         let label = UILabel()
-        label.font = .suit(.body_b_14)
+        label.font = .pretendard(.body_sb_14)
         label.textColor = .gray400
         label.textAlignment = .left
         return label
@@ -75,7 +75,7 @@ final class FeedUserProfile: UIView {
 
     private let followerTitleLabel: UILabel = {
         let label = UILabel()
-        label.font = .suit(.caption_r_14)
+        label.font = .pretendard(.body_r_14)
         label.textColor = .gray400
         label.text = "팔로워"
         label.textAlignment = .left
@@ -90,7 +90,7 @@ final class FeedUserProfile: UIView {
 
     private let followingCountLabel: UILabel = {
         let label = UILabel()
-        label.font = .suit(.body_b_14)
+        label.font = .pretendard(.body_sb_14)
         label.textColor = .gray400
         label.textAlignment = .left
         return label
@@ -98,7 +98,7 @@ final class FeedUserProfile: UIView {
 
     private let followingTitleLabel: UILabel = {
         let label = UILabel()
-        label.font = .suit(.caption_r_14)
+        label.font = .pretendard(.body_r_14)
         label.textColor = .gray400
         label.text = "팔로잉"
         label.textAlignment = .left
@@ -122,7 +122,7 @@ final class FeedUserProfile: UIView {
 
     private let streakLabel: UILabel = {
         let label = UILabel()
-        label.font = .suit(.caption_r_14)
+        label.font = .pretendard(.body_r_14)
         label.textAlignment = .left
         return label
     }()

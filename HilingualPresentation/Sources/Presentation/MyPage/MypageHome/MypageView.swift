@@ -33,7 +33,7 @@ final class MypageView: BaseUIView {
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.text = "마이페이지"
-        label.font = .suit(.head_b_18)
+        label.font = .pretendard(.head_sb_18)
         label.textColor = .black
         return label
     }()
@@ -66,7 +66,7 @@ final class MypageView: BaseUIView {
     let nicknameLabel: UILabel = {
         let label = UILabel()
         label.text = "내 닉네임"
-        label.font = .suit(.head_b_18)
+        label.font = .pretendard(.head_sb_18)
         label.textColor = .black
         return label
     }()
@@ -83,7 +83,7 @@ final class MypageView: BaseUIView {
         button.setTitle("나의 피드", for: .normal)
         button.setTitleColor(.white, for: .normal)
         button.backgroundColor = .black
-        button.titleLabel?.font = .suit(.body_sb_14)
+        button.titleLabel?.font = .pretendard(.body_m_14)
         button.layer.cornerRadius = 4
         return button
     }()
@@ -91,7 +91,7 @@ final class MypageView: BaseUIView {
     let versionLabel: UILabel = {
         let label = UILabel()
         label.text = "버전 정보"
-        label.font = .suit(.body_m_14)
+        label.font = .pretendard(.body_r_14)
         label.textColor = .gray700
         return label
     }()
@@ -106,7 +106,7 @@ final class MypageView: BaseUIView {
     let versionValueLabel: UILabel = {
         let label = UILabel()
         label.text = "1.01.01"
-        label.font = .suit(.caption_r_14)
+        label.font = .pretendard(.body_r_14)
         label.textColor = .gray400
         return label
     }()
@@ -252,7 +252,7 @@ final class MypageView: BaseUIView {
 
         let titleLabel = UILabel()
         titleLabel.text = title
-        titleLabel.font = .suit(.body_m_14)
+        titleLabel.font = .pretendard(.body_r_14)
         titleLabel.textColor = .black
 
         let chevron = UIImageView(image: UIImage(named: "ic_arrow_right_g_24_ios", in: .module, compatibleWith: nil))

@@ -13,7 +13,7 @@ final class ProfileView: UIView {
     
     private let nameLabel: UILabel = {
         let label = UILabel()
-        label.font = .suit(.head_b_18)
+        label.font = .pretendard(.head_sb_18)
         label.textColor = .white
         return label
     }()
@@ -35,7 +35,7 @@ final class ProfileView: UIView {
     
     private let totalLabel: UILabel = {
         let label = UILabel()
-        label.font = .suit(.caption_m_12)
+        label.font = .pretendard(.cap_r_12)
         label.textColor = .white
         return label
     }()
@@ -56,7 +56,7 @@ final class ProfileView: UIView {
     
     private let streakLabel: UILabel = {
         let label = UILabel()
-        label.font = .suit(.caption_m_12)
+        label.font = .pretendard(.cap_r_12)
         label.textColor = .white
         return label
     }()

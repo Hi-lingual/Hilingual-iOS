@@ -47,7 +47,7 @@ final class AgreementRow: UIControl {
     // MARK: - UI Setup
     
     private func setupUI() {
-        titleLabel.font = isBold ? .suit(.body_sb_16) : .suit(.body_sb_14)
+        titleLabel.font = isBold ? .pretendard(.body_m_16) : .pretendard(.body_sb_14)
         titleLabel.textColor = .gray
         titleLabel.isUserInteractionEnabled = true
         updateTitleUnderline()
@@ -81,7 +81,7 @@ final class AgreementRow: UIControl {
         
         if onTapLink != nil {
             let attributes: [NSAttributedString.Key: Any] = [
-                .font: isBold ? UIFont.suit(.body_sb_16) : UIFont.suit(.body_sb_14),
+                .font: isBold ? UIFont.pretendard(.body_m_16) : UIFont.pretendard(.body_sb_14),
                 .foregroundColor: textColor,
                 .underlineStyle: NSUnderlineStyle.single.rawValue
             ]
@@ -90,7 +90,7 @@ final class AgreementRow: UIControl {
             titleLabel.attributedText = NSAttributedString(
                 string: title,
                 attributes: [
-                    .font: isBold ? UIFont.suit(.body_sb_16) : UIFont.suit(.body_sb_14),
+                    .font: isBold ? UIFont.pretendard(.body_m_16) : UIFont.pretendard(.body_sb_14),
                     .foregroundColor: textColor
                 ]
             )

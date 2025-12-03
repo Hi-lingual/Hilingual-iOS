@@ -32,7 +32,7 @@ final class BlockModal: UIView {
 
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.font = .suit(.head_b_18)
+        label.font = .pretendard(.head_sb_18)
         label.textColor = .black
         label.textAlignment = .left
         label.text = "정말 차단하실 건가요?"
@@ -41,7 +41,7 @@ final class BlockModal: UIView {
     
     private let infoLabel: UILabel = {
         let label = UILabel()
-        label.font = .suit(.body_m_14)
+        label.font = .pretendard(.body_r_14)
         label.textColor = .gray400
         label.numberOfLines = 0
         label.textAlignment = .left
@@ -81,7 +81,7 @@ final class BlockModal: UIView {
     
     private let blockedUserInfoLabel: UILabel = {
         let label = UILabel()
-        label.font = .suit(.body_m_14)
+        label.font = .pretendard(.body_r_14)
         label.textColor = .gray850
         label.text = "상대의 모든 활동을 확인할 수 없어요."
         return label
@@ -89,7 +89,7 @@ final class BlockModal: UIView {
     
     private let blockedByMeInfoLabel: UILabel = {
         let label = UILabel()
-        label.font = .suit(.body_m_14)
+        label.font = .pretendard(.body_r_14)
         label.textColor = .gray850
         label.text = "상대는 나의 모든 활동을 확인할 수 없어요."
         return label

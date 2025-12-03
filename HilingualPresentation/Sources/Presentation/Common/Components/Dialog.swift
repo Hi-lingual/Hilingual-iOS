@@ -42,7 +42,7 @@ final class Dialog: UIView {
 
     private let dialogTitleLabel: UILabel = {
         let label = UILabel()
-        label.font = .suit(.head_b_16)
+        label.font = .pretendard(.head_sb_16)
         label.textColor = .gray850
         label.textAlignment = .center
         label.numberOfLines = 1
@@ -51,7 +51,7 @@ final class Dialog: UIView {
 
     private let dialogContentLabel: UILabel = {
         let label = UILabel()
-        label.font = .suit(.caption_r_14)
+        label.font = .pretendard(.body_r_14)
         label.textColor = .gray400
         label.lineBreakMode = .byCharWrapping
         label.textAlignment = .center
@@ -62,7 +62,7 @@ final class Dialog: UIView {
     public let leftButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitleColor(.gray400, for: .normal)
-        button.titleLabel?.font = .suit(.body_sb_16)
+        button.titleLabel?.font = .pretendard(.body_m_16)
         button.backgroundColor = .gray100
         button.layer.cornerRadius = 8
         button.clipsToBounds = true
@@ -72,7 +72,7 @@ final class Dialog: UIView {
     public let rightButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitleColor(.white, for: .normal)
-        button.titleLabel?.font = .suit(.body_sb_16)
+        button.titleLabel?.font = .pretendard(.body_m_16)
         button.backgroundColor = .hilingualOrange
         button.layer.cornerRadius = 8
         button.clipsToBounds = true
@@ -244,10 +244,10 @@ extension Dialog {
         }
 
         if let leftTitle = leftButtonTitle {
-            leftButton.setAttributedTitle(.suit(.body_sb_16, text: leftTitle), for: .normal)
+            leftButton.setAttributedTitle(.pretendard(.body_m_16, text: leftTitle), for: .normal)
         }
 
-        rightButton.setAttributedTitle(.suit(.body_sb_16, text: rightButtonTitle), for: .normal)
+        rightButton.setAttributedTitle(.pretendard(.body_m_16, text: rightButtonTitle), for: .normal)
 
         self.leftAction = leftAction
         self.rightAction = rightAction

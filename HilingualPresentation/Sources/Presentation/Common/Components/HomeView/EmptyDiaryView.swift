@@ -13,7 +13,7 @@ final class EmptyDiaryView: UIView {
     private let emptyDiaryLabel: UILabel = {
         let label = UILabel()
         label.text = "작성된 일기가 없어요.\n좋은 하루 보내셨기를 바라요!"
-        label.font = .suit(.body_sb_14)
+        label.font = .pretendard(.body_m_14)
         label.textColor = .gray400
         label.numberOfLines = 2
         label.textAlignment = .center

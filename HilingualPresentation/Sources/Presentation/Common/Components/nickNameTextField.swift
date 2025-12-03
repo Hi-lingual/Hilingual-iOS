@@ -33,7 +33,7 @@ final class nickNameTextField: BaseUIView {
 
     let textField:  UITextField = {
         let textField = UITextField()
-        textField.attributedText = .suit(.body_sb_16, text: "")
+        textField.attributedText = .pretendard(.body_m_16, text: "")
         textField.borderStyle = .none
         textField.layer.cornerRadius = 8
         textField.layer.borderWidth = 1
@@ -43,7 +43,7 @@ final class nickNameTextField: BaseUIView {
 
     private let messageLabel: UILabel = {
         let label = UILabel()
-        label.font = .suit(.caption_r_12)
+        label.font = .pretendard(.cap_r_12)
         label.textColor = .systemRed
         label.numberOfLines = 0
         return label
@@ -114,7 +114,7 @@ final class nickNameTextField: BaseUIView {
             string: text,
             attributes: [
                 .foregroundColor: UIColor.gray400,
-                .font: UIFont.suit(.body_m_16)
+                .font: UIFont.pretendard(.body_r_16)
             ]
         )
     }
@@ -209,7 +209,7 @@ final class nickNameTextField: BaseUIView {
         let current = textField.text ?? ""
         let noSpaces = current.replacingOccurrences(of: " ", with: "")
         let trimmed = noSpaces.count > maxLength ? String(noSpaces.prefix(maxLength)) : noSpaces
-        textField.attributedText = .suit(.body_sb_16, text: trimmed)
+        textField.attributedText = .pretendard(.body_m_16, text: trimmed)
         updateCharacterCount()
     }
 

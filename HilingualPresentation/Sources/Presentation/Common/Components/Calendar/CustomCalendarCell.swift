@@ -28,7 +28,7 @@ final class CustomCalendarCell: UICollectionViewCell {
         contentView.addSubview(dayLabel)
         contentView.addSubview(dotView)
 
-        dayLabel.font = .suit(.body_sb_14)
+        dayLabel.font = .pretendard(.body_m_14)
         dayLabel.textColor = .black
 
         dotView.backgroundColor = .hilingualBlue
@@ -63,7 +63,7 @@ final class CustomCalendarCell: UICollectionViewCell {
         isWithinMonth: Bool
     ) {
         dayLabel.text = "\(day)"
-        dayLabel.font = .suit(.body_sb_14)
+        dayLabel.font = .pretendard(.body_m_14)
 
         if isWithinMonth {
             dayLabel.textColor = .black // 기본 표시

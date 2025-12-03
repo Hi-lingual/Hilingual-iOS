@@ -75,7 +75,7 @@ final class LikeCounterView: UIView {
 
         switch style {
         case .horizontal:
-            countLabel.font = .suit(.body_sb_14)
+            countLabel.font = .pretendard(.body_m_14)
 
             likeButton.snp.makeConstraints {
                 $0.top.bottom.leading.equalToSuperview()
@@ -88,7 +88,7 @@ final class LikeCounterView: UIView {
             }
 
         case .vertical:
-            countLabel.font = .suit(.caption_m_12)
+            countLabel.font = .pretendard(.cap_r_12)
 
             likeButton.snp.makeConstraints {
                 $0.top.leading.trailing.equalToSuperview()

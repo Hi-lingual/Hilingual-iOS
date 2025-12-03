@@ -26,7 +26,7 @@ final class WordBookHeaderView: UITableViewHeaderFooterView {
 
     private func setupUI() {
         contentView.backgroundColor = .clear
-        titleLabel.font = .suit(.body_sb_16)
+        titleLabel.font = .pretendard(.body_m_16)
         contentView.addSubview(titleLabel)
     }
 
@@ -40,7 +40,7 @@ final class WordBookHeaderView: UITableViewHeaderFooterView {
 
     func configure(title: String) {
         let translated = translateHeaderTitle(title)
-        titleLabel.attributedText = .suit(.body_sb_16, text: translated)
+        titleLabel.attributedText = .pretendard(.body_m_16, text: translated)
     }
 
     private func translateHeaderTitle(_ key: String) -> String {

@@ -78,7 +78,7 @@ final class FeedCell: UITableViewCell {
     
     private let nameLabel: UILabel = {
         let label = UILabel()
-        label.font = .suit(.head_b_16)
+        label.font = .pretendard(.head_sb_16)
         label.textColor = .gray850
         label.numberOfLines = 1
         label.setContentHuggingPriority(.required, for: .horizontal)
@@ -102,13 +102,13 @@ final class FeedCell: UITableViewCell {
 
     private let streakLabel: UILabel = {
         let label = UILabel()
-        label.font = .suit(.caption_r_14)
+        label.font = .pretendard(.body_r_14)
         return label
     }()
 
     private let sharedDateLabel: UILabel = {
         let label = UILabel()
-        label.font = .suit(.caption_m_12)
+        label.font = .pretendard(.cap_r_12)
         label.textColor = .gray400
         label.setContentHuggingPriority(.defaultLow, for: .horizontal)
         return label
@@ -125,7 +125,7 @@ final class FeedCell: UITableViewCell {
 
     private let diaryLabel: UILabel = {
         let label = UILabel()
-        label.attributedText = .suit(.body_r_16, text: "")
+        label.attributedText = .pretendard(.body_r_16, text: "")
         label.textColor = .black
         label.lineBreakMode = .byTruncatingTail
         label.numberOfLines = 5
@@ -163,7 +163,7 @@ final class FeedCell: UITableViewCell {
         let label = UILabel()
         label.text = "상세보기"
         label.textColor = .gray400
-        label.font = .suit(.caption_r_14)
+        label.font = .pretendard(.body_r_14)
         return label
     }()
 
@@ -310,7 +310,7 @@ final class FeedCell: UITableViewCell {
         sharedDateLabel.text = sharedDateMinutes.timeToText
 
         if let preview = diaryPreviewText {
-            diaryLabel.attributedText = .suit(.body_r_16, text: preview)
+            diaryLabel.attributedText = .pretendard(.body_r_16, text: preview)
         }
 
         if let urlString = profileImageURL?.trimmingCharacters(in: .whitespacesAndNewlines),
@@ -357,7 +357,7 @@ final class FeedCell: UITableViewCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         profileImageView.kf.cancelDownloadTask()
-        diaryLabel.attributedText = .suit(.body_r_16, text: "")
+        diaryLabel.attributedText = .pretendard(.body_r_16, text: "")
         diaryImageView.kf.cancelDownloadTask()
         diaryImageView.isHidden = false
         diaryImageView.snp.remakeConstraints {

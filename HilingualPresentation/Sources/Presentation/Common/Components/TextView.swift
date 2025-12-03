@@ -33,8 +33,8 @@ final class TextView: UIView {
     private let textView: UITextView = {
         let textView = UITextView()
         textView.backgroundColor = .gray100
-        textView.font = .suit(.body_r_16)
-        textView.attributedText = .suit(.body_r_16, text: "", lineBreakMode: .byWordWrapping, forceWrap: true)
+        textView.font = .pretendard(.body_r_16)
+        textView.attributedText = .pretendard(.body_r_16, text: "", lineBreakMode: .byWordWrapping, forceWrap: true)
         textView.textColor = .black
         textView.isScrollEnabled = true
         textView.textContainer.lineBreakMode = .byWordWrapping
@@ -47,14 +47,14 @@ final class TextView: UIView {
     
     private var placeholderLabel: UILabel = {
         let label = UILabel()
-        label.attributedText = .suit(.body_r_16, text: "What’s been going on today?")
+        label.attributedText = .pretendard(.body_r_16, text: "What’s been going on today?")
         label.textColor = .gray400
         return label
     }()
 
     private var countLabel: UILabel = {
         let label = UILabel()
-        label.font = .suit(.caption_r_12)
+        label.font = .pretendard(.cap_r_12)
         label.textColor = .gray400
         label.textAlignment = .right
         return label
@@ -107,7 +107,7 @@ final class TextView: UIView {
     
     private func setDelegate() {
         textView.delegate = self
-        setTypingAttributesToSuitBodyR16()
+        setTypingAttributesToPretendardBodyR16()
         updateUI()
     }
     
@@ -125,15 +125,15 @@ final class TextView: UIView {
     
     func configure(text: String) {
         let limitedText = String(text.prefix(maxCharacterCount))
-        textView.attributedText = .suit(.body_r_16, text: limitedText, lineBreakMode: .byWordWrapping, forceWrap: true)
-        setTypingAttributesToSuitBodyR16()
+        textView.attributedText = .pretendard(.body_r_16, text: limitedText, lineBreakMode: .byWordWrapping, forceWrap: true)
+        setTypingAttributesToPretendardBodyR16()
         updateUI()
         scrollToTop()
     }
     
     // MARK: - Helper
-    private func setTypingAttributesToSuitBodyR16() {
-        let probe = NSAttributedString.suit(.body_r_16, text: " ", lineBreakMode: .byWordWrapping, forceWrap: true)
+    private func setTypingAttributesToPretendardBodyR16() {
+        let probe = NSAttributedString.pretendard(.body_r_16, text: " ", lineBreakMode: .byWordWrapping, forceWrap: true)
         let attrs = probe.attributes(at: 0, effectiveRange: nil)
         textView.typingAttributes = attrs
     }

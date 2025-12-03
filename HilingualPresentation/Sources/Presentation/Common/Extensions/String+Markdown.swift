@@ -8,7 +8,7 @@
 import UIKit
 
 extension String {
-    func toMarkdownAttributedString(font: UIFont = .suit(.body_m_16),
+    func toMarkdownAttributedString(font: UIFont = .pretendard(.body_r_16),
                                      textColor: UIColor = .gray850) -> NSAttributedString {
         let components = self.components(separatedBy: "\n\n")
         let result = NSMutableAttributedString()

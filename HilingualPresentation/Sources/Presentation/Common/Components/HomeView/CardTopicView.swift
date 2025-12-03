@@ -21,7 +21,7 @@ final class CardTopicView: UIView {
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.text = "오늘의 추천 주제"
-        label.font = .suit(.caption_m_12)
+        label.font = .pretendard(.cap_r_12)
         label.textColor = .gray500
         label.numberOfLines = 2
         return label
@@ -48,7 +48,7 @@ final class CardTopicView: UIView {
 
     private let topicKorLabel: UILabel = {
         let label = UILabel()
-        label.font = .suit(.body_sb_16)
+        label.font = .pretendard(.body_m_16)
         label.textColor = .gray700
         label.numberOfLines = 2
         return label
@@ -56,7 +56,7 @@ final class CardTopicView: UIView {
 
     private let topicEnLabel: UILabel = {
         let label = UILabel()
-        label.font = .suit(.body_sb_16)
+        label.font = .pretendard(.body_m_16)
         label.textColor = .gray700
         label.numberOfLines = 2
         return label
@@ -170,8 +170,8 @@ final class CardTopicView: UIView {
         let korText = kor ?? "한글 주제 아직 없지롱"
         let enText  = en  ?? "Bringing up the English topic"
         
-        topicKorLabel.attributedText = .suit(.body_sb_16, text: korText)
-        topicEnLabel.attributedText  = .suit(.body_sb_16, text: enText)
+        topicKorLabel.attributedText = .pretendard(.body_m_16, text: korText)
+        topicEnLabel.attributedText  = .pretendard(.body_m_16, text: enText)
         
         if let kor = kor, let en = en {
             topicData = (kor, en)

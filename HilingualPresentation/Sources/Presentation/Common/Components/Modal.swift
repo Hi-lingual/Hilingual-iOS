@@ -26,7 +26,7 @@ final class Modal: UIView {
     private let modalLabel: UILabel = {
         let label = UILabel()
         label.text = "이미지 선택하기"
-        label.font = .suit(.head_b_16)
+        label.font = .pretendard(.head_sb_16)
         label.textColor = .black
         label.textAlignment = .center
         return label
@@ -34,7 +34,7 @@ final class Modal: UIView {
     
     private let subtitleLabel: UILabel = {
         let label = UILabel()
-        label.font = .suit(.caption_r_14)
+        label.font = .pretendard(.body_r_14)
         label.textColor = .gray400
         label.textAlignment = .center
         label.numberOfLines = 0
@@ -145,7 +145,7 @@ final class Modal: UIView {
             var config = UIButton.Configuration.plain()
             
             let attributedTitle = AttributedString(title, attributes: AttributeContainer([
-                .font: UIFont.suit(.body_sb_14),
+                .font: UIFont.pretendard(.body_m_14),
                 .foregroundColor: UIColor.gray700
             ]))
             
@@ -177,7 +177,7 @@ final class Modal: UIView {
             var config = UIButton.Configuration.plain()
             
             let attributedTitle = AttributedString(title, attributes: AttributeContainer([
-                .font: UIFont.suit(.body_sb_14),
+                .font: UIFont.pretendard(.body_m_14),
                 .foregroundColor: UIColor.gray700
             ]))
             
@@ -196,7 +196,7 @@ final class Modal: UIView {
     }
 
 
-    public func applyStyle(to index: Int, titleColor: UIColor, font: UIFont = .suit(.body_sb_14)) {
+    public func applyStyle(to index: Int, titleColor: UIColor, font: UIFont = .pretendard(.body_m_14)) {
         guard buttons.indices.contains(index) else { return }
         let button = buttons[index]
         
@@ -241,7 +241,7 @@ final class Modal: UIView {
 }
 
 extension UIButton {
-    func applyStyle(titleColor: UIColor, font: UIFont = .suit(.body_sb_14)) {
+    func applyStyle(titleColor: UIColor, font: UIFont = .pretendard(.body_m_14)) {
         let title = self.currentTitle ?? ""
         let attributed = NSAttributedString(
             string: title,

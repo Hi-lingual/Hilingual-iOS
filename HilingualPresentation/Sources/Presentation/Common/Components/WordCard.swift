@@ -71,7 +71,7 @@ final class WordCard: UIView {
         
         switch type {
         case .basic:
-            phraseLabel.font = .suit(.head_m_18)
+            phraseLabel.font = .pretendard(.head_r_18)
 
             explanationLabel.isHidden = true
             reasonLabel.isHidden = true
@@ -95,9 +95,9 @@ final class WordCard: UIView {
             }
 
         case .withExample:
-            phraseLabel.attributedText = .suit(.body_sb_16, text: data.phrase)
-            explanationLabel.font = .suit(.body_b_14)
-            reasonLabel.font = .suit(.caption_m_12)
+            phraseLabel.attributedText = .pretendard(.body_m_16, text: data.phrase)
+            explanationLabel.font = .pretendard(.body_sb_14)
+            reasonLabel.font = .pretendard(.cap_r_12)
             
             savedDateLabel.isHidden = true
             
@@ -119,9 +119,9 @@ final class WordCard: UIView {
             }
 
         case .withDate:
-            phraseLabel.font = .suit(.body_m_20)
-            explanationLabel.font = .suit(.body_m_14)
-            savedDateLabel.font = .suit(.caption_m_12)
+            phraseLabel.font = .pretendard(.head_r_20)
+            explanationLabel.font = .pretendard(.body_r_14)
+            savedDateLabel.font = .pretendard(.cap_r_12)
             
             phraseLabel.numberOfLines = 2
             reasonLabel.isHidden = true
@@ -168,10 +168,10 @@ final class WordCard: UIView {
 
         explanationLabel.numberOfLines = 0
         reasonLabel.numberOfLines = 0
-        reasonLabel.font = .suit(.caption_m_12)
+        reasonLabel.font = .pretendard(.cap_r_12)
         reasonLabel.textColor = .gray700
 
-        savedDateLabel.font = .suit(.caption_m_12)
+        savedDateLabel.font = .pretendard(.cap_r_12)
         savedDateLabel.textColor = .gray400
 
         bookmarkButton.addTarget(self, action: #selector(didTapBookmark), for: .touchUpInside)

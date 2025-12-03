@@ -44,7 +44,7 @@ final class FollowButton: UIButton {
     // MARK: - Setup Methods
     
     private func setStyle() {
-        titleLabel?.font = .suit(.body_sb_14)
+        titleLabel?.font = .pretendard(.body_m_14)
         layer.cornerRadius = 4
         clipsToBounds = true
         

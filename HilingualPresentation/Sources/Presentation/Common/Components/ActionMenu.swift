@@ -117,7 +117,7 @@ final class ActionMenu: UIView {
 
         let titleLabel = UILabel()
         titleLabel.text = title
-        titleLabel.font = .suit(.body_sb_14)
+        titleLabel.font = .pretendard(.body_m_14)
         titleLabel.textColor = titleColor
 
         stackView.addArrangedSubviews(iconView, titleLabel)

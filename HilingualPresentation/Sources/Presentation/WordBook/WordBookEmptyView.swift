@@ -25,7 +25,7 @@ final class WordBookEmptyView: UIView {
 
     private let emptyLabel: UILabel = {
         let label = UILabel()
-        label.font = .suit(.head_m_18)
+        label.font = .pretendard(.head_r_18)
         label.textColor = .gray500
         label.textAlignment = .center
         return label
@@ -34,7 +34,7 @@ final class WordBookEmptyView: UIView {
     public let emptyButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitleColor(.white, for: .normal)
-        button.titleLabel?.font = .suit(.body_m_16)
+        button.titleLabel?.font = .pretendard(.body_r_16)
         button.backgroundColor = .hilingualBlack
         button.layer.cornerRadius = 8
         button.clipsToBounds = true
@@ -89,7 +89,7 @@ final class WordBookEmptyView: UIView {
             emptyImageView.image = UIImage(named: "img_word_ios", in: .module, compatibleWith: nil)
             emptyImageView.isHidden = false
             emptyLabel.text = "아직 단어가 추가되지 않았어요."
-            emptyButton.setAttributedTitle(.suit(.body_m_16, text: "일기 쓰고 단어 추가하기"), for: .normal)
+            emptyButton.setAttributedTitle(.pretendard(.body_m_16, text: "일기 쓰고 단어 추가하기"), for: .normal)
             emptyButton.isHidden = false
 
         case .noSearchResult:

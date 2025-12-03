@@ -67,7 +67,7 @@ final class CalendarView: UIView {
         ["일", "월", "화", "수", "목", "금", "토"].forEach { symbol in
             let label = UILabel()
             label.text = symbol
-            label.font = .suit(.body_sb_12)
+            label.font = .pretendard(.body_m_12)
             label.textAlignment = .center
             label.textColor = symbol == "일" ? .alertRed : (symbol == "토" ? .infoBlue : .gray500)
             weekStackView.addArrangedSubview(label)

@@ -90,7 +90,7 @@ final class Chip: UIView {
     
     private let label: UILabel = {
         let label = UILabel()
-        label.font = .suit(.caption_m_12)
+        label.font = .pretendard(.cap_r_12)
         label.textAlignment = .center
         label.numberOfLines = 1
         return label

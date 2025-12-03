@@ -33,7 +33,7 @@ final class SelectedInfo: UIView {
 
     private let selectedDayLabel: UILabel = {
         let label = UILabel()
-        label.font = .suit(.head_b_16)
+        label.font = .pretendard(.head_sb_16)
         label.textColor = .black
         return label
     }()
@@ -47,7 +47,7 @@ final class SelectedInfo: UIView {
 
     private let notWrittenLabel: UILabel = {
         let label = UILabel()
-        label.font = .suit(.caption_m_12)
+        label.font = .pretendard(.cap_r_12)
         label.textColor = .gray300
         return label
     }()
@@ -69,7 +69,7 @@ final class SelectedInfo: UIView {
 
     private let timeLeftLabel: UILabel = {
         let label = UILabel()
-        label.font = .suit(.body_sb_14)
+        label.font = .pretendard(.body_m_14)
         label.textColor = .black
         return label
     }()

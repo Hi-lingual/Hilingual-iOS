@@ -25,7 +25,7 @@ final class CalendarHeaderView: UIView {
 
     private let textLabel: UILabel = {
         let label = UILabel()
-        label.font = .suit(.head_b_18)
+        label.font = .pretendard(.head_sb_18)
         label.textColor = .black
         return label
     }()

@@ -62,11 +62,11 @@ final class AgreementModalView: UIView {
         addSubview(modalSheetView)
 
         titleLabel.text = "하이링구얼이 처음이시군요!"
-        titleLabel.font = .suit(.head_b_18)
+        titleLabel.font = .pretendard(.head_sb_18)
         titleLabel.textColor = .black
 
         descriptionLabel.text = "아래 약관에 동의 후 서비스 이용이 가능해요."
-        descriptionLabel.font = .suit(.body_m_14)
+        descriptionLabel.font = .pretendard(.body_r_14)
         descriptionLabel.textColor = .gray
 
         allAgreeContainer.backgroundColor = .gray100

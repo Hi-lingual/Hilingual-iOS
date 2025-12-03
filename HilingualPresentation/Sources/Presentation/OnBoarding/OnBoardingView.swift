@@ -20,7 +20,7 @@ final class OnBoardingView: BaseUIView {
     let titleLabel: UILabel = {
         let label = UILabel()
         label.text = "프로필 작성"
-        label.font = .suit(.head_b_18)
+        label.font = .pretendard(.head_sb_18)
         label.textColor = .black
         label.textAlignment = .center
         return label
@@ -41,8 +41,8 @@ final class OnBoardingView: BaseUIView {
 
     let nickNameLabel: UILabel = {
         let label = UILabel()
-        label.font = .suit(.body_sb_16)
-        label.attributedText = .suit(.body_sb_16, text: "닉네임")
+        label.font = .pretendard(.body_m_16)
+        label.attributedText = .pretendard(.body_m_16, text: "닉네임")
         label.textAlignment = .left
         label.textColor = .black
         label.text = "닉네임"

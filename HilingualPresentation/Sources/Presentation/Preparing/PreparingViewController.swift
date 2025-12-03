@@ -25,7 +25,7 @@ final class PreparingViewController: UIViewController {
         label.textColor = .gray500
         label.textAlignment = .center
         label.numberOfLines = 2
-        label.font = .suit(.head_m_18)
+        label.font = .pretendard(.head_r_18)
         return label
     }()
 

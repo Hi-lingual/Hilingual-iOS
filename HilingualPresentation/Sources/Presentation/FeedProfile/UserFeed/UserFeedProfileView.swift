@@ -37,14 +37,14 @@ final class UserFeedProfileView: BaseUIView {
     
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.font = .suit(.head_b_18)
+        label.font = .pretendard(.head_sb_18)
         label.textColor = .black
         return label
     }()
     
     private let subTitleLabel: UILabel = {
         let label = UILabel()
-        label.font = .suit(.body_m_16)
+        label.font = .pretendard(.body_r_16)
         label.textColor = .gray400
         label.text = "차단을 해제하면 글을 확인할 수 있어요."
         return label

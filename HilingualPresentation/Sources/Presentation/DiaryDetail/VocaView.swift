@@ -31,7 +31,7 @@ final class RecommendedExpressionView: BaseUIView {
     
     var dateLabel: UILabel = {
         let label = UILabel()
-        label.font = .suit(.body_sb_16)
+        label.font = .pretendard(.body_m_16)
         label.textColor = .gray700
         return label
     }()
@@ -98,6 +98,6 @@ final class RecommendedExpressionView: BaseUIView {
     }
     
     func setDate(_ date: String) {
-        self.dateLabel.attributedText = .suit(.body_sb_16, text: date)
+        self.dateLabel.attributedText = .pretendard(.body_m_16, text: date)
     }
 }
