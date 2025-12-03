@@ -10,7 +10,7 @@ import UIKit
 extension UIFont {
     
     enum Family: String, CaseIterable {
-        case Bold, ExtraBold, ExtraLight, Heavy, Light, Medium, Regular, SemiBold, Thin
+        case Medium, Regular, SemiBold
     }
     
     public static func registerPretendardFonts() {
