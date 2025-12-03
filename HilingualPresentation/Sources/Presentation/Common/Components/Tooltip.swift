@@ -37,7 +37,7 @@ final class Tooltip: UIView {
     
     init(_ text: String) {
         super.init(frame: .zero)
-        tooltipLabel.attributedText = .pretendard(.body_m_16, text: text)
+        tooltipLabel.attributedText = .pretendard(.body_r_16, text: text)
         setUI()
         setLayout()
         dismissTooltip()
