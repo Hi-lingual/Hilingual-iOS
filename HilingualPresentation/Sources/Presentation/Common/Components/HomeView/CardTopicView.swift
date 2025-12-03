@@ -170,8 +170,8 @@ final class CardTopicView: UIView {
         let korText = kor ?? "한글 주제 아직 없지롱"
         let enText  = en  ?? "Bringing up the English topic"
         
-        topicKorLabel.attributedText = .pretendard(.body_m_16, text: korText)
-        topicEnLabel.attributedText  = .pretendard(.body_m_16, text: enText)
+        topicKorLabel.attributedText = .pretendard(.body_m_15, text: korText)
+        topicEnLabel.attributedText  = .pretendard(.body_m_15, text: enText)
         
         if let kor = kor, let en = en {
             topicData = (kor, en)
