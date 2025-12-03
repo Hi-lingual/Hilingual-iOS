@@ -125,7 +125,7 @@ final class FeedCell: UITableViewCell {
 
     private let diaryLabel: UILabel = {
         let label = UILabel()
-        label.attributedText = .pretendard(.body_r_16, text: "")
+        label.attributedText = .pretendard(.body_r_15, text: "")
         label.textColor = .black
         label.lineBreakMode = .byTruncatingTail
         label.numberOfLines = 5
