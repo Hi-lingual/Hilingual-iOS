@@ -67,7 +67,7 @@ final class FeedUserProfile: UIView {
 
     private let followerCountLabel: UILabel = {
         let label = UILabel()
-        label.font = .pretendard(.body_sb_14)
+        label.font = .pretendard(.body_m_14)
         label.textColor = .gray400
         label.textAlignment = .left
         return label
@@ -90,7 +90,7 @@ final class FeedUserProfile: UIView {
 
     private let followingCountLabel: UILabel = {
         let label = UILabel()
-        label.font = .pretendard(.body_sb_14)
+        label.font = .pretendard(.body_m_14)
         label.textColor = .gray400
         label.textAlignment = .left
         return label
