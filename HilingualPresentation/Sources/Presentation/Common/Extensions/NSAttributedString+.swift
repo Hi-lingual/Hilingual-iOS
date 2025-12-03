@@ -10,13 +10,13 @@ import UIKit
 
 extension NSAttributedString {
 
-    static func suit(_ style: UIFont.SuitStyle,
+    static func pretendard(_ style: UIFont.PretendardStyle,
                      text: String,
                      lineBreakMode: NSLineBreakMode = .byTruncatingTail,
                      forceWrap: Bool = false) -> NSAttributedString {
-        let font = UIFont.suit(style)
+        let font = UIFont.pretendard(style)
 
-        let targets: Set<UIFont.SuitStyle> = [.body_sb_16, .body_m_16, .body_r_16]
+        let targets: Set<UIFont.PretendardStyle> = [.body_m_16, .body_r_16, .body_m_15, .body_r_15]
         guard targets.contains(style) else {
             return NSAttributedString(string: text, attributes: [.font: font])
         }
@@ -46,7 +46,7 @@ extension NSAttributedString {
 }
 
 extension NSMutableAttributedString {
-    func applySuitFont(_ style: UIFont.SuitStyle, range: NSRange) {
-        addAttributes([.font: UIFont.suit(style)], range: range)
+    func applyPretendardFont(_ style: UIFont.PretendardStyle, range: NSRange) {
+        addAttributes([.font: UIFont.pretendard(style)], range: range)
     }
 }
