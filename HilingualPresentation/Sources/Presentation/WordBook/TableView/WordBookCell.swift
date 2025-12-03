@@ -48,7 +48,6 @@ final class WordBookCell: UITableViewCell {
         }
     }
 
-
     // MARK: - Configure
 
     func configure(with data: PhraseData, type: WordCardType = .basic) {
@@ -60,6 +59,6 @@ final class WordBookCell: UITableViewCell {
     }
 
     // MARK: - Event
+    
     var onBookmarkToggled: ((Bool) -> Void)?
 }
-

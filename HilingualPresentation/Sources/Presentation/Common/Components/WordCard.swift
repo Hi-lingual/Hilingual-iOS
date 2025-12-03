@@ -71,7 +71,7 @@ final class WordCard: UIView {
         
         switch type {
         case .basic:
-            phraseLabel.font = .pretendard(.head_r_18)
+            phraseLabel.font = .pretendard(.body_r_17)
 
             explanationLabel.isHidden = true
             reasonLabel.isHidden = true
