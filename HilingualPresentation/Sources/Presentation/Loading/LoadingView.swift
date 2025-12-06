@@ -36,7 +36,7 @@ final class LoadingView: BaseUIView {
 
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.font = .suit(.head_b_20)
+        label.font = .pretendard(.head_sb_20)
         label.textColor = .gray850
         label.textAlignment = .center
         return label
@@ -44,7 +44,7 @@ final class LoadingView: BaseUIView {
 
     private let subtitleLabel: UILabel = {
         let label = UILabel()
-        label.font = .suit(.body_r_18)
+        label.font = .pretendard(.head_r_18)
         label.textColor = .gray400
         label.textAlignment = .center
         label.numberOfLines = 2
@@ -76,7 +76,7 @@ final class LoadingView: BaseUIView {
     private let footerLabel: UILabel = {
         let label = UILabel()
         label.text = "지금 화면을 나가면, 작성 중인 일기가\n저장되지 않아요"
-        label.font = .suit(.caption_r_12)
+        label.font = .pretendard(.cap_r_12)
         label.textColor = .gray300
         label.textAlignment = .center
         label.numberOfLines = 2

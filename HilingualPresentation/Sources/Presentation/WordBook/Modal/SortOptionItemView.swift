@@ -32,7 +32,7 @@ final class SortOptionItemView: UIView {
         iconImageView.contentMode = .scaleAspectFit
 
         titleLabel.text = title
-        titleLabel.font = .suit(.body_sb_14)
+        titleLabel.font = .pretendard(.body_m_14)
         titleLabel.textColor = isSelected ? .black : .lightGray
 
         checkmarkImageView.image = isSelected

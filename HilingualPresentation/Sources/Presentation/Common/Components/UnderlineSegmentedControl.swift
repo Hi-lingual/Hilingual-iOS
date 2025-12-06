@@ -47,7 +47,7 @@ final class UnderlineSegmentedControl: UIView {
             let button = UIButton(type: .system)
             button.setTitle(title, for: .normal)
             button.setTitleColor(.lightGray, for: .normal)
-            button.titleLabel?.font = UIFont.suit(.head_b_18)
+            button.titleLabel?.font = UIFont.pretendard(.head_sb_18)
             button.tag = index
             button.addTarget(self, action: #selector(didTapButton(_:)), for: .touchUpInside)
             stackView.addArrangedSubview(button)
@@ -77,8 +77,8 @@ final class UnderlineSegmentedControl: UIView {
             let isSelected = index == selectedIndex
             button.setTitleColor(isSelected ? .black : .gray500, for: .normal)
             button.titleLabel?.font = isSelected
-                ? UIFont.suit(.head_b_18)
-                : UIFont.suit(.head_m_18)
+                ? UIFont.pretendard(.head_sb_18)
+                : UIFont.pretendard(.head_m_18)
         }
 
         let selectedButton = buttons[selectedIndex]

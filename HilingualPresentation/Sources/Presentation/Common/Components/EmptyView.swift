@@ -13,7 +13,7 @@ final class EmptyView: UIView {
     private let noFeedLabel: UILabel = {
         let label = UILabel()
         label.text = "피드에 아직 공유된 일기가 없어요."
-        label.font = .suit(.head_m_18)
+        label.font = .pretendard(.head_r_18)
         label.textColor = .gray500
         label.textAlignment = .center
         label.numberOfLines = 2

@@ -13,7 +13,7 @@ final class DiaryLockView: UIView {
     private let diaryLockLabel: UILabel = {
         let label = UILabel()
         label.text = "아직 작성 가능한 시간이 아니에요.\n오늘의 일기를 작성해주세요!"
-        label.font = .suit(.body_sb_14)
+        label.font = .pretendard(.body_m_14)
         label.textColor = .gray400
         label.numberOfLines = 2
         label.textAlignment = .center

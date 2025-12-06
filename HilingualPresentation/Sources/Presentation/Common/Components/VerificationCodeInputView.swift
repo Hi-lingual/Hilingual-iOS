@@ -59,7 +59,7 @@ final class VerificationCodeInputView: BaseUIView, UIKeyInput, UITextInputTraits
 
     private let messageLabel: UILabel = {
         let label = UILabel()
-        label.font = .suit(.caption_r_12)
+        label.font = .pretendard(.cap_r_12)
         label.textColor = .alertRed
         label.alpha = 0
         label.numberOfLines = 1
@@ -126,7 +126,7 @@ final class VerificationCodeInputView: BaseUIView, UIKeyInput, UITextInputTraits
             let label: UILabel = {
                 let label = UILabel()
                 label.textAlignment = .center
-                label.font = .suit(.head_sb_20)
+                label.font = .pretendard(.head_m_20)
                 label.textColor = .label
                 label.backgroundColor = .gray100
                 label.layer.cornerRadius = 8

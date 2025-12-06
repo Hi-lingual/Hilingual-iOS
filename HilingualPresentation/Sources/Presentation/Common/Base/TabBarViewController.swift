@@ -74,10 +74,10 @@ public final class TabBarViewController: UITabBarController {
         
         let itemAppearance = UITabBarItemAppearance()
         itemAppearance.normal.titleTextAttributes = [
-            .font: UIFont.suit(.caption_m_12),
+            .font: UIFont.pretendard(.cap_r_12),
         ]
         itemAppearance.selected.titleTextAttributes = [
-            .font: UIFont.suit(.caption_m_12),
+            .font: UIFont.pretendard(.cap_r_12),
         ]
         
         appearance.stackedLayoutAppearance = itemAppearance

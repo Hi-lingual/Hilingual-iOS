@@ -25,7 +25,7 @@ final class Tooltip: UIView {
     
     let tooltipLabel: UILabel = {
         let label = UILabel()
-        label.font = .suit(.body_m_16)
+        label.font = .pretendard(.body_r_16)
         label.textColor = .white
         label.numberOfLines = 0
         return label
@@ -37,7 +37,7 @@ final class Tooltip: UIView {
     
     init(_ text: String) {
         super.init(frame: .zero)
-        tooltipLabel.attributedText = .suit(.body_m_16, text: text)
+        tooltipLabel.attributedText = .pretendard(.body_r_16, text: text)
         setUI()
         setLayout()
         dismissTooltip()

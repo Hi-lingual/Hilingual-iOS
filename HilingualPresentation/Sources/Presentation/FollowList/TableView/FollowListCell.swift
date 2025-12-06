@@ -51,7 +51,7 @@ final class FollowListCell: UITableViewCell {
     
     private(set) var nickname: UILabel = {
         let label = UILabel()
-        label.font = .suit(.head_b_16)
+        label.font = .pretendard(.head_sb_16)
         label.text = "닉네임"
         label.textColor = .black
         label.textAlignment = .left

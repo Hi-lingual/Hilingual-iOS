@@ -10,14 +10,14 @@ import UIKit
 extension UIFont {
     
     enum Family: String, CaseIterable {
-        case Bold, ExtraBold, ExtraLight, Heavy, Light, Medium, Regular, SemiBold, Thin
+        case Medium, Regular, SemiBold
     }
     
-    public static func registerSuitFonts() {
+    public static func registerPretendardFonts() {
         for weight in Family.allCases {
-            guard let fontURL = Bundle.module.url(forResource: "SUIT-\(weight.rawValue)", withExtension: "ttf") else {
+            guard let fontURL = Bundle.module.url(forResource: "Pretendard-\(weight.rawValue)", withExtension: "ttf") else {
     #if DEBUG
-                print("SUIT-\(weight.rawValue).ttf 파일을 찾을 수 없습니다.")
+                print("Pretendard-\(weight.rawValue).ttf 파일을 찾을 수 없습니다.")
     #endif
                 continue
             }
@@ -25,71 +25,71 @@ extension UIFont {
             if !CTFontManagerRegisterFontsForURL(fontURL as CFURL, .process, &error) {
     #if DEBUG
                 if let cfError = error?.takeRetainedValue() {
-                    print("SUIT-\(weight.rawValue).ttf 등록 실패: \(cfError)")
+                    print("Pretendard-\(weight.rawValue).ttf 등록 실패: \(cfError)")
                 } else {
-                    print("SUIT-\(weight.rawValue).ttf 등록 실패 (원인 미상)")
+                    print("Pretendard-\(weight.rawValue).ttf 등록 실패 (원인 미상)")
                 }
     #endif
             } else {
     #if DEBUG
-                print("SUIT-\(weight.rawValue).ttf 등록 성공")
+                print("Pretendard-\(weight.rawValue).ttf 등록 성공")
     #endif
             }
         }
     }
 
-    static func suit(weight: Family = .Regular, size: CGFloat) -> UIFont {
-        if let font = UIFont(name: "SUIT-\(weight.rawValue)", size: size) {
+    static func pretendard(weight: Family = .Regular, size: CGFloat) -> UIFont {
+        if let font = UIFont(name: "Pretendard-\(weight.rawValue)", size: size) {
             return font
         } else {
-            print("SUIT-\(weight.rawValue) loading failed, fallback to system font")
+            print("Pretendard-\(weight.rawValue) loading failed, fallback to system font")
             return .systemFont(ofSize: size)
         }
     }
     
-    enum SuitStyle {
-        case head_b_20
+    enum PretendardStyle {
         case head_sb_20
-        case head_b_18
+        case head_m_20
+        case head_r_20
+        case head_sb_18
         case head_m_18
-        case head_b_16
+        case head_r_18
+        case head_sb_16
         
-        case body_m_20
-        case body_r_18
-        case body_sb_16
+        case body_r_17
         case body_m_16
         case body_r_16
-        case body_b_14
+        case body_m_15
+        case body_r_15
         case body_sb_14
         case body_m_14
-        case body_sb_12
+        case body_r_14
+        case body_m_12
         
-        case caption_r_14
-        case caption_m_12
-        case caption_r_12
+        case cap_r_12
     }
     
-    static func suit(_ style: SuitStyle) -> UIFont {
+    static func pretendard(_ style: PretendardStyle) -> UIFont {
         switch style {
-        case .head_b_20: return .suit(weight: .Bold, size: 20)
-        case .head_sb_20: return .suit(weight: .SemiBold, size: 20)
-        case .head_b_18: return .suit(weight: .Bold, size: 18)
-        case .head_m_18: return .suit(weight: .Medium, size: 18)
-        case .head_b_16: return .suit(weight: .Bold, size: 16)
+        case .head_sb_20: return .pretendard(weight: .SemiBold, size: 20)
+        case .head_m_20: return .pretendard(weight: .Medium, size: 20)
+        case .head_r_20: return .pretendard(weight: .Regular, size: 20)
+        case .head_sb_18: return .pretendard(weight: .SemiBold, size: 18)
+        case .head_m_18: return .pretendard(weight: .Medium, size: 18)
+        case .head_r_18: return .pretendard(weight: .Regular, size: 18)
+        case .head_sb_16: return .pretendard(weight: .SemiBold, size: 16)
             
-        case .body_m_20: return .suit(weight: .Medium, size: 20)
-        case .body_r_18: return .suit(weight: .Regular, size: 18)
-        case .body_sb_16: return .suit(weight: .SemiBold, size: 16)
-        case .body_m_16: return .suit(weight: .Medium, size: 16)
-        case .body_r_16: return .suit(weight: .Regular, size: 16)
-        case .body_b_14: return .suit(weight: .Bold, size: 14)
-        case .body_sb_14: return .suit(weight: .SemiBold, size: 14)
-        case .body_m_14: return .suit(weight: .Medium, size: 14)
-        case .body_sb_12: return .suit(weight: .SemiBold, size: 12)
+        case .body_r_17: return .pretendard(weight: .Regular, size: 17)
+        case .body_m_16: return .pretendard(weight: .Medium, size: 16)
+        case .body_r_16: return .pretendard(weight: .Regular, size: 16)
+        case .body_m_15: return .pretendard(weight: .Medium, size: 15)
+        case .body_r_15: return .pretendard(weight: .Regular, size: 15)
+        case .body_sb_14: return .pretendard(weight: .SemiBold, size: 14)
+        case .body_m_14: return .pretendard(weight: .Medium, size: 14)
+        case .body_r_14: return .pretendard(weight: .Regular, size: 14)
+        case .body_m_12: return .pretendard(weight: .Medium, size: 12)
             
-        case .caption_r_14: return .suit(weight: .Regular, size: 14)
-        case .caption_m_12: return .suit(weight: .Medium, size: 12)
-        case .caption_r_12: return .suit(weight: .Regular, size: 12)
+        case .cap_r_12: return .pretendard(weight: .Regular, size: 12)
         }
     }
 }

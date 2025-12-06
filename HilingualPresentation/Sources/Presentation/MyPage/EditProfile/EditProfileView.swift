@@ -39,7 +39,7 @@ final class EditProfileView: BaseUIView {
         let title = "회원탈퇴"
         let attributes: [NSAttributedString.Key: Any] = [
             .foregroundColor: UIColor.gray400,
-            .font: UIFont.suit(.body_m_14),
+            .font: UIFont.pretendard(.body_r_14),
             .underlineStyle: NSUnderlineStyle.single.rawValue
         ]
         let attributedTitle = NSAttributedString(string: title, attributes: attributes)

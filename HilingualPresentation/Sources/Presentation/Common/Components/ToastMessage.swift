@@ -54,7 +54,7 @@ final class ToastMessage: UIView {
         actionButton.contentEdgeInsets = UIEdgeInsets(top: 7, left: 11, bottom: 7, right: 11)
 
         actionButton.setTitleColor(.white, for: .normal)
-        actionButton.titleLabel?.font = .suit(.body_sb_14)
+        actionButton.titleLabel?.font = .pretendard(.body_m_14)
         actionButton.backgroundColor = .gray700
         actionButton.layer.cornerRadius = 6
 
@@ -106,7 +106,7 @@ final class ToastMessage: UIView {
         actionTitle: String? = nil,
         action: (() -> Void)? = nil
     ) {
-        messageLabel.attributedText = .suit(.body_m_16, text: message)
+        messageLabel.attributedText = .pretendard(.body_m_16, text: message)
         apply(type: type, actionTitle: actionTitle, action: action)
     }
 

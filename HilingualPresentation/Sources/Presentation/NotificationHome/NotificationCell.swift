@@ -15,7 +15,7 @@ final class NotificationCell: UITableViewCell {
 
     private let messageLabel: UILabel = {
         let label = UILabel()
-        label.font = .suit(.body_m_16)
+        label.font = .pretendard(.body_m_16)
         label.textColor = .hilingualBlack
         label.numberOfLines = 2
         return label
@@ -23,7 +23,7 @@ final class NotificationCell: UITableViewCell {
 
     private let dateLabel: UILabel = {
         let label = UILabel()
-        label.font = .suit(.caption_r_14)
+        label.font = .pretendard(.body_r_14)
         label.textColor = .gray300
         return label
     }()
@@ -88,7 +88,7 @@ final class NotificationCell: UITableViewCell {
         let attributed = NSMutableAttributedString(string: text)
         if let range = text.range(of: "이 당신") {
             let nameRange = NSRange(text.startIndex..<range.lowerBound, in: text)
-            attributed.addAttribute(.font, value: UIFont.suit(.body_sb_16), range: nameRange)
+            attributed.addAttribute(.font, value: UIFont.pretendard(.body_m_16), range: nameRange)
         }
         return attributed
     }

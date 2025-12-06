@@ -20,7 +20,7 @@ final class WordBookView: BaseUIView {
         let label = UILabel()
         label.text = "나의 단어장"
         label.textColor = .white
-        label.font = .suit(.head_b_18)
+        label.font = .pretendard(.head_sb_18)
         return label
     }()
 
@@ -33,8 +33,8 @@ final class WordBookView: BaseUIView {
         searchBar.searchTextField.clipsToBounds = true
         searchBar.setImage(UIImage(named: "ic_search_20_ios", in: .module, compatibleWith: nil), for: .search, state: .normal)
         searchBar.setImage(UIImage(named: "ic_close_20_ios", in: .module, compatibleWith: nil), for: .clear, state: .normal)
-        searchBar.searchTextField.attributedText = .suit(.body_m_16, text: "")
-        searchBar.searchTextField.defaultTextAttributes[.font] = UIFont.suit(.body_m_16)
+        searchBar.searchTextField.attributedText = .pretendard(.body_m_16, text: "")
+        searchBar.searchTextField.defaultTextAttributes[.font] = UIFont.pretendard(.body_m_16)
         searchBar.updateHeight(height: 46)
         searchBar.searchTextField.keyboardType = .asciiCapable
         searchBar.searchTextField.autocorrectionType = .no
@@ -42,7 +42,7 @@ final class WordBookView: BaseUIView {
 
         let attributes: [NSAttributedString.Key: Any] = [
             .foregroundColor: UIColor.gray400,
-            .font: UIFont.suit(.body_m_16)
+            .font: UIFont.pretendard(.body_m_16)
         ]
         searchBar.searchTextField.attributedPlaceholder = NSAttributedString(
             string: "단어나 표현을 검색해주세요",
@@ -55,7 +55,7 @@ final class WordBookView: BaseUIView {
         let label = UILabel()
         label.text = "총 0개"
         label.textColor = .gray500
-        label.font = .suit(.body_m_14)
+        label.font = .pretendard(.body_r_14)
         return label
     }()
 
@@ -67,7 +67,7 @@ final class WordBookView: BaseUIView {
         button.setTitle("최신순", for: .normal)
         button.tintColor = .gray500
         button.setTitleColor(.gray500, for: .normal)
-        button.titleLabel?.font = .suit(.body_m_14)
+        button.titleLabel?.font = .pretendard(.body_r_14)
         button.contentHorizontalAlignment = .right
         button.semanticContentAttribute = .forceLeftToRight
         button.imageEdgeInsets = UIEdgeInsets(top: 0, left: -2, bottom: 0, right: 2)

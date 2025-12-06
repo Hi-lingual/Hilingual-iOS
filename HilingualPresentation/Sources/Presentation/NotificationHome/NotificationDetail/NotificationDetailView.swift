@@ -13,7 +13,7 @@ final class NotificationDetailView: BaseUIView {
 
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.font = .suit(.head_b_20)
+        label.font = .pretendard(.head_sb_20)
         label.textColor = .black
         label.numberOfLines = 0
         return label
@@ -21,7 +21,7 @@ final class NotificationDetailView: BaseUIView {
 
     private let dateLabel: UILabel = {
         let label = UILabel()
-        label.font = .suit(.caption_r_14)
+        label.font = .pretendard(.body_r_14)
         label.textColor = .gray300
         return label
     }()

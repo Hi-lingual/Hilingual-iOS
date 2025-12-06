@@ -27,14 +27,14 @@ final class FeedbackView: BaseUIView {
 
     var dateLabel: UILabel = {
         let label = UILabel()
-        label.font = .suit(.body_sb_16)
+        label.font = .pretendard(.body_m_16)
         label.textColor = .gray700
         return label
     }()
 
     let AILabel: UILabel = {
         let label = UILabel()
-        label.font = .suit(.caption_r_14)
+        label.font = .pretendard(.body_r_14)
         label.textColor = .gray500
         label.text = "교정된 일기"
         return label
@@ -65,7 +65,7 @@ final class FeedbackView: BaseUIView {
 
     private let feedbackLabel: UILabel = {
         let label = UILabel()
-        label.font = .suit(.body_sb_16)
+        label.font = .pretendard(.body_m_16)
         label.textColor = .hilingualBlack
         return label
     }()
@@ -82,7 +82,7 @@ final class FeedbackView: BaseUIView {
 
         let label = UILabel()
         label.text = "추가 설명이 필요 없는 일기네요!"
-        label.font = .suit(.body_m_14)
+        label.font = .pretendard(.body_r_14)
         label.textColor = .hilingualBlack
 
         label.numberOfLines = 0
@@ -176,7 +176,7 @@ final class FeedbackView: BaseUIView {
 
     func configureDiary(data: DiaryViewData) {
         currentDiaryData = data
-        dateLabel.attributedText = .suit(.body_sb_16, text: data.date)
+        dateLabel.attributedText = .pretendard(.body_m_16, text: data.date)
 
         diaryTextView.configure(
             image: data.imageURL,
@@ -191,8 +191,8 @@ final class FeedbackView: BaseUIView {
         feedbackStackView.arrangedSubviews.dropFirst().forEach { $0.removeFromSuperview() }
 
         if data.isEmpty {
-            feedbackLabel.font = .suit(.body_sb_16)
-            feedbackLabel.attributedText = .suit(.body_sb_16, text: "일기에서 발견된 피드백이 없어요!")
+            feedbackLabel.font = .pretendard(.body_m_16)
+            feedbackLabel.attributedText = .pretendard(.body_m_16, text: "일기에서 발견된 피드백이 없어요!")
             feedbackStackView.addArrangedSubview(emptyFeedbackView)
             emptyFeedbackView.snp.makeConstraints {
                 $0.horizontalEdges.equalToSuperview()
@@ -203,7 +203,7 @@ final class FeedbackView: BaseUIView {
         let count = data.count
         let fullText = "주요 피드백 \(count)개를 알려드릴게요!"
         let attributedText = NSMutableAttributedString(
-            attributedString: .suit(.body_sb_16, text: fullText)
+            attributedString: .pretendard(.body_m_16, text: fullText)
         )
 
         if let range = fullText.range(of: "\(count)") {

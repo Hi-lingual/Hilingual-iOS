@@ -15,14 +15,14 @@ final class ProfileRow: UIView {
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.textColor = .hilingualBlack
-        label.font = .suit(.body_sb_16)
+        label.font = .pretendard(.body_m_16)
         return label
     }()
 
     private let valueLabel: UILabel = {
         let label = UILabel()
         label.textColor = .gray500
-        label.font = .suit(.body_m_16)
+        label.font = .pretendard(.body_m_16)
         label.textAlignment = .right
         return label
     }()

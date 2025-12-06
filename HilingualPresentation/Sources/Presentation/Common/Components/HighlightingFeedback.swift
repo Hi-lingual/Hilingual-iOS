@@ -17,7 +17,7 @@ final class HighlightingFeedback: UIView {
     
     let originalLabel: UILabel = {
         let label = UILabel()
-        label.font = .suit(.body_r_16)
+        label.font = .pretendard(.body_m_15)
         label.textColor = .gray700
         label.numberOfLines = 0
         label.textAlignment = .left
@@ -27,7 +27,7 @@ final class HighlightingFeedback: UIView {
     
     let rewriteLabel: UILabel = {
         let label = UILabel()
-        label.font = .suit(.body_m_16)
+        label.font = .pretendard(.body_m_15)
         label.textColor = .hilingualOrange
         label.numberOfLines = 0
         label.textAlignment = .left
@@ -43,7 +43,7 @@ final class HighlightingFeedback: UIView {
     
     let explainLabel: UILabel = {
         let label = UILabel()
-        label.font = .suit(.body_m_14)
+        label.font = .pretendard(.body_r_14)
         label.textColor = .hilingualBlack
         label.numberOfLines = 0
         label.textAlignment = .left
@@ -124,8 +124,8 @@ final class HighlightingFeedback: UIView {
     }
     
     func configure(original: String, rewrite: String, explanation: String) {
-        originalLabel.attributedText = .suit(.body_r_16, text: original)
-        rewriteLabel.attributedText = .suit(.body_m_16, text: rewrite)
-        explainLabel.attributedText = .suit(.body_m_14, text: explanation)
+        originalLabel.attributedText = .pretendard(.body_r_15, text: original)
+        rewriteLabel.attributedText = .pretendard(.body_m_15, text: rewrite)
+        explainLabel.attributedText = .pretendard(.body_m_14, text: explanation)
     }
 }

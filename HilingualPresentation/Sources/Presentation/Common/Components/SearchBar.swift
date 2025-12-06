@@ -30,8 +30,8 @@ public final class SearchBar: UISearchBar {
         self.searchTextField.clipsToBounds = true
         self.setImage(UIImage(named: "ic_search_20_ios", in: .module, compatibleWith: nil), for: .search, state: .normal)
         self.setImage(UIImage(named: "ic_close_20_ios", in: .module, compatibleWith: nil), for: .clear, state: .normal)
-        self.searchTextField.attributedText = .suit(.body_m_16, text: "")
-        self.searchTextField.defaultTextAttributes[.font] = UIFont.suit(.body_m_16)
+        self.searchTextField.attributedText = .pretendard(.body_m_16, text: "")
+        self.searchTextField.defaultTextAttributes[.font] = UIFont.pretendard(.body_r_16)
         self.searchTextField.autocorrectionType = .no
         self.searchTextField.autocapitalizationType = .none
         self.searchTextField.returnKeyType = .done
@@ -43,7 +43,7 @@ public final class SearchBar: UISearchBar {
         
         let attributes: [NSAttributedString.Key: Any] = [
             .foregroundColor: UIColor.gray400,
-            .font: UIFont.suit(.body_m_16)
+            .font: UIFont.pretendard(.body_r_16)
         ]
         
         self.searchTextField.attributedPlaceholder = NSAttributedString(

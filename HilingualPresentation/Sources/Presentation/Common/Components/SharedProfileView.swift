@@ -42,7 +42,7 @@ public class SharedProfileView: UIView {
     
     private let nameLabel: UILabel = {
         let label = UILabel()
-        label.font = .suit(.head_b_16)
+        label.font = .pretendard(.head_sb_16)
         label.textColor = .gray850
         label.numberOfLines = 1
         return label
@@ -65,13 +65,13 @@ public class SharedProfileView: UIView {
     
     private let streakLabel: UILabel = {
         let label = UILabel()
-        label.font = .suit(.caption_r_14)
+        label.font = .pretendard(.body_r_14)
         return label
     }()
     
     private let sharedDateLabel: UILabel = {
         let label = UILabel()
-        label.font = .suit(.caption_r_12)
+        label.font = .pretendard(.cap_r_12)
         label.textColor = .gray500
         return label
     }()

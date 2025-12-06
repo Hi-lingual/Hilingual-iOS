@@ -18,7 +18,7 @@ final class NotificationSettingView: BaseUIView {
     private let marketingLabel: UILabel = {
         let label = UILabel()
         label.text = "마케팅 알림"
-        label.font = .suit(.body_m_16)
+        label.font = .pretendard(.body_r_16)
         label.textColor = .black
         return label
     }()
@@ -26,7 +26,7 @@ final class NotificationSettingView: BaseUIView {
     private let feedLabel: UILabel = {
         let label = UILabel()
         label.text = "피드 알림"
-        label.font = .suit(.body_m_16)
+        label.font = .pretendard(.body_r_16)
         label.textColor = .black
         return label
     }()

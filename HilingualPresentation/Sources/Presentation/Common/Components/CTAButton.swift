@@ -65,7 +65,7 @@ final class CTAButton: UIButton {
             layer.cornerRadius = 8
             clipsToBounds = true
 
-            titleLabel?.font = .suit(.body_sb_16)
+            titleLabel?.font = .pretendard(.body_m_16)
             setTitleColor(.white, for: .normal)
             imageView?.contentMode = .scaleAspectFit
 
@@ -76,11 +76,11 @@ final class CTAButton: UIButton {
         private func configure(with style: CTAButtonStyle) {
             switch style {
             case .TextButton(let text):
-                setAttributedTitle(.suit(.body_sb_16, text: text), for: .normal)
+                setAttributedTitle(.pretendard(.body_m_16, text: text), for: .normal)
                 setImage(nil, for: .normal)
 
             case .IconTextButton(let iconName, let text):
-                setAttributedTitle(.suit(.body_sb_16, text: text), for: .normal)
+                setAttributedTitle(.pretendard(.body_m_16, text: text), for: .normal)
                 titleEdgeInsets = UIEdgeInsets(top: 0, left: 8, bottom: 0, right: -8)
 
                 //아이콘 터치 이벤트 무효화 위해서
@@ -106,10 +106,10 @@ final class CTAButton: UIButton {
             super.setTitle(nil, for: state)
             return
         }
-        super.setAttributedTitle(.suit(.body_sb_16, text: title), for: state)
+        super.setAttributedTitle(.pretendard(.body_m_16, text: title), for: state)
     }
     
     func updateText(_ text: String) {
-        setAttributedTitle(.suit(.body_sb_16, text: text), for: .normal)
+        setAttributedTitle(.pretendard(.body_m_16, text: text), for: .normal)
     }
 }
