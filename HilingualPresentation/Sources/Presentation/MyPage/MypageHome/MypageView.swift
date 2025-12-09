@@ -297,7 +297,7 @@ final class MypageView: BaseUIView {
 
 extension MypageView {
     public func configure(nickname: String, profileImageURL: String?) {
-        nicknameLabel.text = nickname
+        nicknameLabel.attributedText = .pretendard(.head_sb_18, text: nickname)
 
         if let urlString = profileImageURL, let url = URL(string: urlString) {
             profileImageView.kf.setImage(
