@@ -142,7 +142,10 @@ final class ProfileView: UIView {
         streak: Int = 0,
         newAlarm: Bool = false
     ) {
-        nameLabel.text = nickname
+        nameLabel.attributedText = .pretendard(
+            .head_sb_18,
+            text: nickname
+        )
         totalLabel.text = "총 \(totalDiaries)편"
         streakLabel.text = "\(streak)일 연속 작성 중"
         

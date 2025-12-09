@@ -73,9 +73,7 @@ public extension BaseUIViewController {
 
     private func makeTitleLabel(_ title: String) -> UILabel {
         let label = UILabel()
-        label.text = title
-        label.font = .pretendard(.head_sb_18)
-        label.textColor = .black
+        label.attributedText = .pretendard(.head_sb_18, text: title)
         label.textAlignment = .center
         label.sizeToFit()
         return label

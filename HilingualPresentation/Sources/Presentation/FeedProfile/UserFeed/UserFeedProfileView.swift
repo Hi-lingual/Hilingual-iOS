@@ -112,7 +112,10 @@ final class UserFeedProfileView: BaseUIView {
             following: following,
             streak: streak
         )
-        titleLabel.text = "\(nickname)님의 글을 확인할 수 없어요."
+        titleLabel.attributedText = .pretendard(
+            .head_sb_18,
+            text: "\(nickname)님의 글을 확인할 수 없어요."
+        )
     }
     
     func updateHeader(offsetY: CGFloat) {

@@ -18,7 +18,6 @@ final class WordBookView: BaseUIView {
 
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "나의 단어장"
         label.textColor = .white
         label.font = .pretendard(.head_sb_18)
         return label
@@ -118,6 +117,12 @@ final class WordBookView: BaseUIView {
     }
 
     override func setUI() {
+        
+        titleLabel.attributedText = .pretendard(
+            .head_sb_18,
+            text: "나의 단어장"
+        )
+        
         navigationContainer.backgroundColor = .hilingualBlack
 
         addSubviews(

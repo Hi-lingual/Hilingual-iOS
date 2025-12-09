@@ -32,10 +32,13 @@ final class BlockModal: UIView {
 
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.font = .pretendard(.head_sb_18)
         label.textColor = .black
         label.textAlignment = .left
-        label.text = "정말 차단하실 건가요?"
+        label.font = .pretendard(.head_sb_18)
+        label.attributedText = .pretendard(
+            .head_sb_18,
+            text: "정말 차단하실 건가요?"
+        )
         return label
     }()
     

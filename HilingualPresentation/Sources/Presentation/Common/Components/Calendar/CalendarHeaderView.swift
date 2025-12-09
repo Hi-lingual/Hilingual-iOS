@@ -15,7 +15,10 @@ final class CalendarHeaderView: UIView {
 
     private var currentDate: Date = Date() {
         didSet {
-            textLabel.text = CalendarHeaderView.format(date: currentDate)
+            textLabel.attributedText = .pretendard(
+                .head_sb_18,
+                text: CalendarHeaderView.format(date: currentDate)
+            )
         }
     }
 
@@ -82,7 +85,10 @@ final class CalendarHeaderView: UIView {
         setupUI()
         setupLayout()
         setupActions()
-        textLabel.text = CalendarHeaderView.format(date: currentDate)
+        textLabel.attributedText = .pretendard(
+            .head_sb_18,
+            text: CalendarHeaderView.format(date: currentDate)
+        )
     }
 
     required init?(coder: NSCoder) {

@@ -20,8 +20,7 @@ final class VerificationCodeView: BaseUIView {
 
     let titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "인증번호 입력"
-        label.font = .pretendard(.head_sb_18)
+        label.attributedText = .pretendard(.head_sb_18, text: "인증번호 입력")
         label.textColor = .black
         label.textAlignment = .center
         return label
