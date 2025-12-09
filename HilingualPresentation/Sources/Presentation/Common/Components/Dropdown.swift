@@ -79,7 +79,7 @@ final class Dropdown: UIView {
 
     private let topicEnLabel: UILabel = {
         let label = UILabel()
-        label.attributedText = .pretendard(.body_m_16, text: "What surprised you today?")
+        label.attributedText = .pretendard(.body_m_15, text: "What surprised you today?")
         label.textColor = .gray700
         label.numberOfLines = 3
         return label
@@ -171,7 +171,7 @@ final class Dropdown: UIView {
 
     private func updateLabel() {
         let text = isKorean ? (topicKor ?? "What surprised you today?") : (topicEn ?? "What surprised you today?")
-        topicEnLabel.attributedText = .pretendard(.body_m_16, text: text)
+        topicEnLabel.attributedText = .pretendard(.body_m_15, text: text)
     }
 
     func configure(kor: String?, en: String?) {
@@ -184,11 +184,4 @@ final class Dropdown: UIView {
     func addDropdownToggleAction(_ action: @escaping () -> Void) {
         self.onToggleAction = action
     }
-}
-
-// MARK: - Preview
-
-#Preview {
-    let dropdown = Dropdown()
-    return dropdown
 }
