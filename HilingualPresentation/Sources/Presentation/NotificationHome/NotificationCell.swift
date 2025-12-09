@@ -88,7 +88,7 @@ final class NotificationCell: UITableViewCell {
         let attributed = NSMutableAttributedString(string: text)
         if let range = text.range(of: "이 당신") {
             let nameRange = NSRange(text.startIndex..<range.lowerBound, in: text)
-            attributed.addAttribute(.font, value: UIFont.pretendard(.body_m_16), range: nameRange)
+            attributed.addAttribute(.font, value: UIFont.pretendard(.head_sb_16), range: nameRange)
         }
         return attributed
     }

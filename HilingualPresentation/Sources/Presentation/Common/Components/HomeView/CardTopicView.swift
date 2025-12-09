@@ -66,7 +66,7 @@ final class CardTopicView: UIView {
         let stack = UIStackView()
         stack.axis = .vertical
         stack.alignment = .leading
-        stack.spacing = 8
+        stack.spacing = 4
         stack.backgroundColor = .gray100
         stack.layer.cornerRadius = 8
         return stack
