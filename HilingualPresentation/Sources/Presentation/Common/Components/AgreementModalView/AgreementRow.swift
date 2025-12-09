@@ -81,7 +81,7 @@ final class AgreementRow: UIControl {
         
         if onTapLink != nil {
             let attributes: [NSAttributedString.Key: Any] = [
-                .font: isBold ? UIFont.pretendard(.body_m_16) : UIFont.pretendard(.body_sb_14),
+                .font: isBold ? UIFont.pretendard(.body_m_16) : UIFont.pretendard(.body_m_14),
                 .foregroundColor: textColor,
                 .underlineStyle: NSUnderlineStyle.single.rawValue
             ]
@@ -90,7 +90,7 @@ final class AgreementRow: UIControl {
             titleLabel.attributedText = NSAttributedString(
                 string: title,
                 attributes: [
-                    .font: isBold ? UIFont.pretendard(.body_m_16) : UIFont.pretendard(.body_sb_14),
+                    .font: isBold ? UIFont.pretendard(.body_m_16) : UIFont.pretendard(.body_m_14),
                     .foregroundColor: textColor
                 ]
             )

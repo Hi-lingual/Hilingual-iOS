@@ -51,7 +51,7 @@ final class nickNameTextField: BaseUIView {
 
     private lazy var characterCountLabel:  UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 14)
+        label.font = .pretendard(.cap_r_12)
         label.textColor = .lightGray
         label.text = "0/\(maxLength)"
         return label
@@ -68,7 +68,7 @@ final class nickNameTextField: BaseUIView {
     private let mainStack: UIStackView = {
         let stack = UIStackView()
         stack.axis = .vertical
-        stack.spacing = 8
+        stack.spacing = 4
         return stack
     }()
 
@@ -127,9 +127,9 @@ final class nickNameTextField: BaseUIView {
             stopLoading()
 
         case .error(let message):
-            textField.layer.borderColor = UIColor.systemRed.cgColor
+            textField.layer.borderColor = UIColor.alertRed.cgColor
             messageLabel.text = message
-            messageLabel.textColor = .systemRed
+            messageLabel.textColor = .alertRed
             stopLoading()
 
         case .success(let message):
@@ -152,11 +152,9 @@ final class nickNameTextField: BaseUIView {
         backgroundColor = .clear
         addSubview(mainStack)
 
-        mainStack.addArrangedSubview(textField)
-        mainStack.addArrangedSubview(messageStack)
+        mainStack.addArrangedSubviews(textField, messageStack)
 
-        messageStack.addArrangedSubview(messageLabel)
-        messageStack.addArrangedSubview(characterCountLabel)
+        messageStack.addArrangedSubviews(messageLabel, characterCountLabel)
 
         rightStackView.addArrangedSubview(loadingIndicator)
 
@@ -212,5 +210,4 @@ final class nickNameTextField: BaseUIView {
         textField.attributedText = .pretendard(.body_m_16, text: trimmed)
         updateCharacterCount()
     }
-
 }
