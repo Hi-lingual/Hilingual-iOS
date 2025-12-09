@@ -32,8 +32,7 @@ final class MypageView: BaseUIView {
 
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "마이페이지"
-        label.font = .pretendard(.head_sb_18)
+        label.attributedText = .pretendard(.head_sb_18, text: "마이페이지")
         label.textColor = .black
         return label
     }()
@@ -65,8 +64,7 @@ final class MypageView: BaseUIView {
 
     let nicknameLabel: UILabel = {
         let label = UILabel()
-        label.text = "내 닉네임"
-        label.font = .pretendard(.head_sb_18)
+        label.attributedText = .pretendard(.head_sb_18, text: "내 닉네임")
         label.textColor = .black
         return label
     }()
@@ -299,7 +297,7 @@ final class MypageView: BaseUIView {
 
 extension MypageView {
     public func configure(nickname: String, profileImageURL: String?) {
-        nicknameLabel.text = nickname
+        nicknameLabel.attributedText = .pretendard(.head_sb_18, text: nickname)
 
         if let urlString = profileImageURL, let url = URL(string: urlString) {
             profileImageView.kf.setImage(

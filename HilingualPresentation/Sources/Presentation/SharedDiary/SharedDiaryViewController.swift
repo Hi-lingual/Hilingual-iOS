@@ -258,7 +258,7 @@ public final class SharedDiaryViewController: BaseUIViewController<SharedDiaryVi
     @objc private func showPrivateDialog() {
         dialog.configure(
             title: "영어 일기를 비공개 하시겠어요?",
-            content: "비공개로 전환 시,\n해당 일기의 피드 활동 내역은 모두 사라져요.",
+            content: "비공개로 전환 시, 해당 일기의\n피드 활동 내역은 모두 사라져요.",
             leftButtonTitle: "아니요",
             rightButtonTitle: "비공개하기",
             leftAction: { [weak self] in

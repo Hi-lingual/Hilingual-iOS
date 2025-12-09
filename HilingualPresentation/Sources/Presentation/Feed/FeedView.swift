@@ -22,27 +22,10 @@ final class FeedView: BaseUIView {
     private(set) var segmentedControl: SegmentedControl?
     private let toast = ToastMessage()
 
-    private let headerStack: UIStackView = {
-        let stack = UIStackView()
-        stack.axis = .horizontal
-        stack.alignment = .center
-        stack.distribution = .equalSpacing
-        return stack
-    }()
-
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.font = .pretendard(.head_sb_18)
-        label.text = "피드"
+        label.attributedText = .pretendard(.head_sb_18, text: "피드")
         return label
-    }()
-
-    private let searchStack: UIStackView = {
-        let stack = UIStackView()
-        stack.axis = .horizontal
-        stack.spacing = 14
-        stack.alignment = .center
-        return stack
     }()
 
     let searchButton: UIButton = {
@@ -64,13 +47,31 @@ final class FeedView: BaseUIView {
         imageView.isUserInteractionEnabled = true
         return imageView
     }()
+    
+    private let headerStack: UIStackView = {
+        let stack = UIStackView()
+        stack.axis = .horizontal
+        stack.alignment = .center
+        stack.distribution = .equalSpacing
+        return stack
+    }()
+    
+    private let searchStack: UIStackView = {
+        let stack = UIStackView()
+        stack.axis = .horizontal
+        stack.spacing = 14
+        stack.alignment = .center
+        return stack
+    }()
 
     // MARK: - Setup
 
     override func setUI() {
-        addSubviews(headerStack, toast)
+        
         headerStack.addArrangedSubviews(titleLabel, searchStack)
         searchStack.addArrangedSubviews(searchButton, profileImageView)
+        
+        addSubviews(headerStack, toast)
         
         toast.isHidden = true
 
@@ -94,7 +95,7 @@ final class FeedView: BaseUIView {
         }
     }
 
-    // MARK: - Public Method
+    // MARK: - Public Methods
 
     func configureSegmentedControl(
         parentVC: UIViewController,

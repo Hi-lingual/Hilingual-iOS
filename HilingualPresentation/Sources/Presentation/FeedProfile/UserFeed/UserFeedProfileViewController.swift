@@ -199,28 +199,6 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
     }
         
     // MARK: - Private Methods
-
-    private func showHideDialog() {
-        dialog.configure(
-            style: .normal,
-            title: "영어 일기를 비공개 하시겠어요?",
-            content: "비공개로 전환 시,\n해당 일기의 피드 활동 내역은 모두 사라져요.",
-            leftButtonTitle: "취소",
-            rightButtonTitle: "확인",
-            leftAction: { [weak self] in
-                self?.dialog.dismiss()
-            },
-            rightAction: { [weak self] in
-                guard let self, let row = self.pendingDeleteRow else { return }
-                self.dialog.dismiss()
-                self.sharedVC.removeDiary(at: row)
-                self.pendingDeleteRow = nil
-            }
-        )
-        dialog.isHidden = false
-        dialog.showAnimation()
-        view.bringSubviewToFront(dialog)
-    }
         
     private func showReportDialog() {
         dialog.configure(
@@ -264,7 +242,6 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
         view.bringSubviewToFront(dialog)
     }
 
-    
     private func openReportPage() {
         guard let url =
                 URL(string: "https://hilingual.notion.site/230829677ebf801c965be24b0ef444e9")

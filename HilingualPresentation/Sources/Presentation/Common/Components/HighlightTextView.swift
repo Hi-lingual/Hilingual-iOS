@@ -42,6 +42,8 @@ final class HighlightTextView: BaseUIView {
         let textView = UITextView()
         textView.isScrollEnabled = false
         textView.textColor = .hilingualBlack
+        textView.layoutManager.usesFontLeading = false
+
         return textView
     }()
     
@@ -59,6 +61,8 @@ final class HighlightTextView: BaseUIView {
         textView.isUserInteractionEnabled = false
         textView.textContainerInset = .zero
         textView.textContainer.lineFragmentPadding = 0
+        textView.layoutManager.usesFontLeading = false
+
         self.backgroundColor = .white
         self.layer.cornerRadius = 12
         diaryImageView.isUserInteractionEnabled = true

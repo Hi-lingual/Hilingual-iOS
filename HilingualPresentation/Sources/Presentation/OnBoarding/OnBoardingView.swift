@@ -19,8 +19,7 @@ final class OnBoardingView: BaseUIView {
 
     let titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "프로필 작성"
-        label.font = .pretendard(.head_sb_18)
+        label.attributedText = .pretendard(.head_sb_18, text: "프로필 작성")
         label.textColor = .black
         label.textAlignment = .center
         return label

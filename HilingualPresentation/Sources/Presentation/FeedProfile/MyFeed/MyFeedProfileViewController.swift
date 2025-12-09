@@ -151,9 +151,9 @@ public final class MyFeedProfileViewController: BaseUIViewController<FeedProfile
         dialog.configure(
             style: .normal,
             title: "영어 일기를 비공개 하시겠어요?",
-            content: "비공개로 전환 시,\n해당 일기의 피드 활동 내역은 모두 사라져요.",
-            leftButtonTitle: "취소",
-            rightButtonTitle: "확인",
+            content: "비공개로 전환 시, 해당 일기의\n피드 활동 내역은 모두 사라져요.",
+            leftButtonTitle: "아니요",
+            rightButtonTitle: "비공개하기",
             leftAction: { [weak self] in
                 self?.dialog.dismiss()
                 self?.pendingDeleteRow = nil
@@ -165,6 +165,10 @@ public final class MyFeedProfileViewController: BaseUIViewController<FeedProfile
                 let diaryId = listVC.feedCellView.feeds[row].diaryID
                 listVC.removeDiary(at: row)
                 self.input.unpublish.send(diaryId)
+                
+                let toast = ToastMessage()
+                self.view.addSubview(toast)
+                toast.configure(type: .basic, message: "일기가 비공개 되었어요.")
             }
         )
         dialog.isHidden = false

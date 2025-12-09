@@ -61,8 +61,7 @@ final class AgreementModalView: UIView {
         modalSheetView.clipsToBounds = true
         addSubview(modalSheetView)
 
-        titleLabel.text = "하이링구얼이 처음이시군요!"
-        titleLabel.font = .pretendard(.head_sb_18)
+        titleLabel.attributedText = .pretendard(.head_sb_18, text: "하이링구얼이 처음이시군요!")
         titleLabel.textColor = .black
 
         descriptionLabel.text = "아래 약관에 동의 후 서비스 이용이 가능해요."

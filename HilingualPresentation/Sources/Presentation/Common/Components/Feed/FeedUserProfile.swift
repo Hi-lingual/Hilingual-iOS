@@ -196,8 +196,11 @@ final class FeedUserProfile: UIView {
         following: Int = 0,
         streak: Int = 0
     ) {
-        nameLabel.text = nickname
-        
+        nameLabel.attributedText = .pretendard(
+            .head_sb_18,
+            text: nickname
+        )
+
         followerCountLabel.text = "\(follower)"
         followingCountLabel.text = "\(following)"
         
