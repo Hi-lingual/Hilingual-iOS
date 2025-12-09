@@ -123,6 +123,7 @@ final class ToastMessage: UIView {
 
             self.snp.makeConstraints {
                 $0.height.equalTo(52)
+                $0.horizontalEdges.equalToSuperview().inset(16)
             }
 
         case .basic:
