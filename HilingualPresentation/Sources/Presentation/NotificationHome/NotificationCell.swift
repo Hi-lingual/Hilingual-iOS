@@ -15,7 +15,7 @@ final class NotificationCell: UITableViewCell {
 
     private let messageLabel: UILabel = {
         let label = UILabel()
-        label.font = .pretendard(.body_m_16)
+        label.font = .pretendard(.body_r_16)
         label.textColor = .hilingualBlack
         label.numberOfLines = 2
         return label
