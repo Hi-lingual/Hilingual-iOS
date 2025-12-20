@@ -38,6 +38,8 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         let year = calendar.component(.year, from: selectedDate)
         let month = calendar.component(.month, from: selectedDate)
         input.monthChange.send((year, month))
+        checkAndRequestLocalPushPermission()
+
     }
     
     // MARK: - Bind
@@ -570,7 +572,32 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         myFeedProfileVC.hidesBottomBarWhenPushed = true
         navigationController?.pushViewController(myFeedProfileVC, animated: true)
     }
-    
+
+    private func checkAndRequestLocalPushPermission() {
+        let center = UNUserNotificationCenter.current()
+
+        center.getNotificationSettings { [weak self] settings in
+            let status = settings.authorizationStatus
+
+            DispatchQueue.main.async {
+                switch status {
+                case .notDetermined:
+                    center.requestAuthorization(options: [.alert, .sound, .badge]) { granted, _ in
+                        if granted {
+                            DispatchQueue.main.async {
+                                self?.viewModel?.registerInitialLocalPushes()
+                            }
+                        }
+                    }
+                case .authorized, .provisional:
+                    self?.viewModel?.registerInitialLocalPushes()
+                default:
+                    break
+                }
+            }
+        }
+    }
+
     // MARK: - Recall
     
     private func refreshUserInfo() {
