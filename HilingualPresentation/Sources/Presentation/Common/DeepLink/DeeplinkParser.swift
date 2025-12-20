@@ -36,6 +36,9 @@ public struct DeeplinkParser {
                 return .userProfile(userId: id)
             }
 
+        case "/home": 
+            return .home
+
         default:
             break
         }

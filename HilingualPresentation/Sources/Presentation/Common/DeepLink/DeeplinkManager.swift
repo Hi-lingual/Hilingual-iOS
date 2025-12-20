@@ -24,6 +24,9 @@ public final class DeeplinkManager {
         case .userProfile(let userId):
             let vc = di.makeUserFeedProfileViewController(userId: Int64(userId))
             nav.pushViewController(vc, animated: true)
+
+        case .home:
+            nav.popToRootViewController(animated: true)
         }
     }
 }
