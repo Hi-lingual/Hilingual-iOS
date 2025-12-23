@@ -60,6 +60,15 @@ final class OnBoardingView: BaseUIView {
         stack.spacing = 4
         return stack
     }()
+    
+    private let infoMessage: UILabel = {
+        let label = UILabel()
+        label.font = .pretendard(.body_m_14)
+        label.textAlignment = .center
+        label.textColor = .gray400
+        label.text = "설정한 닉네임은 변경이 불가능해요."
+        return label
+    }()
 
     // MARK: - Custom Method
 
@@ -68,6 +77,7 @@ final class OnBoardingView: BaseUIView {
             titleLabel,
             profileImageView,
             nicknameStackView,
+            infoMessage,
             startButton,
             modal
         )
@@ -91,6 +101,11 @@ final class OnBoardingView: BaseUIView {
         nicknameStackView.snp.makeConstraints {
             $0.top.equalTo(profileImageView.snp.bottom).offset(28)
             $0.horizontalEdges.equalToSuperview().inset(16)
+        }
+        
+        infoMessage.snp.makeConstraints {
+            $0.centerX.equalToSuperview()
+            $0.bottom.equalTo(startButton.snp.top).offset(-16)
         }
 
         startButton.snp.makeConstraints {
