@@ -45,7 +45,7 @@ public final class SplashViewController: BaseUIViewController<SplashViewModel> {
 
     private func checkRemoteConfigVersion() {
         let defaults: [String: NSObject] = [
-            "minimumVersion": "1.0.0" as NSObject,
+            "minimum_version_iOS": "1.0.0" as NSObject,
             "latestVersion": "1.0.0" as NSObject,
             "update_title": "새로운 버전이 업데이트 되었어요!" as NSObject,
             "update_message": "안정적인 서비스 사용을 위해 \n최신 버전으로 업데이트 해주세요." as NSObject,
