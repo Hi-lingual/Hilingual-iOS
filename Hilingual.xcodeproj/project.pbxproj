@@ -18,6 +18,9 @@
 		E5C79B342E15282100E461C3 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5C79B262E15282100E461C3 /* AppDelegate.swift */; };
 		E5C79B352E15282100E461C3 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5C79B2D2E15282100E461C3 /* SceneDelegate.swift */; };
 		E5C84AC92E1538C700CBD669 /* AppDIContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5C84AC82E1538C700CBD669 /* AppDIContainer.swift */; };
+		E5CBCFB42EC4B3E100475E81 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = E5CBCFB32EC4B3E100475E81 /* FirebaseCore */; };
+		E5CBCFB62EC4B3E100475E81 /* FirebaseRemoteConfig in Frameworks */ = {isa = PBXBuildFile; productRef = E5CBCFB52EC4B3E100475E81 /* FirebaseRemoteConfig */; };
+		E5CBCFB82EC4B4C900475E81 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = E5CBCFB72EC4B4C900475E81 /* GoogleService-Info.plist */; };
 		E5D5D0A92E171AC300DABE8D /* HilingualData in Frameworks */ = {isa = PBXBuildFile; productRef = E5D5D0A82E171AC300DABE8D /* HilingualData */; };
 		E5D5D0AC2E17289000DABE8D /* HilingualPresentation in Frameworks */ = {isa = PBXBuildFile; productRef = E5D5D0AB2E17289000DABE8D /* HilingualPresentation */; };
 /* End PBXBuildFile section */
@@ -50,6 +53,7 @@
 		E5C79B292E15282100E461C3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		E5C79B2D2E15282100E461C3 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		E5C84AC82E1538C700CBD669 /* AppDIContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDIContainer.swift; sourceTree = "<group>"; };
+		E5CBCFB72EC4B4C900475E81 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		E5D5D0A72E171AA900DABE8D /* HilingualData */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = HilingualData; sourceTree = "<group>"; };
 		E5D5D0AA2E1727BB00DABE8D /* HilingualPresentation */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = HilingualPresentation; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -60,7 +64,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				E5D5D0A92E171AC300DABE8D /* HilingualData in Frameworks */,
+				E5CBCFB42EC4B3E100475E81 /* FirebaseCore in Frameworks */,
 				E5C2F3992E171575003DF6C4 /* HilingualDomain in Frameworks */,
+				E5CBCFB62EC4B3E100475E81 /* FirebaseRemoteConfig in Frameworks */,
 				E5C2F3952E170A01003DF6C4 /* HilingualNetwork in Frameworks */,
 				E5D5D0AC2E17289000DABE8D /* HilingualPresentation in Frameworks */,
 			);
@@ -116,6 +122,7 @@
 				E5C79B3B2E152AC800E461C3 /* App */,
 				E51DB2002E1CF7AD000C2BEA /* Hilingual.entitlements */,
 				E5C79B282E15282100E461C3 /* Info.plist */,
+				E5CBCFB72EC4B4C900475E81 /* GoogleService-Info.plist */,
 			);
 			path = Hilingual;
 			sourceTree = "<group>";
@@ -154,6 +161,8 @@
 				E5C2F3982E171575003DF6C4 /* HilingualDomain */,
 				E5D5D0A82E171AC300DABE8D /* HilingualData */,
 				E5D5D0AB2E17289000DABE8D /* HilingualPresentation */,
+				E5CBCFB32EC4B3E100475E81 /* FirebaseCore */,
+				E5CBCFB52EC4B3E100475E81 /* FirebaseRemoteConfig */,
 			);
 			productName = Hilingual;
 			productReference = E5C79B0E2E15281900E461C3 /* Hilingual-Dev.app */;
@@ -184,6 +193,7 @@
 			mainGroup = E5C79B052E15281900E461C3;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
+				E5CBCFB22EC4B3E100475E81 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = E5C79B0F2E15281900E461C3 /* Products */;
@@ -203,6 +213,7 @@
 				3A3016992EE74F7D00880527 /* Debug.xcconfig in Resources */,
 				3A3016972EE74F6600880527 /* Release.xcconfig in Resources */,
 				E51B4C542E28DC11000B16D0 /* AppIcon.xcassets in Resources */,
+				E5CBCFB82EC4B4C900475E81 /* GoogleService-Info.plist in Resources */,
 				E5C79B322E15282100E461C3 /* LaunchScreen.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -245,7 +256,7 @@
 				BUNDLE_NAME = "Hilingual-Dev";
 				CODE_SIGN_ENTITLEMENTS = Hilingual/Hilingual.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2025112401;
+				CURRENT_PROJECT_VERSION = 2025112402;
 				DEVELOPMENT_TEAM = C9XX799UJH;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Hilingual/Info.plist;
@@ -261,7 +272,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1.0;
+				MARKETING_VERSION = 1.1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.Hilingual$(BUNDLE_ID_SUFFIX)";
 				PRODUCT_NAME = "Hilingual-Dev";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -282,7 +293,7 @@
 				BUNDLE_NAME = Hilingual;
 				CODE_SIGN_ENTITLEMENTS = Hilingual/Hilingual.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2025112401;
+				CURRENT_PROJECT_VERSION = 2025112402;
 				DEVELOPMENT_TEAM = C9XX799UJH;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Hilingual/Info.plist;
@@ -298,7 +309,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1.0;
+				MARKETING_VERSION = 1.1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.Hilingual$(BUNDLE_ID_SUFFIX)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -454,6 +465,17 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCRemoteSwiftPackageReference section */
+		E5CBCFB22EC4B3E100475E81 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.5.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
 /* Begin XCSwiftPackageProductDependency section */
 		E5C2F3942E170A01003DF6C4 /* HilingualNetwork */ = {
 			isa = XCSwiftPackageProductDependency;
@@ -462,6 +484,16 @@
 		E5C2F3982E171575003DF6C4 /* HilingualDomain */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = HilingualDomain;
+		};
+		E5CBCFB32EC4B3E100475E81 /* FirebaseCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E5CBCFB22EC4B3E100475E81 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCore;
+		};
+		E5CBCFB52EC4B3E100475E81 /* FirebaseRemoteConfig */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E5CBCFB22EC4B3E100475E81 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseRemoteConfig;
 		};
 		E5D5D0A82E171AC300DABE8D /* HilingualData */ = {
 			isa = XCSwiftPackageProductDependency;

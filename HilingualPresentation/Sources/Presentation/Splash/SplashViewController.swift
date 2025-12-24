@@ -7,6 +7,8 @@
 
 import Combine
 import UIKit
+import FirebaseCore
+import FirebaseRemoteConfig
 
 public final class SplashViewController: BaseUIViewController<SplashViewModel> {
 
@@ -17,6 +19,10 @@ public final class SplashViewController: BaseUIViewController<SplashViewModel> {
     // MARK: - Combine
 
     private let viewDidAppearSubject = PassthroughSubject<Void, Never>()
+
+    // MARK: - Firebase Remote Config
+
+    private var remoteConfig = RemoteConfig.remoteConfig()
 
     // MARK: - Lifecycle
 
@@ -32,7 +38,86 @@ public final class SplashViewController: BaseUIViewController<SplashViewModel> {
 
     public override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        viewDidAppearSubject.send(())
+        checkRemoteConfigVersion()
+    }
+
+    // MARK: - Remote Config Check
+
+    private func checkRemoteConfigVersion() {
+        let defaults: [String: NSObject] = [
+            "minimum_version_iOS": "1.0.0" as NSObject,
+            "latestVersion": "1.0.0" as NSObject,
+            "update_title": "새로운 버전이 업데이트 되었어요!" as NSObject,
+            "update_message": "안정적인 서비스 사용을 위해 \n최신 버전으로 업데이트 해주세요." as NSObject,
+            "update_link": "https://apps.apple.com/kr/app/id6752608763" as NSObject
+        ]
+        remoteConfig.setDefaults(defaults)
+
+        remoteConfig.fetch(withExpirationDuration: 0) { [weak self] status, error in
+            guard let self = self else { return }
+
+            if let error = error {
+                print("🔥 RemoteConfig fetch 실패: \(error.localizedDescription)")
+                self.viewDidAppearSubject.send(())
+                return
+            }
+
+            self.remoteConfig.activate { _, _ in
+                self.evaluateVersion()
+            }
+        }
+    }
+
+    private func evaluateVersion() {
+        let minimumVersion = remoteConfig["minimum_version_iOS"].stringValue
+        let latestVersion = remoteConfig["latestVersion"].stringValue
+        let title = remoteConfig["update_title"].stringValue
+        let message = remoteConfig["update_message"].stringValue
+        let link = remoteConfig["update_link"].stringValue
+
+        guard let currentVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String else {
+            print("현재 버전 정보를 가져오지 못했습니다.")
+            viewDidAppearSubject.send(())
+            return
+        }
+
+        print("현재 버전: \(currentVersion)")
+        print("최소 지원 버전: \(minimumVersion)")
+        print("최신 버전: \(latestVersion)")
+
+        if currentVersion.compare(minimumVersion, options: .numeric) == .orderedAscending {
+            DispatchQueue.main.async {
+                self.showUpdateAlert(title: title, message: message, link: link, isForce: true)
+            }
+        }
+        else if currentVersion.compare(latestVersion, options: .numeric) == .orderedAscending {
+            DispatchQueue.main.async {
+                self.showUpdateAlert(title: title, message: message, link: link, isForce: false)
+            }
+        }
+        else {
+            DispatchQueue.main.async {
+                self.viewDidAppearSubject.send(())
+            }
+        }
+    }
+
+    private func showUpdateAlert(title: String, message: String, link: String, isForce: Bool) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        let updateAction = UIAlertAction(title: "업데이트 하러가기", style: .default) { _ in
+            if let url = URL(string: link), UIApplication.shared.canOpenURL(url) {
+                UIApplication.shared.open(url)
+            }
+        }
+        alert.addAction(updateAction)
+
+        if !isForce {
+            alert.addAction(UIAlertAction(title: "나중에", style: .cancel) { [weak self] _ in
+                self?.viewDidAppearSubject.send(())
+            })
+        }
+
+        present(alert, animated: true)
     }
 
     // MARK: - Bind
