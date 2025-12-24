@@ -10,4 +10,5 @@ import Foundation
 public enum DeeplinkDestination {
     case diaryDetail(diaryId: Int)
     case userProfile(userId: Int)
+    case home
 }

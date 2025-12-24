@@ -417,6 +417,14 @@ extension AppDIContainer {
 
 extension AppDIContainer {
 
+    private func makeLocalPushRepository() -> LocalPushRepository {
+        return DefaultLocalPushRepository()
+    }
+
+    private func makeLocalPushUseCase() -> LocalPushUseCase {
+        return DefaultLocalPushUseCase(repository: makeLocalPushRepository())
+    }
+
     private func makeHomeService() -> HomeService {
         return DefaultHomeService()
     }
@@ -431,7 +439,7 @@ extension AppDIContainer {
     
     @MainActor
     private func makeHomeViewModel() -> HomeViewModel {
-        return HomeViewModel(useCase: makeHomeUseCase(), fetchTemporaryDiaryUseCase: makeFetchTemporaryDiaryUseCase())
+        return HomeViewModel(useCase: makeHomeUseCase(), fetchTemporaryDiaryUseCase: makeFetchTemporaryDiaryUseCase(), localPushUseCase: makeLocalPushUseCase())
     }
 }
 

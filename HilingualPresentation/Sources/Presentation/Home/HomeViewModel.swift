@@ -33,6 +33,7 @@ public final class HomeViewModel: BaseViewModel {
 
     private let useCase: HomeUseCase
     private let fetchTemporaryDiaryUseCase: FetchTemporaryDiaryUseCase
+    private let localPushUseCase: LocalPushUseCase
 
     public let hasDraft = PassthroughSubject<Bool, Never>()
 
@@ -40,10 +41,12 @@ public final class HomeViewModel: BaseViewModel {
 
     public init(
         useCase: HomeUseCase,
-        fetchTemporaryDiaryUseCase: FetchTemporaryDiaryUseCase
+        fetchTemporaryDiaryUseCase: FetchTemporaryDiaryUseCase,
+        localPushUseCase: LocalPushUseCase
     ) {
         self.useCase = useCase
         self.fetchTemporaryDiaryUseCase = fetchTemporaryDiaryUseCase
+        self.localPushUseCase = localPushUseCase
     }
 
     // MARK: - Transform
@@ -74,6 +77,12 @@ public final class HomeViewModel: BaseViewModel {
             userInfo: userInfoPublisher,
             filledDates: filledDatesPublisher
         )
+    }
+
+    // MARK: - Local Push Methods
+    
+    public func registerInitialLocalPushes() {
+        localPushUseCase.registerInitialPushes()
     }
 
 
