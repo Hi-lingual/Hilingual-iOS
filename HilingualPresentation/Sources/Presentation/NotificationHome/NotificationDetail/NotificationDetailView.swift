@@ -11,6 +11,18 @@ final class NotificationDetailView: BaseUIView {
 
     // MARK: - UI Components
 
+    private let scrollView: UIScrollView = {
+        let scrollView = UIScrollView()
+        scrollView.showsVerticalScrollIndicator = true
+        scrollView.alwaysBounceVertical = true
+        return scrollView
+    }()
+
+    private let contentView: UIView = {
+        let view = UIView()
+        return view
+    }()
+
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.font = .pretendard(.head_sb_20)
@@ -62,12 +74,23 @@ final class NotificationDetailView: BaseUIView {
     // MARK: - Setup
 
     override func setUI() {
-        addSubviews(titleLabel, dateLabel, separatorView, contentTextView)
+        addSubview(scrollView)
+        scrollView.addSubview(contentView)
+        contentView.addSubviews(titleLabel, dateLabel, separatorView, contentTextView)
     }
 
     override func setLayout() {
+        scrollView.snp.makeConstraints {
+            $0.edges.equalTo(safeAreaLayoutGuide)
+        }
+
+        contentView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+            $0.width.equalToSuperview()
+        }
+
         titleLabel.snp.makeConstraints {
-            $0.top.equalTo(safeAreaLayoutGuide).inset(16)
+            $0.top.equalToSuperview().inset(16)
             $0.leading.trailing.equalToSuperview().inset(20)
         }
 
@@ -85,7 +108,7 @@ final class NotificationDetailView: BaseUIView {
         contentTextView.snp.makeConstraints {
             $0.top.equalTo(separatorView.snp.bottom).offset(10)
             $0.leading.trailing.equalToSuperview().inset(20)
-            $0.bottom.lessThanOrEqualToSuperview().inset(20)
+            $0.bottom.equalToSuperview().inset(20)
         }
     }
 
