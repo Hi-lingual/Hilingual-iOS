@@ -28,8 +28,24 @@ final class SelectedInfo: UIView {
 
     internal let cardTopicView = CardTopicView()
     internal let cardPreview = CardPreview()
-    private let emptyDiaryView = EmptyDiaryView()
-    private let diaryLockView = DiaryLockView()
+    
+    private let emptyDiaryView: EmptyView = {
+        let view = EmptyView()
+        view.configure(
+            message: "작성된 일기가 없어요.\n좋은 하루 보내셨기를 바라요!",
+            imageName: "img_diary_empty_ios"
+        )
+        return view
+    }()
+
+    private let diaryLockView: EmptyView = {
+        let view = EmptyView()
+        view.configure(
+            message: "아직 작성 가능한 시간이 아니에요.\n오늘의 일기를 작성해주세요!",
+            imageName: "img_diary_lock_ios"
+        )
+        return view
+    }()
 
     private let selectedDayLabel: UILabel = {
         let label = UILabel()
