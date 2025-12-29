@@ -62,8 +62,12 @@ final class NotificationView: BaseUIView {
     private func updateView() {
         let items = notificationListModel.items
         let message = "아직 알림이 없어요."
-        emptyView.configure(message: message)
-
+        
+        emptyView.configure(
+            message: message,
+            imageName: "img_diary_empty_ios"
+        )
+        
         tableView.isHidden = items.isEmpty
         emptyView.isHidden = !items.isEmpty
         tableView.reloadData()

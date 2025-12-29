@@ -77,16 +77,13 @@ final class FollowListView: BaseUIView {
             message = "아직 팔로잉한 유저가 없어요."
         }
         
-        emptyView.configure(message: message)
+        emptyView.configure(
+            message: message,
+            imageName: "img_diary_empty_ios"
+        )
         
         emptyView.isHidden = !users.isEmpty
         tableView.isHidden = users.isEmpty
         tableView.reloadData()
     }
-}
-
-// MARK: - Preview
-
-#Preview {
-    FollowListView()
 }
