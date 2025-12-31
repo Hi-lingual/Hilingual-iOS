@@ -71,7 +71,7 @@ final class FeedListView: BaseUIView {
     }
 }
 
-// MARK: - Public API
+// MARK: - Extensions
 
 extension FeedListView {
 
@@ -86,7 +86,27 @@ extension FeedListView {
         updateEmptyView(customMessage: emptyMessage)
     }
 
-    var feeds: [FeedModel] { items }
+    var feeds: [FeedModel] {
+        items
+    }
+
+    func closeAllMenus() {
+        tableView.visibleCells
+            .compactMap { $0 as? FeedCell }
+            .forEach { $0.closeMenuIfNeeded() }
+    }
+
+    func addTableTapGesture(target: Any, action: Selector) {
+        let tap = UITapGestureRecognizer(target: target, action: action)
+        tap.cancelsTouchesInView = false
+        tableView.addGestureRecognizer(tap)
+    }
+
+    func removeDiary(at row: Int) {
+        guard items.indices.contains(row) else { return }
+        items.remove(at: row)
+        tableView.reloadData()
+    }
 }
 
 // MARK: - Private Methods
@@ -114,9 +134,9 @@ private extension FeedListView {
     }
 }
 
-// MARK: - UITableViewDataSource
+// MARK: - UITableViewDataSource, UITableViewDelegate
 
-extension FeedListView: UITableViewDataSource {
+extension FeedListView: UITableViewDataSource, UITableViewDelegate {
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         items.count
@@ -153,11 +173,6 @@ extension FeedListView: UITableViewDataSource {
 
         return cell
     }
-}
-
-// MARK: - UITableViewDelegate
-
-extension FeedListView: UITableViewDelegate {
 
     func scrollViewDidEndDragging(
         _ scrollView: UIScrollView,
@@ -196,28 +211,5 @@ extension FeedListView: FeedCell.FeedCellDelegate {
         tableView.indexPath(for: cell).map {
             isMine ? onHideTapped?($0.row) : onReportTapped?()
         }
-    }
-}
-
-// MARK: - Utilities
-
-extension FeedListView {
-
-    func closeAllMenus() {
-        tableView.visibleCells
-            .compactMap { $0 as? FeedCell }
-            .forEach { $0.closeMenuIfNeeded() }
-    }
-
-    func addTableTapGesture(target: Any, action: Selector) {
-        let tap = UITapGestureRecognizer(target: target, action: action)
-        tap.cancelsTouchesInView = false
-        tableView.addGestureRecognizer(tap)
-    }
-
-    func removeDiary(at row: Int) {
-        guard items.indices.contains(row) else { return }
-        items.remove(at: row)
-        tableView.reloadData()
     }
 }
