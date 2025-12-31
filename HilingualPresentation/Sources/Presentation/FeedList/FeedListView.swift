@@ -9,9 +9,9 @@ import UIKit
 import SnapKit
 
 final class FeedListView: BaseUIView {
-    
+
     // MARK: - Callbacks
-    
+
     var onHideTapped: ((Int) -> Void)?
     var onReportTapped: (() -> Void)?
     var onRefresh: (() -> Void)?
@@ -20,127 +20,119 @@ final class FeedListView: BaseUIView {
     var onFeedTextTapped: ((Int) -> Void)?
     var onFeedImageTapped: ((Int) -> Void)?
     var onLikeTapped: ((Int, Bool) -> Void)?
-    
+
     // MARK: - Properties
-    
+
     private var items: [FeedModel] = [] {
-        didSet {
-            tableView.reloadData()
-            updateEmptyState()
-        }
+        didSet { tableView.reloadData() }
     }
-    
     private var type: FeedProfileListType?
-    
+
     private(set) var tableView = UITableView(frame: .zero, style: .plain)
     private let noFeedView = EmptyView()
-    
+
     // MARK: - Setup Methods
-    
+
     override func setUI() {
         addSubviews(tableView, noFeedView)
-        
+
         tableView.dataSource = self
         tableView.delegate = self
         tableView.register(
             FeedCell.self,
             forCellReuseIdentifier: FeedCell.reuseIdentifier
         )
+
         tableView.separatorStyle = .none
         tableView.rowHeight = UITableView.automaticDimension
         tableView.estimatedRowHeight = 140
         tableView.showsVerticalScrollIndicator = false
-        
-        let refreshControl = UIRefreshControl()
-        refreshControl.addTarget(self, action: #selector(handleTopRefresh), for: .valueChanged)
-        tableView.refreshControl = refreshControl
-        
         tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 32, right: 0)
-        
+
+        let refresh = UIRefreshControl()
+        refresh.addTarget(self, action: #selector(handleTopRefresh), for: .valueChanged)
+        tableView.refreshControl = refresh
+
         noFeedView.isHidden = true
     }
-    
+
     override func setLayout() {
-        tableView.snp.makeConstraints {
-            $0.top.equalToSuperview()
-            $0.horizontalEdges.equalToSuperview()
-            $0.bottom.equalToSuperview()
-        }
-        
+        tableView.snp.makeConstraints { $0.edges.equalToSuperview() }
         noFeedView.snp.makeConstraints {
-            $0.top.equalToSuperview().offset(140)
+            $0.top.equalToSuperview().offset(160)
             $0.centerX.equalToSuperview()
         }
     }
-    
+
     // MARK: - Actions
-    
+
     @objc private func handleTopRefresh() {
         tableView.refreshControl?.endRefreshing()
     }
 }
 
-// MARK: - Extensions
+// MARK: - Public API
 
 extension FeedListView {
+
     func apply(items: [FeedModel], followingState haveFollowing: Bool? = nil) {
         self.items = items
-        
+        updateEmptyView(followingState: haveFollowing)
+    }
+
+    func apply(items: [FeedModel], emptyMessage: String?, type: FeedProfileListType) {
+        self.items = items
+        self.type = type
+        updateEmptyView(customMessage: emptyMessage)
+    }
+
+    var feeds: [FeedModel] { items }
+}
+
+// MARK: - Private Methods
+
+private extension FeedListView {
+
+    func updateEmptyView(
+        followingState haveFollowing: Bool? = nil,
+        customMessage: String? = nil
+    ) {
         guard items.isEmpty else {
             noFeedView.isHidden = true
             return
         }
-        
-        let message: String
-        
-        if let haveFollowing {
-            message = haveFollowing
-            ? "피드에 아직 공유된 일기가 없어요."
-            : "아직 팔로잉한 유저가 없어요.\n마음에 드는 사람을 찾아 팔로우해 보세요!"
-        } else {
-            message = "피드에 아직 공유된 일기가 없어요."
-        }
-        
+
+        let message =
+            customMessage ??
+            (haveFollowing == false
+                ? "아직 팔로잉한 유저가 없어요.\n마음에 드는 사람을 찾아 팔로우해 보세요!"
+                : "피드에 아직 공유된 일기가 없어요.")
+
         noFeedView.configure(message: message)
-        noFeedView.snp.updateConstraints {
-            $0.top.equalToSuperview().offset(160)
-        }
         noFeedView.isHidden = false
-    }
-    
-    func apply(items: [FeedModel], emptyMessage: String?, type: FeedProfileListType) {
-        self.items = items
-        self.type = type
-        
-        guard items.isEmpty, let emptyMessage else {
-            noFeedView.isHidden = true
-            return
-        }
-        
-        noFeedView.configure(message: emptyMessage)
-        noFeedView.isHidden = false
-    }
-    
-    var feeds: [FeedModel] {
-        items
+        bringSubviewToFront(noFeedView)
     }
 }
 
+// MARK: - UITableViewDataSource
+
 extension FeedListView: UITableViewDataSource {
-    func tableView(_ tableView: UITableView,
-                   numberOfRowsInSection section: Int) -> Int { items.count }
-    
-    func tableView(_ tableView: UITableView,
-                   cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        items.count
+    }
+
+    func tableView(
+        _ tableView: UITableView,
+        cellForRowAt indexPath: IndexPath
+    ) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(
             withIdentifier: FeedCell.reuseIdentifier,
             for: indexPath
-        ) as? FeedCell else {
-            return UITableViewCell()
-        }
+        ) as? FeedCell else { return UITableViewCell() }
+
         let item = items[indexPath.row]
         cell.delegate = self
-        
         cell.configure(
             nickname: item.nickname,
             profileImageURL: item.profileImg,
@@ -154,87 +146,78 @@ extension FeedListView: UITableViewDataSource {
             isLast: indexPath.row == items.count - 1,
             type: type
         )
-        
+
         cell.onLikeToggled = { [weak self] isLiked in
             self?.onLikeTapped?(indexPath.row, isLiked)
         }
-        
+
         return cell
     }
 }
 
+// MARK: - UITableViewDelegate
+
 extension FeedListView: UITableViewDelegate {
-    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-        let offsetY = scrollView.contentOffset.y
-        let contentHeight = scrollView.contentSize.height
-        let frameHeight = scrollView.frame.size.height
-        
-        if offsetY > contentHeight - frameHeight + 50 {
+
+    func scrollViewDidEndDragging(
+        _ scrollView: UIScrollView,
+        willDecelerate decelerate: Bool
+    ) {
+        let threshold = scrollView.contentSize.height - scrollView.frame.height + 50
+        if scrollView.contentOffset.y > threshold {
             onRefresh?()
         }
     }
 }
 
-private extension FeedListView {
-    func updateEmptyState() {
-        noFeedView.isHidden = !items.isEmpty
-        bringSubviewToFront(noFeedView)
-    }
-}
-
-extension FeedListView {
-    func closeAllMenus() {
-        for cell in tableView.visibleCells {
-            (cell as? FeedCell)?.closeMenuIfNeeded()
-        }
-    }
-    func addTableTapGesture(target: Any, action: Selector) {
-        let tapGesture = UITapGestureRecognizer(target: target, action: action)
-        tapGesture.cancelsTouchesInView = false
-        tableView.addGestureRecognizer(tapGesture)
-    }
-    
-    func removeDiary(at row: Int) {
-        guard row < items.count else { return }
-        items.remove(at: row)
-        tableView.reloadData()
-    }
-}
+// MARK: - FeedCellDelegate
 
 extension FeedListView: FeedCell.FeedCellDelegate {
+
     func feedCellDidTapProfile(_ cell: FeedCell) {
-        if let row = tableView.indexPath(for: cell)?.row {
-            onProfileTapped?(row)
-        }
+        tableView.indexPath(for: cell).map { onProfileTapped?($0.row) }
     }
-    
+
     func feedCellDidTapDetail(_ cell: FeedCell) {
-        if let row = tableView.indexPath(for: cell)?.row {
-            onDetailTapped?(row)
-        }
+        tableView.indexPath(for: cell).map { onDetailTapped?($0.row) }
     }
-    
+
     func feedCellDidTapFeedText(_ cell: FeedCell) {
-        if let row = tableView.indexPath(for: cell)?.row {
-            onFeedTextTapped?(row)
-        }
+        tableView.indexPath(for: cell).map { onFeedTextTapped?($0.row) }
     }
-    
+
     func feedCellDidTapFeedImage(_ cell: FeedCell) {
-        if let row = tableView.indexPath(for: cell)?.row {
-            onFeedImageTapped?(row)
+        tableView.indexPath(for: cell).map { onFeedImageTapped?($0.row) }
+    }
+
+    func feedCell(_ cell: FeedCell, didTapMoreButton isMine: Bool) { }
+
+    func feedCell(_ cell: FeedCell, didTapMenuItemAt index: Int, isMine: Bool) {
+        tableView.indexPath(for: cell).map {
+            isMine ? onHideTapped?($0.row) : onReportTapped?()
         }
     }
-    
-    func feedCell(_ cell: FeedCell, didTapMoreButton isMine: Bool) { }
-    
-    func feedCell(_ cell: FeedCell, didTapMenuItemAt index: Int, isMine: Bool) {
-        if isMine {
-            if let row = tableView.indexPath(for: cell)?.row {
-                onHideTapped?(row)
-            }
-        } else {
-            onReportTapped?()
-        }
+}
+
+// MARK: - Utilities
+
+extension FeedListView {
+
+    func closeAllMenus() {
+        tableView.visibleCells
+            .compactMap { $0 as? FeedCell }
+            .forEach { $0.closeMenuIfNeeded() }
+    }
+
+    func addTableTapGesture(target: Any, action: Selector) {
+        let tap = UITapGestureRecognizer(target: target, action: action)
+        tap.cancelsTouchesInView = false
+        tableView.addGestureRecognizer(tap)
+    }
+
+    func removeDiary(at row: Int) {
+        guard items.indices.contains(row) else { return }
+        items.remove(at: row)
+        tableView.reloadData()
     }
 }
