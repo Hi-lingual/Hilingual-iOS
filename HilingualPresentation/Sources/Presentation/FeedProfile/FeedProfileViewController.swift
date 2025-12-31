@@ -26,7 +26,7 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
 
     // MARK: - Properties
 
-    private(set) var feedCellView = FeedList()
+    private(set) var feedCellView = FeedListView()
     private let input = FeedProfileViewModel.Input()
     private let type: FeedProfileListType
 

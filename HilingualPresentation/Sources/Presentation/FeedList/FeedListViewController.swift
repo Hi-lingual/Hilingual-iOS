@@ -14,7 +14,7 @@ public final class FeedListViewController: BaseUIViewController<FeedViewModel> {
 
     // MARK: - Properties
 
-    private(set) var feedCellView = FeedList()
+    private(set) var feedCellView = FeedListView()
     private let input = FeedViewModel.Input()
 
     var onHideTapped: ((Int) -> Void)?

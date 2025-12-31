@@ -1,5 +1,5 @@
 //
-//  FeedList.swift
+//  FeedListView.swift
 //  HilingualPresentation
 //
 //  Created by 조영서 on 8/19/25.
@@ -8,10 +8,10 @@
 import UIKit
 import SnapKit
 
-final class FeedList: BaseUIView {
+final class FeedListView: BaseUIView {
     
     // MARK: - Callbacks
-
+    
     var onHideTapped: ((Int) -> Void)?
     var onReportTapped: (() -> Void)?
     var onRefresh: (() -> Void)?
@@ -20,7 +20,7 @@ final class FeedList: BaseUIView {
     var onFeedTextTapped: ((Int) -> Void)?
     var onFeedImageTapped: ((Int) -> Void)?
     var onLikeTapped: ((Int, Bool) -> Void)?
-
+    
     // MARK: - Properties
     
     private var items: [FeedModel] = [] {
@@ -34,12 +34,12 @@ final class FeedList: BaseUIView {
     
     private(set) var tableView = UITableView(frame: .zero, style: .plain)
     private let noFeedView = EmptyView()
-
+    
     // MARK: - Setup Methods
     
     override func setUI() {
         addSubviews(tableView, noFeedView)
-
+        
         tableView.dataSource = self
         tableView.delegate = self
         tableView.register(
@@ -54,19 +54,19 @@ final class FeedList: BaseUIView {
         let refreshControl = UIRefreshControl()
         refreshControl.addTarget(self, action: #selector(handleTopRefresh), for: .valueChanged)
         tableView.refreshControl = refreshControl
-                
+        
         tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 32, right: 0)
-
+        
         noFeedView.isHidden = true
     }
-
+    
     override func setLayout() {
         tableView.snp.makeConstraints {
             $0.top.equalToSuperview()
             $0.horizontalEdges.equalToSuperview()
             $0.bottom.equalToSuperview()
         }
-
+        
         noFeedView.snp.makeConstraints {
             $0.top.equalToSuperview().offset(140)
             $0.centerX.equalToSuperview()
@@ -80,53 +80,53 @@ final class FeedList: BaseUIView {
     }
 }
 
-// MARK: - Public API
+// MARK: - Extensions
 
-extension FeedList {
+extension FeedListView {
     func apply(items: [FeedModel], followingState haveFollowing: Bool? = nil) {
         self.items = items
         
-        if items.isEmpty {
-            if let haveFollowing = haveFollowing {
-                if haveFollowing {
-                    noFeedView.configure(message: "피드에 아직 공유된 일기가 없어요.")
-                    noFeedView.snp.updateConstraints { $0.top.equalToSuperview().offset(160) }
-
-                } else {
-                    noFeedView.configure(
-                        message: "아직 팔로잉한 유저가 없어요.\n마음에 드는 사람을 찾아 팔로우해 보세요!"
-                    )
-                    noFeedView.snp.updateConstraints { $0.top.equalToSuperview().offset(160) }
-                }
-            } else {
-                noFeedView.configure(message: "피드에 아직 공유된 일기가 없어요.")
-                noFeedView.snp.updateConstraints { $0.top.equalToSuperview().offset(160) }
-            }
-            noFeedView.isHidden = false
-        } else {
+        guard items.isEmpty else {
             noFeedView.isHidden = true
+            return
         }
+        
+        let message: String
+        
+        if let haveFollowing {
+            message = haveFollowing
+            ? "피드에 아직 공유된 일기가 없어요."
+            : "아직 팔로잉한 유저가 없어요.\n마음에 드는 사람을 찾아 팔로우해 보세요!"
+        } else {
+            message = "피드에 아직 공유된 일기가 없어요."
+        }
+        
+        noFeedView.configure(message: message)
+        noFeedView.snp.updateConstraints {
+            $0.top.equalToSuperview().offset(160)
+        }
+        noFeedView.isHidden = false
     }
     
     func apply(items: [FeedModel], emptyMessage: String?, type: FeedProfileListType) {
         self.items = items
         self.type = type
-        if let emptyMessage, items.isEmpty {
-            noFeedView.configure(message: emptyMessage)
-            noFeedView.isHidden = false
-        } else {
+        
+        guard items.isEmpty, let emptyMessage else {
             noFeedView.isHidden = true
+            return
         }
+        
+        noFeedView.configure(message: emptyMessage)
+        noFeedView.isHidden = false
     }
     
     var feeds: [FeedModel] {
-        return items
+        items
     }
 }
 
-// MARK: - Extensions
-
-extension FeedList: UITableViewDataSource {
+extension FeedListView: UITableViewDataSource {
     func tableView(_ tableView: UITableView,
                    numberOfRowsInSection section: Int) -> Int { items.count }
     
@@ -163,26 +163,26 @@ extension FeedList: UITableViewDataSource {
     }
 }
 
-extension FeedList: UITableViewDelegate {
+extension FeedListView: UITableViewDelegate {
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
         let offsetY = scrollView.contentOffset.y
         let contentHeight = scrollView.contentSize.height
         let frameHeight = scrollView.frame.size.height
-
+        
         if offsetY > contentHeight - frameHeight + 50 {
             onRefresh?()
         }
     }
 }
 
-private extension FeedList {
+private extension FeedListView {
     func updateEmptyState() {
         noFeedView.isHidden = !items.isEmpty
         bringSubviewToFront(noFeedView)
     }
 }
 
-extension FeedList {
+extension FeedListView {
     func closeAllMenus() {
         for cell in tableView.visibleCells {
             (cell as? FeedCell)?.closeMenuIfNeeded()
@@ -201,13 +201,13 @@ extension FeedList {
     }
 }
 
-extension FeedList: FeedCell.FeedCellDelegate {
+extension FeedListView: FeedCell.FeedCellDelegate {
     func feedCellDidTapProfile(_ cell: FeedCell) {
         if let row = tableView.indexPath(for: cell)?.row {
             onProfileTapped?(row)
         }
     }
-
+    
     func feedCellDidTapDetail(_ cell: FeedCell) {
         if let row = tableView.indexPath(for: cell)?.row {
             onDetailTapped?(row)
@@ -225,9 +225,9 @@ extension FeedList: FeedCell.FeedCellDelegate {
             onFeedImageTapped?(row)
         }
     }
-
+    
     func feedCell(_ cell: FeedCell, didTapMoreButton isMine: Bool) { }
-
+    
     func feedCell(_ cell: FeedCell, didTapMenuItemAt index: Int, isMine: Bool) {
         if isMine {
             if let row = tableView.indexPath(for: cell)?.row {
