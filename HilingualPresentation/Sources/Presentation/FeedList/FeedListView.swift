@@ -49,10 +49,6 @@ final class FeedListView: BaseUIView {
         tableView.showsVerticalScrollIndicator = false
         tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 32, right: 0)
 
-        let refresh = UIRefreshControl()
-        refresh.addTarget(self, action: #selector(handleTopRefresh), for: .valueChanged)
-        tableView.refreshControl = refresh
-
         noFeedView.isHidden = true
     }
 
@@ -62,12 +58,6 @@ final class FeedListView: BaseUIView {
             $0.top.equalToSuperview().offset(160)
             $0.centerX.equalToSuperview()
         }
-    }
-
-    // MARK: - Actions
-
-    @objc private func handleTopRefresh() {
-        tableView.refreshControl?.endRefreshing()
     }
 }
 

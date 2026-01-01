@@ -34,10 +34,6 @@ public final class FeedListViewController: BaseUIViewController<FeedViewModel> {
         super.viewDidLoad()
         bindViewModel()
 
-        let refreshControl = UIRefreshControl()
-        refreshControl.addTarget(self, action: #selector(didTopScrollRefresh), for: .valueChanged)
-        feedCellView.tableView.refreshControl = refreshControl
-
         feedCellView.addTableTapGesture(target: self, action: #selector(didTapTableView))
 
         feedCellView.onHideTapped = { [weak self] row in
