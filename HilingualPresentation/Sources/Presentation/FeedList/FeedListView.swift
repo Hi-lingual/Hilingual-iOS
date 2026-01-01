@@ -81,9 +81,11 @@ extension FeedListView {
     }
 
     func closeAllMenus() {
-        tableView.visibleCells
-            .compactMap { $0 as? FeedCell }
-            .forEach { $0.closeMenuIfNeeded() }
+        for cell in tableView.visibleCells {
+            if let feedCell = cell as? FeedCell {
+                feedCell.closeMenuIfNeeded()
+            }
+        }
     }
 
     func addTableTapGesture(target: Any, action: Selector) {
