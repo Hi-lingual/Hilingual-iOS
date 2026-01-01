@@ -208,8 +208,12 @@ extension FeedListView: FeedCell.FeedCellDelegate {
     func feedCell(_ cell: FeedCell, didTapMoreButton isMine: Bool) { }
 
     func feedCell(_ cell: FeedCell, didTapMenuItemAt index: Int, isMine: Bool) {
-        if let row = tableView.indexPath(for: cell)?.row {
-            isMine ? onHideTapped?(row) : onReportTapped?()
+        guard let row = tableView.indexPath(for: cell)?.row else { return }
+
+        if isMine {
+            onHideTapped?(row)
+        } else {
+            onReportTapped?()
         }
     }
 }
