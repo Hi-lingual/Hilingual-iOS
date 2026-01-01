@@ -180,26 +180,34 @@ extension FeedListView: UITableViewDataSource, UITableViewDelegate {
 extension FeedListView: FeedCell.FeedCellDelegate {
 
     func feedCellDidTapProfile(_ cell: FeedCell) {
-        tableView.indexPath(for: cell).map { onProfileTapped?($0.row) }
+        if let row = tableView.indexPath(for: cell)?.row {
+            onProfileTapped?(row)
+        }
     }
 
     func feedCellDidTapDetail(_ cell: FeedCell) {
-        tableView.indexPath(for: cell).map { onDetailTapped?($0.row) }
+        if let row = tableView.indexPath(for: cell)?.row {
+            onDetailTapped?(row)
+        }
     }
 
     func feedCellDidTapFeedText(_ cell: FeedCell) {
-        tableView.indexPath(for: cell).map { onFeedTextTapped?($0.row) }
+        if let row = tableView.indexPath(for: cell)?.row {
+            onFeedTextTapped?(row)
+        }
     }
 
     func feedCellDidTapFeedImage(_ cell: FeedCell) {
-        tableView.indexPath(for: cell).map { onFeedImageTapped?($0.row) }
+        if let row = tableView.indexPath(for: cell)?.row {
+            onFeedImageTapped?(row)
+        }
     }
 
     func feedCell(_ cell: FeedCell, didTapMoreButton isMine: Bool) { }
 
     func feedCell(_ cell: FeedCell, didTapMenuItemAt index: Int, isMine: Bool) {
-        tableView.indexPath(for: cell).map {
-            isMine ? onHideTapped?($0.row) : onReportTapped?()
+        if let row = tableView.indexPath(for: cell)?.row {
+            isMine ? onHideTapped?(row) : onReportTapped?()
         }
     }
 }
