@@ -84,9 +84,3 @@ final class FollowListView: BaseUIView {
         tableView.reloadData()
     }
 }
-
-// MARK: - Preview
-
-#Preview {
-    FollowListView()
-}

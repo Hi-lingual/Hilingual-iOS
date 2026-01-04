@@ -9,68 +9,83 @@ import UIKit
 import SnapKit
 
 final class EmptyView: UIView {
-
-    private let noFeedLabel: UILabel = {
+    
+    // MARK: - UI Components
+    
+    private let messageLabel: UILabel = {
         let label = UILabel()
-        label.text = "피드에 아직 공유된 일기가 없어요."
         label.font = .pretendard(.head_r_18)
         label.textColor = .gray500
         label.textAlignment = .center
         label.numberOfLines = 2
         return label
     }()
-
-    private let noFeedView: UIImageView = {
+    
+    private let imageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFit
-        imageView.image = UIImage(named: "img_diary_empty_ios", in: .module, compatibleWith: nil)
         return imageView
     }()
-
-    private let noFeedStack: UIStackView = {
+    
+    private let stackView: UIStackView = {
         let stack = UIStackView()
         stack.axis = .vertical
         stack.spacing = 8
         stack.alignment = .center
         return stack
     }()
-
+    
+    // MARK: - Initializer
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
-        setupUI()
-        setupLayout()
+        setUI()
+        setLayout()
+        setDefault()
     }
-
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
-    private func setupUI() {
-        addSubview(noFeedStack)
-        noFeedStack.addArrangedSubviews(
-            noFeedView,
-            noFeedLabel
+    
+    // MARK: - Setup Methods
+    
+    private func setUI() {
+        addSubview(stackView)
+        stackView.addArrangedSubviews(
+            imageView,
+            messageLabel
         )
     }
-
-    private func setupLayout() {
-        noFeedStack.snp.makeConstraints {
+    
+    private func setLayout() {
+        stackView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
         
-        noFeedView.snp.makeConstraints {
+        imageView.snp.makeConstraints {
             $0.width.equalTo(200)
             $0.height.equalTo(100)
         }
     }
     
+    private func setDefault() {
+        configure(
+            message: "피드에 아직 공유된 일기가 없어요.",
+            imageName: "img_diary_empty_ios"
+        )
+    }
+    
     // MARK: - Configure
-    func configure(message: String? = nil, imageName: String? = nil) {
-        if let message = message {
-            noFeedLabel.text = message
-        }
-        if let imageName = imageName {
-            noFeedView.image = UIImage(
+    
+    func configure(
+        message: String,
+        imageName: String? = nil
+    ) {
+        messageLabel.text = message
+        
+        if let imageName {
+            imageView.image = UIImage(
                 named: imageName,
                 in: .module,
                 compatibleWith: nil

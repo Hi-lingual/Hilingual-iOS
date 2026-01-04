@@ -14,7 +14,7 @@ public final class FeedListViewController: BaseUIViewController<FeedViewModel> {
 
     // MARK: - Properties
 
-    private(set) var feedCellView = FeedList()
+    private(set) var feedCellView = FeedListView()
     private let input = FeedViewModel.Input()
 
     var onHideTapped: ((Int) -> Void)?
@@ -33,10 +33,6 @@ public final class FeedListViewController: BaseUIViewController<FeedViewModel> {
     public override func viewDidLoad() {
         super.viewDidLoad()
         bindViewModel()
-
-        let refreshControl = UIRefreshControl()
-        refreshControl.addTarget(self, action: #selector(didTopScrollRefresh), for: .valueChanged)
-        feedCellView.tableView.refreshControl = refreshControl
 
         feedCellView.addTableTapGesture(target: self, action: #selector(didTapTableView))
 
