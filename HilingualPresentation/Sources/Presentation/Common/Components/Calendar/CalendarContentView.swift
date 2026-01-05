@@ -12,7 +12,13 @@ final class CalendarContentView: UICollectionView {
 
     // MARK: - Properties
 
-    private let calendar = Calendar.current
+    private let calendar: Calendar = {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.firstWeekday = 1
+        calendar.timeZone = .current
+        return calendar
+    }()
+
     private var currentDate = Date()
     private var startOfMonth: Date? {
         calendar.date(from: calendar.dateComponents([.year, .month], from: currentDate))
