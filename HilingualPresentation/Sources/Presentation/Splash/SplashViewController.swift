@@ -54,16 +54,22 @@ public final class SplashViewController: BaseUIViewController<SplashViewModel> {
         remoteConfig.setDefaults(defaults)
 
         remoteConfig.fetch(withExpirationDuration: 0) { [weak self] status, error in
-            guard let self = self else { return }
+            Task { @MainActor in
+                guard let self = self else { return }
 
-            if let error = error {
-                print("🔥 RemoteConfig fetch 실패: \(error.localizedDescription)")
-                self.viewDidAppearSubject.send(())
-                return
-            }
+                if let error = error {
+                    print("🔥 RemoteConfig fetch 실패: \(error.localizedDescription)")
+                    self.viewDidAppearSubject.send(())
+                    return
+                }
 
-            self.remoteConfig.activate { _, _ in
-                self.evaluateVersion()
+                do {
+                    _ = try await self.remoteConfig.activate()
+                    self.evaluateVersion()
+                } catch {
+                    print("🔥 RemoteConfig activate 실패: \(error.localizedDescription)")
+                    self.viewDidAppearSubject.send(())
+                }
             }
         }
     }
