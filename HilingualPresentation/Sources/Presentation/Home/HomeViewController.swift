@@ -13,6 +13,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     private var currentDateRequestCancellable: AnyCancellable?
     private var pendingDraftDate: Date?
     private var pendingDraftTopic: (String, String)?
+    private let localPushPermissionService = LocalPushPermissionService()
     
     // MARK: - Life Cycle
     
@@ -574,27 +575,11 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     }
 
     private func checkAndRequestLocalPushPermission() {
-        let center = UNUserNotificationCenter.current()
-
-        center.getNotificationSettings { [weak self] settings in
-            let status = settings.authorizationStatus
-
-            DispatchQueue.main.async {
-                switch status {
-                case .notDetermined:
-                    center.requestAuthorization(options: [.alert, .sound, .badge]) { granted, _ in
-                        if granted {
-                            DispatchQueue.main.async {
-                                self?.viewModel?.registerInitialLocalPushes()
-                            }
-                        }
-                    }
-                case .authorized, .provisional:
-                    self?.viewModel?.registerInitialLocalPushes()
-                default:
-                    break
-                }
-            }
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+            let shouldRegister = await localPushPermissionService.checkAndRequestPermission()
+            guard shouldRegister else { return }
+            self.viewModel?.registerInitialLocalPushes()
         }
     }
 
