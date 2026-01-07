@@ -21,8 +21,7 @@ public final class SplashViewController: BaseUIViewController<SplashViewModel> {
     private let viewDidAppearSubject = PassthroughSubject<Void, Never>()
 
     // MARK: - Firebase Remote Config
-
-    private var remoteConfig = RemoteConfig.remoteConfig()
+    private let remoteConfig = RemoteConfig.remoteConfig()
 
     // MARK: - Lifecycle
 
@@ -53,27 +52,39 @@ public final class SplashViewController: BaseUIViewController<SplashViewModel> {
         ]
         remoteConfig.setDefaults(defaults)
 
-        remoteConfig.fetch(withExpirationDuration: 0) { [weak self] status, error in
+        remoteConfig.fetch(withExpirationDuration: 0) { [weak self] _, error in
             Task { @MainActor in
-                guard let self = self else { return }
+                guard let self else { return }
 
-                if let error = error {
+                if let error {
                     print("🔥 RemoteConfig fetch 실패: \(error.localizedDescription)")
                     self.viewDidAppearSubject.send(())
                     return
                 }
 
-                do {
-                    _ = try await self.remoteConfig.activate()
-                    self.evaluateVersion()
-                } catch {
-                    print("🔥 RemoteConfig activate 실패: \(error.localizedDescription)")
-                    self.viewDidAppearSubject.send(())
-                }
+                self.activateRemoteConfigAndEvaluate()
             }
         }
     }
 
+    @MainActor
+    private func activateRemoteConfigAndEvaluate() {
+        remoteConfig.activate { [weak self] _, error in
+            Task { @MainActor in
+                guard let self else { return }
+
+                if let error {
+                    print("🔥 RemoteConfig activate 실패: \(error.localizedDescription)")
+                    self.viewDidAppearSubject.send(())
+                    return
+                }
+
+                self.evaluateVersion()
+            }
+        }
+    }
+
+    @MainActor
     private func evaluateVersion() {
         let minimumVersion = remoteConfig["minimum_version_iOS"].stringValue
         let latestVersion = remoteConfig["latestVersion"].stringValue
@@ -92,28 +103,20 @@ public final class SplashViewController: BaseUIViewController<SplashViewModel> {
         print("최신 버전: \(latestVersion)")
 
         if currentVersion.compare(minimumVersion, options: .numeric) == .orderedAscending {
-            DispatchQueue.main.async {
-                self.showUpdateAlert(title: title, message: message, link: link, isForce: true)
-            }
-        }
-        else if currentVersion.compare(latestVersion, options: .numeric) == .orderedAscending {
-            DispatchQueue.main.async {
-                self.showUpdateAlert(title: title, message: message, link: link, isForce: false)
-            }
-        }
-        else {
-            DispatchQueue.main.async {
-                self.viewDidAppearSubject.send(())
-            }
+            showUpdateAlert(title: title, message: message, link: link, isForce: true)
+        } else if currentVersion.compare(latestVersion, options: .numeric) == .orderedAscending {
+            showUpdateAlert(title: title, message: message, link: link, isForce: false)
+        } else {
+            viewDidAppearSubject.send(())
         }
     }
 
+    @MainActor
     private func showUpdateAlert(title: String, message: String, link: String, isForce: Bool) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         let updateAction = UIAlertAction(title: "업데이트 하러가기", style: .default) { _ in
-            if let url = URL(string: link), UIApplication.shared.canOpenURL(url) {
-                UIApplication.shared.open(url)
-            }
+            guard let url = URL(string: link), UIApplication.shared.canOpenURL(url) else { return }
+            UIApplication.shared.open(url)
         }
         alert.addAction(updateAction)
 
