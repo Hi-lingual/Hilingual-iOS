@@ -24,9 +24,7 @@ final class FeedCell: UITableViewCell {
     }
 
     // MARK: - Properties
-    
-    static let reuseIdentifier = "FeedCell"
-    
+        
     weak var delegate: FeedCellDelegate?
     private var isMine: Bool = false
     
