@@ -1,3 +1,10 @@
+//
+//  CustomCalendarCell.swift
+//  HilingualPresentation
+//
+//  Created by 조영서 on 8/2/25.
+//
+
 import UIKit
 import SnapKit
 
@@ -53,7 +60,24 @@ final class CustomCalendarCell: UICollectionViewCell {
         }
     }
 
-    // MARK: - Public
+    // MARK: - Private Methods
+
+    private func animateAppearance() {
+        bubbleView.transform = CGAffineTransform(scaleX: 0.4, y: 0.4)
+
+        UIView.animate(
+            withDuration: 0.25,
+            delay: 0,
+            usingSpringWithDamping: 0.45,
+            initialSpringVelocity: 1.5,
+            options: [.curveEaseOut],
+            animations: {
+                self.bubbleView.transform = .identity
+            }
+        )
+    }
+
+    // MARK: - Configure
 
     func configure(
         day: Int,
@@ -63,43 +87,27 @@ final class CustomCalendarCell: UICollectionViewCell {
         isWithinMonth: Bool
     ) {
         dayLabel.text = "\(day)"
-        dayLabel.font = .pretendard(.body_m_14)
+        dayLabel.textColor = isWithinMonth ? .black : .gray200
 
-        if isWithinMonth {
-            dayLabel.textColor = .black // 기본 표시
-        } else {
-            dayLabel.textColor = .gray200 // 이번 달이 아닌 날짜 표시
-        }
+        bubbleView.image = nil
 
-        if isSelected { // 현재 선택한 날 표시
-            bubbleView.image = UIImage(named: "img_bubble_filled_ios", in: .module, compatibleWith: nil)
+        if isSelected {
+            bubbleView.image = UIImage(
+                named: "img_bubble_filled_ios",
+                in: .module,
+                compatibleWith: nil
+            )
             dayLabel.textColor = .white
             animateAppearance()
-        } else if isFilled { // 작성한 날 표시
-            bubbleView.image = UIImage(named: "img_bubble_written_ios", in: .module, compatibleWith: nil)
-            dayLabel.textColor = .hilingualBlue
-        } else {
-            bubbleView.image = nil
-        }
-
-        dotView.isHidden = !isToday // 오늘 날짜 표시
-    }
-
-    private func animateAppearance() {
-        DispatchQueue.main.async {
-            self.bubbleView.transform = CGAffineTransform(scaleX: 0.4, y: 0.4)
-
-            UIView.animate(
-                withDuration: 0.25,
-                delay: 0,
-                usingSpringWithDamping: 0.45,
-                initialSpringVelocity: 1.5,
-                options: [.curveEaseOut],
-                animations: {
-                    self.bubbleView.transform = .identity
-                },
-                completion: nil
+        } else if isFilled {
+            bubbleView.image = UIImage(
+                named: "img_bubble_written_ios",
+                in: .module,
+                compatibleWith: nil
             )
+            dayLabel.textColor = .hilingualBlue
         }
+
+        dotView.isHidden = !isToday
     }
 }
