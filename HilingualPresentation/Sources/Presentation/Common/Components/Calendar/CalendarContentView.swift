@@ -69,21 +69,20 @@ final class CalendarContentView: UICollectionView {
         fatalError("init(coder:) has not been implemented")
     }
 
-    // MARK: - Private Methods
+    // MARK: - Public Methods
 
     func reload(for date: Date) {
         currentDate = date
         generateDays()
-
-        DispatchQueue.main.async {
-            self.reloadData()
-            self.invalidateIntrinsicContentSize()
-        }
+        reloadData()
+        invalidateIntrinsicContentSize()
     }
 
     func setSelectedDate(_ date: Date) {
         selectedDate = date
     }
+
+    // MARK: - Private Methods
 
     private func generateDays() {
         days.removeAll()
