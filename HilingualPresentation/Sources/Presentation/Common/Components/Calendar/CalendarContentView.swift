@@ -74,8 +74,10 @@ final class CalendarContentView: UICollectionView {
     func reload(for date: Date) {
         currentDate = date
         generateDays()
-        reloadData()
-        invalidateIntrinsicContentSize()
+        DispatchQueue.main.async {
+            self.reloadData()
+            self.invalidateIntrinsicContentSize()
+        }
     }
 
     func setSelectedDate(_ date: Date) {
