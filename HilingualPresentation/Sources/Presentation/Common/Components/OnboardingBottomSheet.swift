@@ -50,7 +50,7 @@ final class OnboardingBottomSheet: UIView {
         let view = UIImageView()
         view.contentMode = .scaleAspectFit
         view.image = UIImage(
-            named: "img_onboarding_bottomsheet_1_ios",
+            named: "img_onboarding_bottomsheet_ios",
             in: .module,
             compatibleWith: nil
         )
