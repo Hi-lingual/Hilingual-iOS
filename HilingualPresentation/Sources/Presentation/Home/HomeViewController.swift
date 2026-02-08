@@ -1,11 +1,19 @@
-import Foundation
-import Combine
+//
+//  HomeViewController.swift
+//  Hilingual
+//
+//  Created by 조영서 on 7/9/25.
+//
+
 import UIKit
+import Combine
 
 public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     
     // MARK: - Properties
     
+    private var hasShownOnboardingBottomSheet = false
+    private var onboardingBottomSheet: OnboardingBottomSheet?
     private var overlayView: UIControl?
     private let homeView = HomeView()
     let dialog = Dialog()
@@ -41,6 +49,11 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         input.monthChange.send((year, month))
         checkAndRequestLocalPushPermission()
 
+    }
+    
+    public override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        showOnboardingBottomSheet()
     }
     
     // MARK: - Bind
@@ -127,7 +140,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     }
     
     // MARK: - Action
-    
+
     public override func addTarget() {
         
         // 주제 카드 눌렀을 때, 일기 작성화면으로 이동
@@ -185,8 +198,23 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         homeView.profileView.profileImageView.addGestureRecognizer(profileTapGesture)
     }
     
-    //MARK: - Private Methods
-    
+    // MARK: - Private Methods
+
+    private func showOnboardingBottomSheet() {
+        guard !hasShownOnboardingBottomSheet else { return }
+        hasShownOnboardingBottomSheet = true
+
+        let bottomSheet = OnboardingBottomSheet()
+        onboardingBottomSheet = bottomSheet
+
+        view.window?.addSubview(bottomSheet)
+        bottomSheet.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
+
+        //bottomSheet.showAnimation()
+    }
+
     private func fetchAndShowDateInfo(for date: Date) {
         self.currentDateRequestCancellable?.cancel()
         

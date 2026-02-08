@@ -10,6 +10,31 @@ import SnapKit
 
 final class OnboardingBottomSheet: UIView {
 
+    // MARK: - Properties
+
+    private var currentStep: Int = 0
+
+    private let onboardingTexts: [String] = [
+        "오늘의 일기는\n48시간 동안 작성할 수 있어요.",
+        "일기를 삭제한 날에는\n다시 일기를 작성할 수 없어요.",
+        "작성한 일기는\n커뮤니티에 공유할 수 있어요.",
+        "일상 속 영어 습관을\n만들 준비가 됐나요?"
+    ]
+
+    private let onboardingImages: [UIImage?] = [
+        UIImage(named: "img_onboarding_bottomsheet_ios", in: .module, compatibleWith: nil),
+        UIImage(named: "img_onboarding_bottomsheet_2_ios", in: .module, compatibleWith: nil),
+        UIImage(named: "img_onboarding_bottomsheet_3_ios", in: .module, compatibleWith: nil),
+        UIImage(named: "img_onboarding_bottomsheet_4_ios", in: .module, compatibleWith: nil)
+    ]
+
+    private let barIndicatorImages: [UIImage?] = [
+        UIImage(named: "bar_indicator_1_ios", in: .module, compatibleWith: nil),
+        UIImage(named: "bar_indicator_2_ios", in: .module, compatibleWith: nil),
+        UIImage(named: "bar_indicator_3_ios", in: .module, compatibleWith: nil),
+        UIImage(named: "bar_indicator_4_ios", in: .module, compatibleWith: nil)
+    ]
+
     // MARK: - UI Components
 
     private let dimView: UIView = {
@@ -38,7 +63,6 @@ final class OnboardingBottomSheet: UIView {
 
     private let onboardingLabel: UILabel = {
         let label = UILabel()
-        label.text = "오늘의 일기는\n48시간 동안 작성할 수 있어요."
         label.textAlignment = .center
         label.font = .pretendard(.head_sb_20)
         label.textColor = .black
@@ -49,22 +73,12 @@ final class OnboardingBottomSheet: UIView {
     private let onboardingImageView: UIImageView = {
         let view = UIImageView()
         view.contentMode = .scaleAspectFit
-        view.image = UIImage(
-            named: "img_onboarding_bottomsheet_ios",
-            in: .module,
-            compatibleWith: nil
-        )
         return view
     }()
 
     private let barIndicatorImageView: UIImageView = {
         let view = UIImageView()
         view.contentMode = .scaleAspectFit
-        view.image = UIImage(
-            named: "bar_indicator_1_ios",
-            in: .module,
-            compatibleWith: nil
-        )
         return view
     }()
 
@@ -80,6 +94,7 @@ final class OnboardingBottomSheet: UIView {
         setUI()
         setLayout()
         bind()
+        updateStep()
     }
 
     required init?(coder: NSCoder) {
@@ -141,6 +156,8 @@ final class OnboardingBottomSheet: UIView {
         }
     }
 
+    // MARK: - Private Methods
+
     private func bind() {
         closeButton.addAction(
             UIAction { [weak self] _ in
@@ -148,29 +165,55 @@ final class OnboardingBottomSheet: UIView {
             },
             for: .touchUpInside
         )
-    }
 
-    // MARK: - Animation
-
-    func showAnimation() {
-        layoutIfNeeded()
-        let height = bottomSheetView.frame.height
-
-        bottomSheetView.transform = CGAffineTransform(translationX: 0, y: height)
-        dimView.alpha = 0
-
-        UIView.animate(
-            withDuration: 0.3,
-            delay: 0,
-            options: [.curveEaseOut],
-            animations: {
-                self.bottomSheetView.transform = .identity
-                self.dimView.alpha = 1
-            }
+        startButton.addAction(
+            UIAction { [weak self] _ in
+                self?.showNextStep()
+            },
+            for: .touchUpInside
         )
     }
 
-    func dismiss() {
+    private func showNextStep() {
+        guard currentStep < onboardingTexts.count - 1 else {
+            dismiss()
+            return
+        }
+
+        currentStep += 1
+        updateStep()
+    }
+
+    private func updateStep() {
+        onboardingLabel.text = onboardingTexts[currentStep]
+        onboardingImageView.image = onboardingImages[currentStep]
+        barIndicatorImageView.image = barIndicatorImages[currentStep]
+
+        let isLast = currentStep == onboardingTexts.count - 1
+        startButton.setTitle(isLast ? "시작하기" : "다음", for: .normal)
+    }
+
+    // TODO: - 바텀시트 show 애니메이션 넣을 것인지 말 것인지 물어보기
+
+//    private func showAnimation() {
+//        layoutIfNeeded()
+//        let height = bottomSheetView.frame.height
+//
+//        bottomSheetView.transform = CGAffineTransform(translationX: 0, y: height)
+//        dimView.alpha = 0
+//
+//        UIView.animate(
+//            withDuration: 0.3,
+//            delay: 0,
+//            options: [.curveEaseOut],
+//            animations: {
+//                self.bottomSheetView.transform = .identity
+//                self.dimView.alpha = 1
+//            }
+//        )
+//    }
+
+    private func dismiss() {
         let height = bottomSheetView.frame.height
 
         UIView.animate(
