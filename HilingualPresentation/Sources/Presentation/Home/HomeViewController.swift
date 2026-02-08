@@ -201,6 +201,8 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     // MARK: - Private Methods
 
     private func showOnboardingBottomSheet() {
+        guard UserDefaults.standard.bool(forKey: "showHomeOnboarding") else { return }
+
         guard !hasShownOnboardingBottomSheet else { return }
         hasShownOnboardingBottomSheet = true
 
@@ -213,6 +215,8 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         }
 
         //bottomSheet.showAnimation()
+
+        UserDefaults.standard.set(false, forKey: "showHomeOnboarding")
     }
 
     private func fetchAndShowDateInfo(for date: Date) {

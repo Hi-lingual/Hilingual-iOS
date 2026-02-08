@@ -200,6 +200,7 @@ final class AgreementModalView: UIView {
     }
 
     @objc private func startButtonTapped() {
+        UserDefaults.standard.set(true, forKey: "showHomeOnboarding")
         onStart?()
     }
 }
