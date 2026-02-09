@@ -214,8 +214,6 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
             $0.edges.equalToSuperview()
         }
 
-//        bottomSheet.showAnimation()
-
         UserDefaults.standard.set(false, forKey: "showHomeOnboarding")
     }
 

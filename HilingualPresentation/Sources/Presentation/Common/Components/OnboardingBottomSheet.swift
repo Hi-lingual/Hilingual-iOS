@@ -209,26 +209,4 @@ final class OnboardingBottomSheet: UIView {
             }
         )
     }
-    
-    // MARK: - Public Method
-    
-    // TODO: - 바텀시트 show 애니메이션 넣을 것인지 말 것인지 물어보기
-
-//    func showAnimation() {
-//        layoutIfNeeded()
-//        let height = bottomSheetView.frame.height
-//
-//        bottomSheetView.transform = CGAffineTransform(translationX: 0, y: height)
-//        dimView.alpha = 0
-//
-//        UIView.animate(
-//            withDuration: 0.3,
-//            delay: 0,
-//            options: [.curveEaseOut],
-//            animations: {
-//                self.bottomSheetView.transform = .identity
-//                self.dimView.alpha = 1
-//            }
-//        )
-//    }
 }
