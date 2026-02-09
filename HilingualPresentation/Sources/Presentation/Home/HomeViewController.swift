@@ -199,10 +199,8 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     }
     
     // MARK: - Private Methods
-
+    
     private func showOnboardingBottomSheet() {
-        guard UserDefaults.standard.bool(forKey: "showHomeOnboarding") else { return }
-
         guard !hasShownOnboardingBottomSheet else { return }
         hasShownOnboardingBottomSheet = true
 
@@ -213,9 +211,24 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         bottomSheet.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
-
-        UserDefaults.standard.set(false, forKey: "showHomeOnboarding")
     }
+
+//    private func showOnboardingBottomSheet() {
+//        guard UserDefaults.standard.bool(forKey: "showHomeOnboarding") else { return }
+//
+//        guard !hasShownOnboardingBottomSheet else { return }
+//        hasShownOnboardingBottomSheet = true
+//
+//        let bottomSheet = OnboardingBottomSheet()
+//        onboardingBottomSheet = bottomSheet
+//
+//        view.window?.addSubview(bottomSheet)
+//        bottomSheet.snp.makeConstraints {
+//            $0.edges.equalToSuperview()
+//        }
+//
+//        UserDefaults.standard.set(false, forKey: "showHomeOnboarding")
+//    }
 
     private func fetchAndShowDateInfo(for date: Date) {
         self.currentDateRequestCancellable?.cancel()
