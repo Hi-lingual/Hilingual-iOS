@@ -77,7 +77,7 @@ final class OnboardingBottomSheet: UIView {
     }()
 
     private let barIndicatorImageView: UIImageView = {
-        let view = UIImageView()
+        let view = UIImageView(image: UIImage(named: "bar_indicator_1_ios", in: .module, compatibleWith: nil))
         view.contentMode = .scaleAspectFit
         return view
     }()
@@ -94,8 +94,6 @@ final class OnboardingBottomSheet: UIView {
         setUI()
         setLayout()
         setupPages()
-        bind()
-        updateStep()
     }
 
     required init?(coder: NSCoder) {
@@ -113,9 +111,12 @@ final class OnboardingBottomSheet: UIView {
             barIndicatorImageView,
             startButton
         )
-
+        
         scrollView.addSubview(pageStackView)
         scrollView.delegate = self
+        
+        closeButton.addAction(UIAction { [weak self] _ in self?.dismiss()}, for: .touchUpInside)
+        startButton.addAction(UIAction { [weak self] _ in self?.showNextStep()}, for: .touchUpInside)
     }
 
     private func setLayout() {
@@ -193,22 +194,6 @@ final class OnboardingBottomSheet: UIView {
         }
     }
 
-    private func bind() {
-        closeButton.addAction(
-            UIAction { [weak self] _ in
-                self?.dismiss()
-            },
-            for: .touchUpInside
-        )
-
-        startButton.addAction(
-            UIAction { [weak self] _ in
-                self?.showNextStep()
-            },
-            for: .touchUpInside
-        )
-    }
-
     private func showNextStep() {
         guard currentStep < onboardingTexts.count - 1 else {
             dismiss()
@@ -216,21 +201,19 @@ final class OnboardingBottomSheet: UIView {
         }
 
         currentStep += 1
+
         scrollView.setContentOffset(
             CGPoint(x: CGFloat(currentStep) * scrollView.bounds.width, y: 0),
             animated: true
         )
-        updateStep()
-    }
 
-    private func updateStep() {
         barIndicatorImageView.image = barIndicatorImages[currentStep]
         startButton.setTitle(
             currentStep == onboardingTexts.count - 1 ? "시작하기" : "다음",
             for: .normal
         )
     }
-
+    
     private func dismiss() {
         UIView.animate(
             withDuration: 0.2,
@@ -254,6 +237,11 @@ extension OnboardingBottomSheet: UIScrollViewDelegate {
         currentStep = Int(
             round(scrollView.contentOffset.x / scrollView.bounds.width)
         )
-        updateStep()
+
+        barIndicatorImageView.image = barIndicatorImages[currentStep]
+        startButton.setTitle(
+            currentStep == onboardingTexts.count - 1 ? "시작하기" : "다음",
+            for: .normal
+        )
     }
 }
