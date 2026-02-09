@@ -61,19 +61,19 @@ final class OnboardingBottomSheet: UIView {
         return button
     }()
 
-    private let onboardingLabel: UILabel = {
-        let label = UILabel()
-        label.textAlignment = .center
-        label.font = .pretendard(.head_sb_20)
-        label.textColor = .black
-        label.numberOfLines = 2
-        return label
+    private let scrollView: UIScrollView = {
+        let scroll = UIScrollView()
+        scroll.isPagingEnabled = true
+        scroll.showsHorizontalScrollIndicator = false
+        scroll.bounces = false
+        return scroll
     }()
 
-    private let onboardingImageView: UIImageView = {
-        let view = UIImageView()
-        view.contentMode = .scaleAspectFit
-        return view
+    private let pageStackView: UIStackView = {
+        let stack = UIStackView()
+        stack.axis = .horizontal
+        stack.distribution = .fillEqually
+        return stack
     }()
 
     private let barIndicatorImageView: UIImageView = {
@@ -93,6 +93,7 @@ final class OnboardingBottomSheet: UIView {
         super.init(frame: frame)
         setUI()
         setLayout()
+        setupPages()
         bind()
         updateStep()
     }
@@ -107,12 +108,14 @@ final class OnboardingBottomSheet: UIView {
         addSubviews(dimView, bottomSheetView)
 
         bottomSheetView.addSubviews(
-            onboardingLabel,
             closeButton,
-            onboardingImageView,
+            scrollView,
             barIndicatorImageView,
             startButton
         )
+
+        scrollView.addSubview(pageStackView)
+        scrollView.delegate = self
     }
 
     private func setLayout() {
@@ -131,20 +134,19 @@ final class OnboardingBottomSheet: UIView {
             $0.size.equalTo(44)
         }
 
-        onboardingLabel.snp.makeConstraints {
+        scrollView.snp.makeConstraints {
             $0.top.equalToSuperview().inset(40)
-            $0.centerX.equalToSuperview()
-            $0.height.equalTo(48)
+            $0.leading.trailing.equalToSuperview()
+            $0.bottom.equalTo(barIndicatorImageView.snp.top).offset(-16)
         }
 
-        onboardingImageView.snp.makeConstraints {
-            $0.top.equalTo(onboardingLabel.snp.bottom).offset(12)
-            $0.centerX.equalToSuperview()
-            $0.size.equalTo(CGSize(width: 343, height: 172))
+        pageStackView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+            $0.height.equalToSuperview()
         }
 
         barIndicatorImageView.snp.makeConstraints {
-            $0.top.equalTo(onboardingImageView.snp.bottom).offset(16)
+            $0.top.equalTo(scrollView.snp.bottom).offset(16)
             $0.centerX.equalToSuperview()
             $0.size.equalTo(CGSize(width: 68, height: 8))
         }
@@ -157,6 +159,39 @@ final class OnboardingBottomSheet: UIView {
     }
 
     // MARK: - Private Methods
+
+    private func setupPages() {
+        onboardingTexts.indices.forEach { index in
+            let page = UIView()
+
+            let label = UILabel()
+            label.text = onboardingTexts[index]
+            label.textAlignment = .center
+            label.font = .pretendard(.head_sb_20)
+            label.numberOfLines = 2
+
+            let imageView = UIImageView(image: onboardingImages[index])
+            imageView.contentMode = .scaleAspectFit
+
+            page.addSubviews(label, imageView)
+            pageStackView.addArrangedSubview(page)
+
+            page.snp.makeConstraints {
+                $0.width.equalTo(scrollView.snp.width)
+            }
+
+            label.snp.makeConstraints {
+                $0.top.centerX.equalToSuperview()
+                $0.height.equalTo(48)
+            }
+
+            imageView.snp.makeConstraints {
+                $0.top.equalTo(label.snp.bottom).offset(12)
+                $0.centerX.equalToSuperview()
+                $0.size.equalTo(CGSize(width: 343, height: 172))
+            }
+        }
+    }
 
     private func bind() {
         closeButton.addAction(
@@ -181,32 +216,44 @@ final class OnboardingBottomSheet: UIView {
         }
 
         currentStep += 1
+        scrollView.setContentOffset(
+            CGPoint(x: CGFloat(currentStep) * scrollView.bounds.width, y: 0),
+            animated: true
+        )
         updateStep()
     }
 
     private func updateStep() {
-        onboardingLabel.text = onboardingTexts[currentStep]
-        onboardingImageView.image = onboardingImages[currentStep]
         barIndicatorImageView.image = barIndicatorImages[currentStep]
-
-        let isLast = currentStep == onboardingTexts.count - 1
-        startButton.setTitle(isLast ? "시작하기" : "다음", for: .normal)
+        startButton.setTitle(
+            currentStep == onboardingTexts.count - 1 ? "시작하기" : "다음",
+            for: .normal
+        )
     }
 
     private func dismiss() {
-        let height = bottomSheetView.frame.height
-
         UIView.animate(
             withDuration: 0.2,
-            delay: 0,
-            options: [.curveEaseIn],
             animations: {
-                self.bottomSheetView.transform = CGAffineTransform(translationX: 0, y: height)
+                self.bottomSheetView.transform =
+                    CGAffineTransform(translationX: 0, y: self.bottomSheetView.frame.height)
                 self.dimView.alpha = 0
             },
             completion: { _ in
                 self.removeFromSuperview()
             }
         )
+    }
+}
+
+// MARK: - UIScrollViewDelegate
+
+extension OnboardingBottomSheet: UIScrollViewDelegate {
+
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        currentStep = Int(
+            round(scrollView.contentOffset.x / scrollView.bounds.width)
+        )
+        updateStep()
     }
 }
