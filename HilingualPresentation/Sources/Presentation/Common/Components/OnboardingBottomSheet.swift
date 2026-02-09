@@ -162,16 +162,16 @@ final class OnboardingBottomSheet: UIView {
     // MARK: - Private Methods
 
     private func setupPages() {
-        onboardingTexts.indices.forEach { index in
+        for i in 0..<onboardingTexts.count {
             let page = UIView()
 
             let label = UILabel()
-            label.text = onboardingTexts[index]
+            label.text = onboardingTexts[i]
             label.textAlignment = .center
             label.font = .pretendard(.head_sb_20)
             label.numberOfLines = 2
 
-            let imageView = UIImageView(image: onboardingImages[index])
+            let imageView = UIImageView(image: onboardingImages[i])
             imageView.contentMode = .scaleAspectFit
 
             page.addSubviews(label, imageView)
