@@ -15,6 +15,8 @@ public final class LoginOnBoardingViewController: BaseUIViewController<LoginOnBo
 
     private let loginOnBoardingView = LoginOnBoardingView()
     private let startTappedSubject = PassthroughSubject<Void, Never>()
+    private let pages = LoginOnBoardingModel.pages
+    private var currentPage = 0
 
     // MARK: - Layout
 
@@ -26,6 +28,14 @@ public final class LoginOnBoardingViewController: BaseUIViewController<LoginOnBo
         loginOnBoardingView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
+    }
+
+    public override func viewDidLoad() {
+        super.viewDidLoad()
+        loginOnBoardingView.collectionView.dataSource = self
+        loginOnBoardingView.collectionView.delegate = self
+        loginOnBoardingView.collectionView.reloadData()
+        applyPageState(animated: false)
     }
 
     public override func addTarget() {
@@ -56,6 +66,10 @@ public final class LoginOnBoardingViewController: BaseUIViewController<LoginOnBo
 
     @objc
     private func startTapped() {
+        if currentPage < pages.count - 1 {
+            moveToNextPage()
+            return
+        }
         UserDefaults.standard.set(true, forKey: "hasLoggedInBefore")
         print("[LoginOnBoardingVC] 💾 hasLoggedInBefore 저장: true")
         startTappedSubject.send()
@@ -66,5 +80,74 @@ public final class LoginOnBoardingViewController: BaseUIViewController<LoginOnBo
         UserDefaults.standard.set(true, forKey: "hasLoggedInBefore")
         print("[LoginOnBoardingVC] ⏭️ 건너뛰기 탭 - hasLoggedInBefore 저장: true")
         startTappedSubject.send()
+    }
+
+    private func moveToNextPage() {
+        let nextPage = currentPage + 1
+        guard nextPage < pages.count else { return }
+
+        currentPage = nextPage
+        let indexPath = IndexPath(item: nextPage, section: 0)
+        loginOnBoardingView.collectionView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
+        applyPageState(animated: true)
+    }
+
+    private func applyPageState(animated: Bool) {
+        let page = pages[currentPage]
+        loginOnBoardingView.updateTitle(text: page.text, highlightText: page.highlightText)
+        loginOnBoardingView.updateIndicator(currentIndex: currentPage, animated: animated)
+    }
+
+    private func updateCurrentPageIfNeeded(from scrollView: UIScrollView) {
+        let pageWidth = scrollView.bounds.width
+        guard pageWidth > 0 else { return }
+        let page = Int(round(scrollView.contentOffset.x / pageWidth))
+        let clampedPage = max(0, min(page, pages.count - 1))
+        guard clampedPage != currentPage else { return }
+        currentPage = clampedPage
+        applyPageState(animated: true)
+    }
+}
+
+extension LoginOnBoardingViewController: UICollectionViewDataSource {
+    public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        pages.count
+    }
+
+    public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        guard let cell = collectionView.dequeueReusableCell(
+            withReuseIdentifier: LoginOnBoardingPageCell.cellIdentifier,
+            for: indexPath
+        ) as? LoginOnBoardingPageCell else {
+            return UICollectionViewCell()
+        }
+        cell.configure(imageName: pages[indexPath.item].imageName)
+        return cell
+    }
+}
+
+extension LoginOnBoardingViewController: UICollectionViewDelegateFlowLayout {
+    public func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        sizeForItemAt indexPath: IndexPath
+    ) -> CGSize {
+        CGSize(width: collectionView.bounds.width, height: collectionView.bounds.height)
+    }
+}
+
+extension LoginOnBoardingViewController {
+    public func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        if !decelerate {
+            updateCurrentPageIfNeeded(from: scrollView)
+        }
+    }
+
+    public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        updateCurrentPageIfNeeded(from: scrollView)
+    }
+
+    public func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
+        updateCurrentPageIfNeeded(from: scrollView)
     }
 }

@@ -10,6 +10,8 @@ import Combine
 
 public final class LoginOnBoardingViewModel: BaseViewModel {
 
+    // MARK: - Input / Output
+
     public struct Input {
         let startTapped: AnyPublisher<Void, Never>
     }
@@ -20,9 +22,13 @@ public final class LoginOnBoardingViewModel: BaseViewModel {
 
     private let loginSubject = PassthroughSubject<Void, Never>()
 
+    // MARK: - Init
+
     public override init() {
         super.init()
     }
+
+    // MARK: - Transform
 
     public func transform(input: Input) -> Output {
         input.startTapped
