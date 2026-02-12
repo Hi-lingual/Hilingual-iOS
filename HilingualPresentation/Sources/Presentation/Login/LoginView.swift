@@ -13,16 +13,27 @@ final class LoginView: BaseUIView {
 
     // MARK: - UI Components
 
+    let subtitleLabel: UILabel = {
+        let label = UILabel()
+        label.text = "일기로 시작하는 일상 속 영어 습관"
+        label.font = .pretendard(.head_sb_16)
+        label.textColor = .black
+        label.textAlignment = .center
+        return label
+    }()
+
     let logoImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = UIImage(named: "img_logo_ios", in: .module, compatibleWith: nil)
+        imageView.image = UIImage(named: "img_logo_ios", in: .module, compatibleWith: nil)?.withRenderingMode(.alwaysTemplate)
+        imageView.tintColor = .black
         imageView.contentMode = .scaleAspectFit
         return imageView
     }()
 
     let characterImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = UIImage(named: "img_login_ios", in: .module, compatibleWith: nil)
+        imageView.image = UIImage(named: "img_login_ios_v2", in: .module, compatibleWith: nil)
+        imageView.contentMode = .scaleAspectFit
         return imageView
     }()
 
@@ -71,7 +82,7 @@ final class LoginView: BaseUIView {
             string: title,
             attributes: [
                 .underlineStyle: NSUnderlineStyle.single.rawValue,
-                .foregroundColor: UIColor.white,
+                .foregroundColor: UIColor.gray400,
                 .font: UIFont.pretendard(.body_r_14)
             ]
         )
@@ -94,8 +105,9 @@ final class LoginView: BaseUIView {
     // MARK: - Setup
 
     override func setUI() {
-        backgroundColor = .hilingualOrange
+        backgroundColor = .white
         addSubviews(
+            subtitleLabel,
             logoImageView,
             appleLoginButton,
             characterImageView,
@@ -104,9 +116,16 @@ final class LoginView: BaseUIView {
     }
 
     override func setLayout() {
-        logoImageView.snp.makeConstraints {
-            $0.top.equalTo(safeAreaLayoutGuide.snp.top).offset(252)
+        subtitleLabel.snp.makeConstraints {
+            $0.top.equalTo(safeAreaLayoutGuide.snp.top).offset(132)
             $0.centerX.equalToSuperview()
+        }
+
+        logoImageView.snp.makeConstraints {
+            $0.top.equalTo(subtitleLabel.snp.bottom).offset(4)
+            $0.centerX.equalToSuperview()
+            $0.width.equalTo(200)
+            $0.height.equalTo(50)
         }
 
         appleLoginButton.snp.makeConstraints {
@@ -117,48 +136,15 @@ final class LoginView: BaseUIView {
         }
 
         characterImageView.snp.makeConstraints {
-            $0.bottom.equalTo(appleLoginButton.snp.top).offset(1)
+            $0.width.equalTo(375)
+            $0.height.equalTo(260)
+            $0.top.equalTo(safeAreaLayoutGuide.snp.top).offset(261)
             $0.centerX.equalToSuperview()
         }
 
         privacyPolicyButton.snp.makeConstraints {
             $0.bottom.equalTo(safeAreaLayoutGuide).inset(16)
             $0.centerX.equalToSuperview()
-        }
-    }
-}
-
-// MARK: - Animation
-
-extension LoginView {
-
-    public func startSplashAnimation() {
-        characterImageView.alpha = 0
-        appleLoginButton.alpha = 0
-        privacyPolicyButton.alpha = 0
-
-        characterImageView.transform = CGAffineTransform(translationX: 0, y: 20)
-        appleLoginButton.transform = CGAffineTransform(translationX: 0, y: 20)
-        privacyPolicyButton.transform = CGAffineTransform(translationX: 0, y: 20)
-
-        // 1
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.4) {
-            UIView.animate(withDuration: 0.3, delay: 0, options: [.curveEaseOut], animations: {
-                self.logoImageView.transform = CGAffineTransform(translationX: 0, y: -72)
-            })
-        }
-
-        // 2
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.8) {
-            UIView.animate(withDuration: 0.3, delay: 0, options: [.curveEaseOut], animations: {
-                self.characterImageView.alpha = 1
-                self.appleLoginButton.alpha = 1
-                self.privacyPolicyButton.alpha = 1
-
-                self.characterImageView.transform = .identity
-                self.appleLoginButton.transform = .identity
-                self.privacyPolicyButton.transform = .identity
-            })
         }
     }
 }

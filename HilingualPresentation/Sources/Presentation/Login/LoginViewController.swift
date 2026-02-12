@@ -15,18 +15,12 @@ public final class LoginViewController: BaseUIViewController<LoginViewModel> {
     // MARK: - Properties
 
     private let loginView = LoginView()
-    private static var hasShownSplash = false
 
     //MARK: - Life cycle
 
 
     public override func viewWillAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-//        if !LoginViewController.hasShownSplash {
-//            loginView.startSplashAnimation()
-//            LoginViewController.hasShownSplash = true
-//        }
-        loginView.startSplashAnimation()
+        super.viewWillAppear(animated)
         navigationController?.navigationBar.isHidden = true
     }
 
