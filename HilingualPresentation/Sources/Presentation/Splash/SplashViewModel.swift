@@ -21,6 +21,7 @@ public final class SplashViewModel: BaseViewModel {
         let navigateToHome: AnyPublisher<Void, Never>
         let navigateToOnboarding: AnyPublisher<Void, Never>
         let navigateToLogin: AnyPublisher<Void, Never>
+        let navigateToLoginOnBoarding: AnyPublisher<Void, Never>
     }
 
     // MARK: - Dependencies
@@ -33,6 +34,7 @@ public final class SplashViewModel: BaseViewModel {
     private let homeSubject = PassthroughSubject<Void, Never>()
     private let onboardingSubject = PassthroughSubject<Void, Never>()
     private let loginSubject = PassthroughSubject<Void, Never>()
+    private let loginOnBoardingSubject = PassthroughSubject<Void, Never>()
 
     // MARK: - Init
 
@@ -56,7 +58,8 @@ public final class SplashViewModel: BaseViewModel {
         return Output(
             navigateToHome: homeSubject.eraseToAnyPublisher(),
             navigateToOnboarding: onboardingSubject.eraseToAnyPublisher(),
-            navigateToLogin: loginSubject.eraseToAnyPublisher()
+            navigateToLogin: loginSubject.eraseToAnyPublisher(),
+            navigateToLoginOnBoarding: loginOnBoardingSubject.eraseToAnyPublisher()
         )
     }
 
@@ -70,8 +73,15 @@ public final class SplashViewModel: BaseViewModel {
         print("[SplashVM] 리프래시 토큰: \(refreshToken.isEmpty ? "없음" : "있음")")
 
         guard !accessToken.isEmpty, !refreshToken.isEmpty else {
-            print("[SplashVM] ❌ 토큰 없음 → 로그인 화면으로 이동")
-            loginSubject.send()
+            let hasLoggedInBefore = UserDefaults.standard.bool(forKey: "hasLoggedInBefore")
+            print("[SplashVM] hasLoggedInBefore: \(hasLoggedInBefore)")
+            if hasLoggedInBefore {
+                print("[SplashVM] ❌ 토큰 없음 → 로그인 화면으로 이동")
+                loginSubject.send()
+            } else {
+                print("[SplashVM] ❌ 토큰 없음 → 로그인 온보딩 화면으로 이동")
+                loginOnBoardingSubject.send()
+            }
             return
         }
 
