@@ -129,10 +129,9 @@ final class LoginView: BaseUIView {
         }
 
         appleLoginButton.snp.makeConstraints {
-            $0.bottom.equalTo(privacyPolicyButton.snp.top).offset(-16)
-            $0.centerX.equalToSuperview()
-            $0.leading.trailing.equalToSuperview().inset(16)
             $0.height.equalTo(58)
+            $0.leading.trailing.equalToSuperview().inset(16)
+            $0.bottom.equalTo(safeAreaLayoutGuide).inset(49)
         }
 
         characterImageView.snp.makeConstraints {
@@ -143,7 +142,7 @@ final class LoginView: BaseUIView {
         }
 
         privacyPolicyButton.snp.makeConstraints {
-            $0.bottom.equalTo(safeAreaLayoutGuide).inset(16)
+            $0.top.equalTo(appleLoginButton.snp.bottom).offset(16)
             $0.centerX.equalToSuperview()
         }
     }

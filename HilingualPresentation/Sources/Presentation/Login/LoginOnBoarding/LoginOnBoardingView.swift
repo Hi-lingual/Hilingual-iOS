@@ -31,14 +31,10 @@ final class LoginOnBoardingView: BaseUIView {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
         layout.minimumLineSpacing = 0
-        layout.minimumInteritemSpacing = 0
 
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.backgroundColor = .white
         collectionView.showsHorizontalScrollIndicator = false
         collectionView.isPagingEnabled = true
-        collectionView.decelerationRate = .fast
-        collectionView.contentInsetAdjustmentBehavior = .never
         collectionView.register(LoginOnBoardingPageCell.self, forCellWithReuseIdentifier: LoginOnBoardingPageCell.cellIdentifier)
         return collectionView
     }()
@@ -50,7 +46,7 @@ final class LoginOnBoardingView: BaseUIView {
         return button
     }()
 
-    // MARK: - Setup
+    // MARK: - Lifecycle
 
     override func setUI() {
         backgroundColor = .white
@@ -78,7 +74,7 @@ final class LoginOnBoardingView: BaseUIView {
         collectionView.snp.makeConstraints {
             $0.top.equalTo(titleLabel.snp.bottom).offset(28)
             $0.horizontalEdges.equalToSuperview()
-            $0.height.equalTo(376)
+            $0.height.equalTo(416)
         }
 
         indicatorView.snp.makeConstraints {
@@ -95,7 +91,7 @@ final class LoginOnBoardingView: BaseUIView {
 
     // MARK: - Public Methods
 
-    func updateTitle(text: String, highlightText: String?) {
+    func updateTitle(text: String, highlightText: String?, animated: Bool = false) {
         let attributedText = NSMutableAttributedString(
             attributedString: .pretendard(.head_sb_20, text: text, lineBreakMode: .byWordWrapping)
         )
@@ -108,10 +104,34 @@ final class LoginOnBoardingView: BaseUIView {
             }
         }
 
-        titleLabel.attributedText = attributedText
+        applyTitleTransition(attributedText, animated: animated)
     }
 
     func updateIndicator(currentIndex: Int, animated: Bool = true) {
         indicatorView.update(currentIndex: currentIndex, animated: animated)
+    }
+}
+
+//MARK: - animation
+
+private extension LoginOnBoardingView {
+    func applyTitleTransition(_ attributedText: NSAttributedString, animated: Bool) {
+        if !animated {
+            titleLabel.attributedText = attributedText
+            return
+        }
+
+        let originalTransform = titleLabel.transform
+        UIView.animate(withDuration: 0.12, delay: 0, options: [.curveEaseIn], animations: {
+            self.titleLabel.alpha = 0
+            self.titleLabel.transform = CGAffineTransform(translationX: 0, y: 6)
+        }) { _ in
+            self.titleLabel.attributedText = attributedText
+            self.titleLabel.transform = CGAffineTransform(translationX: 0, y: -6)
+            UIView.animate(withDuration: 0.18, delay: 0, options: [.curveEaseOut], animations: {
+                self.titleLabel.alpha = 1
+                self.titleLabel.transform = originalTransform
+            })
+        }
     }
 }

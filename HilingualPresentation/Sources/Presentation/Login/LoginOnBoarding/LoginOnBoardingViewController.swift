@@ -11,12 +11,17 @@ import SnapKit
 
 public final class LoginOnBoardingViewController: BaseUIViewController<LoginOnBoardingViewModel> {
 
-    // MARK: - UI
+    // MARK: - View & State
 
     private let loginOnBoardingView = LoginOnBoardingView()
-    private let startTappedSubject = PassthroughSubject<Void, Never>()
+
     private let pages = LoginOnBoardingModel.pages
     private var currentPage = 0
+
+    // MARK: - Input
+
+    private let startTappedSubject = PassthroughSubject<Void, Never>()
+
 
     // MARK: - Layout
 
@@ -30,6 +35,8 @@ public final class LoginOnBoardingViewController: BaseUIViewController<LoginOnBo
         }
     }
 
+    // MARK: - Lifecycle
+
     public override func viewDidLoad() {
         super.viewDidLoad()
         loginOnBoardingView.collectionView.dataSource = self
@@ -38,12 +45,12 @@ public final class LoginOnBoardingViewController: BaseUIViewController<LoginOnBo
         applyPageState(animated: false)
     }
 
+    // MARK: - Custom Method
+
     public override func addTarget() {
         loginOnBoardingView.nextButton.addTarget(self, action: #selector(startTapped), for: .touchUpInside)
         loginOnBoardingView.skipButton.addTarget(self, action: #selector(skipTapped), for: .touchUpInside)
     }
-
-    // MARK: - Bind
 
     public override func bind(viewModel: LoginOnBoardingViewModel) {
         let input = LoginOnBoardingViewModel.Input(
@@ -62,7 +69,7 @@ public final class LoginOnBoardingViewController: BaseUIViewController<LoginOnBo
             .store(in: &cancellables)
     }
 
-    // MARK: - Actions
+    // MARK: - Action Method
 
     @objc
     private func startTapped() {
@@ -82,6 +89,8 @@ public final class LoginOnBoardingViewController: BaseUIViewController<LoginOnBo
         startTappedSubject.send()
     }
 
+    // MARK: - Private Methods
+
     private func moveToNextPage() {
         let nextPage = currentPage + 1
         guard nextPage < pages.count else { return }
@@ -94,7 +103,7 @@ public final class LoginOnBoardingViewController: BaseUIViewController<LoginOnBo
 
     private func applyPageState(animated: Bool) {
         let page = pages[currentPage]
-        loginOnBoardingView.updateTitle(text: page.text, highlightText: page.highlightText)
+        loginOnBoardingView.updateTitle(text: page.text, highlightText: page.highlightText, animated: animated)
         loginOnBoardingView.updateIndicator(currentIndex: currentPage, animated: animated)
     }
 
@@ -108,6 +117,8 @@ public final class LoginOnBoardingViewController: BaseUIViewController<LoginOnBo
         applyPageState(animated: true)
     }
 }
+
+// MARK: - UITableViewDataSource & UITableViewDelegate
 
 extension LoginOnBoardingViewController: UICollectionViewDataSource {
     public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -135,6 +146,8 @@ extension LoginOnBoardingViewController: UICollectionViewDelegateFlowLayout {
         CGSize(width: collectionView.bounds.width, height: collectionView.bounds.height)
     }
 }
+
+// MARK: - ScrollView
 
 extension LoginOnBoardingViewController {
     public func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
