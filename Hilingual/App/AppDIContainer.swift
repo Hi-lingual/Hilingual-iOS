@@ -42,6 +42,10 @@ final class AppDIContainer: ViewControllerFactory {
     public func makeLoginViewController() -> LoginViewController {
         return LoginViewController(viewModel: makeLoginViewModel(), diContainer: self)
     }
+
+    public func makeLoginOnBoardingViewController() -> LoginOnBoardingViewController {
+        return LoginOnBoardingViewController(viewModel: makeLoginOnBoardingViewModel(), diContainer: self)
+    }
     
     public func makeDiaryDetailViewController(diaryId: Int) -> DiaryDetailViewController {
         return DiaryDetailViewController(
@@ -238,6 +242,10 @@ extension AppDIContainer {
         return LoginViewModel(
             socialLoginUseCase: makeSocialLoginUseCase(), tokenStore: makeTokenStoreUseCase()
         )
+    }
+
+    private func makeLoginOnBoardingViewModel() -> LoginOnBoardingViewModel {
+        return LoginOnBoardingViewModel()
     }
 }
 

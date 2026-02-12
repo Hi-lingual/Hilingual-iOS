@@ -11,6 +11,7 @@ public protocol ViewControllerFactory {
     func makeSplashViewController() -> SplashViewController
     func makeTabBarViewController() -> TabBarViewController
     func makeLoginViewController() -> LoginViewController
+    func makeLoginOnBoardingViewController() -> LoginOnBoardingViewController
     func makeOnboardingViewController() -> OnBoardingViewController
     func makeHomeViewController() -> HomeViewController
     func makeMypageViewController() -> MypageViewController

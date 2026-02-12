@@ -164,5 +164,14 @@ public final class SplashViewController: BaseUIViewController<SplashViewModel> {
                 changeRootVC(nav, animated: true)
             }
             .store(in: &cancellables)
+
+        output.navigateToLoginOnBoarding
+            .sink { [weak self] in
+                guard let self else { return }
+                print("스플래시 -> 로그인 온보딩")
+                let vc = self.diContainer.makeLoginOnBoardingViewController()
+                changeRootVC(vc, animated: true)
+            }
+            .store(in: &cancellables)
     }
 }
