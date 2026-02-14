@@ -9,6 +9,7 @@ import Foundation
 import UIKit
 import Combine
 import SafariServices
+import HilingualCore
 
 public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailViewModel> {
 
@@ -77,12 +78,7 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
     public override func viewDidLoad() {
         super.viewDidLoad()
 
-        AmplitudeManager.shared.logEvent(
-            "pageview",
-            properties: [
-                "page": "feedback"
-            ]
-        )
+        AmplitudeManager.shared.send(.pageviewFeedback)
 
         hideKeyboardWhenTappedAround()
         updateButtonTitle()
@@ -113,25 +109,23 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
             guard let self = self else { return }
             self.toggleClickCount += 1
 
-            AmplitudeManager.shared.logEvent(
-                "click_feedback_toggle",
-                properties: [
-                    "toggle_click_count": self.toggleClickCount,
-                    "toggle_state": isEnabled
-                ]
+            AmplitudeManager.shared.send(
+                .clickFeedbackToggle(
+                    clickCount: self.toggleClickCount,
+                    isEnabled: isEnabled
+                )
             )
         }
 
         recommendedExpressionViewController.onBookmarkToggle = { [weak self] phraseId, isBookmarked in
             guard let self = self else { return }
 
-            AmplitudeManager.shared.logEvent(
-                "bookmark_action",
-                properties: [
-                    "entry_id": self.entryId,
-                    "entry_source": self.entrySource,
-                    "bookmark_action": isBookmarked ? "add" : "remove"
-                ]
+            AmplitudeManager.shared.send(
+                .bookmarkAction(
+                    entryId: self.entryId,
+                    entrySource: .from(self.entrySource),
+                    action: isBookmarked ? .add : .remove
+                )
             )
         }
 
@@ -235,26 +229,24 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
                 if isPublished {
                     toast.configure(type: .withButton, message: "일기가 게시되었어요!")
                     toast.action = { [weak self] in
-                        AmplitudeManager.shared.logEvent(
-                            "toast_action",
-                            properties: [
-                                "toast_action": "cta_click",
-                                "toast_id": "diary_post_success",
-                                "entry_id": self?.entryId ?? ""
-                            ]
+                        AmplitudeManager.shared.send(
+                            .toastAction(
+                                action: .ctaClick,
+                                toastId: .diaryPostSuccess,
+                                entryId: self?.entryId ?? ""
+                            )
                         )
                         self?.tabBarController?.selectedIndex = 2
                         self?.navigationController?.popToRootViewController(animated: false)
                     }
 
                     DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) { [weak self] in
-                        AmplitudeManager.shared.logEvent(
-                            "toast_action",
-                            properties: [
-                                "toast_action": "auto_dismiss",
-                                "toast_id": "diary_post_success",
-                                "entry_id": self?.entryId ?? ""
-                            ]
+                        AmplitudeManager.shared.send(
+                            .toastAction(
+                                action: .autoDismiss,
+                                toastId: .diaryPostSuccess,
+                                entryId: self?.entryId ?? ""
+                            )
                         )
                     }
                 } else {
@@ -277,12 +269,11 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
     }
 
     @objc public override func backButtonTapped() {
-        AmplitudeManager.shared.logEvent(
-            "click_back_feedback",
-            properties: [
-                "entry_id": entryId,
-                "back_source": "ui_button"
-            ]
+        AmplitudeManager.shared.send(
+            .clickBackFeedback(
+                entryId: entryId,
+                backSource: .uiButton
+            )
         )
         navigationController?.popToRootViewController(animated: true)
     }
@@ -378,12 +369,7 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
                 guard let self = self else { return }
                 self.dialog.dismiss()
 
-                AmplitudeManager.shared.logEvent(
-                    "submitted_post_diary",
-                    properties: [
-                        "entry_id": self.entryId
-                    ]
-                )
+                AmplitudeManager.shared.send(.submittedPostDiary(entryId: self.entryId))
 
                 self.publishTappedSubject.send(())
             }
