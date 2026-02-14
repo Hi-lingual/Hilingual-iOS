@@ -1,0 +1,214 @@
+//
+//  TextView.swift
+//  HilingualPresentation
+//
+//  Created by 신혜연 on 7/5/25.
+//
+
+import UIKit
+import SnapKit
+
+@MainActor
+protocol TextViewDelegate: AnyObject {
+    func textView(_ textView: TextView, didChangeTextCount count: Int)
+}
+
+final class TextView: UIView {
+    
+    // MARK: - Properties
+    
+    var maxCharacterCount: Int = 1000
+    
+    weak var delegate: TextViewDelegate?
+    
+    var text: String {
+        get { textView.text }
+        set { configure(text: newValue) }
+    }
+    
+    var onTemporarySaveButtonTapped: (() -> Void)?
+    
+    // MARK: - UI Components
+    
+    private let textView: UITextView = {
+        let textView = UITextView()
+        textView.backgroundColor = .gray100
+        textView.font = .pretendard(.body_r_16)
+        textView.attributedText = .pretendard(.body_r_15, text: "", lineBreakMode: .byWordWrapping, forceWrap: true)
+        textView.textColor = .black
+        textView.isScrollEnabled = true
+        textView.textContainer.lineBreakMode = .byWordWrapping
+        textView.autocorrectionType = .no
+        textView.spellCheckingType = .no
+        textView.layer.borderWidth = 0
+        textView.layer.borderColor = UIColor.hilingualBlack.cgColor
+        return textView
+    }()
+    
+    private var placeholderLabel: UILabel = {
+        let label = UILabel()
+        label.attributedText = .pretendard(.body_r_15, text: "What’s been going on today?")
+        label.textColor = .gray400
+        return label
+    }()
+
+    private var countLabel: UILabel = {
+        let label = UILabel()
+        label.font = .pretendard(.cap_r_12)
+        label.textColor = .gray400
+        label.textAlignment = .right
+        return label
+    }()
+    
+    // MARK: - Lifecycle
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        
+        setStyle()
+        setUI()
+        setLayout()
+        setDelegate()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    // MARK: - Setup Methods
+
+    func setStyle() {
+        backgroundColor = .gray100
+        clipsToBounds = true
+        layer.cornerRadius = 8
+    }
+    
+    func setUI() {
+        addSubviews(textView, placeholderLabel, countLabel)
+    }
+    
+    func setLayout() {
+        textView.snp.makeConstraints {
+            $0.top.leading.equalToSuperview().offset(12)
+            $0.trailing.equalToSuperview().inset(12)
+            $0.bottom.equalToSuperview().inset(39)
+        }
+        
+        placeholderLabel.snp.makeConstraints {
+            $0.top.equalToSuperview().offset(18)
+            $0.leading.equalToSuperview().offset(18)
+        }
+        
+        countLabel.snp.makeConstraints {
+            $0.bottom.equalToSuperview().inset(12)
+            $0.trailing.equalToSuperview().inset(12)
+        }
+    }
+    
+    private func setDelegate() {
+        textView.delegate = self
+        setTypingAttributesToPretendardBodyR15()
+        updateUI()
+    }
+    
+    private func updateUI() {
+        let count = textView.text.count
+        countLabel.text = "\(count)/\(maxCharacterCount)"
+        placeholderLabel.isHidden = !textView.text.isEmpty
+        
+        delegate?.textView(self, didChangeTextCount: count)
+    }
+    
+    func scrollToTop(animated: Bool = false) {
+        textView.setContentOffset(.zero, animated: animated)
+    }
+    
+    func configure(text: String) {
+        let limitedText = String(text.prefix(maxCharacterCount))
+        textView.attributedText = .pretendard(.body_r_15, text: limitedText, lineBreakMode: .byWordWrapping, forceWrap: true)
+        setTypingAttributesToPretendardBodyR15()
+        updateUI()
+        scrollToTop()
+    }
+    
+    // MARK: - Helper
+    private func setTypingAttributesToPretendardBodyR15() {
+        let probe = NSAttributedString.pretendard(.body_r_15, text: " ", lineBreakMode: .byWordWrapping, forceWrap: true)
+        let attrs = probe.attributes(at: 0, effectiveRange: nil)
+        textView.typingAttributes = attrs
+    }
+
+    // MARK: - Toolbar
+
+    override var inputAccessoryView: UIView? {
+        let toolbar = UIToolbar()
+        toolbar.sizeToFit()
+
+        let flex = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
+
+        let save = UIBarButtonItem(
+            title: "임시저장",
+            style: .plain,
+            target: self,
+            action: #selector(saveButtonDidTap)
+        )
+        
+        let done = UIBarButtonItem(
+            title: "완료",
+            style: .plain,
+            target: self,
+            action: #selector(dismissKeyboard)
+        )
+
+        toolbar.items = [save, flex, done]
+
+        return toolbar
+    }
+
+    @objc private func dismissKeyboard() {
+        textView.resignFirstResponder()
+    }
+    
+    @objc private func saveButtonDidTap() {
+        onTemporarySaveButtonTapped?()
+    }
+}
+
+// MARK: - Extensions
+
+extension TextView: UITextViewDelegate {
+    func textViewDidChange(_ textView: UITextView) {
+        updateUI()
+    }
+    
+    func textViewDidBeginEditing(_ textView: UITextView) {
+        layer.borderWidth = 1
+    }
+    
+    func textViewDidEndEditing(_ textView: UITextView) {
+        layer.borderWidth = 0
+    }
+    
+    func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
+        if text.contains(where: { $0.isEmoji }) {
+            return false
+        }
+        
+        let allowedPunctuation: Set<Character> = [".", ",", "!", "?", "'", "\"", "-", ":", ";", "(", ")", "[", "]", "{", "}", "…"]
+        let isAllowed = text.allSatisfy { char in
+            char.isLetter || char.isNumber || char.isWhitespace || allowedPunctuation.contains(char)
+        }
+        
+        if !isAllowed {
+            return false
+        }
+        
+        guard let currentText = textView.text else { return true }
+        
+        if let stringRange = Range(range, in: currentText) {
+            let updatedText = currentText.replacingCharacters(in: stringRange, with: text)
+            return updatedText.count <= maxCharacterCount
+        }
+        return true
+    }
+}
