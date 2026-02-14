@@ -7,6 +7,7 @@
 
 import Foundation
 import Combine
+import HilingualCore
 
 import PhotosUI
 import HilingualDomain
@@ -49,17 +50,13 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
         
 
         // 1️⃣ [Amplitude] 페이지 진입 (pageview)
-        AmplitudeManager.shared.logEvent(
-            "pageview",
-            properties: [
-                "entry_id": entryId,
-                "back_source": backSource,
-                "selected_date": selectedDate.toFormattedString("yyyy-MM-dd"),
-                "recommen_topic": [
-                    "kor": topicData?.0 ?? "",
-                    "en": topicData?.1 ?? ""
-                ]
-            ]
+        AmplitudeManager.shared.send(
+            .pageviewDiaryWriting(
+                entryId: entryId,
+                backSource: .from(backSource),
+                selectedDate: selectedDate,
+                recommendedTopic: .from(topicData)
+            )
         )
         
         viewModel?.loadDraftIfExists(for: selectedDate)
@@ -187,12 +184,7 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
 
     // 4️⃣ [Amplitude] 텍스트 스캔하기 버튼 클릭 (click_scan_text)
     @objc private func textScanButtonTapped() {
-        AmplitudeManager.shared.logEvent(
-            "click_scan_text",
-            properties: [
-                "entry_id": entryId
-            ]
-        )
+        AmplitudeManager.shared.send(.clickScanText(entryId: entryId))
         diaryWritingView.modal.isHidden = false
         diaryWritingView.modal.showAnimation()
     }
@@ -205,16 +197,12 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
     // 5️⃣ [Amplitude] 드롭다운 클릭 (click_dropdown)
     private func dropdownButtonTapped() {
         dropdownClickCount += 1
-        AmplitudeManager.shared.logEvent(
-            "click_dropdown",
-            properties: [
-                "entry_id": entryId,
-                "recommen_topic": [
-                    "kor": topicData?.0 ?? "",
-                    "en": topicData?.1 ?? ""
-                ],
-                "dropdown_click_count": dropdownClickCount
-            ]
+        AmplitudeManager.shared.send(
+            .clickDropdown(
+                entryId: entryId,
+                recommendedTopic: .from(topicData),
+                clickCount: dropdownClickCount
+            )
         )
     }
 
@@ -224,14 +212,13 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
         imageData = diaryWritingView.selectedImageView.image?.jpegData(compressionQuality: 0.8)
         let dateString = selectedDate.toFormattedString("yyyy-MM-dd")
 
-        AmplitudeManager.shared.logEvent(
-            "submitted_entry_diary",
-            properties: [
-                "entry_id": entryId,
-                "has_photo": imageData != nil,
-                "char_count": text.count,
-                "ai_request_start_time": Date().timeIntervalSince1970
-            ]
+        AmplitudeManager.shared.send(
+            .submittedEntryDiary(
+                entryId: entryId,
+                hasPhoto: imageData != nil,
+                charCount: text.count,
+                aiRequestStartTime: Date().timeIntervalSince1970
+            )
         )
 
         let loadingVC = diContainer.makeLoadingViewController()
@@ -286,12 +273,11 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
 
     @objc public override func backButtonTapped() {
         // 2️⃣ 뒤로가기 버튼 클릭
-        AmplitudeManager.shared.logEvent(
-            "click_back_diary",
-            properties: [
-                "entry_id": entryId,
-                "back_source": "ui_button"
-            ]
+        AmplitudeManager.shared.send(
+            .clickBackDiary(
+                entryId: entryId,
+                backSource: .uiButton
+            )
         )
         if isImageChanged() {
             showModal()
@@ -365,13 +351,12 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
             firstInputTime = Date()
             let timeToFirstInput = Int(firstInputTime!.timeIntervalSince(writingStartTime ?? Date()))
 
-            AmplitudeManager.shared.logEvent(
-                "click_textfield",
-                properties: [
-                    "entry_id": entryId,
-                    "text_input_type": "typed",
-                    "time_to_first_input": timeToFirstInput
-                ]
+            AmplitudeManager.shared.send(
+                .clickTextfield(
+                    entryId: entryId,
+                    inputType: .typed,
+                    timeToFirstInput: timeToFirstInput
+                )
             )
         }
     }

@@ -14,9 +14,15 @@ let package = Package(
             targets: ["HilingualCore"]
         ),
     ],
+    dependencies: [
+        .package(url: "https://github.com/amplitude/Amplitude-Swift", from: "1.15.2")
+    ],
     targets: [
         .target(
-            name: "HilingualCore"
+            name: "HilingualCore",
+            dependencies: [
+                .product(name: "AmplitudeSwift", package: "Amplitude-Swift")
+            ]
         )
     ]
 )
