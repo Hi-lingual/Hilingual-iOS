@@ -86,6 +86,7 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
         wordBookView.refreshControl.addTarget(self, action: #selector(didPullToRefresh), for: .valueChanged)
         wordBookView.sortButton.addTarget(self, action: #selector(didTapSort), for: .touchUpInside)
         wordBookView.emptyView.emptyButton.addTarget(self, action: #selector(didTapEmptyAdd), for: .touchUpInside)
+        wordBookView.studyButton.addTarget(self, action: #selector(didTapStudy), for: .touchUpInside)
     }
 
     public override func bind(viewModel: WordBookViewModel) {
@@ -212,6 +213,31 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
         }
         modal.isHidden = false
         modal.showAnimation()
+    }
+
+    @objc
+    private func didTapStudy() {
+        let bookmarkedWords = fullWordList.flatMap { $0.1 }.filter { $0.isMarked }
+        guard !bookmarkedWords.isEmpty else {
+            showToast(message: "북마크된 단어가 없어요.")
+            return
+        }
+
+        let studyVC = WordBookStudyViewController(words: bookmarkedWords)
+        studyVC.modalPresentationStyle = .fullScreen
+        present(studyVC, animated: true)
+    }
+
+    private func showToast(message: String) {
+        let toast = ToastMessage()
+        view.addSubview(toast)
+        toast.configure(type: .basic, message: message)
+        toast.isHidden = false
+        toast.alpha = 0
+        view.bringSubviewToFront(toast)
+        UIView.animate(withDuration: 0.3) {
+            toast.alpha = 1
+        }
     }
 }
 

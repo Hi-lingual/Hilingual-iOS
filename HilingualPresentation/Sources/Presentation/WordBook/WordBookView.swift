@@ -105,6 +105,20 @@ final class WordBookView: BaseUIView {
 
     let emptyView = WordBookEmptyView()
 
+    let studyButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("학습", for: .normal)
+        button.setTitleColor(.white, for: .normal)
+        button.titleLabel?.font = UIFont.pretendard(.body_m_12)
+        button.backgroundColor = .hilingualBlack
+        button.layer.cornerRadius = 28
+        button.layer.shadowColor = UIColor.black.cgColor
+        button.layer.shadowOpacity = 0.15
+        button.layer.shadowRadius = 6
+        button.layer.shadowOffset = CGSize(width: 0, height: 3)
+        return button
+    }()
+
     // MARK: - Private Properties
 
     private let sortOptions = ["최신순", "A-Z순"]
@@ -128,7 +142,8 @@ final class WordBookView: BaseUIView {
         addSubviews(
             navigationContainer,
             tableView,
-            emptyView
+            emptyView,
+            studyButton
         )
 
         navigationContainer.addSubviews(
@@ -137,6 +152,7 @@ final class WordBookView: BaseUIView {
         )
         showHeaderView(true)
         tableView.refreshControl = refreshControl
+        tableView.contentInset.bottom = 96
     }
 
     override func setLayout() {
@@ -163,6 +179,12 @@ final class WordBookView: BaseUIView {
         emptyView.snp.makeConstraints {
             $0.top.equalTo(navigationContainer.snp.bottom).offset(120)
             $0.leading.trailing.bottom.equalToSuperview()
+        }
+
+        studyButton.snp.makeConstraints {
+            $0.width.height.equalTo(56)
+            $0.trailing.equalToSuperview().inset(20)
+            $0.bottom.equalTo(safeAreaLayoutGuide).inset(16)
         }
     }
 
