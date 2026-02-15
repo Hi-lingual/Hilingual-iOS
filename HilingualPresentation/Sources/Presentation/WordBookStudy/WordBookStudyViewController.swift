@@ -2,7 +2,7 @@
 //  WordBookStudyViewController.swift
 //  HilingualPresentation
 //
-//  Created by Codex on 2/15/26.
+//  Created by 성현주 on 2/15/26.
 //
 
 import UIKit
