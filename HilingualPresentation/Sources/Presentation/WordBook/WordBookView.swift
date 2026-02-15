@@ -107,15 +107,20 @@ final class WordBookView: BaseUIView {
 
     let studyButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("학습", for: .normal)
-        button.setTitleColor(.white, for: .normal)
-        button.titleLabel?.font = UIFont.pretendard(.body_m_12)
-        button.backgroundColor = .hilingualBlack
-        button.layer.cornerRadius = 28
+
+        var config = UIButton.Configuration.filled()
+        config.title = "단어 점검하기"
+        config.baseForegroundColor = .white
+        config.baseBackgroundColor = .hilingualBlack
+        config.cornerStyle = .capsule
+        config.contentInsets = NSDirectionalEdgeInsets(top: 14, leading: 24, bottom: 14, trailing: 24)
+
+        button.configuration = config
+        button.titleLabel?.font = UIFont.pretendard(.body_sb_14)
         button.layer.shadowColor = UIColor.black.cgColor
-        button.layer.shadowOpacity = 0.15
-        button.layer.shadowRadius = 6
-        button.layer.shadowOffset = CGSize(width: 0, height: 3)
+        button.layer.shadowOpacity = 0.2
+        button.layer.shadowRadius = 8
+        button.layer.shadowOffset = CGSize(width: 0, height: 4)
         return button
     }()
 
@@ -182,7 +187,6 @@ final class WordBookView: BaseUIView {
         }
 
         studyButton.snp.makeConstraints {
-            $0.width.height.equalTo(56)
             $0.trailing.equalToSuperview().inset(20)
             $0.bottom.equalTo(safeAreaLayoutGuide).inset(16)
         }

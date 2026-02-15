@@ -7,6 +7,7 @@
 
 import UIKit
 import SnapKit
+import Lottie
 
 final class WordBookStudyView: BaseUIView {
 
@@ -18,13 +19,13 @@ final class WordBookStudyView: BaseUIView {
         let button = UIButton(type: .system)
         let image = UIImage(named: "ic_arrow_left_b_24_ios", in: .module, compatibleWith: nil)
         button.setImage(image, for: .normal)
-        button.tintColor = .white
+        button.tintColor = .black
         return button
     }()
 
     let remainingLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .white
+        label.textColor = .black
         label.font = .pretendard(.head_sb_18)
         label.textAlignment = .center
         return label
@@ -38,23 +39,23 @@ final class WordBookStudyView: BaseUIView {
 
     let notRememberedButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("안 외움", for: .normal)
+        button.setTitle("모르겠어요", for: .normal)
         button.setTitleColor(.gray850, for: .normal)
-        button.titleLabel?.font = UIFont.pretendard(.body_sb_14)
+        button.titleLabel?.font = UIFont.pretendard(.body_m_16)
         button.backgroundColor = .white
         button.layer.borderWidth = 1
         button.layer.borderColor = UIColor.gray300.cgColor
-        button.layer.cornerRadius = 26
+        button.layer.cornerRadius = 8
         return button
     }()
 
     let rememberedButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("외움", for: .normal)
+        button.setTitle("알아요", for: .normal)
         button.setTitleColor(.white, for: .normal)
-        button.titleLabel?.font = UIFont.pretendard(.body_sb_14)
-        button.backgroundColor = UIColor(red: 0.20, green: 0.72, blue: 0.41, alpha: 1)
-        button.layer.cornerRadius = 26
+        button.titleLabel?.font = UIFont.pretendard(.body_m_16)
+       button.backgroundColor = .hilingualBlack
+        button.layer.cornerRadius = 8
         return button
     }()
 
@@ -67,30 +68,62 @@ final class WordBookStudyView: BaseUIView {
         return stack
     }()
 
-    let emptyLabel: UILabel = {
+    let completeButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("완료", for: .normal)
+        button.setTitleColor(.white, for: .normal)
+        button.titleLabel?.font = UIFont.pretendard(.body_m_16)
+        button.backgroundColor = .hilingualBlack
+        button.layer.cornerRadius = 8
+        button.isHidden = true
+        return button
+    }()
+
+    private let emptyImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.image = UIImage(named: "img_login_ios_v2", in: .module, compatibleWith: nil)
+        imageView.contentMode = .scaleAspectFit
+        return imageView
+    }()
+
+    private let emptyTextLabel: UILabel = {
         let label = UILabel()
-        label.text = "학습이 완료됐어요"
-        label.textColor = .white
-        label.font = UIFont.pretendard(.body_r_14)
+        label.text = "단어를 모두 확인했어요.\n 다른 단어도 보러 가볼까요?"
+        label.numberOfLines = 2
+        label.textColor = .black
+        label.font = UIFont.pretendard(.head_sb_20)
         label.textAlignment = .center
-        label.isHidden = true
         return label
     }()
+
+    lazy var emptyContainerView: UIStackView = {
+        let stack = UIStackView(arrangedSubviews: [emptyImageView, emptyTextLabel])
+        stack.axis = .vertical
+        stack.alignment = .center
+        stack.spacing = 16
+        stack.isHidden = true
+        return stack
+    }()
+
+    // For backward compatibility
+    var emptyLabel: UIStackView {
+        return emptyContainerView
+    }
 
     // MARK: - Setup
 
     override func setUI() {
-        backgroundColor = .clear
+       backgroundColor = .gray200
 
-        gradientLayer.colors = [
-            UIColor(red: 0.37, green: 0.12, blue: 0.43, alpha: 1).cgColor,
-            UIColor(red: 0.22, green: 0.07, blue: 0.30, alpha: 1).cgColor
-        ]
-        gradientLayer.startPoint = CGPoint(x: 0, y: 0)
-        gradientLayer.endPoint = CGPoint(x: 1, y: 1)
-        layer.insertSublayer(gradientLayer, at: 0)
+//        gradientLayer.colors = [
+//            UIColor(red: 0.37, green: 0.12, blue: 0.43, alpha: 1).cgColor,
+//            UIColor(red: 0.22, green: 0.07, blue: 0.30, alpha: 1).cgColor
+//        ]
+//        gradientLayer.startPoint = CGPoint(x: 0, y: 0)
+//        gradientLayer.endPoint = CGPoint(x: 1, y: 1)
+//        layer.insertSublayer(gradientLayer, at: 0)
 
-        addSubviews(backButton, remainingLabel, cardContainerView, actionStackView, emptyLabel)
+        addSubviews(backButton, remainingLabel, cardContainerView, actionStackView, completeButton, emptyContainerView)
     }
 
     override func setLayout() {
@@ -117,8 +150,18 @@ final class WordBookStudyView: BaseUIView {
             $0.height.equalTo(52)
         }
 
-        emptyLabel.snp.makeConstraints {
+        completeButton.snp.makeConstraints {
+            $0.leading.trailing.equalToSuperview().inset(20)
+            $0.bottom.equalTo(safeAreaLayoutGuide).inset(16)
+            $0.height.equalTo(52)
+        }
+
+        emptyContainerView.snp.makeConstraints {
             $0.center.equalToSuperview()
+        }
+
+        emptyImageView.snp.makeConstraints {
+            $0.width.height.equalTo(180)
         }
     }
 
@@ -129,5 +172,21 @@ final class WordBookStudyView: BaseUIView {
 
     func updateRemainingCount(_ count: Int) {
         remainingLabel.text = "\(count)개 남음"
+    }
+
+    func showCompleteState() {
+        completeButton.isHidden = false
+        completeButton.alpha = 0
+
+        emptyContainerView.isHidden = false
+        emptyContainerView.alpha = 0
+
+        UIView.animate(withDuration: 0.3) {
+            self.actionStackView.alpha = 0
+            self.completeButton.alpha = 1
+            self.emptyContainerView.alpha = 1
+        } completion: { _ in
+            self.actionStackView.isHidden = true
+        }
     }
 }

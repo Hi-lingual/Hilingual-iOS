@@ -68,6 +68,7 @@ final class WordBookStudyViewController: UIViewController {
         studyView.backButton.addTarget(self, action: #selector(didTapClose), for: .touchUpInside)
         studyView.notRememberedButton.addTarget(self, action: #selector(didTapNotRemembered), for: .touchUpInside)
         studyView.rememberedButton.addTarget(self, action: #selector(didTapRemembered), for: .touchUpInside)
+        studyView.completeButton.addTarget(self, action: #selector(didTapComplete), for: .touchUpInside)
     }
 
     // MARK: - Actions
@@ -85,6 +86,11 @@ final class WordBookStudyViewController: UIViewController {
     @objc
     private func didTapRemembered() {
         loadedCards.first?.swipeRight()
+    }
+
+    @objc
+    private func didTapComplete() {
+        dismiss(animated: true)
     }
 
     // MARK: - Cards
@@ -125,7 +131,7 @@ final class WordBookStudyViewController: UIViewController {
 
     private func layoutCards(animated: Bool) {
         guard !loadedCards.isEmpty else {
-            studyView.emptyLabel.isHidden = false
+            studyView.showCompleteState()
             return
         }
 
