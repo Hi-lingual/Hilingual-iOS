@@ -44,7 +44,7 @@ final class WordBookStudyView: BaseUIView {
         button.titleLabel?.font = UIFont.pretendard(.body_m_16)
         button.backgroundColor = .white
         button.layer.borderWidth = 1
-        button.layer.borderColor = UIColor.gray300.cgColor
+        button.layer.borderColor = UIColor.gray200.cgColor
         button.layer.cornerRadius = 8
         return button
     }()

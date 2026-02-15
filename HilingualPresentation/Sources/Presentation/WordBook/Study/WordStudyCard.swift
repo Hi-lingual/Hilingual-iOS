@@ -82,6 +82,8 @@ final class WordStudyCard: UIView {
     private let overlayIconView = UIImageView()
     private let overlayLabel = UILabel()
     private var originalCenter = CGPoint.zero
+    private var didTriggerOverlayHaptic = false
+    private let overlayHaptic = UIImpactFeedbackGenerator(style: .medium)
 
     init(word: PhraseData) {
         self.word = word
@@ -243,6 +245,8 @@ final class WordStudyCard: UIView {
         switch gesture.state {
         case .began:
             originalCenter = center
+            didTriggerOverlayHaptic = false
+            overlayHaptic.prepare()
 
         case .changed:
             center = CGPoint(x: originalCenter.x + translation.x, y: originalCenter.y + translation.y)
@@ -271,6 +275,7 @@ final class WordStudyCard: UIView {
             self.transform = .identity
             self.overlayView.alpha = 0
         }
+        didTriggerOverlayHaptic = false
     }
 
     private func animateOut(direction: SwipeDirection) {
@@ -283,6 +288,7 @@ final class WordStudyCard: UIView {
             self.alpha = 0
             self.overlayView.alpha = self.overlayMaxAlpha
         }, completion: { _ in
+            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
             self.removeFromSuperview()
             switch direction {
             case .left:
@@ -310,6 +316,11 @@ final class WordStudyCard: UIView {
             : UIColor(red: 0.16, green: 0.50, blue: 0.82, alpha: 1)
         overlayView.backgroundColor = color
         overlayView.alpha = alpha
+
+        if progress >= 1, !didTriggerOverlayHaptic {
+            overlayHaptic.impactOccurred()
+            didTriggerOverlayHaptic = true
+        }
 
         if isRight {
             overlayLabel.text = "외움"
@@ -380,7 +391,7 @@ private final class StudyChip: UIView {
 
     private func setupStyle(type: ChipType) {
         backgroundColor = type.backgroundColor
-        layer.cornerRadius = 14
+        layer.cornerRadius = 16
         clipsToBounds = true
 
         if type.isImageChip {
@@ -396,13 +407,13 @@ private final class StudyChip: UIView {
         if type.isImageChip {
             imageView.snp.makeConstraints {
                 $0.edges.equalToSuperview()
-                $0.size.equalTo(32)
+                $0.size.equalTo(36)
             }
         } else {
             label.snp.makeConstraints {
                 $0.center.equalToSuperview()
-                $0.verticalEdges.equalToSuperview().inset(4)
-                $0.horizontalEdges.equalToSuperview().inset(10)
+                $0.verticalEdges.equalToSuperview().inset(6)
+                $0.horizontalEdges.equalToSuperview().inset(12)
             }
         }
     }

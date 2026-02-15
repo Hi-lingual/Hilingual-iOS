@@ -26,6 +26,7 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
     private let selectedWordIdSubject = PassthroughSubject<Int, Never>()
     private let bookmarkToggledSubject = PassthroughSubject<(Int, Bool), Never>()
     private let refreshSubject = PassthroughSubject<Void, Never>()
+    private let studyRequestedSubject = PassthroughSubject<Void, Never>()
 
     // MARK: - UI Components
 
@@ -95,7 +96,8 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
             sortChanged: sortSubject.eraseToAnyPublisher(),
             selectedWordId: selectedWordIdSubject.eraseToAnyPublisher(),
             bookmarkToggled: bookmarkToggledSubject.eraseToAnyPublisher(),
-            refreshTriggered: refreshSubject.eraseToAnyPublisher()
+            refreshTriggered: refreshSubject.eraseToAnyPublisher(),
+            studyRequested: studyRequestedSubject.eraseToAnyPublisher()
         )
 
         let output = viewModel.transform(input: input)
@@ -123,6 +125,20 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
                     self?.bookmarkToggledSubject.send((phraseId, isMarked))
                 }
                 self?.wordDetailDialog.showAnimation()
+            }
+            .store(in: &cancellables)
+
+        output.studyWords
+            .receive(on: RunLoop.main)
+            .sink { [weak self] words in
+                guard let self = self else { return }
+                guard !words.isEmpty else {
+                    self.showToast(message: "북마크된 단어가 없어요.")
+                    return
+                }
+                let studyVC = WordBookStudyViewController(words: words)
+                studyVC.modalPresentationStyle = .fullScreen
+                self.present(studyVC, animated: true)
             }
             .store(in: &cancellables)
     }
@@ -223,9 +239,7 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
             return
         }
 
-        let studyVC = WordBookStudyViewController(words: bookmarkedWords)
-        studyVC.modalPresentationStyle = .fullScreen
-        present(studyVC, animated: true)
+        studyRequestedSubject.send(())
     }
 
     private func showToast(message: String) {
