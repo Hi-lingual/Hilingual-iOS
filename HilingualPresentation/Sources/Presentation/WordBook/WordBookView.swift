@@ -109,7 +109,7 @@ final class WordBookView: BaseUIView {
         let button = UIButton(type: .system)
 
         var config = UIButton.Configuration.filled()
-        config.title = "단어 점검하기"
+        config.title = "단어 복습하기"
         config.baseForegroundColor = .white
         config.baseBackgroundColor = .hilingualBlack
         config.cornerStyle = .capsule

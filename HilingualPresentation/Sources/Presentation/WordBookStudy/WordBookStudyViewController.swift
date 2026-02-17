@@ -93,8 +93,6 @@ final class WordBookStudyViewController: UIViewController {
         dismiss(animated: true)
     }
 
-    // MARK: - Cards
-
     private func loadInitialCards() {
         guard !words.isEmpty else {
             studyView.emptyLabel.isHidden = false

@@ -333,7 +333,7 @@ final class WordStudyCard: UIView {
                 $0.trailing.lessThanOrEqualToSuperview().inset(24)
             }
         } else {
-            overlayLabel.text = "안 외움"
+            overlayLabel.text = "모름"
             overlayLabel.textAlignment = .right
             overlayIconContainer.snp.remakeConstraints {
                 $0.top.equalToSuperview().inset(28)
@@ -352,7 +352,7 @@ final class WordStudyCard: UIView {
     }
 }
 
-// MARK: - StudyChip (Larger chip for study card)
+// MARK: - StudyChip
 
 private final class StudyChip: UIView {
 

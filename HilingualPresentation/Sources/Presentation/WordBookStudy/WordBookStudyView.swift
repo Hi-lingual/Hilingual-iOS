@@ -51,7 +51,7 @@ final class WordBookStudyView: BaseUIView {
 
     let rememberedButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("알아요", for: .normal)
+        button.setTitle("외웠어요", for: .normal)
         button.setTitleColor(.white, for: .normal)
         button.titleLabel?.font = UIFont.pretendard(.body_m_16)
        button.backgroundColor = .hilingualBlack
