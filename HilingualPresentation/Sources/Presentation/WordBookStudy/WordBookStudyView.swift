@@ -115,14 +115,6 @@ final class WordBookStudyView: BaseUIView {
     override func setUI() {
        backgroundColor = .gray200
 
-//        gradientLayer.colors = [
-//            UIColor(red: 0.37, green: 0.12, blue: 0.43, alpha: 1).cgColor,
-//            UIColor(red: 0.22, green: 0.07, blue: 0.30, alpha: 1).cgColor
-//        ]
-//        gradientLayer.startPoint = CGPoint(x: 0, y: 0)
-//        gradientLayer.endPoint = CGPoint(x: 1, y: 1)
-//        layer.insertSublayer(gradientLayer, at: 0)
-
         addSubviews(backButton, remainingLabel, cardContainerView, actionStackView, completeButton, emptyContainerView)
     }
 

@@ -141,7 +141,6 @@ final class WordBookStudyViewController: UIViewController {
             let frame = cardFrame(at: i)
             card.isUserInteractionEnabled = i == 0
 
-            // transform이 적용된 카드(스와이프 중)는 frame 업데이트 건너뛰기
             if card.transform != .identity {
                 continue
             }

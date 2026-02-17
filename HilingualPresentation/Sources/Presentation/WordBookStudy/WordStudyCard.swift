@@ -182,19 +182,16 @@ final class WordStudyCard: UIView {
     }
 
     private func configure() {
-        // Chips
         chipStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
         word.phraseType.compactMap { chipType(from: $0) }
             .map { StudyChip(type: $0) }
             .forEach { chipStackView.addArrangedSubview($0) }
 
-        // Labels
         phraseLabel.text = word.phrase
         explanationLabel.text = word.explanation
         reasonLabel.text = word.reason.isEmpty ? nil : word.reason
         reasonLabel.isHidden = word.reason.isEmpty
         
-        // Shadow
         layer.shadowColor = UIColor.black.cgColor
         layer.shadowOpacity = 0.12
         layer.shadowRadius = 12

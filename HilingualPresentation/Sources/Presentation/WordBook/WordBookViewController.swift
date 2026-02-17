@@ -47,6 +47,7 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
         wordBookView.showHeaderView(true)
         selectedSortIndex = 0
         wordBookView.tableView.contentInset.top = 0
+        applyFeatureFlags()
         sortSubject.send(.latest)
         wordBookView.updateHeaderView(totalCount: fullWordList.reduce(0) { $0 + $1.1.count }, sortIndex: selectedSortIndex)
         refreshSubject.send(())
@@ -197,6 +198,15 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
 
         wordBookView.tableView.reloadData()
         updateViewState()
+    }
+
+    private func applyFeatureFlags() {
+        let nickname = UserDefaults.standard.string(forKey: "currentUser.nickname")
+        let isEnabled = FeatureFlagService.shared.isEnabled(
+            .wordStudyAllowedNicknames,
+            nickname: nickname
+        )
+        wordBookView.setStudyButtonVisible(isEnabled)
     }
 
     // MARK: - Action Method

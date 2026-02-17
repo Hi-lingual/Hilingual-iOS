@@ -127,6 +127,8 @@ final class WordBookView: BaseUIView {
     // MARK: - Private Properties
 
     private let sortOptions = ["최신순", "A-Z순"]
+    private let studyButtonVisibleInset: CGFloat = 96
+    private let studyButtonHiddenInset: CGFloat = 16
 
     // MARK: - Lifecycle
 
@@ -157,7 +159,7 @@ final class WordBookView: BaseUIView {
         )
         showHeaderView(true)
         tableView.refreshControl = refreshControl
-        tableView.contentInset.bottom = 96
+        setStudyButtonVisible(false)
     }
 
     override func setLayout() {
@@ -210,6 +212,11 @@ final class WordBookView: BaseUIView {
         } else {
             tableView.tableHeaderView = nil
         }
+    }
+
+    func setStudyButtonVisible(_ isVisible: Bool) {
+        studyButton.isHidden = !isVisible
+        tableView.contentInset.bottom = isVisible ? studyButtonVisibleInset : studyButtonHiddenInset
     }
 
     private func updateHeaderViewLayout() {
