@@ -7,11 +7,8 @@
 
 import UIKit
 import SnapKit
-import Lottie
 
 final class WordBookStudyView: BaseUIView {
-
-    private let gradientLayer = CAGradientLayer()
 
     // MARK: - UI
 
@@ -54,7 +51,7 @@ final class WordBookStudyView: BaseUIView {
         button.setTitle("외웠어요", for: .normal)
         button.setTitleColor(.white, for: .normal)
         button.titleLabel?.font = UIFont.pretendard(.body_m_16)
-       button.backgroundColor = .hilingualBlack
+        button.backgroundColor = .hilingualBlack
         button.layer.cornerRadius = 8
         return button
     }()
@@ -105,15 +102,10 @@ final class WordBookStudyView: BaseUIView {
         return stack
     }()
 
-    // For backward compatibility
-    var emptyLabel: UIStackView {
-        return emptyContainerView
-    }
-
     // MARK: - Setup
 
     override func setUI() {
-       backgroundColor = .gray200
+        backgroundColor = .gray200
 
         addSubviews(backButton, remainingLabel, cardContainerView, actionStackView, completeButton, emptyContainerView)
     }
@@ -155,11 +147,6 @@ final class WordBookStudyView: BaseUIView {
         emptyImageView.snp.makeConstraints {
             $0.width.height.equalTo(180)
         }
-    }
-
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        gradientLayer.frame = bounds
     }
 
     func updateRemainingCount(_ count: Int) {

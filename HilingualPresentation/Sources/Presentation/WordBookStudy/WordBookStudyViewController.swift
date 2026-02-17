@@ -6,9 +6,7 @@
 //
 
 import UIKit
-import SnapKit
 
-@MainActor
 final class WordBookStudyViewController: UIViewController {
 
     // MARK: - Properties
@@ -95,7 +93,7 @@ final class WordBookStudyViewController: UIViewController {
 
     private func loadInitialCards() {
         guard !words.isEmpty else {
-            studyView.emptyLabel.isHidden = false
+            studyView.emptyContainerView.isHidden = false
             return
         }
 
@@ -133,7 +131,7 @@ final class WordBookStudyViewController: UIViewController {
             return
         }
 
-        studyView.emptyLabel.isHidden = true
+        studyView.emptyContainerView.isHidden = true
 
         for (i, card) in loadedCards.enumerated() {
             let frame = cardFrame(at: i)

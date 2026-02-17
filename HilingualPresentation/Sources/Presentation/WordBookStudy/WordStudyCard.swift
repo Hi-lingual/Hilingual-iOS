@@ -77,6 +77,7 @@ final class WordStudyCard: UIView {
     }()
 
     // MARK: - Overlay Views
+   
     private let overlayView = UIView()
     private let overlayIconContainer = UIView()
     private let overlayIconView = UIImageView()
@@ -102,12 +103,10 @@ final class WordStudyCard: UIView {
     private func setupUI() {
         backgroundColor = .clear
 
-        // Card content
         cardContentView.backgroundColor = .white
         cardContentView.layer.cornerRadius = 28
         cardContentView.clipsToBounds = true
 
-        // Overlay
         overlayView.backgroundColor = .clear
         overlayView.alpha = 0
         overlayView.isUserInteractionEnabled = false
@@ -184,7 +183,7 @@ final class WordStudyCard: UIView {
     private func configure() {
         chipStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
         word.phraseType.compactMap { chipType(from: $0) }
-            .map { StudyChip(type: $0) }
+            .map { Chip(type: $0, size: .large) }
             .forEach { chipStackView.addArrangedSubview($0) }
 
         phraseLabel.text = word.phrase
@@ -196,25 +195,6 @@ final class WordStudyCard: UIView {
         layer.shadowOpacity = 0.12
         layer.shadowRadius = 12
         layer.shadowOffset = CGSize(width: 0, height: 6)
-    }
-
-    private func chipType(from korTitle: String) -> ChipType? {
-        switch korTitle {
-        case "동사": return .verb
-        case "명사": return .noun
-        case "대명사": return .pronoun
-        case "형용사": return .adjective
-        case "부사": return .adverb
-        case "전치사": return .preposition
-        case "접속사": return .conjunction
-        case "감탄사": return .interjection
-        case "숙어": return .phrase
-        case "속어": return .clause
-        case "구": return .expression
-        case "me": return .me
-        case "AI": return .ai
-        default: return nil
-        }
     }
 
     override func layoutSubviews() {
@@ -350,68 +330,23 @@ final class WordStudyCard: UIView {
         overlayIconView.image = UIImage(systemName: isRight ? "checkmark" : "eye.slash")
         overlayIconView.tintColor = color
     }
-}
 
-// MARK: - StudyChip
-
-private final class StudyChip: UIView {
-
-    private let label: UILabel = {
-        let label = UILabel()
-        label.font = .pretendard(.body_sb_14)
-        label.textAlignment = .center
-        label.numberOfLines = 1
-        return label
-    }()
-
-    private let imageView = UIImageView()
-
-    init(type: ChipType) {
-        super.init(frame: .zero)
-        setupUI(type: type)
-        setupStyle(type: type)
-        setupLayout(type: type)
-    }
-
-    @available(*, unavailable)
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-
-    private func setupUI(type: ChipType) {
-        if type.isImageChip {
-            addSubview(imageView)
-        } else {
-            addSubview(label)
-        }
-    }
-
-    private func setupStyle(type: ChipType) {
-        backgroundColor = type.backgroundColor
-        layer.cornerRadius = 16
-        clipsToBounds = true
-
-        if type.isImageChip {
-            imageView.image = type.image
-            imageView.contentMode = .scaleAspectFit
-        } else {
-            label.text = type.title
-            label.textColor = type.textColor
-        }
-    }
-
-    private func setupLayout(type: ChipType) {
-        if type.isImageChip {
-            imageView.snp.makeConstraints {
-                $0.edges.equalToSuperview()
-                $0.size.equalTo(36)
-            }
-        } else {
-            label.snp.makeConstraints {
-                $0.center.equalToSuperview()
-                $0.verticalEdges.equalToSuperview().inset(6)
-                $0.horizontalEdges.equalToSuperview().inset(12)
-            }
+    private func chipType(from korTitle: String) -> ChipType? {
+        switch korTitle {
+        case "동사": return .verb
+        case "명사": return .noun
+        case "대명사": return .pronoun
+        case "형용사": return .adjective
+        case "부사": return .adverb
+        case "전치사": return .preposition
+        case "접속사": return .conjunction
+        case "감탄사": return .interjection
+        case "숙어": return .phrase
+        case "속어": return .clause
+        case "구": return .expression
+        case "me": return .me
+        case "AI": return .ai
+        default: return nil
         }
     }
 }
