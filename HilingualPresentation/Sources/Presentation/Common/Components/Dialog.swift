@@ -52,7 +52,7 @@ final class Dialog: UIView {
     private let dialogContentLabel: UILabel = {
         let label = UILabel()
         label.font = .pretendard(.body_r_14)
-        label.textColor = .gray400
+        label.textColor = .gray500
         label.lineBreakMode = .byCharWrapping
         label.textAlignment = .center
         label.numberOfLines = 2
