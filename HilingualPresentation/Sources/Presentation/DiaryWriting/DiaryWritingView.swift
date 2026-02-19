@@ -104,6 +104,15 @@ final class DiaryWritingView: BaseUIView {
         return button
     }()
     
+    private let noticeLabel: UILabel = {
+        let label = UILabel()
+        label.text = "피드백을 요청한 일기는 수정이 불가능해요."
+        label.font = .pretendard(.body_m_14)
+        label.textAlignment = .center
+        label.textColor = .gray400
+        return label
+    }()
+    
     let feedbackButton = CTAButton(style: .TextButton("피드백 요청하기"), autoBackground: true)
     
     let tooltip = Tooltip("10자 이상 작성해야 피드백 요청이 가능해요!")
@@ -135,8 +144,14 @@ final class DiaryWritingView: BaseUIView {
         setLayout()
         addTarget()
         bindTextView()
+
+        noticeLabel.isHidden = true
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5.1) {
+            self.noticeLabel.isHidden = false
+        }
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -145,7 +160,7 @@ final class DiaryWritingView: BaseUIView {
     
     override func setUI() {
         headerStackView.addArrangedSubviews(dateLabel, textScanButton)
-        addSubviews(scrollView, feedbackButton, modal)
+        addSubviews(scrollView, noticeLabel, feedbackButton, modal)
         scrollView.addSubview(contentView)
         contentView.addSubviews(
             headerStackView, dropdown, textView,
@@ -205,6 +220,12 @@ final class DiaryWritingView: BaseUIView {
             $0.top.equalTo(selectedImageView).offset(-7)
             $0.trailing.equalTo(selectedImageView).offset(6)
             $0.size.equalTo(18)
+        }
+        
+        noticeLabel.snp.makeConstraints {
+            $0.bottom.equalTo(feedbackButton.snp.top).offset(-16)
+            $0.centerX.equalToSuperview()
+            $0.height.equalTo(17)
         }
         
         feedbackButton.snp.makeConstraints {
@@ -339,10 +360,4 @@ final class DiaryWritingView: BaseUIView {
         scrollView.contentInset.bottom = 0
         scrollView.verticalScrollIndicatorInsets.bottom = 0
     }
-}
-
-//MARK: - Preview
-
-#Preview {
-    DiaryWritingView()
 }

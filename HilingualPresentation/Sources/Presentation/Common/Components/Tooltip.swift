@@ -125,7 +125,3 @@ fileprivate final class TooltipPreviewViewController: UIViewController {
         }
     }
 }
-
-#Preview {
-    TooltipPreviewViewController()
-}
