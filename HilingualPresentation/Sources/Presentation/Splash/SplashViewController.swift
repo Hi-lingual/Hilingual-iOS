@@ -50,6 +50,7 @@ public final class SplashViewController: BaseUIViewController<SplashViewModel> {
             "update_message": "안정적인 서비스 사용을 위해 \n최신 버전으로 업데이트 해주세요." as NSObject,
             "update_link": "https://apps.apple.com/kr/app/id6752608763" as NSObject
         ]
+        FeatureFlagService.shared.configureDefaults()
         remoteConfig.setDefaults(defaults)
 
         remoteConfig.fetch(withExpirationDuration: 0) { [weak self] _, error in

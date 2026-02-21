@@ -106,6 +106,10 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                     print("🚨 [UserInfo] API 호출 실패: \(error.localizedDescription)")
                 }
             }, receiveValue: { [weak self] entity in
+                UserDefaults.standard.set(
+                    entity.nickname.trimmingCharacters(in: .whitespacesAndNewlines),
+                    forKey: "currentUser.nickname"
+                )
                 self?.homeView.profileView.updateView(
                     nickname: entity.nickname,
                     profileImageURL: entity.profileImg,
