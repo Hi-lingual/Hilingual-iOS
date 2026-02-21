@@ -105,9 +105,30 @@ final class WordBookView: BaseUIView {
 
     let emptyView = WordBookEmptyView()
 
+    let studyButton: UIButton = {
+        let button = UIButton(type: .system)
+
+        var config = UIButton.Configuration.filled()
+        config.title = "단어 복습하기"
+        config.baseForegroundColor = .white
+        config.baseBackgroundColor = .hilingualBlack
+        config.cornerStyle = .capsule
+        config.contentInsets = NSDirectionalEdgeInsets(top: 14, leading: 24, bottom: 14, trailing: 24)
+
+        button.configuration = config
+        button.titleLabel?.font = UIFont.pretendard(.body_sb_14)
+        button.layer.shadowColor = UIColor.black.cgColor
+        button.layer.shadowOpacity = 0.2
+        button.layer.shadowRadius = 8
+        button.layer.shadowOffset = CGSize(width: 0, height: 4)
+        return button
+    }()
+
     // MARK: - Private Properties
 
     private let sortOptions = ["최신순", "A-Z순"]
+    private let studyButtonVisibleInset: CGFloat = 96
+    private let studyButtonHiddenInset: CGFloat = 16
 
     // MARK: - Lifecycle
 
@@ -128,7 +149,8 @@ final class WordBookView: BaseUIView {
         addSubviews(
             navigationContainer,
             tableView,
-            emptyView
+            emptyView,
+            studyButton
         )
 
         navigationContainer.addSubviews(
@@ -137,6 +159,7 @@ final class WordBookView: BaseUIView {
         )
         showHeaderView(true)
         tableView.refreshControl = refreshControl
+        setStudyButtonVisible(false)
     }
 
     override func setLayout() {
@@ -164,6 +187,11 @@ final class WordBookView: BaseUIView {
             $0.top.equalTo(navigationContainer.snp.bottom).offset(120)
             $0.leading.trailing.bottom.equalToSuperview()
         }
+
+        studyButton.snp.makeConstraints {
+            $0.trailing.equalToSuperview().inset(20)
+            $0.bottom.equalTo(safeAreaLayoutGuide).inset(16)
+        }
     }
 
     // MARK: - Public Method
@@ -184,6 +212,11 @@ final class WordBookView: BaseUIView {
         } else {
             tableView.tableHeaderView = nil
         }
+    }
+
+    func setStudyButtonVisible(_ isVisible: Bool) {
+        studyButton.isHidden = !isVisible
+        tableView.contentInset.bottom = isVisible ? studyButtonVisibleInset : studyButtonHiddenInset
     }
 
     private func updateHeaderViewLayout() {

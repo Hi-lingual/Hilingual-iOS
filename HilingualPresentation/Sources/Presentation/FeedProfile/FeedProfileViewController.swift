@@ -9,6 +9,7 @@ import UIKit
 import Foundation
 import Combine
 import SafariServices
+import HilingualCore
 
 public enum FeedProfileListType {
     case liked
@@ -77,14 +78,13 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
             let targetId = self.viewModel?.targetUserId ?? 0
             if user.isMine || Int64(user.userID) == targetId { return }
 
-            AmplitudeManager.shared.logEvent(
-                "viewe_profile_user",
-                properties: [
-                    "profile_user_id": String(user.userID),
-                    "entry_source": "user_profile",
-                    "entry_id": String(user.diaryID),
-                    "page": "user_profile"
-                ]
+            AmplitudeManager.shared.send(
+                .viewProfileUser(
+                    profileUserId: String(user.userID),
+                    entrySource: .userProfile,
+                    entryId: String(user.diaryID),
+                    page: .userProfile
+                )
             )
 
             let vc = self.diContainer.makeUserFeedProfileViewController(userId: Int64(user.userID))
@@ -95,13 +95,7 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
             guard let self else { return }
             let feed = self.feedCellView.feeds[row]
 
-            AmplitudeManager.shared.logEvent(
-                "pageview",
-                properties: [
-                    "entry_id": String(feed.diaryID),
-                    "tab_name": "posted_diary"
-                ]
-            )
+            AmplitudeManager.shared.send(.pageviewPostedDiary(entryId: String(feed.diaryID)))
 
             let vc = self.diContainer.makeSharedDiaryViewController(diaryId: feed.diaryID)
             vc.hidesBottomBarWhenPushed = true
@@ -111,13 +105,7 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
             guard let self else { return }
             let feed = self.feedCellView.feeds[row]
 
-            AmplitudeManager.shared.logEvent(
-                "pageview",
-                properties: [
-                    "entry_id": String(feed.diaryID),
-                    "tab_name": "posted_diary"
-                ]
-            )
+            AmplitudeManager.shared.send(.pageviewPostedDiary(entryId: String(feed.diaryID)))
 
             let vc = self.diContainer.makeSharedDiaryViewController(diaryId: feed.diaryID)
             vc.hidesBottomBarWhenPushed = true
@@ -127,13 +115,7 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
             guard let self else { return }
             let feed = self.feedCellView.feeds[row]
 
-            AmplitudeManager.shared.logEvent(
-                "pageview",
-                properties: [
-                    "entry_id": String(feed.diaryID),
-                    "tab_name": "posted_diary"
-                ]
-            )
+            AmplitudeManager.shared.send(.pageviewPostedDiary(entryId: String(feed.diaryID)))
 
             let vc = self.diContainer.makeSharedDiaryViewController(diaryId: feed.diaryID)
             vc.hidesBottomBarWhenPushed = true
@@ -166,12 +148,11 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
                           row < self.feedCellView.feeds.count else { return }
                     let feed = self.feedCellView.feeds[row]
 
-                    AmplitudeManager.shared.logEvent(
-                        "click_empathy_action",
-                        properties: [
-                            "entry_id": String(feed.diaryID),
-                            "empathy_action": isLiked ? "add" : "remove"
-                        ]
+                    AmplitudeManager.shared.send(
+                        .clickEmpathyAction(
+                            entryId: String(feed.diaryID),
+                            action: isLiked ? .add : .remove
+                        )
                     )
 
                     self.onLikeTapped?(feed.diaryID, isLiked)
@@ -204,12 +185,11 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
 
     @objc private func didTopScrollRefresh() {
         if let firstFeed = feedCellView.feeds.first {
-            AmplitudeManager.shared.logEvent(
-                "refresh_triggered",
-                properties: [
-                    "entry_id": String(firstFeed.diaryID),
-                    "refresh_method": "pull_to_refresh"
-                ]
+            AmplitudeManager.shared.send(
+                .refreshTriggered(
+                    entryId: String(firstFeed.diaryID),
+                    method: .pullToRefresh
+                )
             )
         }
 

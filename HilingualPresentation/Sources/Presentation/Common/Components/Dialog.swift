@@ -7,6 +7,7 @@
 
 import UIKit
 import SnapKit
+import HilingualCore
 
 final class Dialog: UIView {
 
@@ -258,12 +259,11 @@ extension Dialog {
         if leftAction != nil {
             leftButton.addAction(UIAction { [weak self] _ in
                 if let entryId = entryId {
-                    AmplitudeManager.shared.logEvent(
-                        "click_modal",
-                        properties: [
-                            "entry_id": entryId,
-                            "modal_action": "continue_writing"
-                        ]
+                    AmplitudeManager.shared.send(
+                        .clickModal(
+                            entryId: entryId,
+                            action: .continueWriting
+                        )
                     )
                 }
                 self?.leftAction?()
@@ -273,12 +273,11 @@ extension Dialog {
 
         rightButton.addAction(UIAction { [weak self] _ in
             if let entryId = entryId {
-                AmplitudeManager.shared.logEvent(
-                    "click_modal",
-                    properties: [
-                        "entry_id": entryId,
-                        "modal_action": "confirm_exit"
-                    ]
+                AmplitudeManager.shared.send(
+                    .clickModal(
+                        entryId: entryId,
+                        action: .confirmExit
+                    )
                 )
             }
             self?.rightAction?()

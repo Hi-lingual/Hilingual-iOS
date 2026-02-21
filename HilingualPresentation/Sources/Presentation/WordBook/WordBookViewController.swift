@@ -26,6 +26,7 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
     private let selectedWordIdSubject = PassthroughSubject<Int, Never>()
     private let bookmarkToggledSubject = PassthroughSubject<(Int, Bool), Never>()
     private let refreshSubject = PassthroughSubject<Void, Never>()
+    private let studyRequestedSubject = PassthroughSubject<Void, Never>()
 
     // MARK: - UI Components
 
@@ -46,6 +47,7 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
         wordBookView.showHeaderView(true)
         selectedSortIndex = 0
         wordBookView.tableView.contentInset.top = 0
+        applyFeatureFlags()
         sortSubject.send(.latest)
         wordBookView.updateHeaderView(totalCount: fullWordList.reduce(0) { $0 + $1.1.count }, sortIndex: selectedSortIndex)
         refreshSubject.send(())
@@ -86,6 +88,7 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
         wordBookView.refreshControl.addTarget(self, action: #selector(didPullToRefresh), for: .valueChanged)
         wordBookView.sortButton.addTarget(self, action: #selector(didTapSort), for: .touchUpInside)
         wordBookView.emptyView.emptyButton.addTarget(self, action: #selector(didTapEmptyAdd), for: .touchUpInside)
+        wordBookView.studyButton.addTarget(self, action: #selector(didTapStudy), for: .touchUpInside)
     }
 
     public override func bind(viewModel: WordBookViewModel) {
@@ -94,7 +97,8 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
             sortChanged: sortSubject.eraseToAnyPublisher(),
             selectedWordId: selectedWordIdSubject.eraseToAnyPublisher(),
             bookmarkToggled: bookmarkToggledSubject.eraseToAnyPublisher(),
-            refreshTriggered: refreshSubject.eraseToAnyPublisher()
+            refreshTriggered: refreshSubject.eraseToAnyPublisher(),
+            studyRequested: studyRequestedSubject.eraseToAnyPublisher()
         )
 
         let output = viewModel.transform(input: input)
@@ -122,6 +126,20 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
                     self?.bookmarkToggledSubject.send((phraseId, isMarked))
                 }
                 self?.wordDetailDialog.showAnimation()
+            }
+            .store(in: &cancellables)
+
+        output.studyWords
+            .receive(on: RunLoop.main)
+            .sink { [weak self] words in
+                guard let self = self else { return }
+                guard !words.isEmpty else {
+                    self.showToast(message: "북마크된 단어가 없어요.")
+                    return
+                }
+                let studyVC = WordBookStudyViewController(words: words)
+                studyVC.modalPresentationStyle = .fullScreen
+                self.present(studyVC, animated: true)
             }
             .store(in: &cancellables)
     }
@@ -182,6 +200,15 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
         updateViewState()
     }
 
+    private func applyFeatureFlags() {
+        let nickname = UserDefaults.standard.string(forKey: "currentUser.nickname")
+        let isEnabled = FeatureFlagService.shared.isEnabled(
+            .wordStudyAllowedNicknames,
+            nickname: nickname
+        )
+        wordBookView.setStudyButtonVisible(isEnabled)
+    }
+
     // MARK: - Action Method
 
     @objc
@@ -212,6 +239,29 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
         }
         modal.isHidden = false
         modal.showAnimation()
+    }
+
+    @objc
+    private func didTapStudy() {
+        let bookmarkedWords = fullWordList.flatMap { $0.1 }.filter { $0.isMarked }
+        guard !bookmarkedWords.isEmpty else {
+            showToast(message: "북마크된 단어가 없어요.")
+            return
+        }
+
+        studyRequestedSubject.send(())
+    }
+
+    private func showToast(message: String) {
+        let toast = ToastMessage()
+        view.addSubview(toast)
+        toast.configure(type: .basic, message: message)
+        toast.isHidden = false
+        toast.alpha = 0
+        view.bringSubviewToFront(toast)
+        UIView.animate(withDuration: 0.3) {
+            toast.alpha = 1
+        }
     }
 }
 

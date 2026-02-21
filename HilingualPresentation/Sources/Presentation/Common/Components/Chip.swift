@@ -8,6 +8,46 @@
 import UIKit
 import SnapKit
 
+enum ChipSize {
+    case small
+    case large
+
+    var font: UIFont {
+        switch self {
+        case .small: return .pretendard(.cap_r_12)
+        case .large: return .pretendard(.body_sb_14)
+        }
+    }
+
+    var cornerRadius: CGFloat {
+        switch self {
+        case .small: return 10
+        case .large: return 16
+        }
+    }
+
+    var imageSize: CGFloat {
+        switch self {
+        case .small: return 24
+        case .large: return 36
+        }
+    }
+
+    var verticalInset: CGFloat {
+        switch self {
+        case .small: return 2.5
+        case .large: return 6
+        }
+    }
+
+    var horizontalInset: CGFloat {
+        switch self {
+        case .small: return 6
+        case .large: return 12
+        }
+    }
+}
+
 enum ChipType {
     case me
     case ai
@@ -22,7 +62,7 @@ enum ChipType {
     case phrase
     case clause
     case expression
-    
+
     var isImageChip: Bool {
         self == .me || self == .ai
     }
@@ -85,49 +125,45 @@ enum ChipType {
 }
 
 final class Chip: UIView {
-    
+
     // MARK: - Properties
-    
-    private let label: UILabel = {
-        let label = UILabel()
-        label.font = .pretendard(.cap_r_12)
-        label.textAlignment = .center
-        label.numberOfLines = 1
-        return label
-    }()
-    
+
+    private let label = UILabel()
     private let imageView = UIImageView()
-    
+
     // MARK: - Lifecycle
-    
-    init(type: ChipType) {
+
+    init(type: ChipType, size: ChipSize = .small) {
         super.init(frame: .zero)
-        
+
         setUI(type: type)
-        setStyle(type: type)
-        setLayout(type: type)
+        setStyle(type: type, size: size)
+        setLayout(type: type, size: size)
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     // MARK: - Setup Methods
-    
-    private func setStyle(type: ChipType) {
+
+    private func setStyle(type: ChipType, size: ChipSize) {
         backgroundColor = type.backgroundColor
-        layer.cornerRadius = 10
+        layer.cornerRadius = size.cornerRadius
         clipsToBounds = true
-        
+
         if type.isImageChip {
             imageView.image = type.image
             imageView.contentMode = .scaleAspectFit
         } else {
             label.text = type.title
             label.textColor = type.textColor
+            label.font = size.font
+            label.textAlignment = .center
+            label.numberOfLines = 1
         }
     }
-    
+
     private func setUI(type: ChipType) {
         if type.isImageChip {
             addSubview(imageView)
@@ -135,18 +171,18 @@ final class Chip: UIView {
             addSubview(label)
         }
     }
-    
-    private func setLayout(type: ChipType) {
+
+    private func setLayout(type: ChipType, size: ChipSize) {
         if type.isImageChip {
             imageView.snp.makeConstraints {
                 $0.edges.equalToSuperview()
-                $0.size.equalTo(24)
+                $0.size.equalTo(size.imageSize)
             }
         } else {
             label.snp.makeConstraints {
                 $0.center.equalToSuperview()
-                $0.verticalEdges.equalToSuperview().inset(2.5)
-                $0.horizontalEdges.equalToSuperview().inset(6)
+                $0.verticalEdges.equalToSuperview().inset(size.verticalInset)
+                $0.horizontalEdges.equalToSuperview().inset(size.horizontalInset)
             }
         }
     }

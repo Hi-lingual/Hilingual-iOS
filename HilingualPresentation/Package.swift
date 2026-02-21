@@ -17,18 +17,18 @@ let package = Package(
         .package(url: "https://github.com/SnapKit/SnapKit.git", from: "5.6.0"),
         .package(url: "https://github.com/onevcat/Kingfisher.git", from: "8.4.0"),
         .package(url: "https://github.com/airbnb/lottie-spm.git", from: "4.5.2"),
-        .package(url: "https://github.com/amplitude/Amplitude-Swift", from: "1.15.2"),
-        .package(name: "HilingualDomain", path: "../HilingualDomain")
+        .package(name: "HilingualDomain", path: "../HilingualDomain"),
+        .package(name: "HilingualCore", path: "../HilingualCore")
     ],
     targets: [
         .target(
             name: "HilingualPresentation",
             dependencies: [
+                "HilingualCore",
                 "HilingualDomain",
                 .product(name: "SnapKit", package: "SnapKit"),
                 .product(name: "Kingfisher", package: "Kingfisher"),
                 .product(name: "Lottie", package: "lottie-spm"),
-                .product(name: "AmplitudeSwift", package: "Amplitude-Swift"),
                 .product(name: "FirebaseCore", package: "firebase-ios-sdk"),
                 .product(name: "FirebaseRemoteConfig", package: "firebase-ios-sdk")
             ],

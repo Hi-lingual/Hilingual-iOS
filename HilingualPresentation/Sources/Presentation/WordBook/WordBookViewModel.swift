@@ -20,11 +20,13 @@ public final class WordBookViewModel: BaseViewModel {
         let selectedWordId: AnyPublisher<Int, Never>
         let bookmarkToggled: AnyPublisher<(Int, Bool), Never>
         let refreshTriggered: AnyPublisher<Void, Never>
+        let studyRequested: AnyPublisher<Void, Never>
     }
 
     public struct Output {
         let wordList: AnyPublisher<[(date: String, items: [PhraseData])], Never>
         let wordDetail: AnyPublisher<PhraseData, Never>
+        let studyWords: AnyPublisher<[PhraseData], Never>
     }
 
     // MARK: - Dependencies
@@ -36,6 +38,7 @@ public final class WordBookViewModel: BaseViewModel {
 
     private let wordListSubject = CurrentValueSubject<[(date: String, items: [PhraseData])], Never>([])
     private let wordDetailSubject = PassthroughSubject<PhraseData, Never>()
+    private let studyWordsSubject = PassthroughSubject<[PhraseData], Never>()
     private var currentSortOption: SortOption = .latest
 
     // MARK: - Init
@@ -82,10 +85,16 @@ public final class WordBookViewModel: BaseViewModel {
                }
                .store(in: &cancellables)
 
+        input.studyRequested
+            .sink { [weak self] in
+                self?.fetchStudyWords()
+            }
+            .store(in: &cancellables)
 
         return Output(
             wordList: wordListSubject.eraseToAnyPublisher(),
-            wordDetail: wordDetailSubject.eraseToAnyPublisher()
+            wordDetail: wordDetailSubject.eraseToAnyPublisher(),
+            studyWords: studyWordsSubject.eraseToAnyPublisher()
         )
     }
 
@@ -163,5 +172,41 @@ public final class WordBookViewModel: BaseViewModel {
             return (date, updatedItems)
         }
         wordListSubject.send(updated)
+    }
+
+    private func fetchStudyWords() {
+        let bookmarkedIds = wordListSubject.value
+            .flatMap { $0.items }
+            .filter { $0.isMarked }
+            .map { Int($0.phraseId) }
+
+        guard !bookmarkedIds.isEmpty else {
+            studyWordsSubject.send([])
+            return
+        }
+
+        let publishers = bookmarkedIds.map { id in
+            fetchWordListUseCase.getWordDetail(id: id)
+                .map { entity -> PhraseData in
+                    PhraseData(
+                        phraseId: Int64(entity.phraseId),
+                        phraseType: entity.phraseType,
+                        phrase: entity.phrase,
+                        explanation: entity.explanation ?? "",
+                        reason: entity.example ?? "",
+                        createdAt: entity.createdAt ?? "",
+                        isMarked: entity.isMarked
+                    )
+                }
+                .catch { _ in Empty<PhraseData, Never>() }
+                .eraseToAnyPublisher()
+        }
+
+        Publishers.MergeMany(publishers)
+            .collect()
+            .sink { [weak self] words in
+                self?.studyWordsSubject.send(words)
+            }
+            .store(in: &cancellables)
     }
 }

@@ -7,6 +7,7 @@
 
 import UIKit
 import HilingualPresentation
+import HilingualCore
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
