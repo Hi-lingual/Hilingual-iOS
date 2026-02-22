@@ -1,0 +1,40 @@
+//
+//  NotificationUseCase.swift
+//  HilingualDomain
+//
+//  Created by 성현주 on 8/26/25.
+//
+
+import Combine
+
+public protocol NotificationUseCase {
+    func fetchFeedNotifications() -> AnyPublisher<[NotificationEntity], Error>
+    func fetchNoticeNotifications() -> AnyPublisher<[NotificationEntity], Error>
+    func fetchNotificationDetail(notiId: Int) -> AnyPublisher<NotificationDetailEntity, Error>
+    func markNotificationAsRead(notiId: Int) -> AnyPublisher<Void, Error>
+}
+
+public final class DefaultNotificationUseCase: NotificationUseCase {
+
+    private let repository: NotificationRepository
+
+    public init(repository: NotificationRepository) {
+        self.repository = repository
+    }
+
+    public func fetchFeedNotifications() -> AnyPublisher<[NotificationEntity], Error> {
+        return repository.fetchGeneralNotifications()
+    }
+    
+    public func fetchNoticeNotifications() -> AnyPublisher<[NotificationEntity], Error> {
+        return repository.fetchNoticeNotifications()
+    }
+
+    public func fetchNotificationDetail(notiId: Int) -> AnyPublisher<NotificationDetailEntity, Error> {
+        return repository.fetchNotificationDetail(notiId: notiId)
+    }
+
+    public func markNotificationAsRead(notiId: Int) -> AnyPublisher<Void, Error> {
+            return repository.markNotificationAsRead(notiId: notiId)
+        }
+}

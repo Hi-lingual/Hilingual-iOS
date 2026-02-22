@@ -1,0 +1,100 @@
+//
+//  BaseUIViewController.swift
+//  HilingualPresentation
+//
+//  Created by 성현주 on 7/6/25.
+//
+
+import UIKit
+import Combine
+
+// MARK: - NavigationType Extension
+
+public extension BaseUIViewController {
+
+    enum NavigationType {
+        case titleOnly(String)
+        case backTitle(String)
+        case backTitleMenu(title: String, rightIconName: String? = nil)
+        case backOnly
+        case backSearchBar
+    }
+
+    // MARK: - Setup
+
+    func setupNavigationBar() {
+        guard let type = navigationType() else { return }
+
+        switch type {
+        case .titleOnly(let title):
+            navigationItem.titleView = makeTitleLabel(title)
+            navigationItem.leftBarButtonItem = nil
+            navigationItem.rightBarButtonItem = nil
+
+        case .backTitle(let title):
+            navigationItem.titleView = makeTitleLabel(title)
+            navigationItem.leftBarButtonItem = makeBarButton(
+                imageName: "ic_arrow_left_b_24_ios",
+                action: #selector(backButtonTapped)
+            )
+            navigationItem.rightBarButtonItem = nil
+
+        case .backTitleMenu(let title, let rightIconName):
+            navigationItem.titleView = makeTitleLabel(title)
+            navigationItem.leftBarButtonItem = makeBarButton(
+                imageName: "ic_arrow_left_b_24_ios",
+                action: #selector(backButtonTapped)
+            )
+            navigationItem.rightBarButtonItem = makeBarButton(
+                imageName: rightIconName ?? "ic_more_24_ios",
+                action: #selector(menuButtonTapped)
+            )
+
+        case .backOnly:
+            navigationItem.titleView = nil
+            navigationItem.leftBarButtonItem = makeBarButton(
+                imageName: "ic_arrow_left_b_24_ios",
+                action: #selector(backButtonTapped)
+            )
+            navigationItem.rightBarButtonItem = nil
+            
+        case .backSearchBar:
+            navigationItem.leftBarButtonItem = makeBarButton(
+                imageName: "ic_arrow_left_b_24_ios",
+                action: #selector(backButtonTapped)
+            )
+            
+            navigationItem.titleView = SearchBar()
+            navigationItem.rightBarButtonItem = nil
+        }
+    }
+
+    // MARK: - Title Label
+
+    private func makeTitleLabel(_ title: String) -> UILabel {
+        let label = UILabel()
+        label.attributedText = .pretendard(.head_sb_18, text: title)
+        label.textAlignment = .center
+        label.sizeToFit()
+        return label
+    }
+
+    // MARK: - Button
+
+    private func makeBarButton(imageName: String, action: Selector) -> UIBarButtonItem {
+        let button = UIButton(type: .system)
+
+        let image = UIImage(named: imageName, in: .module, compatibleWith: nil)?
+            .withRenderingMode(.alwaysOriginal)
+
+        button.setImage(image, for: .normal)
+        button.tintColor = .black
+        button.addTarget(self, action: action, for: .touchUpInside)
+//        button.frame = CGRect(x: 0, y: 0, width: 24, height: 24)
+//        button.contentHorizontalAlignment = .fill
+//        button.contentVerticalAlignment = .fill
+
+        return UIBarButtonItem(customView: button)
+    }
+
+}
