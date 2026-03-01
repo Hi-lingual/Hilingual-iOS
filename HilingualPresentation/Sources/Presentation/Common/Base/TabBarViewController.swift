@@ -166,13 +166,17 @@ public final class TabBarViewController: UIViewController {
 
         let currentNav = childNavigationControllers[currentIndex]
         let newInset: CGFloat = hidden ? 0 : customTabBarHeight
+        let tabBarHeight = customTabBarHeight + view.safeAreaInsets.bottom
 
         if animated {
             if !hidden {
                 customTabBarView.isHidden = false
+                customTabBarView.transform = CGAffineTransform(translationX: 0, y: tabBarHeight)
             }
-            UIView.animate(withDuration: 0.25) {
-                self.customTabBarView.alpha = hidden ? 0 : 1
+            UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut) {
+                self.customTabBarView.transform = hidden
+                    ? CGAffineTransform(translationX: 0, y: tabBarHeight)
+                    : .identity
                 currentNav.additionalSafeAreaInsets.bottom = newInset
             } completion: { _ in
                 if hidden {
@@ -181,7 +185,9 @@ public final class TabBarViewController: UIViewController {
             }
         } else {
             customTabBarView.isHidden = hidden
-            customTabBarView.alpha = hidden ? 0 : 1
+            customTabBarView.transform = hidden
+                ? CGAffineTransform(translationX: 0, y: tabBarHeight)
+                : .identity
             currentNav.additionalSafeAreaInsets.bottom = newInset
         }
     }
