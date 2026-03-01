@@ -236,7 +236,7 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
                                 entryId: self?.entryId ?? ""
                             )
                         )
-                        self?.tabBarController?.selectedIndex = 2
+                        self?.customTabBarController?.selectedIndex = 2
                         self?.navigationController?.popToRootViewController(animated: false)
                     }
 

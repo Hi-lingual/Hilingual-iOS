@@ -287,10 +287,10 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     }
     
     private func showDraftDialog(selectedDate: Date, topicData: (String, String)?) {
-        guard let containerView = self.tabBarController?.view else { return }
+        guard let window = view.window else { return }
 
-        containerView.addSubview(dialog)
-        dialog.snp.remakeConstraints { $0.edges.equalTo(containerView) }
+        window.addSubview(dialog)
+        dialog.snp.remakeConstraints { $0.edges.equalToSuperview() }
 
         dialog.configure(
             style: .normal,
@@ -381,36 +381,34 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     }
     
     private func showOverlay() {
-        guard let containerView = tabBarController?.view ?? view else { return }
-        
         let overlay = UIControl()
         overlay.backgroundColor = .clear
         overlay.addTarget(self, action: #selector(dismissMenu), for: .touchUpInside)
-        containerView.addSubview(overlay)
+        view.addSubview(overlay)
         overlay.snp.makeConstraints { $0.edges.equalToSuperview() }
         overlayView = overlay
-        
+
         if homeView.selectedInfo.menu.superview != nil {
             homeView.selectedInfo.menu.removeFromSuperview()
         }
-        containerView.addSubview(homeView.selectedInfo.menu)
-        
+        view.addSubview(homeView.selectedInfo.menu)
+
         homeView.selectedInfo.menu.snp.remakeConstraints {
             $0.top.equalTo(homeView.selectedInfo.moreImageView.snp.bottom).offset(4)
             $0.trailing.equalTo(homeView.selectedInfo.moreImageView.snp.trailing)
             $0.height.equalTo(96)
             $0.width.equalTo(182)
         }
-        
+
         homeView.selectedInfo.menu.isHidden = false
-        containerView.bringSubviewToFront(homeView.selectedInfo.menu)
+        view.bringSubviewToFront(homeView.selectedInfo.menu)
     }
     
     private func showDialog(for action: MenuAction, diaryId: Int) {
-        guard let containerView = self.tabBarController?.view else { return }
-        
-        containerView.addSubview(dialog)
-        dialog.snp.remakeConstraints { $0.edges.equalTo(containerView) }
+        guard let window = view.window else { return }
+
+        window.addSubview(dialog)
+        dialog.snp.remakeConstraints { $0.edges.equalToSuperview() }
         
         switch action {
         case .publish:
@@ -446,7 +444,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                             
                             toast.action = { [weak self] in
                                 guard let self else { return }
-                                tabBarController?.selectedIndex = 2
+                                customTabBarController?.selectedIndex = 2
                             }
                         })
                         .store(in: &self.viewModel!.cancellables)
