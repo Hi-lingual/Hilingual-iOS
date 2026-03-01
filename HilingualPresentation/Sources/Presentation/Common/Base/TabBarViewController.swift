@@ -13,7 +13,7 @@ public final class TabBarViewController: UIViewController {
     // MARK: - Properties
 
     private let factory: ViewControllerFactory
-    private let customTabBarHeight: CGFloat = 50
+    private let customTabBarHeight: CGFloat = 82
     private var childNavigationControllers: [UINavigationController] = []
     private var currentIndex: Int = 0
 

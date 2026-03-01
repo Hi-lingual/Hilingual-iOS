@@ -16,6 +16,11 @@ struct CustomTabBarItem {
 
 final class CustomTabBarView: UIView {
 
+    private enum Layout {
+        static let tabHeight: CGFloat = 58
+        static let adHeight: CGFloat = 24
+    }
+
     // MARK: - Callback
 
     var onSelect: ((Int) -> Void)?
@@ -24,7 +29,7 @@ final class CustomTabBarView: UIView {
 
     private let topDivider: UIView = {
         let view = UIView()
-        view.backgroundColor = .gray200
+        view.backgroundColor = .gray100
         return view
     }()
 
@@ -33,6 +38,33 @@ final class CustomTabBarView: UIView {
         stack.axis = .horizontal
         stack.distribution = .fillEqually
         return stack
+    }()
+
+    private let adContainerView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .white
+        return view
+    }()
+
+    private let adBadgeLabel: UILabel = {
+        let label = UILabel()
+        label.text = "AD"
+        label.font = .pretendard(.cap_r_12)
+        label.textColor = .white
+        label.textAlignment = .center
+        label.backgroundColor = .gray500
+        label.layer.cornerRadius = 8
+        label.layer.masksToBounds = true
+        return label
+    }()
+
+    private let adTitleLabel: UILabel = {
+        let label = UILabel()
+        label.font = .pretendard(.cap_r_12)
+        label.textColor = .gray700
+        label.numberOfLines = 1
+        label.text = "광고 이름 메인 카피 메인 카피 메인 카피 메인 카피 광고 이름 메인 카피 메인 카피 메인 카피 메인 카피"
+        return label
     }()
 
     private let itemViews: [CustomTabBarItemView]
@@ -63,7 +95,8 @@ final class CustomTabBarView: UIView {
 
     private func setupUI() {
         backgroundColor = .white
-        addSubviews(topDivider, stackView)
+        addSubviews(topDivider, stackView, adContainerView)
+        adContainerView.addSubviews(adBadgeLabel, adTitleLabel)
         itemViews.forEach { stackView.addArrangedSubview($0) }
     }
 
@@ -74,9 +107,29 @@ final class CustomTabBarView: UIView {
         }
 
         stackView.snp.makeConstraints {
-            $0.top.equalTo(topDivider.snp.bottom)
+            $0.top.equalToSuperview()
             $0.horizontalEdges.equalToSuperview()
-            $0.bottom.equalTo(safeAreaLayoutGuide)
+            $0.height.equalTo(Layout.tabHeight)
+        }
+
+        adContainerView.snp.makeConstraints {
+            $0.top.equalTo(stackView.snp.bottom)
+            $0.horizontalEdges.equalToSuperview()
+            $0.height.equalTo(Layout.adHeight)
+            $0.bottom.equalTo(safeAreaLayoutGuide.snp.bottom)
+        }
+
+        adBadgeLabel.snp.makeConstraints {
+            $0.leading.equalToSuperview().inset(12)
+            $0.centerY.equalToSuperview()
+            $0.width.equalTo(24)
+            $0.height.equalTo(16)
+        }
+
+        adTitleLabel.snp.makeConstraints {
+            $0.leading.equalTo(adBadgeLabel.snp.trailing).offset(8)
+            $0.trailing.equalToSuperview().inset(12)
+            $0.centerY.equalToSuperview()
         }
     }
 
