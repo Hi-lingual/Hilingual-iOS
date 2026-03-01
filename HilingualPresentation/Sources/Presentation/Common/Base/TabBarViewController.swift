@@ -10,13 +10,10 @@ import SnapKit
 
 public final class TabBarViewController: UIViewController {
 
-    // MARK: - Dependencies
+    // MARK: - Properties
 
     private let factory: ViewControllerFactory
     private let customTabBarHeight: CGFloat = 50
-
-    // MARK: - Child ViewControllers
-
     private var childNavigationControllers: [UINavigationController] = []
     private var currentIndex: Int = 0
 
@@ -30,26 +27,10 @@ public final class TabBarViewController: UIViewController {
     private let containerView = UIView()
 
     private let customTabBarView = CustomTabBarView(items: [
-        .init(
-            title: "홈",
-            selectedImageName: "ic_home_black_24_ios",
-            unselectedImageName: "ic_home_gray_24_ios"
-        ),
-        .init(
-            title: "단어장",
-            selectedImageName: "ic_book_black_24_ios",
-            unselectedImageName: "ic_book_gray_24_ios"
-        ),
-        .init(
-            title: "피드",
-            selectedImageName: "ic_community_black_24_ios",
-            unselectedImageName: "ic_community_gray_24_ios"
-        ),
-        .init(
-            title: "마이",
-            selectedImageName: "ic_my_black_24_ios",
-            unselectedImageName: "ic_my_gray_24_ios"
-        )
+        .init(title: "홈", selectedImageName: "ic_home_black_24_ios", unselectedImageName: "ic_home_gray_24_ios"),
+        .init(title: "단어장", selectedImageName: "ic_book_black_24_ios", unselectedImageName: "ic_book_gray_24_ios"),
+        .init(title: "피드", selectedImageName: "ic_community_black_24_ios", unselectedImageName: "ic_community_gray_24_ios"),
+        .init(title: "마이", selectedImageName: "ic_my_black_24_ios", unselectedImageName: "ic_my_gray_24_ios")
     ])
 
     // MARK: - Init
@@ -68,7 +49,6 @@ public final class TabBarViewController: UIViewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
-        definesPresentationContext = true
         setupChildViewControllers()
         setupUI()
         setupLayout()
@@ -84,12 +64,12 @@ public final class TabBarViewController: UIViewController {
     // MARK: - Setup
 
     private func setupChildViewControllers() {
-        let homeNav = makeNavigationController(root: factory.makeHomeViewController())
-        let vocabNav = makeNavigationController(root: factory.makeWordBookViewController())
-        let feedNav = makeNavigationController(root: factory.makeFeedViewController())
-        let myNav = makeNavigationController(root: factory.makeMypageViewController())
-
-        childNavigationControllers = [homeNav, vocabNav, feedNav, myNav]
+        childNavigationControllers = [
+            makeNavigationController(root: factory.makeHomeViewController()),
+            makeNavigationController(root: factory.makeWordBookViewController()),
+            makeNavigationController(root: factory.makeFeedViewController()),
+            makeNavigationController(root: factory.makeMypageViewController())
+        ]
     }
 
     private func makeNavigationController(root: UIViewController) -> UINavigationController {
@@ -116,16 +96,11 @@ public final class TabBarViewController: UIViewController {
     private func setupTabBarAction() {
         customTabBarView.onSelect = { [weak self] index in
             guard let self else { return }
-            let previousIndex = self.currentIndex
 
-            if previousIndex == index {
-                if index == 2,
-                   let feedVC = self.childNavigationControllers[index].viewControllers.first as? FeedViewController {
-                    feedVC.handleFeedTabSelected(isReSelected: true)
-                }
+            if self.currentIndex == index {
+                self.handleTabReselection(at: index)
                 return
             }
-
             self.selectTab(at: index)
         }
     }
@@ -144,17 +119,24 @@ public final class TabBarViewController: UIViewController {
 
         addChild(newVC)
         containerView.addSubview(newVC.view)
-        newVC.view.snp.makeConstraints {
-            $0.edges.equalToSuperview()
-        }
+        newVC.view.snp.makeConstraints { $0.edges.equalToSuperview() }
         newVC.didMove(toParent: self)
-
         newVC.additionalSafeAreaInsets.bottom = customTabBarHeight
 
         currentIndex = index
         customTabBarView.setSelectedIndex(index)
         updateTabBarVisibility(for: newVC)
     }
+
+    private func handleTabReselection(at index: Int) {
+        guard index == 2,
+              let feedVC = childNavigationControllers[index].viewControllers.first as? FeedViewController else {
+            return
+        }
+        feedVC.handleFeedTabSelected(isReSelected: true)
+    }
+
+    // MARK: - TabBar Visibility
 
     private func updateTabBarVisibility(for navigationController: UINavigationController) {
         let shouldHide = navigationController.topViewController?.hidesBottomBarWhenPushed ?? false
@@ -213,11 +195,11 @@ public extension UIViewController {
 
     var customTabBarController: TabBarViewController? {
         var current: UIViewController? = self
-        while let viewController = current {
-            if let tabBar = viewController as? TabBarViewController {
+        while let vc = current {
+            if let tabBar = vc as? TabBarViewController {
                 return tabBar
             }
-            current = viewController.parent
+            current = vc.parent
         }
         return nil
     }

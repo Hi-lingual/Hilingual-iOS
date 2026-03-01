@@ -47,7 +47,6 @@ final class CustomTabBarView: UIView {
         setupUI()
         setupLayout()
         bindActions()
-        setSelectedIndex(0)
     }
 
     required init?(coder: NSCoder) {
@@ -90,19 +89,18 @@ final class CustomTabBarView: UIView {
     }
 }
 
+// MARK: - CustomTabBarItemView
+
 private final class CustomTabBarItemView: UIControl {
-
-    // MARK: - Callback
-
-    var onTap: ((Int) -> Void)?
 
     // MARK: - Properties
 
     let itemIndex: Int
     private let item: CustomTabBarItem
+    var onTap: ((Int) -> Void)?
 
     var isItemSelected: Bool = false {
-        didSet { updateUI() }
+        didSet { updateAppearance() }
     }
 
     // MARK: - UI
@@ -125,6 +123,7 @@ private final class CustomTabBarItemView: UIControl {
         stack.axis = .vertical
         stack.alignment = .center
         stack.spacing = 2
+        stack.isUserInteractionEnabled = false
         return stack
     }()
 
@@ -137,7 +136,6 @@ private final class CustomTabBarItemView: UIControl {
         setupUI()
         setupLayout()
         addTarget(self, action: #selector(didTap), for: .touchUpInside)
-        updateUI()
     }
 
     required init?(coder: NSCoder) {
@@ -150,7 +148,7 @@ private final class CustomTabBarItemView: UIControl {
         titleLabel.text = item.title
         addSubview(contentStack)
         contentStack.addArrangedSubviews(iconImageView, titleLabel)
-        contentStack.isUserInteractionEnabled = false
+        updateAppearance()
     }
 
     private func setupLayout() {
@@ -163,7 +161,7 @@ private final class CustomTabBarItemView: UIControl {
         }
     }
 
-    private func updateUI() {
+    private func updateAppearance() {
         let imageName = isItemSelected ? item.selectedImageName : item.unselectedImageName
         iconImageView.image = UIImage(named: imageName, in: .module, compatibleWith: nil)?
             .withRenderingMode(.alwaysOriginal)
