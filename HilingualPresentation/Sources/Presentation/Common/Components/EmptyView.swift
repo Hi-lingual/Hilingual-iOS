@@ -14,7 +14,6 @@ final class EmptyView: UIView {
     
     private let messageLabel: UILabel = {
         let label = UILabel()
-        label.font = .pretendard(.head_r_18)
         label.textColor = .gray500
         label.textAlignment = .center
         label.numberOfLines = 2
@@ -80,9 +79,11 @@ final class EmptyView: UIView {
     
     func configure(
         message: String,
-        imageName: String? = nil
+        imageName: String? = nil,
+        font: UIFont = .pretendard(.head_r_18)
     ) {
         messageLabel.text = message
+        messageLabel.font = font
         
         if let imageName {
             imageView.image = UIImage(
