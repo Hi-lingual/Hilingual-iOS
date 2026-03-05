@@ -8,6 +8,7 @@
 import UIKit
 import SnapKit
 import Kingfisher
+import GoogleMobileAds
 
 final class MypageView: BaseUIView {
 
@@ -131,15 +132,21 @@ final class MypageView: BaseUIView {
     ]
 
     private var menuRows: [UIControl] = []
-
+    
+    let bannerView: BannerView = {
+        let view = BannerView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
     // MARK: - Custom Method
 
     override func setUI() {
         backgroundColor = .gray100
-
-        addSubview(scrollView)
+        
+        addSubviews(scrollView)
         scrollView.addSubview(contentView)
-        contentView.addSubviews(titleLabel, profileCardView, menuCardView, versionIconView, versionLabel, versionValueLabel, logoutButton)
+        contentView.addSubviews(titleLabel, profileCardView, menuCardView, versionIconView, versionLabel, versionValueLabel, logoutButton, bannerView)
         profileCardView.addSubviews(profileImageView, nicknameLabel, editButton, feedButton)
 
         for item in menuItems {
@@ -200,7 +207,7 @@ final class MypageView: BaseUIView {
             $0.top.equalTo(profileCardView.snp.bottom).offset(16)
             $0.leading.trailing.equalToSuperview().inset(16)
         }
-
+        
         for (index, row) in menuRows.enumerated() {
             row.snp.makeConstraints {
                 $0.leading.trailing.equalToSuperview()
@@ -237,6 +244,12 @@ final class MypageView: BaseUIView {
             $0.leading.trailing.equalToSuperview().inset(28)
             $0.height.equalTo(44)
             $0.bottom.equalToSuperview().inset(40)
+        }
+        
+        bannerView.snp.makeConstraints {
+            // TODO: 커스텀 탭바 머지하고 위치제약 나중에 수정 ㄱ 문제는 높이지정이 안됨
+            $0.top.equalTo(logoutButton.snp.bottom).offset(16)
+            $0.horizontalEdges.equalToSuperview()
         }
     }
 
