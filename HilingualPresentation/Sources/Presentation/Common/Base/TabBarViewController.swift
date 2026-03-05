@@ -10,12 +10,22 @@ import SnapKit
 
 public final class TabBarViewController: UIViewController {
 
+    private enum Layout {
+        static let tabHeight: CGFloat = 58
+        static let adHeight: CGFloat = 24
+    }
+
     // MARK: - Properties
 
     private let factory: ViewControllerFactory
-    private let customTabBarHeight: CGFloat = 82
     private var childNavigationControllers: [UINavigationController] = []
     private var currentIndex: Int = 0
+    private var isAdVisible = false
+    private var customTabBarTopConstraint: Constraint?
+
+    private var currentTabBarHeight: CGFloat {
+        Layout.tabHeight + (isAdVisible ? Layout.adHeight : 0)
+    }
 
     public var selectedIndex: Int {
         get { currentIndex }
@@ -48,6 +58,8 @@ public final class TabBarViewController: UIViewController {
 
     public override func viewDidLoad() {
         super.viewDidLoad()
+        AdMobManager.startIfNeeded()
+        customTabBarView.loadAd()
         view.backgroundColor = .white
         setupChildViewControllers()
         setupUI()
@@ -89,7 +101,11 @@ public final class TabBarViewController: UIViewController {
 
         customTabBarView.snp.makeConstraints {
             $0.leading.trailing.bottom.equalToSuperview()
-            $0.top.equalTo(view.safeAreaLayoutGuide.snp.bottom).offset(-customTabBarHeight)
+            customTabBarTopConstraint = $0
+                .top
+                .equalTo(view.safeAreaLayoutGuide.snp.bottom)
+                .offset(-currentTabBarHeight)
+                .constraint
         }
     }
 
@@ -102,6 +118,10 @@ public final class TabBarViewController: UIViewController {
                 return
             }
             self.selectTab(at: index)
+        }
+
+        customTabBarView.onAdVisibilityChanged = { [weak self] visible in
+            self?.updateAdVisibility(visible, animated: true)
         }
     }
 
@@ -121,7 +141,7 @@ public final class TabBarViewController: UIViewController {
         containerView.addSubview(newVC.view)
         newVC.view.snp.makeConstraints { $0.edges.equalToSuperview() }
         newVC.didMove(toParent: self)
-        newVC.additionalSafeAreaInsets.bottom = customTabBarHeight
+        newVC.additionalSafeAreaInsets.bottom = currentTabBarHeight
 
         currentIndex = index
         customTabBarView.setSelectedIndex(index)
@@ -147,8 +167,8 @@ public final class TabBarViewController: UIViewController {
         guard customTabBarView.isHidden != hidden else { return }
 
         let currentNav = childNavigationControllers[currentIndex]
-        let newInset: CGFloat = hidden ? 0 : customTabBarHeight
-        let tabBarHeight = customTabBarHeight + view.safeAreaInsets.bottom
+        let newInset: CGFloat = hidden ? 0 : currentTabBarHeight
+        let tabBarHeight = currentTabBarHeight + view.safeAreaInsets.bottom
 
         if animated {
             if !hidden {
@@ -171,6 +191,27 @@ public final class TabBarViewController: UIViewController {
                 ? CGAffineTransform(translationX: 0, y: tabBarHeight)
                 : .identity
             currentNav.additionalSafeAreaInsets.bottom = newInset
+        }
+    }
+
+    private func updateAdVisibility(_ visible: Bool, animated: Bool) {
+        guard isAdVisible != visible else { return }
+        isAdVisible = visible
+
+        customTabBarTopConstraint?.update(offset: -currentTabBarHeight)
+
+        let applyLayout = {
+            self.view.layoutIfNeeded()
+            guard self.customTabBarView.isHidden == false else { return }
+            self.childNavigationControllers[self.currentIndex].additionalSafeAreaInsets.bottom = self.currentTabBarHeight
+        }
+
+        if animated {
+            UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseInOut) {
+                applyLayout()
+            }
+        } else {
+            applyLayout()
         }
     }
 }

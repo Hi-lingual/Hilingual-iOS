@@ -7,6 +7,7 @@
 
 import UIKit
 import SnapKit
+@preconcurrency import GoogleMobileAds
 
 struct CustomTabBarItem {
     let title: String
@@ -21,9 +22,15 @@ final class CustomTabBarView: UIView {
         static let adHeight: CGFloat = 24
     }
 
+    private enum Ads {
+        static let nativeTestUnitID = "ca-app-pub-3940256099942544/3986624511"
+        static let fallbackTitle = "광고 이름"
+    }
+
     // MARK: - Callback
 
     var onSelect: ((Int) -> Void)?
+    var onAdVisibilityChanged: ((Bool) -> Void)?
 
     // MARK: - UI
 
@@ -63,9 +70,15 @@ final class CustomTabBarView: UIView {
         label.font = .pretendard(.cap_r_12)
         label.textColor = .gray700
         label.numberOfLines = 1
-        label.text = "광고 이름 메인 카피 메인 카피 메인 카피 메인 카피 광고 이름 메인 카피 메인 카피 메인 카피 메인 카피"
+        label.text = Ads.fallbackTitle
         return label
     }()
+
+    private var adHeightConstraint: Constraint?
+    private var adLoader: GADAdLoader?
+    private var nativeAd: GADNativeAd?
+    private var isAdVisible = false
+    private lazy var adLoaderDelegate = NativeAdLoaderDelegate(owner: self)
 
     private let itemViews: [CustomTabBarItemView]
 
@@ -91,12 +104,17 @@ final class CustomTabBarView: UIView {
         itemViews.forEach { $0.isItemSelected = ($0.itemIndex == index) }
     }
 
+    func loadAd() {
+        loadTestNativeAd()
+    }
+
     // MARK: - Private
 
     private func setupUI() {
         backgroundColor = .white
         addSubviews(topDivider, stackView, adContainerView)
         adContainerView.addSubviews(adBadgeLabel, adTitleLabel)
+        adContainerView.isHidden = true
         itemViews.forEach { stackView.addArrangedSubview($0) }
     }
 
@@ -115,7 +133,7 @@ final class CustomTabBarView: UIView {
         adContainerView.snp.makeConstraints {
             $0.top.equalTo(stackView.snp.bottom)
             $0.horizontalEdges.equalToSuperview()
-            $0.height.equalTo(Layout.adHeight)
+            adHeightConstraint = $0.height.equalTo(0).constraint
             $0.bottom.equalTo(safeAreaLayoutGuide.snp.bottom)
         }
 
@@ -138,6 +156,61 @@ final class CustomTabBarView: UIView {
             itemView.onTap = { [weak self] index in
                 self?.onSelect?(index)
             }
+        }
+    }
+
+    private func setAdVisible(_ visible: Bool) {
+        guard isAdVisible != visible else { return }
+        isAdVisible = visible
+        adContainerView.isHidden = !visible
+        adHeightConstraint?.update(offset: visible ? Layout.adHeight : 0)
+        onAdVisibilityChanged?(visible)
+    }
+
+    private func loadTestNativeAd() {
+        let adLoader = GADAdLoader(
+            adUnitID: Ads.nativeTestUnitID,
+            rootViewController: nil,
+            adTypes: [.native],
+            options: nil
+        )
+        adLoader.delegate = adLoaderDelegate
+        self.adLoader = adLoader
+        adLoader.load(GADRequest())
+    }
+
+    fileprivate func handleAdLoadSuccess(_ nativeAd: GADNativeAd) {
+        self.nativeAd = nativeAd
+        adTitleLabel.text = nativeAd.headline ?? Ads.fallbackTitle
+        setAdVisible(true)
+    }
+
+    fileprivate func handleAdLoadFailure() {
+        setAdVisible(false)
+    }
+}
+
+// MARK: - NativeAdLoaderDelegate
+
+private final class NativeAdLoaderDelegate: NSObject, GADNativeAdLoaderDelegate {
+
+    weak var owner: CustomTabBarView?
+
+    init(owner: CustomTabBarView) {
+        self.owner = owner
+    }
+
+    func adLoader(_ adLoader: GADAdLoader, didReceive nativeAd: GADNativeAd) {
+        let owner = self.owner
+        DispatchQueue.main.async {
+            owner?.handleAdLoadSuccess(nativeAd)
+        }
+    }
+
+    func adLoader(_ adLoader: GADAdLoader, didFailToReceiveAdWithError error: Error) {
+        let owner = self.owner
+        DispatchQueue.main.async {
+            owner?.handleAdLoadFailure()
         }
     }
 }

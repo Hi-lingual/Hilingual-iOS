@@ -8,13 +8,17 @@
 import Combine
 import Foundation
 import SafariServices
+import SnapKit
 
 public final class MypageViewController: BaseUIViewController<MypageViewModel> {
 
     // MARK: - Properties
 
     private let mypageView = MypageView()
+    private let bannerContainerView = UIView()
+    private let anchoredBannerAdView = AnchoredBannerAdView()
     private let logoutTappedSubject = PassthroughSubject<Void, Never>()
+    private var bannerHeightConstraint: Constraint?
 
     // MARK: - Life Cycle
 
@@ -24,18 +28,51 @@ public final class MypageViewController: BaseUIViewController<MypageViewModel> {
         viewModel?.fetchUserProfile()
     }
 
+    public override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        loadBannerIfNeeded()
+    }
+
+    public override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        loadBannerIfNeeded()
+    }
+
     // MARK: - Custom Method
 
     public override func setUI() {
         super.setUI()
-        view.addSubview(mypageView)
+        AdMobManager.startIfNeeded()
+        view.addSubviews(mypageView, bannerContainerView)
+        bannerContainerView.addSubview(anchoredBannerAdView)
+        bannerContainerView.backgroundColor = .clear
+
+        anchoredBannerAdView.onHeightChanged = { [weak self] height in
+            guard let self else { return }
+            self.bannerHeightConstraint?.update(offset: height)
+            UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseInOut) {
+                self.view.layoutIfNeeded()
+            }
+        }
+
         if let value = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String {
             mypageView.versionValueLabel.text = "\(value)"
         }
     }
 
     public override func setLayout() {
-        mypageView.snp.makeConstraints { $0.edges.equalToSuperview() }
+        bannerContainerView.snp.makeConstraints {
+            $0.leading.trailing.equalToSuperview()
+            $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom)
+            bannerHeightConstraint = $0.height.equalTo(0).constraint
+        }
+
+        anchoredBannerAdView.snp.makeConstraints { $0.edges.equalToSuperview() }
+
+        mypageView.snp.makeConstraints {
+            $0.top.leading.trailing.equalToSuperview()
+            $0.bottom.equalTo(bannerContainerView.snp.top)
+        }
     }
 
     public override func addTarget() {
@@ -71,6 +108,12 @@ public final class MypageViewController: BaseUIViewController<MypageViewModel> {
                 self.present(safariVC, animated: true)
             }
         }
+    }
+
+    private func loadBannerIfNeeded() {
+        let safeAreaWidth = view.safeAreaLayoutGuide.layoutFrame.width
+        let availableWidth = max(safeAreaWidth, view.bounds.width)
+        anchoredBannerAdView.loadIfNeeded(rootViewController: self, availableWidth: availableWidth)
     }
 
     public override func bind(viewModel: MypageViewModel) {
