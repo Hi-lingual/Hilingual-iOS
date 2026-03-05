@@ -144,11 +144,14 @@ public final class TabBarViewController: UIViewController {
     }
 
     private func setTabBarHidden(_ hidden: Bool, animated: Bool) {
-        guard customTabBarView.isHidden != hidden else { return }
-
         let currentNav = childNavigationControllers[currentIndex]
         let newInset: CGFloat = hidden ? 0 : customTabBarHeight
         let tabBarHeight = customTabBarHeight + view.safeAreaInsets.bottom
+
+        if customTabBarView.isHidden == hidden {
+            currentNav.additionalSafeAreaInsets.bottom = newInset
+            return
+        }
 
         if animated {
             if !hidden {
