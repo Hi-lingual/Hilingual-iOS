@@ -247,7 +247,7 @@ final class MypageView: BaseUIView {
         }
         
         bannerView.snp.makeConstraints {
-            $0.bottom.equalTo(safeAreaLayoutGuide).inset(50)
+            $0.bottom.equalTo(safeAreaLayoutGuide)
             $0.horizontalEdges.equalToSuperview()
         }
     }
