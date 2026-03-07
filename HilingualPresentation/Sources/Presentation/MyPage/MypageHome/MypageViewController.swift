@@ -177,7 +177,6 @@ public final class MypageViewController: BaseUIViewController<MypageViewModel> {
 }
 
 // MARK: - BannerViewDelegate
-//TODO: - 배너 이벤트 머머 넣을건지 논의하자
 
 extension MypageViewController: BannerViewDelegate {
 

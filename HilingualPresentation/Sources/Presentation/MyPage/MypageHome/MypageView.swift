@@ -247,8 +247,7 @@ final class MypageView: BaseUIView {
         }
         
         bannerView.snp.makeConstraints {
-            // TODO: 커스텀 탭바 머지하고 위치제약 나중에 수정 ㄱ 문제는 높이지정이 안됨
-            $0.top.equalTo(logoutButton.snp.bottom).offset(16)
+            $0.bottom.equalTo(safeAreaLayoutGuide).inset(50)
             $0.horizontalEdges.equalToSuperview()
         }
     }
