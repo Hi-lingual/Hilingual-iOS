@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		1988F8F82B0F4E84A7827BF3 /* HilingualCore in Frameworks */ = {isa = PBXBuildFile; productRef = 0512DDBB07374DA5A2F41BA2 /* HilingualCore */; };
+		3A1464192F59BD11001D047C /* GoogleMobileAds in Frameworks */ = {isa = PBXBuildFile; productRef = 3A1464182F59BD11001D047C /* GoogleMobileAds */; };
 		E51B4C542E28DC11000B16D0 /* AppIcon.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E51B4C532E28DC11000B16D0 /* AppIcon.xcassets */; };
 		E51DB2052E1D9E8B000C2BEA /* AppConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = E51DB2042E1D9E8B000C2BEA /* AppConfig.swift */; };
 		E51DB2242E1E4407000C2BEA /* AppBaseURLProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E51DB2232E1E4407000C2BEA /* AppBaseURLProvider.swift */; };
@@ -69,6 +70,7 @@
 				E5CBCFB42EC4B3E100475E81 /* FirebaseCore in Frameworks */,
 				E5C2F3992E171575003DF6C4 /* HilingualDomain in Frameworks */,
 				1988F8F82B0F4E84A7827BF3 /* HilingualCore in Frameworks */,
+				3A1464192F59BD11001D047C /* GoogleMobileAds in Frameworks */,
 				E5CBCFB62EC4B3E100475E81 /* FirebaseRemoteConfig in Frameworks */,
 				E5C2F3952E170A01003DF6C4 /* HilingualNetwork in Frameworks */,
 				E5D5D0AC2E17289000DABE8D /* HilingualPresentation in Frameworks */,
@@ -168,6 +170,7 @@
 				E5D5D0AB2E17289000DABE8D /* HilingualPresentation */,
 				E5CBCFB32EC4B3E100475E81 /* FirebaseCore */,
 				E5CBCFB52EC4B3E100475E81 /* FirebaseRemoteConfig */,
+				3A1464182F59BD11001D047C /* GoogleMobileAds */,
 			);
 			productName = Hilingual;
 			productReference = E5C79B0E2E15281900E461C3 /* Hilingual-Dev.app */;
@@ -199,6 +202,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				E5CBCFB22EC4B3E100475E81 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				3A1464172F59BD11001D047C /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = E5C79B0F2E15281900E461C3 /* Products */;
@@ -261,9 +265,10 @@
 				BUNDLE_ID_SUFFIX = .dev;
 				BUNDLE_NAME = "Hilingual-Dev";
 				CODE_SIGN_ENTITLEMENTS = Hilingual/Hilingual.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 2025021501;
-				DEVELOPMENT_TEAM = C9XX799UJH;
+				DEVELOPMENT_TEAM = 25T76RX27Y;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Hilingual/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "Hilingual에서 제공하는 일기 텍스트 스캔기능을 위해 카메라 접근 권한이 필요합니다. 설정에서 이를 변경할 수 있습니다.";
@@ -281,6 +286,7 @@
 				MARKETING_VERSION = 2.1.3;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.Hilingual$(BUNDLE_ID_SUFFIX)";
 				PRODUCT_NAME = "Hilingual-Dev";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -299,9 +305,10 @@
 				BUNDLE_ID_SUFFIX = "";
 				BUNDLE_NAME = Hilingual;
 				CODE_SIGN_ENTITLEMENTS = Hilingual/Hilingual.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 2025021501;
-				DEVELOPMENT_TEAM = C9XX799UJH;
+				DEVELOPMENT_TEAM = 25T76RX27Y;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Hilingual/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "Hilingual에서 제공하는 일기 텍스트 스캔기능을 위해 카메라 접근 권한이 필요합니다. 설정에서 이를 변경할 수 있습니다.";
@@ -319,6 +326,7 @@
 				MARKETING_VERSION = 2.1.3;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.Hilingual$(BUNDLE_ID_SUFFIX)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -473,6 +481,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		3A1464172F59BD11001D047C /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/googleads/swift-package-manager-google-mobile-ads.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 13.1.0;
+			};
+		};
 		E5CBCFB22EC4B3E100475E81 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
@@ -487,6 +503,11 @@
 		0512DDBB07374DA5A2F41BA2 /* HilingualCore */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = HilingualCore;
+		};
+		3A1464182F59BD11001D047C /* GoogleMobileAds */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3A1464172F59BD11001D047C /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */;
+			productName = GoogleMobileAds;
 		};
 		E5C2F3942E170A01003DF6C4 /* HilingualNetwork */ = {
 			isa = XCSwiftPackageProductDependency;
