@@ -20,7 +20,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         UIFont.registerPretendardFonts()
 
 //        for key in UserDefaults.standard.dictionaryRepresentation().keys {
-//            UserDefaults.standard.removeObject(forKey: key.description)ca-app-pub-3766017495269250~2794502804
+//            UserDefaults.standard.removeObject(forKey: key.description)
 //        }
         _ = CoreDataStorage.shared
 

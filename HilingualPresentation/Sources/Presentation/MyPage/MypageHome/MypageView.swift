@@ -133,11 +133,7 @@ final class MypageView: BaseUIView {
 
     private var menuRows: [UIControl] = []
     
-    let bannerView: BannerView = {
-        let view = BannerView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
-    }()
+    let bannerView = BannerView()
     
     // MARK: - Custom Method
 

@@ -190,12 +190,4 @@ extension MypageViewController: BannerViewDelegate {
     public func bannerView(_ bannerView: BannerView, didFailToReceiveAdWithError error: Error) {
         print("AdMob error:", error)
     }
-
-    public func bannerViewDidRecordImpression(_ bannerView: BannerView) {
-        print("Banner impression recorded")
-    }
-
-    public func bannerViewDidRecordClick(_ bannerView: BannerView) {
-        print("Banner clicked")
-    }
 }
