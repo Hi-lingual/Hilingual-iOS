@@ -9,5 +9,5 @@ import Foundation
 
 public enum NetworkEnvironment {
     //TODO: - 강제 언래핑 제거
-    public static var shared: BaseURLProvider!
+    nonisolated(unsafe) public static var shared: BaseURLProvider!
 }
