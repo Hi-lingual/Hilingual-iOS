@@ -33,7 +33,8 @@ final class SelectedInfo: UIView {
         let view = EmptyView()
         view.configure(
             message: "작성된 일기가 없어요.\n좋은 하루 보내셨기를 바라요!",
-            imageName: "img_diary_empty_ios"
+            imageName: "img_diary_empty_ios",
+            font: .pretendard(.body_m_14)
         )
         return view
     }()
@@ -42,7 +43,8 @@ final class SelectedInfo: UIView {
         let view = EmptyView()
         view.configure(
             message: "아직 작성 가능한 시간이 아니에요.\n오늘의 일기를 작성해주세요!",
-            imageName: "img_diary_lock_ios"
+            imageName: "img_diary_lock_ios",
+            font: .pretendard(.body_m_14)
         )
         return view
     }()
