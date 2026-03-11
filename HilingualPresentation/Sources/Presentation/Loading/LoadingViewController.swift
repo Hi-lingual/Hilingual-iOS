@@ -142,10 +142,11 @@ public final class LoadingViewController: BaseUIViewController<LoadingViewModel>
             .sink { [weak self] (diaryId: Int) in
                 guard let self = self else { return }
                 self.currentDiaryId = diaryId
+                self.pushDiaryDetail(diaryId: diaryId)
                 if let ad = self.interstitial {
-                    ad.present(from: self)
-                } else {
-                    self.pushDiaryDetail(diaryId: diaryId)
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        ad.present(from: self)
+                    }
                 }
             }
             .store(in: &cancellables)
@@ -154,7 +155,7 @@ public final class LoadingViewController: BaseUIViewController<LoadingViewModel>
     private func pushDiaryDetail(diaryId: Int) {
         let detailVC = diContainer.makeDiaryDetailViewController(diaryId: diaryId)
         detailVC.hidesBottomBarWhenPushed = true
-        navigationController?.pushViewController(detailVC, animated: true)
+        navigationController?.pushViewController(detailVC, animated: false)
     }
     
     private func goToHomeView() {
@@ -165,11 +166,6 @@ public final class LoadingViewController: BaseUIViewController<LoadingViewModel>
 // MARK: - FullScreenContentDelegate
 
 extension LoadingViewController: FullScreenContentDelegate {
-    public func adDidDismissFullScreenContent(_ ad: FullScreenPresentingAd) {
-        guard let diaryId = currentDiaryId else { return }
-        pushDiaryDetail(diaryId: diaryId)
-    }
-    
     public func ad(_ ad: FullScreenPresentingAd, didFailToPresentFullScreenContentWithError error: Error) {
         print("Interstitial present failed: \(error)")
         guard let diaryId = currentDiaryId else { return }
