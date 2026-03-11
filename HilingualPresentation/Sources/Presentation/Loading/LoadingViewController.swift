@@ -10,9 +10,9 @@ import Combine
 import GoogleMobileAds
 
 public final class LoadingViewController: BaseUIViewController<LoadingViewModel> {
-
+    
     // MARK: - Properties
-
+    
     private let loadingView = LoadingView()
     private var interstitial: InterstitialAd?
     
@@ -20,53 +20,53 @@ public final class LoadingViewController: BaseUIViewController<LoadingViewModel>
     private let closeTappedSubject = PassthroughSubject<Void, Never>()
     
     private var currentDiaryId: Int?
-
+    
     // MARK: - Lifecycle
-
+    
     public override func viewDidLoad() {
         super.viewDidLoad()
         addTarget()
         setStyle()
         loadInterstitialAd()
     }
-
+    
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: animated)
     }
-
+    
     public override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         navigationController?.setNavigationBarHidden(false, animated: animated)
     }
-
+    
     // MARK: - Setup
-
+    
     public func setStyle() {
         navigationController?.setNavigationBarHidden(true, animated: false)
     }
-
+    
     public override func setUI() {
         view.addSubviews(loadingView)
-
+        
         loadingView.onCloseTapped = { [weak self] in
             self?.closeTappedSubject.send(())
         }
     }
-
+    
     public override func setLayout() {
         loadingView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
     }
-
+    
     public override func addTarget() {
         loadingView.feedbackButton.addTarget(self, action: #selector(feedbackButtonTapped), for: .touchUpInside)
         loadingView.closeIcon.addTarget(self, action: #selector(closeButtonTapped), for: .touchUpInside)
     }
-
+    
     // MARK: - Action
-
+    
     @objc private func feedbackButtonTapped() {
         switch loadingView.currentState {
         case .loading:
@@ -142,11 +142,10 @@ public final class LoadingViewController: BaseUIViewController<LoadingViewModel>
             .sink { [weak self] (diaryId: Int) in
                 guard let self = self else { return }
                 self.currentDiaryId = diaryId
-                self.pushDiaryDetail(diaryId: diaryId)
                 if let ad = self.interstitial {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                        ad.present(from: self)
-                    }
+                    ad.present(from: self)
+                } else {
+                    self.pushDiaryDetail(diaryId: diaryId)
                 }
             }
             .store(in: &cancellables)
@@ -155,7 +154,7 @@ public final class LoadingViewController: BaseUIViewController<LoadingViewModel>
     private func pushDiaryDetail(diaryId: Int) {
         let detailVC = diContainer.makeDiaryDetailViewController(diaryId: diaryId)
         detailVC.hidesBottomBarWhenPushed = true
-        navigationController?.pushViewController(detailVC, animated: false)
+        navigationController?.pushViewController(detailVC, animated: true)
     }
     
     private func goToHomeView() {
@@ -166,6 +165,11 @@ public final class LoadingViewController: BaseUIViewController<LoadingViewModel>
 // MARK: - FullScreenContentDelegate
 
 extension LoadingViewController: FullScreenContentDelegate {
+    public func adDidDismissFullScreenContent(_ ad: FullScreenPresentingAd) {
+        guard let diaryId = currentDiaryId else { return }
+        pushDiaryDetail(diaryId: diaryId)
+    }
+    
     public func ad(_ ad: FullScreenPresentingAd, didFailToPresentFullScreenContentWithError error: Error) {
         print("Interstitial present failed: \(error)")
         guard let diaryId = currentDiaryId else { return }
