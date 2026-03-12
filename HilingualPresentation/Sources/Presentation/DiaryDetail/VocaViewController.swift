@@ -7,8 +7,8 @@
 
 import Foundation
 import UIKit
-
 import Combine
+import GoogleMobileAds
 
 public final class RecommendedExpressionViewController: BaseUIViewController<RecommendedExpressionViewModel>, ScrollControllable {
 
@@ -18,8 +18,19 @@ public final class RecommendedExpressionViewController: BaseUIViewController<Rec
     private let dialog = Dialog()
     private var pendingDate: String?
 
-    // 북마크 토글 콜백
     var onBookmarkToggle: ((Int64, Bool) -> Void)?
+
+    // MARK: - Ad
+
+    public var showsAdBanner: Bool = false
+    private var bannerView: BannerView?
+
+    private lazy var adPlaceholderImageView: UIImageView = {
+        let imageView = UIImageView(image: UIImage(named: "img_loading_feed_ios", in: .module, with: nil))
+        imageView.contentMode = .scaleAspectFill
+        imageView.clipsToBounds = true
+        return imageView
+    }()
 
     // MARK: - LifeCycle
 
@@ -27,12 +38,39 @@ public final class RecommendedExpressionViewController: BaseUIViewController<Rec
         super.viewDidLoad()
     }
 
-    // MARK: Custom Method
+    public override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+
+        if showsAdBanner {
+            adPlaceholderImageView.alpha = 1
+            adPlaceholderImageView.isHidden = false
+            recommendedExpressionView.setAdBannerView(adPlaceholderImageView)
+            adPlaceholderImageView.snp.makeConstraints {
+                $0.height.equalTo(160)
+            }
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+                self?.loadAd()
+            }
+        }
+    }
+
+    // MARK: - Custom Method
 
     public override func setUI() {
         view.addSubviews(recommendedExpressionView, dialog)
         view.backgroundColor = .gray100
         view.bringSubviewToFront(dialog)
+
+        if showsAdBanner {
+            let banner = BannerView()
+            banner.adUnitID = "ca-app-pub-3940256099942544/2435281174"
+            banner.rootViewController = self
+            banner.delegate = self
+            self.bannerView = banner
+
+            recommendedExpressionView.setAdBannerView(adPlaceholderImageView)
+        }
 
         if let date = pendingDate {
             recommendedExpressionView.setDate(date)
@@ -43,6 +81,25 @@ public final class RecommendedExpressionViewController: BaseUIViewController<Rec
         recommendedExpressionView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
+
+        dialog.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
+
+        if showsAdBanner {
+            adPlaceholderImageView.snp.makeConstraints {
+                $0.height.equalTo(160)
+            }
+        }
+    }
+
+    private func loadAd() {
+        guard let bannerView else { return }
+
+        bannerView.adSize = inlineAdaptiveBanner(width: view.frame.width, maxHeight: 300)
+
+        let request = Request()
+        bannerView.load(request)
     }
 
     // MARK: - Binding
@@ -52,8 +109,6 @@ public final class RecommendedExpressionViewController: BaseUIViewController<Rec
     public override func bind(viewModel: RecommendedExpressionViewModel) {
         recommendedExpressionView.onBookmarkToggle = { [weak self] phraseId, isBookmarked in
             self?.bookmarkToggleSubject.send((Int(phraseId), isBookmarked))
-
-            // 부모 ViewController에 북마크 토글 전달
             self?.onBookmarkToggle?(phraseId, isBookmarked)
         }
 
@@ -115,7 +170,6 @@ public final class RecommendedExpressionViewController: BaseUIViewController<Rec
                 self?.navigationController?.popViewController(animated: true)
             }
         )
-
         dialog.showAnimation()
     }
 
@@ -127,5 +181,21 @@ public final class RecommendedExpressionViewController: BaseUIViewController<Rec
         pendingDate = date
         recommendedExpressionView.setDate(date)
     }
+}
 
+// MARK: - BannerViewDelegate
+
+extension RecommendedExpressionViewController: BannerViewDelegate {
+    public func bannerViewDidReceiveAd(_ bannerView: BannerView) {
+        recommendedExpressionView.setAdBannerView(bannerView)
+        bannerView.snp.makeConstraints {
+            $0.height.equalTo(bannerView.adSize.size.height)
+        }
+        self.adPlaceholderImageView.alpha = 0
+        self.adPlaceholderImageView.isHidden = true
+    }
+
+    public func bannerView(_ bannerView: BannerView, didFailToReceiveAdWithError error: Error) {
+        recommendedExpressionView.removeAdBannerView()
+    }
 }
