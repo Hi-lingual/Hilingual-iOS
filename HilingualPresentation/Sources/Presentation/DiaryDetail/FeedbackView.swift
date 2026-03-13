@@ -173,25 +173,24 @@ final class FeedbackView: BaseUIView {
 
     // MARK: - Ad
 
+    private var adBannerView: UIView?
+
     func setAdBannerView(_ adView: UIView) {
-        contentView.arrangedSubviews
-            .filter { $0.accessibilityIdentifier == "adBannerView" }
-            .forEach { $0.removeFromSuperview() }
-
-        adView.accessibilityIdentifier = "adBannerView"
-
-        let index = contentView.arrangedSubviews.firstIndex(of: bottomSpacingView) ?? contentView.arrangedSubviews.count
+        adBannerView?.removeFromSuperview()
+        adBannerView = adView
+        
+        let index = contentView.arrangedSubviews.firstIndex(of: bottomSpacingView)
+                    ?? contentView.arrangedSubviews.count
         contentView.insertArrangedSubview(adView, at: index)
-
+        
         adView.snp.makeConstraints {
             $0.horizontalEdges.equalToSuperview()
         }
     }
 
     func removeAdBannerView() {
-        contentView.arrangedSubviews
-            .filter { $0.accessibilityIdentifier == "adBannerView" }
-            .forEach { $0.removeFromSuperview() }
+        adBannerView?.removeFromSuperview()
+        adBannerView = nil
     }
 
     // MARK: - Configure

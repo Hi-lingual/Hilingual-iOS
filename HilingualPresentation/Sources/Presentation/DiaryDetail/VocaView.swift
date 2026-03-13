@@ -71,12 +71,11 @@ final class RecommendedExpressionView: BaseUIView {
 
     // MARK: - Ad
 
-    func setAdBannerView(_ adView: UIView) {
-        contentView.arrangedSubviews
-            .filter { $0.accessibilityIdentifier == "adBannerView" }
-            .forEach { $0.removeFromSuperview() }
+    private var adBannerView: UIView?
 
-        adView.accessibilityIdentifier = "adBannerView"
+    func setAdBannerView(_ adView: UIView) {
+        adBannerView?.removeFromSuperview()
+        adBannerView = adView
 
         let index = contentView.arrangedSubviews.firstIndex(of: bottomSpacingView) ?? contentView.arrangedSubviews.count
         contentView.insertArrangedSubview(adView, at: index)
@@ -92,16 +91,15 @@ final class RecommendedExpressionView: BaseUIView {
     }
 
     func removeAdBannerView() {
-        contentView.arrangedSubviews
-            .filter { $0.accessibilityIdentifier == "adBannerView" }
-            .forEach { $0.removeFromSuperview() }
+        adBannerView?.removeFromSuperview()
+        adBannerView = nil
     }
 
     // MARK: - Configure
 
     func configure(dataList: [PhraseViewData]) {
         contentView.arrangedSubviews
-            .filter { $0 !== dateLabel && $0 !== bottomSpacingView && $0.accessibilityIdentifier != "adBannerView" }
+            .filter { $0 !== dateLabel && $0 !== bottomSpacingView && $0 !== adBannerView }
             .forEach { $0.removeFromSuperview() }
 
         dataList.forEach { phrase in
