@@ -16,14 +16,16 @@ final class OnboardingBottomSheet: UIView {
 
     private let onboardingTexts: [String] = [
         "오늘의 일기는\n48시간 동안 작성할 수 있어요.",
-        "일기를 삭제한 날에는\n다시 일기를 작성할 수 없어요.",
+        // TODO: 홈 온보딩 2단계 재노출 시 두 번째 문구 복구
+//        "일기를 삭제한 날에는\n다시 일기를 작성할 수 없어요.",
         "작성한 일기는\n커뮤니티에 공유할 수 있어요.",
         "일상 속 영어 습관을\n만들 준비가 됐나요?"
     ]
 
     private let onboardingImages: [UIImage?] = [
         UIImage(named: "img_onboarding_bottomsheet_ios", in: .module, compatibleWith: nil),
-        UIImage(named: "img_onboarding_bottomsheet_2_ios", in: .module, compatibleWith: nil),
+        // TODO: 홈 온보딩 2단계 재노출 시 두 번째 이미지 복구
+//        UIImage(named: "img_onboarding_bottomsheet_2_ios", in: .module, compatibleWith: nil),
         UIImage(named: "img_onboarding_bottomsheet_3_ios", in: .module, compatibleWith: nil),
         UIImage(named: "img_onboarding_bottomsheet_4_ios", in: .module, compatibleWith: nil)
     ]
