@@ -191,7 +191,9 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
             case .unpublish:
                 self.showDialog(for: .unpublish, diaryId: diaryId)
             case .delete:
-                self.showDialog(for: .delete, diaryId: diaryId)
+                // TODO: 일기 삭제 기능 재오픈 시 삭제 다이얼로그 연결 복구
+                // self.showDialog(for: .delete, diaryId: diaryId)
+                break
             }
         }
         
@@ -398,7 +400,8 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         homeView.selectedInfo.menu.snp.remakeConstraints {
             $0.top.equalTo(homeView.selectedInfo.moreImageView.snp.bottom).offset(4)
             $0.trailing.equalTo(homeView.selectedInfo.moreImageView.snp.trailing)
-            $0.height.equalTo(96)
+            // TODO: 일기 삭제 기능 재오픈 시 오버레이 메뉴 높이 원복 검토
+            $0.height.equalTo(48)
             $0.width.equalTo(182)
         }
         
