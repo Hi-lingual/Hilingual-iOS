@@ -28,13 +28,6 @@ final class OnboardingBottomSheet: UIView {
         UIImage(named: "img_onboarding_bottomsheet_4_ios", in: .module, compatibleWith: nil)
     ]
 
-    private let barIndicatorImages: [UIImage?] = [
-        UIImage(named: "bar_indicator_1_ios", in: .module, compatibleWith: nil),
-        UIImage(named: "bar_indicator_2_ios", in: .module, compatibleWith: nil),
-        UIImage(named: "bar_indicator_3_ios", in: .module, compatibleWith: nil),
-        UIImage(named: "bar_indicator_4_ios", in: .module, compatibleWith: nil)
-    ]
-
     // MARK: - UI Components
 
     private let dimView: UIView = {
@@ -76,11 +69,7 @@ final class OnboardingBottomSheet: UIView {
         return stack
     }()
 
-    private let barIndicatorImageView: UIImageView = {
-        let view = UIImageView(image: UIImage(named: "bar_indicator_1_ios", in: .module, compatibleWith: nil))
-        view.contentMode = .scaleAspectFit
-        return view
-    }()
+    private let onboardingIndicatorView = OnBoardingIndicatorView()
 
     private let startButton = CTAButton(
         style: .TextButton("다음"),
@@ -108,7 +97,7 @@ final class OnboardingBottomSheet: UIView {
         bottomSheetView.addSubviews(
             closeButton,
             scrollView,
-            barIndicatorImageView,
+            onboardingIndicatorView,
             startButton
         )
         
@@ -138,7 +127,7 @@ final class OnboardingBottomSheet: UIView {
         scrollView.snp.makeConstraints {
             $0.top.equalToSuperview().inset(40)
             $0.leading.trailing.equalToSuperview()
-            $0.bottom.equalTo(barIndicatorImageView.snp.top).offset(-16)
+            $0.bottom.equalTo(onboardingIndicatorView.snp.top).offset(-16)
         }
 
         pageStackView.snp.makeConstraints {
@@ -146,14 +135,14 @@ final class OnboardingBottomSheet: UIView {
             $0.height.equalToSuperview()
         }
 
-        barIndicatorImageView.snp.makeConstraints {
+        onboardingIndicatorView.snp.makeConstraints {
             $0.top.equalTo(scrollView.snp.bottom).offset(16)
             $0.centerX.equalToSuperview()
-            $0.size.equalTo(CGSize(width: 68, height: 8))
+            $0.height.equalTo(8)
         }
 
         startButton.snp.makeConstraints {
-            $0.top.equalTo(barIndicatorImageView.snp.bottom).offset(16)
+            $0.top.equalTo(onboardingIndicatorView.snp.bottom).offset(16)
             $0.horizontalEdges.equalToSuperview().inset(16)
             $0.bottom.equalTo(safeAreaLayoutGuide).inset(16)
         }
@@ -192,6 +181,9 @@ final class OnboardingBottomSheet: UIView {
                 $0.size.equalTo(CGSize(width: 343, height: 172))
             }
         }
+
+        onboardingIndicatorView.configure(count: onboardingTexts.count)
+        onboardingIndicatorView.update(currentIndex: currentStep, animated: false)
     }
 
     private func showNextStep() {
@@ -207,7 +199,7 @@ final class OnboardingBottomSheet: UIView {
             animated: true
         )
 
-        barIndicatorImageView.image = barIndicatorImages[currentStep]
+        onboardingIndicatorView.update(currentIndex: currentStep)
         startButton.setTitle(
             currentStep == onboardingTexts.count - 1 ? "시작하기" : "다음",
             for: .normal
@@ -238,7 +230,7 @@ extension OnboardingBottomSheet: UIScrollViewDelegate {
             round(scrollView.contentOffset.x / scrollView.bounds.width)
         )
 
-        barIndicatorImageView.image = barIndicatorImages[currentStep]
+        onboardingIndicatorView.update(currentIndex: currentStep)
         startButton.setTitle(
             currentStep == onboardingTexts.count - 1 ? "시작하기" : "다음",
             for: .normal
