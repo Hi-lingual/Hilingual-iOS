@@ -142,7 +142,9 @@ final class MypageView: BaseUIView {
         
         addSubviews(scrollView)
         scrollView.addSubview(contentView)
-        contentView.addSubviews(titleLabel, profileCardView, menuCardView, versionIconView, versionLabel, versionValueLabel, logoutButton, bannerView)
+        contentView.addSubviews(titleLabel, profileCardView, menuCardView, versionIconView, versionLabel, versionValueLabel, logoutButton)
+        // TODO: 마이페이지 광고 재노출 시 배너뷰 서브뷰 복구
+//        contentView.addSubviews(titleLabel, profileCardView, menuCardView, versionIconView, versionLabel, versionValueLabel, logoutButton, bannerView)
         profileCardView.addSubviews(profileImageView, nicknameLabel, editButton, feedButton)
 
         for item in menuItems {
@@ -242,10 +244,11 @@ final class MypageView: BaseUIView {
             $0.bottom.equalToSuperview().inset(40)
         }
         
-        bannerView.snp.makeConstraints {
-            $0.bottom.equalTo(safeAreaLayoutGuide)
-            $0.horizontalEdges.equalToSuperview()
-        }
+        // TODO: 마이페이지 광고 재노출 시 배너뷰 제약 복구
+//        bannerView.snp.makeConstraints {
+//            $0.bottom.equalTo(safeAreaLayoutGuide)
+//            $0.horizontalEdges.equalToSuperview()
+//        }
     }
 
     // MARK: - Private Method
