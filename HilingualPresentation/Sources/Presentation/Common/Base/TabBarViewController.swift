@@ -27,10 +27,10 @@ public final class TabBarViewController: UIViewController {
     private let containerView = UIView()
 
     private let customTabBarView = CustomTabBarView(items: [
-        .init(title: "홈", selectedImageName: "ic_home_black_24_ios", unselectedImageName: "ic_home_gray_24_ios"),
-        .init(title: "단어장", selectedImageName: "ic_book_black_24_ios", unselectedImageName: "ic_book_gray_24_ios"),
-        .init(title: "피드", selectedImageName: "ic_community_black_24_ios", unselectedImageName: "ic_community_gray_24_ios"),
-        .init(title: "마이", selectedImageName: "ic_my_black_24_ios", unselectedImageName: "ic_my_gray_24_ios")
+        .init(title: "홈", selectedImage: .icHomeBlack24Ios, unselectedImage: .icHomeGray24Ios),
+        .init(title: "단어장", selectedImage: .icBookBlack24Ios, unselectedImage: .icBookGray24Ios),
+        .init(title: "피드", selectedImage: .icCommunityBlack24Ios, unselectedImage: .icCommunityGray24Ios),
+        .init(title: "마이", selectedImage: .icMyBlack24Ios, unselectedImage: .icMyGray24Ios)
     ])
 
     // MARK: - Init

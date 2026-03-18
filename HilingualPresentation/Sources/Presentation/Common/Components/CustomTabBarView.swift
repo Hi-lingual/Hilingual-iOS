@@ -10,8 +10,8 @@ import SnapKit
 
 struct CustomTabBarItem {
     let title: String
-    let selectedImageName: String
-    let unselectedImageName: String
+    let selectedImage: ImageResource
+    let unselectedImage: ImageResource
 }
 
 final class CustomTabBarView: UIView {
@@ -162,9 +162,8 @@ private final class CustomTabBarItemView: UIControl {
     }
 
     private func updateAppearance() {
-        let imageName = isItemSelected ? item.selectedImageName : item.unselectedImageName
-        iconImageView.image = UIImage(named: imageName, in: .module, compatibleWith: nil)?
-            .withRenderingMode(.alwaysOriginal)
+        let imageResource = isItemSelected ? item.selectedImage : item.unselectedImage
+        iconImageView.image = UIImage(resource: imageResource).withRenderingMode(.alwaysOriginal)
         titleLabel.textColor = isItemSelected ? .black : .gray400
     }
 
