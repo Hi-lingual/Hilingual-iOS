@@ -52,6 +52,9 @@ extension UIApplication {
         if let tab = base as? UITabBarController {
             return tab.selectedViewController.flatMap { topViewController(base: $0) }
         }
+        if let customTab = base as? TabBarViewController {
+            return topViewController(base: customTab.children.first)
+        }
         if let presented = base?.presentedViewController {
             return topViewController(base: presented)
         }

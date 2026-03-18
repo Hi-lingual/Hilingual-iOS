@@ -151,11 +151,11 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
     }
 
     func showHideDialog(listVC: FeedListViewController, row: Int) {
-        guard let containerView = self.tabBarController?.view else { return }
-        
-        containerView.addSubview(dialog)
-        dialog.snp.remakeConstraints { $0.edges.equalTo(containerView) }
-        
+        guard let window = view.window else { return }
+
+        window.addSubview(dialog)
+        dialog.snp.remakeConstraints { $0.edges.equalToSuperview() }
+
         dialog.configure(
             style: .normal,
             title: "영어 일기를 비공개 하시겠어요?",
@@ -181,15 +181,14 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
         )
         dialog.isHidden = false
         dialog.showAnimation()
-        containerView.bringSubviewToFront(dialog)
     }
 
     private func showReportDialog() {
-        guard let containerView = self.tabBarController?.view else { return }
-        
-        containerView.addSubview(dialog)
-        dialog.snp.remakeConstraints { $0.edges.equalTo(containerView) }
-        
+        guard let window = view.window else { return }
+
+        window.addSubview(dialog)
+        dialog.snp.remakeConstraints { $0.edges.equalToSuperview() }
+
         dialog.configure(
             style: .normal,
             title: "게시글을 신고하시겠어요?",
@@ -206,7 +205,6 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
         )
         dialog.isHidden = false
         dialog.showAnimation()
-        containerView.bringSubviewToFront(dialog)
     }
 
     private func openReportPage() {
