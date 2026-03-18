@@ -16,23 +16,18 @@ final class OnboardingBottomSheet: UIView {
 
     private let onboardingTexts: [String] = [
         "오늘의 일기는\n48시간 동안 작성할 수 있어요.",
-        "일기를 삭제한 날에는\n다시 일기를 작성할 수 없어요.",
+        // TODO: 홈 온보딩 2단계 재노출 시 두 번째 문구 복구
+//        "일기를 삭제한 날에는\n다시 일기를 작성할 수 없어요.",
         "작성한 일기는\n커뮤니티에 공유할 수 있어요.",
         "일상 속 영어 습관을\n만들 준비가 됐나요?"
     ]
 
     private let onboardingImages: [UIImage?] = [
         UIImage(named: "img_onboarding_bottomsheet_ios", in: .module, compatibleWith: nil),
-        UIImage(named: "img_onboarding_bottomsheet_2_ios", in: .module, compatibleWith: nil),
+        // TODO: 홈 온보딩 2단계 재노출 시 두 번째 이미지 복구
+//        UIImage(named: "img_onboarding_bottomsheet_2_ios", in: .module, compatibleWith: nil),
         UIImage(named: "img_onboarding_bottomsheet_3_ios", in: .module, compatibleWith: nil),
         UIImage(named: "img_onboarding_bottomsheet_4_ios", in: .module, compatibleWith: nil)
-    ]
-
-    private let barIndicatorImages: [UIImage?] = [
-        UIImage(named: "bar_indicator_1_ios", in: .module, compatibleWith: nil),
-        UIImage(named: "bar_indicator_2_ios", in: .module, compatibleWith: nil),
-        UIImage(named: "bar_indicator_3_ios", in: .module, compatibleWith: nil),
-        UIImage(named: "bar_indicator_4_ios", in: .module, compatibleWith: nil)
     ]
 
     // MARK: - UI Components
@@ -76,11 +71,7 @@ final class OnboardingBottomSheet: UIView {
         return stack
     }()
 
-    private let barIndicatorImageView: UIImageView = {
-        let view = UIImageView(image: UIImage(named: "bar_indicator_1_ios", in: .module, compatibleWith: nil))
-        view.contentMode = .scaleAspectFit
-        return view
-    }()
+    private let onboardingIndicatorView = OnBoardingIndicatorView()
 
     private let startButton = CTAButton(
         style: .TextButton("다음"),
@@ -108,7 +99,7 @@ final class OnboardingBottomSheet: UIView {
         bottomSheetView.addSubviews(
             closeButton,
             scrollView,
-            barIndicatorImageView,
+            onboardingIndicatorView,
             startButton
         )
         
@@ -138,7 +129,7 @@ final class OnboardingBottomSheet: UIView {
         scrollView.snp.makeConstraints {
             $0.top.equalToSuperview().inset(40)
             $0.leading.trailing.equalToSuperview()
-            $0.bottom.equalTo(barIndicatorImageView.snp.top).offset(-16)
+            $0.bottom.equalTo(onboardingIndicatorView.snp.top).offset(-16)
         }
 
         pageStackView.snp.makeConstraints {
@@ -146,14 +137,14 @@ final class OnboardingBottomSheet: UIView {
             $0.height.equalToSuperview()
         }
 
-        barIndicatorImageView.snp.makeConstraints {
+        onboardingIndicatorView.snp.makeConstraints {
             $0.top.equalTo(scrollView.snp.bottom).offset(16)
             $0.centerX.equalToSuperview()
-            $0.size.equalTo(CGSize(width: 68, height: 8))
+            $0.height.equalTo(8)
         }
 
         startButton.snp.makeConstraints {
-            $0.top.equalTo(barIndicatorImageView.snp.bottom).offset(16)
+            $0.top.equalTo(onboardingIndicatorView.snp.bottom).offset(16)
             $0.horizontalEdges.equalToSuperview().inset(16)
             $0.bottom.equalTo(safeAreaLayoutGuide).inset(16)
         }
@@ -192,6 +183,9 @@ final class OnboardingBottomSheet: UIView {
                 $0.size.equalTo(CGSize(width: 343, height: 172))
             }
         }
+
+        onboardingIndicatorView.configure(count: onboardingTexts.count)
+        onboardingIndicatorView.update(currentIndex: currentStep, animated: false)
     }
 
     private func showNextStep() {
@@ -207,7 +201,7 @@ final class OnboardingBottomSheet: UIView {
             animated: true
         )
 
-        barIndicatorImageView.image = barIndicatorImages[currentStep]
+        onboardingIndicatorView.update(currentIndex: currentStep)
         startButton.setTitle(
             currentStep == onboardingTexts.count - 1 ? "시작하기" : "다음",
             for: .normal
@@ -238,7 +232,7 @@ extension OnboardingBottomSheet: UIScrollViewDelegate {
             round(scrollView.contentOffset.x / scrollView.bounds.width)
         )
 
-        barIndicatorImageView.image = barIndicatorImages[currentStep]
+        onboardingIndicatorView.update(currentIndex: currentStep)
         startButton.setTitle(
             currentStep == onboardingTexts.count - 1 ? "시작하기" : "다음",
             for: .normal

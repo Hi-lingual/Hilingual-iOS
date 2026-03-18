@@ -27,7 +27,8 @@ public final class MypageViewController: BaseUIViewController<MypageViewModel> {
     
     public override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        loadBannerAd()
+        // TODO: 마이페이지 광고 재노출 시 배너 로드 호출 복구
+        // loadBannerAd()
     }
     
     // MARK: - Custom Method
