@@ -17,7 +17,7 @@ extension BaseTargetType {
     }
 
     public var headers: [String: String]? {
-        var baseHeaders: [String: String] = [
+        let baseHeaders: [String: String] = [
             "Content-Type": "application/json"
         ]
 

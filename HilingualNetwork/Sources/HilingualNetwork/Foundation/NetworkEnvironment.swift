@@ -8,6 +8,16 @@
 import Foundation
 
 public enum NetworkEnvironment {
-    //TODO: - 강제 언래핑 제거
-    public static var shared: BaseURLProvider!
+    private static var _shared: BaseURLProvider?
+    
+    public static func configure(_ provider: BaseURLProvider) {
+        _shared = provider
+    }
+    
+    public static var shared: BaseURLProvider {
+        guard let provider = _shared else {
+            fatalError("NetworkEnvironment.configure() must be called before use")
+        }
+        return provider
+    }
 }
