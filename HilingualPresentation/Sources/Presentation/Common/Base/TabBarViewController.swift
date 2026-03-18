@@ -113,14 +113,18 @@ public final class TabBarViewController: UIViewController {
         let previousVC = childNavigationControllers[currentIndex]
         let newVC = childNavigationControllers[index]
 
-        previousVC.willMove(toParent: nil)
-        previousVC.view.removeFromSuperview()
-        previousVC.removeFromParent()
+        if previousVC.parent === self, previousVC !== newVC {
+            previousVC.willMove(toParent: nil)
+            previousVC.view.removeFromSuperview()
+            previousVC.removeFromParent()
+        }
 
-        addChild(newVC)
-        containerView.addSubview(newVC.view)
-        newVC.view.snp.makeConstraints { $0.edges.equalToSuperview() }
-        newVC.didMove(toParent: self)
+        if newVC.parent !== self {
+            addChild(newVC)
+            containerView.addSubview(newVC.view)
+            newVC.view.snp.makeConstraints { $0.edges.equalToSuperview() }
+            newVC.didMove(toParent: self)
+        }
         newVC.additionalSafeAreaInsets.bottom = customTabBarHeight
 
         currentIndex = index
@@ -139,7 +143,7 @@ public final class TabBarViewController: UIViewController {
     // MARK: - TabBar Visibility
 
     private func updateTabBarVisibility(for navigationController: UINavigationController) {
-        let shouldHide = navigationController.topViewController?.hidesBottomBarWhenPushed ?? false
+        let shouldHide = navigationController.viewControllers.count > 1
         setTabBarHidden(shouldHide, animated: false)
     }
 
@@ -184,8 +188,12 @@ extension TabBarViewController: UINavigationControllerDelegate {
         willShow viewController: UIViewController,
         animated: Bool
     ) {
-        let shouldHide = viewController.hidesBottomBarWhenPushed
+        let shouldHide = !isRootViewController(viewController, in: navigationController)
         setTabBarHidden(shouldHide, animated: animated)
+    }
+
+    private func isRootViewController(_ viewController: UIViewController, in navigationController: UINavigationController) -> Bool {
+        navigationController.viewControllers.first === viewController
     }
 }
 
