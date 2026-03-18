@@ -14,6 +14,7 @@ import HilingualPresentation
 
 // MARK: - DIContainer Entry Point
 
+@MainActor
 final class AppDIContainer: ViewControllerFactory {
 
     static let shared = AppDIContainer()
@@ -23,7 +24,7 @@ final class AppDIContainer: ViewControllerFactory {
     }
 
     private func injectBaseURL() {
-        NetworkEnvironment.shared = AppBaseURLProvider()
+        NetworkEnvironment.configure(AppBaseURLProvider())
     }
 
     public func makeTabBarViewController() -> HilingualPresentation.TabBarViewController {
@@ -34,7 +35,6 @@ final class AppDIContainer: ViewControllerFactory {
         return SplashViewController(viewModel: makeSplashViewModel(), diContainer: self)
     }
 
-    @MainActor
     public func makeHomeViewController() -> HomeViewController {
         return HomeViewController(viewModel: makeHomeViewModel(), diContainer: self)
     }
@@ -79,7 +79,6 @@ final class AppDIContainer: ViewControllerFactory {
         return OnBoardingViewController(viewModel: makeOnBoardingViewModel(), diContainer: self)
     }
     
-    @MainActor
     func makeDiaryWritingViewController(
         topicData: (String, String)?,
         selectedDate: Date,
@@ -308,7 +307,6 @@ extension AppDIContainer {
 }
 
 // MARK: - TemporaryDiaryDIContainer
-@MainActor
 extension AppDIContainer {
 
     private func makeDiaryDraftLocalDataSource() -> DiaryDraftLocalDataSource {
@@ -445,7 +443,6 @@ extension AppDIContainer {
         return DefaultHomeUseCase(repository: makeHomeRepository())
     }
     
-    @MainActor
     private func makeHomeViewModel() -> HomeViewModel {
         return HomeViewModel(useCase: makeHomeUseCase(), fetchTemporaryDiaryUseCase: makeFetchTemporaryDiaryUseCase(), localPushUseCase: makeLocalPushUseCase())
     }
