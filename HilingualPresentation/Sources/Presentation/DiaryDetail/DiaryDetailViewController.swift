@@ -77,6 +77,9 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
 
     public override func viewDidLoad() {
         super.viewDidLoad()
+        
+        feedbackViewController.showsAdBanner = !showsActionButton
+        recommendedExpressionViewController.showsAdBanner = !showsActionButton
 
         AmplitudeManager.shared.send(.pageviewFeedback)
 

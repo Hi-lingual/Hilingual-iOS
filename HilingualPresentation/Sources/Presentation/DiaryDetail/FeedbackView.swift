@@ -84,7 +84,6 @@ final class FeedbackView: BaseUIView {
         label.text = "추가 설명이 필요 없는 일기네요!"
         label.font = .pretendard(.body_r_14)
         label.textColor = .hilingualBlack
-
         label.numberOfLines = 0
 
         let stack = UIStackView(arrangedSubviews: [imageView, separator, label])
@@ -172,6 +171,28 @@ final class FeedbackView: BaseUIView {
         scrollView.setContentOffset(.zero, animated: true)
     }
 
+    // MARK: - Ad
+
+    private var adBannerView: UIView?
+
+    func setAdBannerView(_ adView: UIView) {
+        adBannerView?.removeFromSuperview()
+        adBannerView = adView
+        
+        let index = contentView.arrangedSubviews.firstIndex(of: bottomSpacingView)
+                    ?? contentView.arrangedSubviews.count
+        contentView.insertArrangedSubview(adView, at: index)
+        
+        adView.snp.makeConstraints {
+            $0.horizontalEdges.equalToSuperview()
+        }
+    }
+
+    func removeAdBannerView() {
+        adBannerView?.removeFromSuperview()
+        adBannerView = nil
+    }
+
     // MARK: - Configure
 
     func configureDiary(data: DiaryViewData) {
@@ -196,6 +217,12 @@ final class FeedbackView: BaseUIView {
             feedbackStackView.addArrangedSubview(emptyFeedbackView)
             emptyFeedbackView.snp.makeConstraints {
                 $0.horizontalEdges.equalToSuperview()
+            }
+            
+            let bottomSpacingView = UIView()
+            feedbackStackView.addArrangedSubview(bottomSpacingView)
+            bottomSpacingView.snp.makeConstraints {
+                $0.height.equalTo(24)
             }
             return
         }
@@ -251,7 +278,6 @@ final class FeedbackView: BaseUIView {
         configureDiary(data: data)
         currentDiaryData = data
 
-        // 토글 상태 콜백 호출
         onToggleChanged?(data.isHighlightingEnabled)
     }
 }
