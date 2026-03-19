@@ -49,7 +49,7 @@ public final class FeedbackViewController: BaseUIViewController<FeedbackViewMode
     private var bannerView: BannerView?
 
     private lazy var adPlaceholderImageView: UIImageView = {
-        let imageView = UIImageView(image: UIImage(named: "img_loading_feed_ios", in: .module, with: nil))
+        let imageView = UIImageView(image: UIImage(resource: .imgLoadingFeedIos))
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         return imageView
