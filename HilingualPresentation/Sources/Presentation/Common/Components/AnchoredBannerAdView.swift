@@ -14,8 +14,7 @@ final class AnchoredBannerAdView: UIView {
     // MARK: - Properties
 
     private enum Ads {
-        // TODO: 실제 광고 id로 변경하기
-        static let adManagerAdaptiveBannerTestUnitID = "/21775744923/example/adaptive-banner"
+        static let adManagerAdaptiveBannerTestUnitID = Bundle.main.infoDictionary?["AD_BANNER_UNIT_ID"] as? String ?? ""
     }
 
     var onHeightChanged: ((CGFloat) -> Void)?

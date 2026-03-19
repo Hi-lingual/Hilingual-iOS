@@ -23,8 +23,7 @@ final class CustomTabBarView: UIView {
     }
 
     private enum Ads {
-        // TODO: 실제 광고 id로 변경하기
-        static let nativeTestUnitID = "ca-app-pub-3940256099942544/3986624511"
+        static let nativeTestUnitID = Bundle.main.infoDictionary?["AD_NATIVE_UNIT_ID"] as? String ?? ""
         static let fallbackTitle = "광고 이름"
     }
 
