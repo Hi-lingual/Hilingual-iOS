@@ -90,12 +90,6 @@ public final class FeedbackViewController: BaseUIViewController<FeedbackViewMode
         dialog.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
-
-        if showsAdBanner {
-            adPlaceholderImageView.snp.makeConstraints {
-                $0.height.equalTo(160)
-            }
-        }
     }
 
     private func loadAd() {
