@@ -218,6 +218,12 @@ final class FeedbackView: BaseUIView {
             emptyFeedbackView.snp.makeConstraints {
                 $0.horizontalEdges.equalToSuperview()
             }
+            
+            let bottomSpacingView = UIView()
+            feedbackStackView.addArrangedSubview(bottomSpacingView)
+            bottomSpacingView.snp.makeConstraints {
+                $0.height.equalTo(24)
+            }
             return
         }
 
