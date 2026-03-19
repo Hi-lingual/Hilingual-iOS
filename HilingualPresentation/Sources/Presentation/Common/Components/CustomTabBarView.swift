@@ -7,24 +7,37 @@
 
 import UIKit
 import SnapKit
+@preconcurrency import GoogleMobileAds
 
 struct CustomTabBarItem {
     let title: String
-    let selectedImage: ImageResource
-    let unselectedImage: ImageResource
+    let selectedImageName: String
+    let unselectedImageName: String
 }
 
 final class CustomTabBarView: UIView {
 
+    private enum Layout {
+        static let tabHeight: CGFloat = 58
+        static let adHeight: CGFloat = 24
+    }
+
+    private enum Ads {
+        // TODO: 실제 광고 id로 변경하기
+        static let nativeTestUnitID = "ca-app-pub-3940256099942544/3986624511"
+        static let fallbackTitle = "광고 이름"
+    }
+
     // MARK: - Callback
 
     var onSelect: ((Int) -> Void)?
+    var onAdVisibilityChanged: ((Bool) -> Void)?
 
     // MARK: - UI
 
     private let topDivider: UIView = {
         let view = UIView()
-        view.backgroundColor = .gray200
+        view.backgroundColor = .gray100
         return view
     }()
 
@@ -35,6 +48,39 @@ final class CustomTabBarView: UIView {
         return stack
     }()
 
+    private let adContainerView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .white
+        return view
+    }()
+
+    private let adBadgeLabel: UILabel = {
+        let label = UILabel()
+        label.text = "AD"
+        label.font = .pretendard(.cap_r_12)
+        label.textColor = .white
+        label.textAlignment = .center
+        label.backgroundColor = .gray500
+        label.layer.cornerRadius = 8
+        label.layer.masksToBounds = true
+        return label
+    }()
+
+    private let adTitleLabel: UILabel = {
+        let label = UILabel()
+        label.font = .pretendard(.cap_r_12)
+        label.textColor = .gray700
+        label.numberOfLines = 1
+        label.text = Ads.fallbackTitle
+        return label
+    }()
+
+    private var adHeightConstraint: Constraint?
+    private var adLoader: AdLoader?
+    private var nativeAd: NativeAd?
+    private var isAdVisible = false
+    private lazy var adLoaderDelegate = CustomNativeAdLoaderDelegate(owner: self)
+    
     private let itemViews: [CustomTabBarItemView]
 
     // MARK: - Init
@@ -59,11 +105,17 @@ final class CustomTabBarView: UIView {
         itemViews.forEach { $0.isItemSelected = ($0.itemIndex == index) }
     }
 
+    func loadAd() {
+        loadTestNativeAd()
+    }
+
     // MARK: - Private
 
     private func setupUI() {
         backgroundColor = .white
-        addSubviews(topDivider, stackView)
+        addSubviews(topDivider, stackView, adContainerView)
+        adContainerView.addSubviews(adBadgeLabel, adTitleLabel)
+        adContainerView.isHidden = true
         itemViews.forEach { stackView.addArrangedSubview($0) }
     }
 
@@ -74,9 +126,29 @@ final class CustomTabBarView: UIView {
         }
 
         stackView.snp.makeConstraints {
-            $0.top.equalTo(topDivider.snp.bottom)
+            $0.top.equalToSuperview()
             $0.horizontalEdges.equalToSuperview()
-            $0.bottom.equalTo(safeAreaLayoutGuide)
+            $0.height.equalTo(Layout.tabHeight)
+        }
+
+        adContainerView.snp.makeConstraints {
+            $0.top.equalTo(stackView.snp.bottom)
+            $0.horizontalEdges.equalToSuperview()
+            adHeightConstraint = $0.height.equalTo(0).constraint
+            $0.bottom.equalTo(safeAreaLayoutGuide.snp.bottom)
+        }
+
+        adBadgeLabel.snp.makeConstraints {
+            $0.leading.equalToSuperview().inset(12)
+            $0.centerY.equalToSuperview()
+            $0.width.equalTo(24)
+            $0.height.equalTo(16)
+        }
+
+        adTitleLabel.snp.makeConstraints {
+            $0.leading.equalTo(adBadgeLabel.snp.trailing).offset(8)
+            $0.trailing.equalToSuperview().inset(12)
+            $0.centerY.equalToSuperview()
         }
     }
 
@@ -85,6 +157,61 @@ final class CustomTabBarView: UIView {
             itemView.onTap = { [weak self] index in
                 self?.onSelect?(index)
             }
+        }
+    }
+
+    private func setAdVisible(_ visible: Bool) {
+        guard isAdVisible != visible else { return }
+        isAdVisible = visible
+        adContainerView.isHidden = !visible
+        adHeightConstraint?.update(offset: visible ? Layout.adHeight : 0)
+        onAdVisibilityChanged?(visible)
+    }
+
+    private func loadTestNativeAd() {
+        let adLoader = AdLoader(
+            adUnitID: Ads.nativeTestUnitID,
+            rootViewController: nil,
+            adTypes: [.native],
+            options: nil
+        )
+        adLoader.delegate = adLoaderDelegate
+        self.adLoader = adLoader
+        adLoader.load(Request())
+    }
+
+    fileprivate func handleAdLoadSuccess(_ nativeAd: NativeAd) {
+        self.nativeAd = nativeAd
+        adTitleLabel.text = nativeAd.headline ?? Ads.fallbackTitle
+        setAdVisible(true)
+    }
+
+    fileprivate func handleAdLoadFailure() {
+        setAdVisible(false)
+    }
+}
+
+// MARK: - NativeAdLoaderDelegate
+
+private final class CustomNativeAdLoaderDelegate: NSObject, NativeAdLoaderDelegate {
+    
+    weak var owner: CustomTabBarView?
+
+    init(owner: CustomTabBarView) {
+        self.owner = owner
+    }
+
+    func adLoader(_ adLoader: AdLoader, didReceive nativeAd: NativeAd) {
+        let owner = self.owner
+        DispatchQueue.main.async {
+            owner?.handleAdLoadSuccess(nativeAd)
+        }
+    }
+
+    func adLoader(_ adLoader: AdLoader, didFailToReceiveAdWithError error: Error) {
+        let owner = self.owner
+        DispatchQueue.main.async {
+            owner?.handleAdLoadFailure()
         }
     }
 }
@@ -162,8 +289,9 @@ private final class CustomTabBarItemView: UIControl {
     }
 
     private func updateAppearance() {
-        let imageResource = isItemSelected ? item.selectedImage : item.unselectedImage
-        iconImageView.image = UIImage(resource: imageResource).withRenderingMode(.alwaysOriginal)
+        let imageName = isItemSelected ? item.selectedImageName : item.unselectedImageName
+        iconImageView.image = UIImage(named: imageName, in: .module, compatibleWith: nil)?
+            .withRenderingMode(.alwaysOriginal)
         titleLabel.textColor = isItemSelected ? .black : .gray400
     }
 
