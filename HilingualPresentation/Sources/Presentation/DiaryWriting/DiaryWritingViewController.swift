@@ -223,6 +223,8 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
 
         let loadingVC = diContainer.makeLoadingViewController()
         loadingVC.viewModel?.postDiary(originalText: text, date: dateString, imageFile: imageData)
+        // TODO: 서버 작업 이후 진행
+//        loadingVC.viewModel?.postDiary(originalText: text, date: dateString, imageFile: imageData, isAdWatched: false)
         navigationController?.pushViewController(loadingVC, animated: true)
     }
 

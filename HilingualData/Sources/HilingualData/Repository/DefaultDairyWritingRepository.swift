@@ -24,6 +24,7 @@ public final class DefaultDiaryWritingRepository: DiaryWritingRepository {
             originalText: entity.originalText,
             date: entity.date,
             fileKey: entity.image?.fileKey
+//            isAdWatched: entity.isAdWatched  // TODO: 서버 작업 이후 교체
         )
         
         return service.postDiaryWriting(requestDTO: requestDTO)

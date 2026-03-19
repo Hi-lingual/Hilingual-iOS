@@ -28,6 +28,7 @@ public final class LoadingViewModel: BaseViewModel {
     private var originalText: String?
     private var date: String?
     private var imageFile: Data?
+//    private var isAdWatched: Bool? // TODO: 서버 작업 이후 교체
     
     private var startTime: Date?
     private var errorCount = 0
@@ -91,6 +92,16 @@ public final class LoadingViewModel: BaseViewModel {
         self.imageFile = imageFile
         startDiaryRequest(originalText: originalText, date: date, imageFile: imageFile)
     }
+    
+    // TODO: 서버 작업 이후 교체
+//    @MainActor
+//    public func postDiary(originalText: String, date: String, imageFile: Data?, isAdWatched: Bool) {
+//        self.originalText = originalText
+//        self.date = date
+//        self.imageFile = imageFile
+//        self.isAdWatched = isAdWatched
+//        startDiaryRequest(originalText: originalText, date: date, imageFile: imageFile, isAdWatched: isAdWatched)
+//    }
 
     // MARK: - Internal
 
@@ -99,6 +110,12 @@ public final class LoadingViewModel: BaseViewModel {
         guard let originalText, let date else { return }
         startDiaryRequest(originalText: originalText, date: date, imageFile: imageFile)
     }
+    
+//    @MainActor
+//    private func retryFeedback() {
+//        guard let originalText, let date, let isAdWatched else { return }
+//        startDiaryRequest(originalText: originalText, date: date, imageFile: imageFile, isAdWatched: isAdWatched)
+//    }
 
     @MainActor
     private func startLoadingState() {
@@ -107,7 +124,7 @@ public final class LoadingViewModel: BaseViewModel {
     }
 
     @MainActor
-    private func startDiaryRequest(originalText: String, date: String, imageFile: Data?) {
+    private func startDiaryRequest(originalText: String, date: String, imageFile: Data?, isAdWatched: Bool) {
         startLoadingState()
         let contentType = "image/jpeg"
 
@@ -123,6 +140,7 @@ public final class LoadingViewModel: BaseViewModel {
                             originalText: originalText,
                             date: date,
                             fileKey: fileKey
+//                            isAdWatched: isAdWatched  // TODO: 서버 작업 이후 교체
                         )
                         return self.diaryWritingUseCase.postDiaryWriting(entity)
                     }
@@ -148,6 +166,7 @@ public final class LoadingViewModel: BaseViewModel {
                 originalText: originalText,
                 date: date,
                 fileKey: nil
+//                isAdWatched: isAdWatched // TODO: 서버 작업 이후 교체
             )
             
             diaryWritingUseCase.postDiaryWriting(entity)
