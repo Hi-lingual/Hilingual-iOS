@@ -64,23 +64,14 @@ public final class FeedbackViewController: BaseUIViewController<FeedbackViewMode
         feedbackView.onToggleChanged = { [weak self] isEnabled in
             self?.onToggleChanged?(isEnabled)
         }
+        
+        if showsAdBanner {
+            setupAdBanner()
+        }
     }
 
     public override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-
-        if showsAdBanner {
-            adPlaceholderImageView.alpha = 1
-            adPlaceholderImageView.isHidden = false
-            feedbackView.setAdBannerView(adPlaceholderImageView)
-            adPlaceholderImageView.snp.makeConstraints {
-                $0.height.equalTo(160)
-            }
-
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
-                self?.loadAd()
-            }
-        }
     }
 
     // MARK: - Custom Method
@@ -89,16 +80,6 @@ public final class FeedbackViewController: BaseUIViewController<FeedbackViewMode
         view.addSubviews(feedbackView, dialog)
         view.backgroundColor = .gray100
         view.bringSubviewToFront(dialog)
-
-        if showsAdBanner {
-            let banner = BannerView()
-            banner.adUnitID = "ca-app-pub-3940256099942544/2435281174"
-            banner.rootViewController = self
-            banner.delegate = self
-            self.bannerView = banner
-
-            feedbackView.setAdBannerView(adPlaceholderImageView)
-        }
     }
 
     public override func setLayout() {
@@ -124,6 +105,25 @@ public final class FeedbackViewController: BaseUIViewController<FeedbackViewMode
 
         let request = Request()
         bannerView.load(request)
+    }
+    
+    private func setupAdBanner() {
+        let banner = BannerView()
+        banner.adUnitID = "ca-app-pub-3940256099942544/2435281174"
+        banner.rootViewController = self
+        banner.delegate = self
+        self.bannerView = banner
+        
+        adPlaceholderImageView.alpha = 1
+        adPlaceholderImageView.isHidden = false
+        feedbackView.setAdBannerView(adPlaceholderImageView)
+        adPlaceholderImageView.snp.makeConstraints {
+            $0.height.equalTo(160)
+        }
+        
+        DispatchQueue.main.async { [weak self] in
+            self?.loadAd()
+        }
     }
 
     // MARK: - Bind

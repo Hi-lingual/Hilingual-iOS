@@ -36,22 +36,9 @@ public final class RecommendedExpressionViewController: BaseUIViewController<Rec
 
     public override func viewDidLoad() {
         super.viewDidLoad()
-    }
-
-    public override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-
+        
         if showsAdBanner {
-            adPlaceholderImageView.alpha = 1
-            adPlaceholderImageView.isHidden = false
-            recommendedExpressionView.setAdBannerView(adPlaceholderImageView)
-            adPlaceholderImageView.snp.makeConstraints {
-                $0.height.equalTo(160)
-            }
-
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
-                self?.loadAd()
-            }
+            setupAdBanner()
         }
     }
 
@@ -61,16 +48,6 @@ public final class RecommendedExpressionViewController: BaseUIViewController<Rec
         view.addSubviews(recommendedExpressionView, dialog)
         view.backgroundColor = .gray100
         view.bringSubviewToFront(dialog)
-
-        if showsAdBanner {
-            let banner = BannerView()
-            banner.adUnitID = "ca-app-pub-3940256099942544/2435281174"
-            banner.rootViewController = self
-            banner.delegate = self
-            self.bannerView = banner
-
-            recommendedExpressionView.setAdBannerView(adPlaceholderImageView)
-        }
 
         if let date = pendingDate {
             recommendedExpressionView.setDate(date)
@@ -85,12 +62,6 @@ public final class RecommendedExpressionViewController: BaseUIViewController<Rec
         dialog.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
-
-        if showsAdBanner {
-            adPlaceholderImageView.snp.makeConstraints {
-                $0.height.equalTo(160)
-            }
-        }
     }
 
     private func loadAd() {
@@ -100,6 +71,25 @@ public final class RecommendedExpressionViewController: BaseUIViewController<Rec
 
         let request = Request()
         bannerView.load(request)
+    }
+    
+    private func setupAdBanner() {
+        let banner = BannerView()
+        banner.adUnitID = "ca-app-pub-3940256099942544/2435281174"
+        banner.rootViewController = self
+        banner.delegate = self
+        self.bannerView = banner
+        
+        adPlaceholderImageView.alpha = 1
+        adPlaceholderImageView.isHidden = false
+        recommendedExpressionView.setAdBannerView(adPlaceholderImageView)
+        adPlaceholderImageView.snp.makeConstraints {
+            $0.height.equalTo(160)
+        }
+        
+        DispatchQueue.main.async { [weak self] in
+            self?.loadAd()
+        }
     }
 
     // MARK: - Binding
