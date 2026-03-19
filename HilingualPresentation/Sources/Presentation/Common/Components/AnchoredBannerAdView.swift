@@ -71,7 +71,6 @@ final class AnchoredBannerAdView: UIView {
             rootViewController: rootViewController
         )
 
-        bannerView.validAdSizes = [nsValue(for: adSize)]
         bannerView.load(AdManagerRequest())
     }
 
