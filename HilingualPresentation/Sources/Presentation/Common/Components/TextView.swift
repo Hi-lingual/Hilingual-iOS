@@ -189,26 +189,23 @@ extension TextView: UITextViewDelegate {
         layer.borderWidth = 0
     }
     
-    func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
+    func textView(
+        _ textView: UITextView,
+        shouldChangeTextIn range: NSRange,
+        replacementText text: String
+    ) -> Bool {
+        
         if text.contains(where: { $0.isEmoji }) {
             return false
         }
-        
-        let allowedPunctuation: Set<Character> = [".", ",", "!", "?", "'", "\"", "-", ":", ";", "(", ")", "[", "]", "{", "}", "…"]
-        let isAllowed = text.allSatisfy { char in
-            char.isLetter || char.isNumber || char.isWhitespace || allowedPunctuation.contains(char)
-        }
-        
-        if !isAllowed {
-            return false
-        }
-        
+
         guard let currentText = textView.text else { return true }
-        
+
         if let stringRange = Range(range, in: currentText) {
             let updatedText = currentText.replacingCharacters(in: stringRange, with: text)
             return updatedText.count <= maxCharacterCount
         }
+
         return true
     }
 }
