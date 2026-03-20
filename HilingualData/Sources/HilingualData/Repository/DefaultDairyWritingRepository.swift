@@ -23,13 +23,15 @@ public final class DefaultDiaryWritingRepository: DiaryWritingRepository {
         let requestDTO = DiaryWritingRequestDTO(
             originalText: entity.originalText,
             date: entity.date,
-            fileKey: entity.image?.fileKey,
-            isAdWatched: entity.isAdWatched
+            fileKey: entity.image?.fileKey
         )
         
         return service.postDiaryWriting(requestDTO: requestDTO)
             .map { responseDTO in
-                DiaryWritingResponseEntity(diaryId: responseDTO.data.diaryId)
+                DiaryWritingResponseEntity(
+                    diaryId: responseDTO.data.diaryId,
+                    isAdWatched: responseDTO.data.isAdWatched
+                )
             }
             .mapError { $0 as Error }
             .eraseToAnyPublisher()

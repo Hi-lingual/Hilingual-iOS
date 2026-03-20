@@ -90,12 +90,11 @@ public final class LoadingViewModel: BaseViewModel {
     // MARK: - External API
 
     @MainActor
-    public func postDiary(originalText: String, date: String, imageFile: Data?, isAdWatched: Bool) {
+    public func postDiary(originalText: String, date: String, imageFile: Data?) {
         self.originalText = originalText
         self.date = date
         self.imageFile = imageFile
-        self.isAdWatched = isAdWatched
-        startDiaryRequest(originalText: originalText, date: date, imageFile: imageFile, isAdWatched: isAdWatched)
+        startDiaryRequest(originalText: originalText, date: date, imageFile: imageFile)
     }
     
     @MainActor
@@ -116,8 +115,8 @@ public final class LoadingViewModel: BaseViewModel {
     
     @MainActor
     private func retryFeedback() {
-        guard let originalText, let date, let isAdWatched else { return }
-        startDiaryRequest(originalText: originalText, date: date, imageFile: imageFile, isAdWatched: isAdWatched)
+        guard let originalText, let date else { return }
+        startDiaryRequest(originalText: originalText, date: date, imageFile: imageFile)
     }
 
     @MainActor
@@ -127,7 +126,7 @@ public final class LoadingViewModel: BaseViewModel {
     }
 
     @MainActor
-    private func startDiaryRequest(originalText: String, date: String, imageFile: Data?, isAdWatched: Bool) {
+    private func startDiaryRequest(originalText: String, date: String, imageFile: Data?) {
         startLoadingState()
         let contentType = "image/jpeg"
 
@@ -142,8 +141,7 @@ public final class LoadingViewModel: BaseViewModel {
                         let entity = DiaryWritingEntity(
                             originalText: originalText,
                             date: date,
-                            fileKey: fileKey,
-                            isAdWatched: isAdWatched
+                            fileKey: fileKey
                         )
                         return self.diaryWritingUseCase.postDiaryWriting(entity)
                     }
@@ -168,8 +166,7 @@ public final class LoadingViewModel: BaseViewModel {
             let entity = DiaryWritingEntity(
                 originalText: originalText,
                 date: date,
-                fileKey: nil,
-                isAdWatched: isAdWatched
+                fileKey: nil
             )
             
             diaryWritingUseCase.postDiaryWriting(entity)

@@ -11,7 +11,6 @@ public struct DiaryWritingRequestDTO: Encodable {
     public let originalText: String
     public let date: String
     public let image: ImageFile?
-    public let isAdWatched: Bool
     
     public struct ImageFile: Encodable {
         public let fileKey: String
@@ -23,10 +22,9 @@ public struct DiaryWritingRequestDTO: Encodable {
         }
     }
 
-    public init(originalText: String, date: String, fileKey: String?, isAdWatched: Bool) {
+    public init(originalText: String, date: String, fileKey: String?) {
         self.originalText = originalText
         self.date = date
-        self.isAdWatched = isAdWatched
         if let fileKey {
             self.image = ImageFile(fileKey: fileKey)
         } else {
@@ -43,4 +41,5 @@ public struct DiaryWritingResponseDTO: Decodable {
 
 public struct DiaryIdDTO: Decodable {
     public let diaryId: Int
+    public let isAdWatched: Bool
 }
