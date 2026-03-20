@@ -14,7 +14,8 @@ public enum DiaryInfoMapper {
             diaryId: dto.diaryId,
             imageUrl: dto.imageUrl,
             originalText: dto.originalText,
-            isPublished: dto.isPublished
+            isPublished: dto.isPublished,
+            isAdWatched: dto.isAdWatched
         )
     }
 }
