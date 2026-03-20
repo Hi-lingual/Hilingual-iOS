@@ -15,6 +15,7 @@ public final class LoadingViewModel: BaseViewModel {
 
     private let diaryWritingUseCase: DiaryWritingUseCase
     private let uploadImageUseCase: UploadImageUseCase
+    private let diaryAdWatchUseCase: DiaryAdWatchUseCase
     
     // MARK: - Properties
     
@@ -35,12 +36,15 @@ public final class LoadingViewModel: BaseViewModel {
     private let maxErrorCount = 2
 
     // MARK: - Init
+    
     public init(
         diaryWritingUseCase: DiaryWritingUseCase,
-        uploadImageUseCase: UploadImageUseCase
+        uploadImageUseCase: UploadImageUseCase,
+        diaryAdWatchUseCase: DiaryAdWatchUseCase
     ) {
         self.diaryWritingUseCase = diaryWritingUseCase
         self.uploadImageUseCase = uploadImageUseCase
+        self.diaryAdWatchUseCase = diaryAdWatchUseCase
         super.init()
     }
 
@@ -92,6 +96,20 @@ public final class LoadingViewModel: BaseViewModel {
         self.imageFile = imageFile
         self.isAdWatched = isAdWatched
         startDiaryRequest(originalText: originalText, date: date, imageFile: imageFile, isAdWatched: isAdWatched)
+    }
+    
+    @MainActor
+    public func patchAdWatch(diaryId: Int) {
+        diaryAdWatchUseCase.execute(diaryId: diaryId)
+            .receive(on: DispatchQueue.main)
+            .sink { completion in
+                if case .failure(let error) = completion {
+                    print("AdWatch patch failed: \(error)")
+                }
+            } receiveValue: { _ in
+                print("AdWatch patch success")
+            }
+            .store(in: &cancellables)
     }
 
     // MARK: - Internal

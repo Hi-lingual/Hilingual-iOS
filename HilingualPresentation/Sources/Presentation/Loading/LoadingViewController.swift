@@ -167,6 +167,7 @@ public final class LoadingViewController: BaseUIViewController<LoadingViewModel>
 extension LoadingViewController: FullScreenContentDelegate {
     public func adDidDismissFullScreenContent(_ ad: FullScreenPresentingAd) {
         guard let diaryId = currentDiaryId else { return }
+        viewModel?.patchAdWatch(diaryId: diaryId)
         pushDiaryDetail(diaryId: diaryId)
     }
     
