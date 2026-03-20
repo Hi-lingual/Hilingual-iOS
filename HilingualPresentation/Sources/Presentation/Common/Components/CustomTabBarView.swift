@@ -19,7 +19,7 @@ final class CustomTabBarView: UIView {
 
     private enum Layout {
         static let tabHeight: CGFloat = 58
-        static let adHeight: CGFloat = 24
+        static let adHeight: CGFloat = 32
     }
 
     private enum Ads {
@@ -53,6 +53,12 @@ final class CustomTabBarView: UIView {
         return view
     }()
 
+    private let nativeAdView: NativeAdView = {
+        let view = NativeAdView()
+        view.backgroundColor = .white
+        return view
+    }()
+
     private let adBadgeLabel: UILabel = {
         let label = UILabel()
         label.text = "AD"
@@ -72,6 +78,12 @@ final class CustomTabBarView: UIView {
         label.numberOfLines = 1
         label.text = Ads.fallbackTitle
         return label
+    }()
+
+    private let adChoicesView: AdChoicesView = {
+        let view = AdChoicesView()
+        view.backgroundColor = .clear
+        return view
     }()
 
     private var adHeightConstraint: Constraint?
@@ -104,8 +116,8 @@ final class CustomTabBarView: UIView {
         itemViews.forEach { $0.isItemSelected = ($0.itemIndex == index) }
     }
 
-    func loadAd() {
-        loadTestNativeAd()
+    func loadAd(rootViewController: UIViewController?) {
+        loadTestNativeAd(rootViewController: rootViewController)
     }
 
     // MARK: - Private
@@ -113,7 +125,10 @@ final class CustomTabBarView: UIView {
     private func setupUI() {
         backgroundColor = .white
         addSubviews(topDivider, stackView, adContainerView)
-        adContainerView.addSubviews(adBadgeLabel, adTitleLabel)
+        adContainerView.addSubview(nativeAdView)
+        nativeAdView.addSubviews(adBadgeLabel, adTitleLabel, adChoicesView)
+        nativeAdView.headlineView = adTitleLabel
+        nativeAdView.adChoicesView = adChoicesView
         adContainerView.isHidden = true
         itemViews.forEach { stackView.addArrangedSubview($0) }
     }
@@ -137,6 +152,10 @@ final class CustomTabBarView: UIView {
             $0.bottom.equalTo(safeAreaLayoutGuide.snp.bottom)
         }
 
+        nativeAdView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
+
         adBadgeLabel.snp.makeConstraints {
             $0.leading.equalToSuperview().inset(12)
             $0.centerY.equalToSuperview()
@@ -146,8 +165,14 @@ final class CustomTabBarView: UIView {
 
         adTitleLabel.snp.makeConstraints {
             $0.leading.equalTo(adBadgeLabel.snp.trailing).offset(8)
-            $0.trailing.equalToSuperview().inset(12)
+            $0.trailing.lessThanOrEqualTo(adChoicesView.snp.leading).offset(-8)
             $0.centerY.equalToSuperview()
+        }
+
+        adChoicesView.snp.makeConstraints {
+            $0.trailing.equalToSuperview().inset(6)
+            $0.centerY.equalToSuperview()
+            $0.width.height.equalTo(14)
         }
     }
 
@@ -167,10 +192,10 @@ final class CustomTabBarView: UIView {
         onAdVisibilityChanged?(visible)
     }
 
-    private func loadTestNativeAd() {
+    private func loadTestNativeAd(rootViewController: UIViewController?) {
         let adLoader = AdLoader(
             adUnitID: Ads.nativeTestUnitID,
-            rootViewController: nil,
+            rootViewController: rootViewController,
             adTypes: [.native],
             options: nil
         )
@@ -182,10 +207,13 @@ final class CustomTabBarView: UIView {
     fileprivate func handleAdLoadSuccess(_ nativeAd: NativeAd) {
         self.nativeAd = nativeAd
         adTitleLabel.text = nativeAd.headline ?? Ads.fallbackTitle
+        nativeAdView.nativeAd = nativeAd
         setAdVisible(true)
     }
 
     fileprivate func handleAdLoadFailure() {
+        nativeAd = nil
+        nativeAdView.nativeAd = nil
         setAdVisible(false)
     }
 }
