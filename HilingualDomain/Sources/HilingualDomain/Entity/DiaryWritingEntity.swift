@@ -11,21 +11,14 @@ public struct DiaryWritingEntity {
     public let originalText: String
     public let date: String
     public let image: ImageFile?
-//    public let isAdWatched: Bool          // TODO: 서버 작업 이후 교체
+    public let isAdWatched: Bool
 
-    public init(originalText: String, date: String, fileKey: String?) {
+    public init(originalText: String, date: String, fileKey: String?, isAdWatched: Bool) {
         self.originalText = originalText
         self.date = date
+        self.isAdWatched = isAdWatched
         self.image = fileKey.map { ImageFile(fileKey: $0) }
     }
-    
-    // TODO: 서버 작업 이후 교체
-//    public init(originalText: String, date: String, fileKey: String?, isAdWatched: Bool) {
-//        self.originalText = originalText
-//        self.date = date
-//        self.isAdWatched = isAdWatched
-//        self.image = fileKey.map { ImageFile(fileKey: $0) }
-//    }
     
     public struct ImageFile {
         public let fileKey: String

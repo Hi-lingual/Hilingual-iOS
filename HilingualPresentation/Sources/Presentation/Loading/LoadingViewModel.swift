@@ -28,7 +28,7 @@ public final class LoadingViewModel: BaseViewModel {
     private var originalText: String?
     private var date: String?
     private var imageFile: Data?
-//    private var isAdWatched: Bool? // TODO: 서버 작업 이후 교체
+    private var isAdWatched: Bool?
     
     private var startTime: Date?
     private var errorCount = 0
@@ -86,36 +86,21 @@ public final class LoadingViewModel: BaseViewModel {
     // MARK: - External API
 
     @MainActor
-    public func postDiary(originalText: String, date: String, imageFile: Data?) {
+    public func postDiary(originalText: String, date: String, imageFile: Data?, isAdWatched: Bool) {
         self.originalText = originalText
         self.date = date
         self.imageFile = imageFile
-        startDiaryRequest(originalText: originalText, date: date, imageFile: imageFile)
+        self.isAdWatched = isAdWatched
+        startDiaryRequest(originalText: originalText, date: date, imageFile: imageFile, isAdWatched: isAdWatched)
     }
-    
-    // TODO: 서버 작업 이후 교체
-//    @MainActor
-//    public func postDiary(originalText: String, date: String, imageFile: Data?, isAdWatched: Bool) {
-//        self.originalText = originalText
-//        self.date = date
-//        self.imageFile = imageFile
-//        self.isAdWatched = isAdWatched
-//        startDiaryRequest(originalText: originalText, date: date, imageFile: imageFile, isAdWatched: isAdWatched)
-//    }
 
     // MARK: - Internal
-
+    
     @MainActor
     private func retryFeedback() {
-        guard let originalText, let date else { return }
-        startDiaryRequest(originalText: originalText, date: date, imageFile: imageFile)
+        guard let originalText, let date, let isAdWatched else { return }
+        startDiaryRequest(originalText: originalText, date: date, imageFile: imageFile, isAdWatched: isAdWatched)
     }
-    
-//    @MainActor
-//    private func retryFeedback() {
-//        guard let originalText, let date, let isAdWatched else { return }
-//        startDiaryRequest(originalText: originalText, date: date, imageFile: imageFile, isAdWatched: isAdWatched)
-//    }
 
     @MainActor
     private func startLoadingState() {
@@ -139,8 +124,8 @@ public final class LoadingViewModel: BaseViewModel {
                         let entity = DiaryWritingEntity(
                             originalText: originalText,
                             date: date,
-                            fileKey: fileKey
-//                            isAdWatched: isAdWatched  // TODO: 서버 작업 이후 교체
+                            fileKey: fileKey,
+                            isAdWatched: isAdWatched
                         )
                         return self.diaryWritingUseCase.postDiaryWriting(entity)
                     }
@@ -165,8 +150,8 @@ public final class LoadingViewModel: BaseViewModel {
             let entity = DiaryWritingEntity(
                 originalText: originalText,
                 date: date,
-                fileKey: nil
-//                isAdWatched: isAdWatched // TODO: 서버 작업 이후 교체
+                fileKey: nil,
+                isAdWatched: isAdWatched
             )
             
             diaryWritingUseCase.postDiaryWriting(entity)

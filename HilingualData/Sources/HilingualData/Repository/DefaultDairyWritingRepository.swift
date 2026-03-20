@@ -23,8 +23,8 @@ public final class DefaultDiaryWritingRepository: DiaryWritingRepository {
         let requestDTO = DiaryWritingRequestDTO(
             originalText: entity.originalText,
             date: entity.date,
-            fileKey: entity.image?.fileKey
-//            isAdWatched: entity.isAdWatched  // TODO: 서버 작업 이후 교체
+            fileKey: entity.image?.fileKey,
+            isAdWatched: entity.isAdWatched
         )
         
         return service.postDiaryWriting(requestDTO: requestDTO)
