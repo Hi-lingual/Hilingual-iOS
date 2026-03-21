@@ -170,7 +170,7 @@ public final class MypageViewController: BaseUIViewController<MypageViewModel> {
         mypageView.bannerView.delegate = self
         mypageView.bannerView.adSize = adSize
         mypageView.bannerView.rootViewController = self
-        mypageView.bannerView.adUnitID = "ca-app-pub-3940256099942544/2435281174"
+        mypageView.bannerView.adUnitID = Bundle.main.infoDictionary?["AD_BANNER_UNIT_ID"] as? String ?? ""
 
         mypageView.bannerView.load(Request())
     }
