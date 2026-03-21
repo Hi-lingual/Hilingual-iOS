@@ -7,7 +7,6 @@
 
 import UIKit
 import SnapKit
-import HilingualCore
 
 @MainActor
 protocol DiaryWritingViewDelegate: AnyObject {
@@ -316,7 +315,9 @@ final class DiaryWritingView: BaseUIView {
     // MARK: - Binding
     
     func setSelectedDate(_ date: Date) {
-        let formatter = AppTimeZone.formatter("M월 d일 EEEE")
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "ko_KR")
+        formatter.dateFormat = "M월 d일 EEEE"
         dateLabel.attributedText = .pretendard(.body_m_16, text: formatter.string(from: date))
     }
     

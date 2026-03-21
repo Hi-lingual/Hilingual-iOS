@@ -7,7 +7,6 @@
 
 import UIKit
 import SnapKit
-import HilingualCore
 
 final class CalendarView: UIView {
 
@@ -146,9 +145,8 @@ final class CalendarView: UIView {
     // MARK: - Calendar Config
 
     private func configureCalendars(for date: Date) {
-        let calendar = AppTimeZone.calendar
-        let prevMonth = calendar.date(byAdding: .month, value: -1, to: date)!
-        let nextMonth = calendar.date(byAdding: .month, value: 1, to: date)!
+        let prevMonth = Calendar.current.date(byAdding: .month, value: -1, to: date)!
+        let nextMonth = Calendar.current.date(byAdding: .month, value: 1, to: date)!
 
         calendarViews[0].reload(for: prevMonth)
         calendarViews[1].reload(for: date)
@@ -224,12 +222,11 @@ extension CalendarView: UIScrollViewDelegate {
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         let pageWidth = scrollView.frame.width
         let page = Int(scrollView.contentOffset.x / pageWidth)
-        let calendar = AppTimeZone.calendar
 
         if page == 0 {
-            currentDate = calendar.date(byAdding: .month, value: -1, to: currentDate)!
+            currentDate = Calendar.current.date(byAdding: .month, value: -1, to: currentDate)!
         } else if page == 2 {
-            currentDate = calendar.date(byAdding: .month, value: 1, to: currentDate)!
+            currentDate = Calendar.current.date(byAdding: .month, value: 1, to: currentDate)!
         } else {
             return
         }
@@ -237,8 +234,8 @@ extension CalendarView: UIScrollViewDelegate {
         configureCalendars(for: currentDate)
         headerView.setCurrentDate(currentDate)
 
-        let firstDayOfMonth = calendar.date(
-            from: calendar.dateComponents([.year, .month], from: currentDate))!
+        let firstDayOfMonth = Calendar.current.date(
+            from: Calendar.current.dateComponents([.year, .month], from: currentDate))!
         calendarViews[1].setSelectedDate(firstDayOfMonth)
         onDateSelected?(firstDayOfMonth)
 

@@ -7,7 +7,6 @@
 
 import UIKit
 import Combine
-import HilingualCore
 
 public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     
@@ -44,7 +43,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         refreshUserInfo()
         homeView.selectedInfo.reset()
         let selectedDate = homeView.calendarView.selectedDate ?? Date()
-        let calendar = AppTimeZone.calendar
+        let calendar = Calendar.current
         let year = calendar.component(.year, from: selectedDate)
         let month = calendar.component(.month, from: selectedDate)
         input.monthChange.send((year, month))
@@ -72,7 +71,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         homeView.onMonthChanged = { [weak self] year, month in
             guard let self = self else { return }
             
-            let calendar = AppTimeZone.calendar
+            let calendar = Calendar.current
             let today = Date()
             let selectedDate: Date
             if year == calendar.component(.year, from: today) &&
@@ -227,7 +226,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     private func fetchAndShowDateInfo(for date: Date) {
         self.currentDateRequestCancellable?.cancel()
         
-        let calendar = AppTimeZone.calendar
+        let calendar = Calendar.current
         let today = calendar.startOfDay(for: Date())
         let yesterday = calendar.date(byAdding: .day, value: -1, to: today)!
         let selectedDay = calendar.startOfDay(for: date)
@@ -334,7 +333,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     // MARK: - Topic 조회 로직 분리
     
     private func fetchTopicIfNeeded(for date: Date, today: Date, yesterday: Date) {
-        let calendar = AppTimeZone.calendar
+        let calendar = Calendar.current
         let selectedDay = calendar.startOfDay(for: date)
         
         guard calendar.isDate(selectedDay, inSameDayAs: today) || calendar.isDate(selectedDay, inSameDayAs: yesterday) else {
@@ -520,7 +519,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                             
                             // 2. 캘린더 및 선택 정보 업데이트
                             let selectedDate = self.homeView.calendarView.selectedDate ?? Date()
-                            let calendar = AppTimeZone.calendar
+                            let calendar = Calendar.current
                             let year = calendar.component(.year, from: selectedDate)
                             let month = calendar.component(.month, from: selectedDate)
                             self.input.monthChange.send((year, month))
@@ -568,7 +567,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         if !homeView.selectedInfo.menu.isHidden { return }
         
         let isDiaryDate = homeView.calendarView.filledDates.contains {
-            AppTimeZone.calendar.isDate($0, inSameDayAs: selectedDate)
+            Calendar.current.isDate($0, inSameDayAs: selectedDate)
         }
         
         guard isDiaryDate else { return }

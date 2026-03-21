@@ -16,8 +16,7 @@ let package = Package(
     ],
     dependencies: [
         .package(name: "HilingualDomain", path: "../HilingualDomain"),
-        .package(name: "HilingualNetwork", path: "../HilingualNetwork"),
-        .package(name: "HilingualCore", path: "../HilingualCore")
+        .package(name: "HilingualNetwork", path: "../HilingualNetwork")
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -26,8 +25,7 @@ let package = Package(
             name: "HilingualData",
             dependencies: [
                 "HilingualDomain",
-                "HilingualNetwork",
-                "HilingualCore"
+                "HilingualNetwork"
             ],
             resources: [
                 .process("Resources")

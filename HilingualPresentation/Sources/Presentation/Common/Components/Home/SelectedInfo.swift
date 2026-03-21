@@ -7,7 +7,6 @@
 
 import UIKit
 import SnapKit
-import HilingualCore
 
 final class SelectedInfo: UIView {
     
@@ -243,7 +242,7 @@ final class SelectedInfo: UIView {
             currentIsPublished = newIsPublished
         }
         
-        let calendar = AppTimeZone.calendar
+        let calendar = Calendar.current
         let today = calendar.startOfDay(for: Date())
         let selectedDay = calendar.startOfDay(for: date)
         
@@ -288,7 +287,9 @@ final class SelectedInfo: UIView {
     }
 
     func setSelectedDate(_ date: Date) {
-        let formatter = AppTimeZone.formatter("M월 d일 EEEE")
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "ko_KR")
+        formatter.dateFormat = "M월 d일 EEEE"
         selectedDayLabel.text = formatter.string(from: date)
     }
     

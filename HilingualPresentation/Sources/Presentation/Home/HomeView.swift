@@ -7,7 +7,6 @@
 
 import UIKit
 import SnapKit
-import HilingualCore
 
 final class HomeView: BaseUIView {
 
@@ -130,7 +129,7 @@ final class HomeView: BaseUIView {
 
         calendarView.onMonthChanged = { [weak self] date in
             guard let self else { return }
-            let calendar = AppTimeZone.calendar
+            let calendar = Calendar.current
             let year = calendar.component(.year, from: date)
             let month = calendar.component(.month, from: date)
             self.onMonthChanged?(year, month)

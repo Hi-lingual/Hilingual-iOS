@@ -8,7 +8,6 @@
 
 import UIKit
 import SnapKit
-import HilingualCore
 
 final class CalendarHeaderView: UIView {
 
@@ -151,15 +150,13 @@ final class CalendarHeaderView: UIView {
     }
 
     @objc private func previousButtonTapped() {
-        let calendar = AppTimeZone.calendar
-        guard let newDate = calendar.date(byAdding: .month, value: -1, to: currentDate)
+        guard let newDate = Calendar.current.date(byAdding: .month, value: -1, to: currentDate)
         else { return }
         onMonthChanged?(newDate)
     }
 
     @objc private func nextButtonTapped() {
-        let calendar = AppTimeZone.calendar
-        guard let newDate = calendar.date(byAdding: .month, value: 1, to: currentDate)
+        guard let newDate = Calendar.current.date(byAdding: .month, value: 1, to: currentDate)
         else { return }
         onMonthChanged?(newDate)
     }
@@ -173,7 +170,8 @@ final class CalendarHeaderView: UIView {
     // MARK: - Helper
 
     private static func format(date: Date) -> String {
-        let formatter = AppTimeZone.formatter("yyyy년 M월")
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy년 M월"
         return formatter.string(from: date)
     }
     
