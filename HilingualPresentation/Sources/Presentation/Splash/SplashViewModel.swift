@@ -28,6 +28,7 @@ public final class SplashViewModel: BaseViewModel {
 
     private let tokenStore: TokenStoreUseCase
     private let socialLoginUseCase: SocialLoginUseCase
+    private let deviceUseCase: DeviceUseCase
 
     // MARK: - Subjects
 
@@ -40,10 +41,12 @@ public final class SplashViewModel: BaseViewModel {
 
     public init(
         tokenStore: TokenStoreUseCase,
-        socialLoginUseCase: SocialLoginUseCase
+        socialLoginUseCase: SocialLoginUseCase,
+        deviceUseCase: DeviceUseCase
     ) {
         self.tokenStore = tokenStore
         self.socialLoginUseCase = socialLoginUseCase
+        self.deviceUseCase = deviceUseCase
     }
 
     // MARK: - Transform
@@ -103,6 +106,8 @@ public final class SplashViewModel: BaseViewModel {
                         refreshToken: response.refreshToken
                     )
 
+                    self?.syncDeviceIfTimezoneChanged()
+
 //                    #if DEBUG
 //                    let isProfileCompleted = true
 //                    print("[SplashVM] ⚙️ DEBUG 모드라서 → isProfileCompleted 강제 true임 ㅋㅋ")
@@ -118,6 +123,32 @@ public final class SplashViewModel: BaseViewModel {
                         print("[SplashVM] 로그인 화면 이동")
                         self?.loginSubject.send()
                     }
+                }
+            )
+            .store(in: &cancellables)
+    }
+
+    private func syncDeviceIfTimezoneChanged() {
+        let currentTimezone = TimeZone.current.identifier
+        let lastKnownTimezone = UserDefaults.standard.string(forKey: "lastKnownTimezone") ?? ""
+
+        guard lastKnownTimezone != currentTimezone else {
+            print("[SplashVM] 타임존 변경 없음")
+            return
+        }
+
+        print("[SplashVM] 타임존 변경 감지: \(lastKnownTimezone) -> \(currentTimezone)")
+
+        deviceUseCase.updateCurrentDevice()
+            .sink(
+                receiveCompletion: { completion in
+                    if case .failure(let error) = completion {
+                        print("[SplashVM] ❌ 타임존 동기화 실패: \(error.localizedDescription)")
+                    }
+                },
+                receiveValue: {
+                    print("[SplashVM] ✅ 타임존 동기화 성공")
+                    UserDefaults.standard.set(currentTimezone, forKey: "lastKnownTimezone")
                 }
             )
             .store(in: &cancellables)

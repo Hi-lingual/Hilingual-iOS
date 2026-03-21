@@ -197,7 +197,8 @@ extension AppDIContainer {
     func makeSplashViewModel() -> SplashViewModel {
         return SplashViewModel(
             tokenStore: makeTokenStoreUseCase(),
-            socialLoginUseCase: makeSocialLoginUseCase()
+            socialLoginUseCase: makeSocialLoginUseCase(),
+            deviceUseCase: makeDeviceUseCase()
         )
     }
 }

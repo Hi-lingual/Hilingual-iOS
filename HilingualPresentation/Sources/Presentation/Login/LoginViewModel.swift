@@ -10,7 +10,6 @@ import Combine
 import HilingualDomain
 
 public final class LoginViewModel: BaseViewModel {
-
     public struct Input {
         let loginTapped: AnyPublisher<Void, Never>
     }
@@ -125,6 +124,7 @@ public final class LoginViewModel: BaseViewModel {
                 },
                 receiveValue: {
                     print("[LoginVM] ✅ device API 성공")
+                    UserDefaults.standard.set(TimeZone.current.identifier, forKey: "lastKnownTimezone")
                 }
             )
             .store(in: &cancellables)
