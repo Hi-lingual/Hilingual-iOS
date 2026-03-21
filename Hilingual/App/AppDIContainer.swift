@@ -304,7 +304,11 @@ extension AppDIContainer {
     }
 
     private func makeOnBoardingViewModel() -> OnBoardingViewModel {
-        OnBoardingViewModel(useCase: makeOnBoardingUseCase(), uploadImageUseCase: makeUploadImageUseCase())
+        OnBoardingViewModel(
+            useCase: makeOnBoardingUseCase(),
+            deviceUseCase: makeDeviceUseCase(),
+            uploadImageUseCase: makeUploadImageUseCase()
+        )
     }
 }
 

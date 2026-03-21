@@ -62,6 +62,12 @@ public final class LoginViewModel: BaseViewModel {
         print("[LoginVM] 🚀 소셜 로그인 UseCase 실행 시작")
 
         return socialLoginUseCase.execute()
+            .flatMap { [weak self] result -> AnyPublisher<LoginResponseEntity, Error> in
+                guard let self else {
+                    return Fail(error: NSError(domain: "LoginViewModel", code: -1)).eraseToAnyPublisher()
+                }
+                return self.syncDevice(after: result)
+            }
             .handleEvents(
                 receiveOutput: { [weak self] result in
                     self?.handleLoginSuccess(result)
@@ -77,6 +83,16 @@ public final class LoginViewModel: BaseViewModel {
             .eraseToAnyPublisher()
     }
 
+    private func syncDevice(after result: LoginResponseEntity) -> AnyPublisher<LoginResponseEntity, Error> {
+        deviceUseCase.updateCurrentDevice()
+            .handleEvents(receiveOutput: {
+                print("[LoginVM] ✅ device API 성공")
+                UserDefaults.standard.set(TimeZone.current.identifier, forKey: "lastKnownTimezone")
+            })
+            .map { result }
+            .eraseToAnyPublisher()
+    }
+
     private func handleLoginSuccess(_ result: LoginResponseEntity) {
         print("[LoginVM] ✅ 로그인 성공")
         print("[LoginVM] 🔑 accessToken: \(result.accessToken.prefix(10))...")
@@ -84,7 +100,6 @@ public final class LoginViewModel: BaseViewModel {
         print("[LoginVM] 🔍 isProfileCompleted: \(result.isProfileCompleted)")
 
         saveLoginState(result)
-        updateCurrentDevice()
         navigateAfterLogin(result)
     }
 
@@ -112,21 +127,5 @@ public final class LoginViewModel: BaseViewModel {
             print("[LoginVM] 🧭 온보딩 화면 이동")
             onboardingSubject.send()
         }
-    }
-
-    private func updateCurrentDevice() {
-        deviceUseCase.updateCurrentDevice()
-            .sink(
-                receiveCompletion: { completion in
-                    if case .failure(let error) = completion {
-                        print("[LoginVM] ❌ device API 실패: \(error.localizedDescription)")
-                    }
-                },
-                receiveValue: {
-                    print("[LoginVM] ✅ device API 성공")
-                    UserDefaults.standard.set(TimeZone.current.identifier, forKey: "lastKnownTimezone")
-                }
-            )
-            .store(in: &cancellables)
     }
 }
