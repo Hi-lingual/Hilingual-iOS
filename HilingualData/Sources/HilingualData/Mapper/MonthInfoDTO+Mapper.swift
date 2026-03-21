@@ -6,14 +6,13 @@
 //
 
 import Foundation
+import HilingualCore
 import HilingualNetwork
 import HilingualDomain
 
 extension DateListDTO {
     public func toEntity() -> MonthInfoEntity {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        formatter.locale = Locale(identifier: "ko_KR")
+        let formatter = AppTimeZone.formatter("yyyy-MM-dd")
 
         let parsedDates = dateList.compactMap { formatter.date(from: $0.date) }
 

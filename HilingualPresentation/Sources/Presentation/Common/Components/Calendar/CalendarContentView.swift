@@ -7,15 +7,15 @@
 
 import UIKit
 import SnapKit
+import HilingualCore
 
 final class CalendarContentView: UICollectionView {
 
     // MARK: - Properties
 
     private let calendar: Calendar = {
-        var calendar = Calendar(identifier: .gregorian)
+        var calendar = AppTimeZone.calendar
         calendar.firstWeekday = 1
-        calendar.timeZone = .current
         return calendar
     }()
 

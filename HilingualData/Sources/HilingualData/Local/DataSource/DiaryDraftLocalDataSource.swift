@@ -9,6 +9,7 @@ import Foundation
 import CoreData
 
 import Combine
+import HilingualCore
 import HilingualDomain
 
 public protocol DiaryDraftLocalDataSource {
@@ -36,8 +37,9 @@ public final class DefaultDiaryDraftLocalDataSource: DiaryDraftLocalDataSource {
                 do {
                     let request = NSFetchRequest<NSManagedObject>(entityName: "DiaryDraft")
 
-                    let start = Calendar.current.startOfDay(for: draft.date)
-                    let end = Calendar.current.date(byAdding: .day, value: 1, to: start)!
+                    let calendar = AppTimeZone.calendar
+                    let start = calendar.startOfDay(for: draft.date)
+                    let end = calendar.date(byAdding: .day, value: 1, to: start)!
 
                     request.predicate = NSPredicate(
                         format: "date >= %@ AND date < %@", start as NSDate, end as NSDate
@@ -106,8 +108,9 @@ public final class DefaultDiaryDraftLocalDataSource: DiaryDraftLocalDataSource {
                 do {
                     let request = NSFetchRequest<NSManagedObject>(entityName: "DiaryDraft")
 
-                    let start = Calendar.current.startOfDay(for: date)
-                    let end = Calendar.current.date(byAdding: .day, value: 1, to: start)!
+                    let calendar = AppTimeZone.calendar
+                    let start = calendar.startOfDay(for: date)
+                    let end = calendar.date(byAdding: .day, value: 1, to: start)!
 
                     request.predicate = NSPredicate(
                         format: "date >= %@ AND date < %@", start as NSDate, end as NSDate

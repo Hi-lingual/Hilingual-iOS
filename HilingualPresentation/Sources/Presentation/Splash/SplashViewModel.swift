@@ -7,6 +7,7 @@
 
 import Foundation
 import Combine
+import HilingualCore
 import HilingualDomain
 
 public final class SplashViewModel: BaseViewModel {
@@ -54,6 +55,7 @@ public final class SplashViewModel: BaseViewModel {
     public func transform(input: Input) -> Output {
         input.viewDidLoad
             .sink { [weak self] _ in
+                AppTimeZone.configureCurrent()
                 self?.handleAutoLogin()
             }
             .store(in: &cancellables)

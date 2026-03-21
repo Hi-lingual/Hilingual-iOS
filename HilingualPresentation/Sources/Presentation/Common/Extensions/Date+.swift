@@ -6,12 +6,11 @@
 //
 
 import Foundation
+import HilingualCore
 
 extension Date {
     func toFormattedString(_ format: String) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = format
-        formatter.locale = Locale(identifier: "ko_KR")
+        let formatter = AppTimeZone.formatter(format)
         return formatter.string(from: self)
     }
 }
