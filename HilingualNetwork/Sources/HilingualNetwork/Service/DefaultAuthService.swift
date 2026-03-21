@@ -20,9 +20,12 @@ public final class DefaultAuthService: BaseService<AuthAPI>, AuthService {
 
     //TODO: - Uikit 의존성 제거하기
     public func loginWithApple(token: String) -> AnyPublisher<LoginResponseDTO, Error> {
+        let deviceUUID = currentDeviceUUID()
+
         let body = AuthLoginRequestDTO(
             provider: "APPLE",
             role: "USER",
+            deviceUuid: deviceUUID,
             deviceName: UIDevice.current.name,
             deviceType: {
 #if targetEnvironment(macCatalyst)
@@ -70,5 +73,16 @@ public final class DefaultAuthService: BaseService<AuthAPI>, AuthService {
             .map { _ in }
             .mapError { $0 as Error }
             .eraseToAnyPublisher()
+    }
+
+    //MARK: - private method
+
+    private func currentDeviceUUID() -> String {
+        if !KeychainHandler.deviceUUID.isEmpty {
+            return KeychainHandler.deviceUUID
+        }
+        let newUUID = UUID().uuidString
+        KeychainHandler.deviceUUID = newUUID
+        return newUUID
     }
 }

@@ -16,6 +16,7 @@ public struct LoginResponseDTO: Decodable {
 public struct AuthLoginRequestDTO: Encodable {
     public let provider: String
     public let role: String
+    public let deviceUuid: String
     public let deviceName: String
     public let deviceType: String
     public let osType: String
@@ -25,6 +26,7 @@ public struct AuthLoginRequestDTO: Encodable {
     public init(
         provider: String,
         role: String,
+        deviceUuid: String,
         deviceName: String,
         deviceType: String,
         osType: String,
@@ -33,6 +35,7 @@ public struct AuthLoginRequestDTO: Encodable {
     ) {
         self.provider = provider
         self.role = role
+        self.deviceUuid = deviceUuid
         self.deviceName = deviceName
         self.deviceType = deviceType
         self.osType = osType
