@@ -75,7 +75,7 @@ public final class RecommendedExpressionViewController: BaseUIViewController<Rec
     
     private func setupAdBanner() {
         let banner = BannerView()
-        banner.adUnitID = Bundle.main.infoDictionary?["AD_BANNER_UNIT_ID"] as? String ?? ""
+        banner.adUnitID = Bundle.main.infoDictionary?["AD_FEEDBACK_UNIT_ID"] as? String ?? ""
         banner.rootViewController = self
         banner.delegate = self
         self.bannerView = banner
