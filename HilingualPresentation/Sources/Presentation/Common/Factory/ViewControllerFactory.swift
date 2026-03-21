@@ -7,6 +7,7 @@
 
 import Foundation
 
+@MainActor
 public protocol ViewControllerFactory {
     func makeSplashViewController() -> SplashViewController
     func makeTabBarViewController() -> TabBarViewController

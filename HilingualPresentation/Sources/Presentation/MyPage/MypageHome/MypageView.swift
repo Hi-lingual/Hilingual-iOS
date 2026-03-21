@@ -8,6 +8,7 @@
 import UIKit
 import SnapKit
 import Kingfisher
+import GoogleMobileAds
 
 final class MypageView: BaseUIView {
 
@@ -131,15 +132,19 @@ final class MypageView: BaseUIView {
     ]
 
     private var menuRows: [UIControl] = []
-
+    
+    let bannerView = BannerView()
+    
     // MARK: - Custom Method
 
     override func setUI() {
         backgroundColor = .gray100
-
-        addSubview(scrollView)
+        
+        addSubviews(scrollView)
         scrollView.addSubview(contentView)
         contentView.addSubviews(titleLabel, profileCardView, menuCardView, versionIconView, versionLabel, versionValueLabel, logoutButton)
+        // TODO: 마이페이지 광고 재노출 시 배너뷰 서브뷰 복구
+//        contentView.addSubviews(titleLabel, profileCardView, menuCardView, versionIconView, versionLabel, versionValueLabel, logoutButton, bannerView)
         profileCardView.addSubviews(profileImageView, nicknameLabel, editButton, feedButton)
 
         for item in menuItems {
@@ -200,7 +205,7 @@ final class MypageView: BaseUIView {
             $0.top.equalTo(profileCardView.snp.bottom).offset(16)
             $0.leading.trailing.equalToSuperview().inset(16)
         }
-
+        
         for (index, row) in menuRows.enumerated() {
             row.snp.makeConstraints {
                 $0.leading.trailing.equalToSuperview()
@@ -238,6 +243,12 @@ final class MypageView: BaseUIView {
             $0.height.equalTo(44)
             $0.bottom.equalToSuperview().inset(40)
         }
+        
+        // TODO: 마이페이지 광고 재노출 시 배너뷰 제약 복구
+//        bannerView.snp.makeConstraints {
+//            $0.bottom.equalTo(safeAreaLayoutGuide)
+//            $0.horizontalEdges.equalToSuperview()
+//        }
     }
 
     // MARK: - Private Method

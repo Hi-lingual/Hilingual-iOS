@@ -33,7 +33,8 @@ final class SelectedInfo: UIView {
         let view = EmptyView()
         view.configure(
             message: "작성된 일기가 없어요.\n좋은 하루 보내셨기를 바라요!",
-            imageName: "img_diary_empty_ios"
+            imageName: "img_diary_empty_ios",
+            font: .pretendard(.body_m_14)
         )
         return view
     }()
@@ -42,7 +43,8 @@ final class SelectedInfo: UIView {
         let view = EmptyView()
         view.configure(
             message: "아직 작성 가능한 시간이 아니에요.\n오늘의 일기를 작성해주세요!",
-            imageName: "img_diary_lock_ios"
+            imageName: "img_diary_lock_ios",
+            font: .pretendard(.body_m_14)
         )
         return view
     }()
@@ -197,7 +199,8 @@ final class SelectedInfo: UIView {
         menu.snp.makeConstraints {
             $0.top.equalTo(moreImageView.snp.bottom).offset(4)
             $0.trailing.equalTo(moreImageView.snp.trailing)
-            $0.height.equalTo(96)
+            // TODO: 일기 삭제 기능 재오픈 시 홈 메뉴 높이 원복 검토
+            $0.height.equalTo(48)
             $0.width.equalTo(182)
         }
     }
@@ -302,15 +305,17 @@ final class SelectedInfo: UIView {
                 notWrittenLabel.text = "게시된 일기"
                 notWrittenLabel.textColor = .hilingualBlue
                 menu.configure(items: [
-                    ("비공개하기", UIImage(named: "ic_hide_24_ios", in: .module, compatibleWith: nil), .gray700),
-                    ("삭제하기", UIImage(named: "ic_delete_24_ios", in: .module, compatibleWith: nil), .alertRed)
+                    ("비공개하기", UIImage(named: "ic_hide_24_ios", in: .module, compatibleWith: nil), .gray700)
+                    // TODO: 일기 삭제 기능 재오픈 시 삭제 메뉴 항목 복구
+//                    ("삭제하기", UIImage(named: "ic_delete_24_ios", in: .module, compatibleWith: nil), .alertRed)
                 ])
             } else { // 비공개 일기
                 notWrittenLabel.text = "비공개 일기"
                 notWrittenLabel.textColor = .gray400
                 menu.configure(items: [
-                    ("피드에 게시하기", UIImage(named: "ic_upload_24_ios", in: .module, compatibleWith: nil), .gray700),
-                    ("삭제하기", UIImage(named: "ic_delete_24_ios", in: .module, compatibleWith: nil), .alertRed)
+                    ("피드에 게시하기", UIImage(named: "ic_upload_24_ios", in: .module, compatibleWith: nil), .gray700)
+                    // TODO: 일기 삭제 기능 재오픈 시 삭제 메뉴 항목 복구
+//                    ("삭제하기", UIImage(named: "ic_delete_24_ios", in: .module, compatibleWith: nil), .alertRed)
                 ])
             }
         } else {
@@ -372,8 +377,9 @@ extension SelectedInfo: ActionMenuDelegate {
             } else {
                 onMenuAction?(.publish, diaryId)
             }
-        case 1:
-            onMenuAction?(.delete, diaryId)
+        // TODO: 일기 삭제 기능 재오픈 시 삭제 액션 분기 복구
+//        case 1:
+//            onMenuAction?(.delete, diaryId)
         default: break
         }
     }

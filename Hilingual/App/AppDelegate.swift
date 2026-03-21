@@ -7,6 +7,7 @@
 
 import UIKit
 import FirebaseCore
+import GoogleMobileAds
 import HilingualData
 
 @main
@@ -15,6 +16,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         FirebaseApp.configure()
+        // TODO: 광고 기능 재활성화 시 GoogleMobileAds 초기화 복구
+        // MobileAds.shared.start()
         UIFont.registerPretendardFonts()
 
 //        for key in UserDefaults.standard.dictionaryRepresentation().keys {
@@ -42,4 +45,3 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 
 }
-
