@@ -1,0 +1,64 @@
+name: Push New QA Build Upload Branch
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: "Base branch for upload branch"
+        required: true
+        default: "develop"
+      app_version:
+        description: "Updating Hilingual Version"
+        required: true
+      requested_by:
+        description: "Who requested this run"
+        required: false
+
+permissions:
+  contents: write
+
+jobs:
+  create-upload-branch:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.x"
+
+      - name: Switch to base branch
+        run: |
+          BASE_BRANCH="${{ github.event.inputs.branch }}"
+          git fetch origin "${BASE_BRANCH}"
+          git switch --create "${BASE_BRANCH}" --track "origin/${BASE_BRANCH}" || git switch "${BASE_BRANCH}"
+          git pull origin "${BASE_BRANCH}" --no-rebase
+
+      - name: Build upload branch name
+        id: branch_name
+        run: |
+          BASE="${{ github.event.inputs.branch }}"
+          VERSION="${{ github.event.inputs.app_version }}"
+          SAFE_BASE=$(echo "$BASE" | tr '/.' '--')
+          SAFE_VERSION=$(echo "$VERSION" | tr '.' '-')
+          echo "name=upload/${SAFE_BASE}-${SAFE_VERSION}-$(date +%Y%m%d-%H%M%S)" >> "$GITHUB_OUTPUT"
+
+      - name: Update xcconfig file
+        run: |
+          python3 scripts/update_marketing_version.py \
+            Hilingual.xcodeproj/project.pbxproj \
+            "${{ github.event.inputs.app_version }}"
+
+      - name: Create and push branch
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          git switch -c "${{ steps.branch_name.outputs.name }}"
+          git add Hilingual.xcodeproj/project.pbxproj
+          git commit -m "Update version to ${{ github.event.inputs.app_version }} by ${{ github.event.inputs.requested_by }}" || true
+          git push -u origin "${{ steps.branch_name.outputs.name }}"
