@@ -1,7 +1,7 @@
 #!/bin/sh
 set -eu
 
-CONFIG_DIR="$CI_WORKSPACE/Hilingual/App/Config"
+CONFIG_DIR="$CI_PRIMARY_REPOSITORY_PATH/Hilingual/App/Config"
 DEBUG_TEMPLATE="$CONFIG_DIR/Debug.xcconfig.template"
 RELEASE_TEMPLATE="$CONFIG_DIR/Release.xcconfig.template"
 DEBUG_OUTPUT="$CONFIG_DIR/Debug.xcconfig"
