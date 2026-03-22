@@ -31,9 +31,10 @@ public struct DiaryWritingEntity {
 
 public struct DiaryWritingResponseEntity {
     public let diaryId: Int
+    public let isAdWatched: Bool
 
-    public init(diaryId: Int) {
+    public init(diaryId: Int, isAdWatched: Bool) {
         self.diaryId = diaryId
+        self.isAdWatched = isAdWatched
     }
 }
-

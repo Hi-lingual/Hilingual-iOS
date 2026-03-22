@@ -19,6 +19,7 @@ final class ToastMessage: UIView {
 
     private var messageTrailingToButton: Constraint?
     private var messageTrailingToSuperview: Constraint?
+    private var bottomConstraint: Constraint?
     
     public var action: (() -> Void)?
 
@@ -90,11 +91,15 @@ final class ToastMessage: UIView {
     override func didMoveToSuperview() {
         super.didMoveToSuperview()
         
-        guard superview != nil else { return }
+        guard let superview else { return }
 
         self.snp.makeConstraints {
             $0.centerX.equalToSuperview()
-            $0.bottom.equalToSuperview().inset(116).priority(400)
+            bottomConstraint = $0.bottom
+                .equalTo(superview.safeAreaLayoutGuide.snp.bottom)
+                .inset(12)
+                .priority(400)
+                .constraint
         }
     }
     

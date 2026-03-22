@@ -123,7 +123,7 @@ public final class LoadingViewController: BaseUIViewController<LoadingViewModel>
     
     private func loadInterstitialAd() {
         InterstitialAd.load(
-            with: "ca-app-pub-3940256099942544/4411468910", // TODO: 실제 ID로 교체
+            with: Bundle.main.infoDictionary?["AD_INTERSTITIAL_UNIT_ID"] as? String ?? "",
             request: Request()
         ) { [weak self] ad, error in
             if let error {
@@ -167,6 +167,7 @@ public final class LoadingViewController: BaseUIViewController<LoadingViewModel>
 extension LoadingViewController: FullScreenContentDelegate {
     public func adDidDismissFullScreenContent(_ ad: FullScreenPresentingAd) {
         guard let diaryId = currentDiaryId else { return }
+        viewModel?.patchAdWatch(diaryId: diaryId)
         pushDiaryDetail(diaryId: diaryId)
     }
     

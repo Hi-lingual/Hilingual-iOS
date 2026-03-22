@@ -132,7 +132,9 @@ final class MypageView: BaseUIView {
     ]
 
     private var menuRows: [UIControl] = []
+    private var bannerHeightConstraint: Constraint?
     
+    let bannerContainerView = UIView()
     let bannerView = BannerView()
     
     // MARK: - Custom Method
@@ -140,12 +142,12 @@ final class MypageView: BaseUIView {
     override func setUI() {
         backgroundColor = .gray100
         
-        addSubviews(scrollView)
+        addSubviews(scrollView, bannerContainerView)
         scrollView.addSubview(contentView)
         contentView.addSubviews(titleLabel, profileCardView, menuCardView, versionIconView, versionLabel, versionValueLabel, logoutButton)
-        // TODO: 마이페이지 광고 재노출 시 배너뷰 서브뷰 복구
-//        contentView.addSubviews(titleLabel, profileCardView, menuCardView, versionIconView, versionLabel, versionValueLabel, logoutButton, bannerView)
         profileCardView.addSubviews(profileImageView, nicknameLabel, editButton, feedButton)
+        bannerContainerView.addSubview(bannerView)
+        bannerContainerView.isHidden = true
 
         for item in menuItems {
             let row = makeMenuRowView(title: item.title, icon: item.icon) { [weak self] in
@@ -160,7 +162,8 @@ final class MypageView: BaseUIView {
 
     override func setLayout() {
         scrollView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
+            $0.top.horizontalEdges.equalToSuperview()
+            $0.bottom.equalTo(bannerContainerView.snp.top)
         }
 
         contentView.snp.makeConstraints {
@@ -244,11 +247,15 @@ final class MypageView: BaseUIView {
             $0.bottom.equalToSuperview().inset(40)
         }
         
-        // TODO: 마이페이지 광고 재노출 시 배너뷰 제약 복구
-//        bannerView.snp.makeConstraints {
-//            $0.bottom.equalTo(safeAreaLayoutGuide)
-//            $0.horizontalEdges.equalToSuperview()
-//        }
+        bannerContainerView.snp.makeConstraints {
+            $0.bottom.equalTo(safeAreaLayoutGuide)
+            $0.horizontalEdges.equalToSuperview()
+            bannerHeightConstraint = $0.height.equalTo(0).constraint
+        }
+
+        bannerView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
     }
 
     // MARK: - Private Method
@@ -301,6 +308,14 @@ final class MypageView: BaseUIView {
 
     @objc private func handleEditProfileTap() {
         onEditProfileTap?()
+    }
+
+    // MARK: - Ad
+
+    func updateBannerHeight(_ height: CGFloat) {
+        let clamped = min(height, 70)
+        bannerContainerView.isHidden = clamped <= 0
+        bannerHeightConstraint?.update(offset: max(clamped, 0))
     }
 }
 

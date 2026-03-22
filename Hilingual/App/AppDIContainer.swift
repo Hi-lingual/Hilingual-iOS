@@ -360,6 +360,20 @@ extension AppDIContainer {
 }
 
 extension AppDIContainer {
+    private func makeDiaryAdWatchService() -> DiaryAdWatchService {
+        return DefaultDiaryAdWatchService()
+    }
+
+    private func makeDiaryAdWatchRepository() -> DiaryAdWatchRepository {
+        return DefaultDiaryAdWatchRepository(service: makeDiaryAdWatchService())
+    }
+
+    func makeDiaryAdWatchUseCase() -> DiaryAdWatchUseCase {
+        return DefaultDiaryAdWatchUseCase(repository: makeDiaryAdWatchRepository())
+    }
+}
+
+extension AppDIContainer {
     private func makePublishDiaryUseCase() -> PublishDiaryUseCase {
         return DefaultPublishDiaryUseCase(repository: makePublishDiaryRepository())
     }
@@ -452,7 +466,11 @@ extension AppDIContainer {
 
 extension AppDIContainer {
     private func makeLoadingViewModel() -> LoadingViewModel {
-        return LoadingViewModel(diaryWritingUseCase: makeDiaryWritingUseCase(), uploadImageUseCase: makeUploadImageUseCase())
+        return LoadingViewModel(
+            diaryWritingUseCase: makeDiaryWritingUseCase(),
+            uploadImageUseCase: makeUploadImageUseCase(),
+            diaryAdWatchUseCase: makeDiaryAdWatchUseCase()
+        )
     }
 }
 

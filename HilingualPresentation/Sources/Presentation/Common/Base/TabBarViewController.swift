@@ -12,7 +12,7 @@ public final class TabBarViewController: UIViewController {
 
     private enum Layout {
         static let tabHeight: CGFloat = 58
-        static let adHeight: CGFloat = 24
+        static let adHeight: CGFloat = 32
     }
 
     // MARK: - Properties
@@ -58,12 +58,12 @@ public final class TabBarViewController: UIViewController {
 
     public override func viewDidLoad() {
         super.viewDidLoad()
-        customTabBarView.loadAd()
         view.backgroundColor = .white
         setupChildViewControllers()
         setupUI()
         setupLayout()
         setupTabBarAction()
+        customTabBarView.loadAd(rootViewController: self)
         selectTab(at: 0)
     }
 
@@ -158,7 +158,7 @@ public final class TabBarViewController: UIViewController {
     // MARK: - TabBar Visibility
 
     private func updateTabBarVisibility(for navigationController: UINavigationController) {
-        let shouldHide = navigationController.topViewController?.hidesBottomBarWhenPushed ?? false
+        let shouldHide = navigationController.viewControllers.count > 1
         setTabBarHidden(shouldHide, animated: false)
     }
 
@@ -224,8 +224,12 @@ extension TabBarViewController: UINavigationControllerDelegate {
         willShow viewController: UIViewController,
         animated: Bool
     ) {
-        let shouldHide = viewController.hidesBottomBarWhenPushed
+        let shouldHide = !isRootViewController(viewController, in: navigationController)
         setTabBarHidden(shouldHide, animated: animated)
+    }
+
+    private func isRootViewController(_ viewController: UIViewController, in navigationController: UINavigationController) -> Bool {
+        navigationController.viewControllers.first === viewController
     }
 }
 
