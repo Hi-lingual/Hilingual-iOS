@@ -62,10 +62,10 @@ final class CustomTabBarView: UIView {
     private let adBadgeLabel: UILabel = {
         let label = UILabel()
         label.text = "AD"
-        label.font = .pretendard(.cap_r_12)
+        label.font = .pretendard(.body_m_12)
         label.textColor = .white
         label.textAlignment = .center
-        label.backgroundColor = .gray500
+        label.backgroundColor = .gray400
         label.layer.cornerRadius = 8
         label.layer.masksToBounds = true
         return label
