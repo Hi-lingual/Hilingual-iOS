@@ -186,6 +186,8 @@ public final class MypageViewController: BaseUIViewController<MypageViewModel> {
 extension MypageViewController: BannerViewDelegate {
 
     public func bannerViewDidReceiveAd(_ bannerView: BannerView) {
+        mypageView.bannerPlaceholderImageView.removeFromSuperview()
+
         hasReceivedBannerOnce = true
         bannerView.alpha = 0
         UIView.animate(withDuration: 1) {
