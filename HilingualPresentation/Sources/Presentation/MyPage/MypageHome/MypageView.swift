@@ -135,6 +135,14 @@ final class MypageView: BaseUIView {
     private var bannerHeightConstraint: Constraint?
     
     let bannerContainerView = UIView()
+    
+    let bannerPlaceholderImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.image = UIImage(resource: .imgLoadingMypageIos)
+        imageView.contentMode = .scaleAspectFill
+        return imageView
+    }()
+    
     let bannerView = BannerView()
     
     // MARK: - Custom Method
@@ -147,8 +155,10 @@ final class MypageView: BaseUIView {
         contentView.addSubviews(titleLabel, profileCardView, menuCardView, versionIconView, versionLabel, versionValueLabel, logoutButton)
         profileCardView.addSubviews(profileImageView, nicknameLabel, editButton, feedButton)
         bannerContainerView.addSubview(bannerView)
-        bannerContainerView.isHidden = true
-
+        bannerView.addSubview(bannerPlaceholderImageView)
+        bannerContainerView.isHidden = false
+        bannerHeightConstraint?.update(offset: 70)
+        
         for item in menuItems {
             let row = makeMenuRowView(title: item.title, icon: item.icon) { [weak self] in
                 self?.onMenuTap?(item.item)
@@ -253,6 +263,10 @@ final class MypageView: BaseUIView {
             bannerHeightConstraint = $0.height.equalTo(0).constraint
         }
 
+        bannerPlaceholderImageView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
+        
         bannerView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
