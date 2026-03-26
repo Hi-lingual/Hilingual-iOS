@@ -228,6 +228,10 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
 
                 let toast = ToastMessage()
                 self.view.addSubview(toast)
+                
+                toast.snp.makeConstraints {
+                    $0.bottom.equalToSuperview().inset(116)
+                }
 
                 if isPublished {
                     toast.configure(type: .withButton, message: "일기가 게시되었어요!")
