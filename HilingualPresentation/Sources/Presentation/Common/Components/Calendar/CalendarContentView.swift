@@ -197,6 +197,19 @@ extension CalendarContentView: UICollectionViewDataSource, UICollectionViewDeleg
 
         return cell
     }
+    
+    func collectionView(
+        _ collectionView: UICollectionView,
+        shouldSelectItemAt indexPath: IndexPath
+    ) -> Bool {
+        let date = days[indexPath.item]
+
+        return calendar.isDate(
+            date,
+            equalTo: currentDate,
+            toGranularity: .month
+        )
+    }
 
     func collectionView(
         _ collectionView: UICollectionView,
