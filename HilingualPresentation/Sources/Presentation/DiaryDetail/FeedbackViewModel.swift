@@ -69,7 +69,6 @@ public final class FeedbackViewModel: BaseViewModel{
                     })
                     .store(in: &self.cancellables)
                 
-                
                 self.diaryDetailUseCase.fetchDiaryDetail(diaryId: diaryId)
                     .sink(
                         receiveCompletion: { [weak self] completion in
