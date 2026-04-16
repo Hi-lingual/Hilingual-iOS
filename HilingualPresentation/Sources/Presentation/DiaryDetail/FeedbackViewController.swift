@@ -138,6 +138,17 @@ public final class FeedbackViewController: BaseUIViewController<FeedbackViewMode
     }
 
     private func bindOutput(_ output: FeedbackViewModel.Output) {
+        
+        output.fetchTopicResult
+            .receive(on: RunLoop.main)
+            .sink { [weak self] topic in
+                self?.feedbackView.setTopic(
+                    kor: topic.topicKor,
+                    en: topic.topicEn
+                )
+            }
+            .store(in: &cancellables)
+        
         output.fetchFeedbackResult
             .receive(on: RunLoop.main)
             .sink(

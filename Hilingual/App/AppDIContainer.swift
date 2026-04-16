@@ -60,7 +60,8 @@ final class AppDIContainer: ViewControllerFactory {
         let viewModel = FeedbackViewModel(
                 diaryId: diaryId,
                 diaryDetailUseCase: makeDiaryDetailUseCase(),
-                feedbackUseCase: makeFeedbackUseCase()
+                feedbackUseCase: makeFeedbackUseCase(),
+                homeUseCase: makeHomeUseCase()
             )
             return FeedbackViewController(viewModel: viewModel, diContainer:  self)
     }
@@ -389,7 +390,7 @@ extension AppDIContainer {
     }
         
     private func makeFeedbackViewModel(diaryId: Int) -> FeedbackViewModel {
-        return FeedbackViewModel(diaryId: diaryId, diaryDetailUseCase: makeDiaryDetailUseCase(), feedbackUseCase: makeFeedbackUseCase())
+        return FeedbackViewModel(diaryId: diaryId, diaryDetailUseCase: makeDiaryDetailUseCase(), feedbackUseCase: makeFeedbackUseCase(), homeUseCase: makeHomeUseCase())
     }
     
     private func makeFeedbackUseCase() -> FeedbackUseCase {
