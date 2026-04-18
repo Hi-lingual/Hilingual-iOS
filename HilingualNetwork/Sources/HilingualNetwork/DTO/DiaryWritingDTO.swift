@@ -41,4 +41,5 @@ public struct DiaryWritingResponseDTO: Decodable {
 
 public struct DiaryIdDTO: Decodable {
     public let diaryId: Int
+    public let isAdWatched: Bool
 }

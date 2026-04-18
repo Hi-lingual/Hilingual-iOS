@@ -15,20 +15,20 @@ struct PhraseViewData {
     let explanation: String
     let reason: String
     let isMarked: Bool
-    let createdAt: String // 빈값 허용
+    let createdAt: String
 }
 
 final class RecommendedExpressionView: BaseUIView {
     
+    // MARK: - Properties
+
     var onBookmarkToggle: ((Int64, Bool) -> Void)?
 
-    // MARK: - UI Properties
-    
     private let scrollView = UIScrollView()
     private let contentView = UIStackView()
-    
+
     let bottomSpacingView = UIView()
-    
+
     var dateLabel: UILabel = {
         let label = UILabel()
         label.font = .pretendard(.body_m_16)
@@ -37,41 +37,71 @@ final class RecommendedExpressionView: BaseUIView {
     }()
     
     // MARK: - Custom Method
-    
+
     override func setUI() {
         self.backgroundColor = .gray100
         contentView.axis = .vertical
         contentView.spacing = 12
         self.addSubview(scrollView)
         scrollView.addSubview(contentView)
-        contentView.addArrangedSubviews(dateLabel,bottomSpacingView)
+        contentView.addArrangedSubviews(dateLabel, bottomSpacingView)
     }
-    
+
     override func setLayout() {
         scrollView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
-        
+
         contentView.snp.makeConstraints {
             $0.edges.equalTo(scrollView.contentLayoutGuide)
-            $0.width.equalTo(scrollView.frameLayoutGuide).offset(-16)
+            $0.width.equalTo(scrollView.frameLayoutGuide)
         }
-        
+
         contentView.isLayoutMarginsRelativeArrangement = true
-        contentView.layoutMargins = UIEdgeInsets(top: 24, left: 16, bottom: 0, right: 0)
+        contentView.layoutMargins = UIEdgeInsets(top: 24, left: 0, bottom: 0, right: 0)
+
+        dateLabel.snp.makeConstraints {
+            $0.horizontalEdges.equalToSuperview().inset(16)
+        }
 
         bottomSpacingView.snp.makeConstraints {
             $0.height.equalTo(16)
         }
     }
-    
+
+    // MARK: - Ad
+
+    private var adBannerView: UIView?
+
+    func setAdBannerView(_ adView: UIView) {
+        adBannerView?.removeFromSuperview()
+        adBannerView = adView
+
+        let index = contentView.arrangedSubviews.firstIndex(of: bottomSpacingView) ?? contentView.arrangedSubviews.count
+        contentView.insertArrangedSubview(adView, at: index)
+        
+        if index > 0 {
+            let previousView = contentView.arrangedSubviews[index - 1]
+            contentView.setCustomSpacing(24, after: previousView)
+        }
+        
+        adView.snp.makeConstraints {
+            $0.horizontalEdges.equalToSuperview()
+        }
+    }
+
+    func removeAdBannerView() {
+        adBannerView?.removeFromSuperview()
+        adBannerView = nil
+    }
+
     // MARK: - Configure
-    
+
     func configure(dataList: [PhraseViewData]) {
         contentView.arrangedSubviews
-            .filter { $0 !== dateLabel && $0 !== bottomSpacingView }
+            .filter { $0 !== dateLabel && $0 !== bottomSpacingView && $0 !== adBannerView }
             .forEach { $0.removeFromSuperview() }
-        
+
         dataList.forEach { phrase in
             let wordCard = WordCard()
             wordCard.configure(
@@ -89,14 +119,17 @@ final class RecommendedExpressionView: BaseUIView {
             wordCard.onBookmarkToggled = { isBookmarked in
                 self.onBookmarkToggle?(phrase.phraseId, isBookmarked)
             }
-            contentView.insertArrangedSubview(wordCard, at: contentView.arrangedSubviews.count - 1) // bottomSpacingView 위에 삽입
+            contentView.insertArrangedSubview(wordCard, at: contentView.arrangedSubviews.count - 1)
+            wordCard.snp.makeConstraints {
+                $0.horizontalEdges.equalToSuperview().inset(16)
+            }
         }
     }
-    
+
     func scrollToTop() {
         scrollView.setContentOffset(.zero, animated: true)
     }
-    
+
     func setDate(_ date: String) {
         self.dateLabel.attributedText = .pretendard(.body_m_16, text: date)
     }

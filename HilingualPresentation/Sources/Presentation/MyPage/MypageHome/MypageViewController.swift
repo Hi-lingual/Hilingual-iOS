@@ -16,6 +16,8 @@ public final class MypageViewController: BaseUIViewController<MypageViewModel> {
     
     private let mypageView = MypageView()
     private let logoutTappedSubject = PassthroughSubject<Void, Never>()
+    private var lastLoadedBannerWidth: CGFloat = 0
+    private var hasReceivedBannerOnce = false
     
     // MARK: - Life Cycle
     
@@ -25,10 +27,9 @@ public final class MypageViewController: BaseUIViewController<MypageViewModel> {
         viewModel?.fetchUserProfile()
     }
     
-    public override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        // TODO: 마이페이지 광고 재노출 시 배너 로드 호출 복구
-        // loadBannerAd()
+    public override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        loadBannerAd()
     }
     
     // MARK: - Custom Method
@@ -163,15 +164,18 @@ public final class MypageViewController: BaseUIViewController<MypageViewModel> {
     }
     
     private func loadBannerAd() {
-        let width = mypageView.bannerView.bounds.width
+        let width = floor(mypageView.bannerContainerView.bounds.width)
         guard width > 0 else { return }
+        guard abs(lastLoadedBannerWidth - width) > 0.5 else { return }
+        lastLoadedBannerWidth = width
 
         let adSize = largeAnchoredAdaptiveBanner(width: width)
 
         mypageView.bannerView.delegate = self
         mypageView.bannerView.adSize = adSize
         mypageView.bannerView.rootViewController = self
-        mypageView.bannerView.adUnitID = "ca-app-pub-3940256099942544/2435281174"
+        mypageView.bannerView.adUnitID = Bundle.main.infoDictionary?["AD_BANNER_UNIT_ID"] as? String ?? ""
+        mypageView.updateBannerHeight(adSize.size.height)
 
         mypageView.bannerView.load(Request())
     }
@@ -182,13 +186,19 @@ public final class MypageViewController: BaseUIViewController<MypageViewModel> {
 extension MypageViewController: BannerViewDelegate {
 
     public func bannerViewDidReceiveAd(_ bannerView: BannerView) {
+        mypageView.bannerPlaceholderImageView.removeFromSuperview()
+
+        hasReceivedBannerOnce = true
         bannerView.alpha = 0
         UIView.animate(withDuration: 1) {
             bannerView.alpha = 1
         }
+        mypageView.updateBannerHeight(bannerView.adSize.size.height)
     }
 
     public func bannerView(_ bannerView: BannerView, didFailToReceiveAdWithError error: Error) {
         print("AdMob error:", error)
+        guard hasReceivedBannerOnce == false else { return }
+        mypageView.updateBannerHeight(0)
     }
 }

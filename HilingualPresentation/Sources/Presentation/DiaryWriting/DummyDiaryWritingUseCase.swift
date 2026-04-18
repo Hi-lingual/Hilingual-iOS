@@ -13,7 +13,7 @@ public class DummyDiaryWritingUseCase: DiaryWritingUseCase {
     public init() {}
     
     public func postDiaryWriting(_ entity: DiaryWritingEntity) -> AnyPublisher<DiaryWritingResponseEntity, Error> {
-        let mockResponse = DiaryWritingResponseEntity(diaryId: 123)
+        let mockResponse = DiaryWritingResponseEntity(diaryId: 123, isAdWatched: false)
 
         return Just(mockResponse)
             .setFailureType(to: Error.self)

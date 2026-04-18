@@ -1,0 +1,105 @@
+name: Push New QA Build Upload Branch
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: "Base branch for upload branch"
+        required: true
+        default: "develop"
+      app_version:
+        description: "Updating Hilingual Version"
+        required: true
+      requested_by:
+        description: "Who requested this run"
+        required: false
+
+permissions:
+  contents: write
+
+jobs:
+  create-upload-branch:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Switch to base branch
+        run: |
+          git fetch origin "${{ github.event.inputs.branch }}"
+          git checkout -B "${{ github.event.inputs.branch }}" "origin/${{ github.event.inputs.branch }}"
+
+      - name: Build upload branch name
+        id: branch_name
+        run: |
+          BASE="${{ github.event.inputs.branch }}"
+          VERSION="${{ github.event.inputs.app_version }}"
+          SAFE_BASE=$(echo "$BASE" | sed 's/[\/.]/-/g')
+          SAFE_VERSION=$(echo "$VERSION" | sed 's/[\/.]/-/g')
+          echo "name=upload/${SAFE_BASE}-${SAFE_VERSION}-$(date +%Y%m%d-%H%M%S)" >> "$GITHUB_OUTPUT"
+
+      - name: Update marketing version
+        id: update_version
+        shell: bash
+        run: |
+          set +e
+          OUTPUT=$(python3 scripts/update_marketing_version.py \
+            "Hilingual.xcodeproj/project.pbxproj" \
+            "${{ github.event.inputs.app_version }}" 2>&1)
+          STATUS=$?
+          set -e
+
+          echo "$OUTPUT"
+
+          {
+            echo "output<<EOF"
+            echo "$OUTPUT"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+          if [ $STATUS -ne 0 ]; then
+            if echo "$OUTPUT" | grep -q "MARKETING_VERSION is already"; then
+              echo "same_version=true" >> "$GITHUB_OUTPUT"
+              echo "No version change detected, but workflow will continue."
+            else
+              echo "Version update script failed."
+              exit $STATUS
+            fi
+          else
+            if echo "$OUTPUT" | grep -q "MARKETING_VERSION is already"; then
+              echo "same_version=true" >> "$GITHUB_OUTPUT"
+            else
+              echo "same_version=false" >> "$GITHUB_OUTPUT"
+            fi
+          fi
+
+      - name: Create and push branch
+        shell: bash
+        run: |
+          REQUESTED_BY="${{ github.event.inputs.requested_by }}"
+          if [ -z "$REQUESTED_BY" ]; then
+            REQUESTED_BY="manual"
+          fi
+
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+
+          git switch -c "${{ steps.branch_name.outputs.name }}"
+          git add Hilingual.xcodeproj/project.pbxproj
+
+          if git diff --cached --quiet; then
+            echo "No file changes to commit."
+            echo "Pushing upload branch from current commit so Xcode Cloud can detect the new branch."
+          else
+            git commit -m "Update MARKETING_VERSION to ${{ github.event.inputs.app_version }} by ${REQUESTED_BY}"
+          fi
+
+          git push -u origin "${{ steps.branch_name.outputs.name }}"

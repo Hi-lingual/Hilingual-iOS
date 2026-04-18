@@ -38,7 +38,8 @@ public final class DefaultDiaryDetailRepository: DiaryDetailRepository {
                     originalText: data.originalText,
                     rewriteText: data.rewriteText,
                     diffRanges: diffRanges,
-                    isPublished: data.isPublished
+                    isPublished: data.isPublished,
+                    isAdWatched: data.isAdWatched
                 )
             }
             .mapError { $0 as Error }

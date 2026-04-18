@@ -77,6 +77,9 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
 
     public override func viewDidLoad() {
         super.viewDidLoad()
+        
+        feedbackViewController.showsAdBanner = !showsActionButton
+        recommendedExpressionViewController.showsAdBanner = !showsActionButton
 
         AmplitudeManager.shared.send(.pageviewFeedback)
 
@@ -225,6 +228,10 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
 
                 let toast = ToastMessage()
                 self.view.addSubview(toast)
+                
+                toast.snp.makeConstraints {
+                    $0.bottom.equalToSuperview().inset(116)
+                }
 
                 if isPublished {
                     toast.configure(type: .withButton, message: "일기가 게시되었어요!")
@@ -236,7 +243,7 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
                                 entryId: self?.entryId ?? ""
                             )
                         )
-                        self?.tabBarController?.selectedIndex = 2
+                        self?.customTabBarController?.selectedIndex = 2
                         self?.navigationController?.popToRootViewController(animated: false)
                     }
 

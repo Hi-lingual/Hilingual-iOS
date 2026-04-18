@@ -229,7 +229,7 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
     @objc
     private func didTapEmptyAdd() {
         print("일기 쓰러 이동")
-        tabBarController?.selectedIndex = 0
+        customTabBarController?.selectedIndex = 0
     }
 
     @objc

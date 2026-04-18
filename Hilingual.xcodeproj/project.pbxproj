@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		1988F8F82B0F4E84A7827BF3 /* HilingualCore in Frameworks */ = {isa = PBXBuildFile; productRef = 0512DDBB07374DA5A2F41BA2 /* HilingualCore */; };
 		3A1464192F59BD11001D047C /* GoogleMobileAds in Frameworks */ = {isa = PBXBuildFile; productRef = 3A1464182F59BD11001D047C /* GoogleMobileAds */; };
+		3A7ECAC72F631F8E005B8F32 /* Release.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 3A7ECAC62F631F8E005B8F32 /* Release.xcconfig */; };
+		3A7ECAC92F631F9D005B8F32 /* Debug.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 3A7ECAC82F631F9D005B8F32 /* Debug.xcconfig */; };
 		E51B4C542E28DC11000B16D0 /* AppIcon.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E51B4C532E28DC11000B16D0 /* AppIcon.xcassets */; };
 		E51DB2052E1D9E8B000C2BEA /* AppConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = E51DB2042E1D9E8B000C2BEA /* AppConfig.swift */; };
 		E51DB2242E1E4407000C2BEA /* AppBaseURLProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E51DB2232E1E4407000C2BEA /* AppBaseURLProvider.swift */; };
@@ -23,8 +25,6 @@
 		E5CBCFB82EC4B4C900475E81 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = E5CBCFB72EC4B4C900475E81 /* GoogleService-Info.plist */; };
 		E5D5D0A92E171AC300DABE8D /* HilingualData in Frameworks */ = {isa = PBXBuildFile; productRef = E5D5D0A82E171AC300DABE8D /* HilingualData */; };
 		E5D5D0AC2E17289000DABE8D /* HilingualPresentation in Frameworks */ = {isa = PBXBuildFile; productRef = E5D5D0AB2E17289000DABE8D /* HilingualPresentation */; };
-		E98FB7222F419D66005BFD3A /* Release.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = E98FB7212F419D66005BFD3A /* Release.xcconfig */; };
-		E98FB7242F419D85005BFD3A /* Debug.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = E98FB7232F419D85005BFD3A /* Debug.xcconfig */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -42,6 +42,8 @@
 
 /* Begin PBXFileReference section */
 		14D69FD3A8604888BF89423D /* HilingualCore */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = HilingualCore; sourceTree = "<group>"; };
+		3A7ECAC62F631F8E005B8F32 /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
+		3A7ECAC82F631F9D005B8F32 /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
 		E51B4C532E28DC11000B16D0 /* AppIcon.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = AppIcon.xcassets; sourceTree = "<group>"; };
 		E51DB2002E1CF7AD000C2BEA /* Hilingual.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Hilingual.entitlements; sourceTree = "<group>"; };
 		E51DB2042E1D9E8B000C2BEA /* AppConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfig.swift; sourceTree = "<group>"; };
@@ -57,8 +59,6 @@
 		E5CBCFB72EC4B4C900475E81 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		E5D5D0A72E171AA900DABE8D /* HilingualData */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = HilingualData; sourceTree = "<group>"; };
 		E5D5D0AA2E1727BB00DABE8D /* HilingualPresentation */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = HilingualPresentation; sourceTree = "<group>"; };
-		E98FB7212F419D66005BFD3A /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
-		E98FB7232F419D85005BFD3A /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -93,8 +93,8 @@
 				E51DB2042E1D9E8B000C2BEA /* AppConfig.swift */,
 				E51DB2232E1E4407000C2BEA /* AppBaseURLProvider.swift */,
 				E51B4C532E28DC11000B16D0 /* AppIcon.xcassets */,
-				E98FB7212F419D66005BFD3A /* Release.xcconfig */,
-				E98FB7232F419D85005BFD3A /* Debug.xcconfig */,
+				3A7ECAC62F631F8E005B8F32 /* Release.xcconfig */,
+				3A7ECAC82F631F9D005B8F32 /* Debug.xcconfig */,
 			);
 			path = Config;
 			sourceTree = "<group>";
@@ -219,11 +219,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3A7ECAC72F631F8E005B8F32 /* Release.xcconfig in Resources */,
 				E51B4C542E28DC11000B16D0 /* AppIcon.xcassets in Resources */,
 				E5CBCFB82EC4B4C900475E81 /* GoogleService-Info.plist in Resources */,
+				3A7ECAC92F631F9D005B8F32 /* Debug.xcconfig in Resources */,
 				E5C79B322E15282100E461C3 /* LaunchScreen.storyboard in Resources */,
-				E98FB7242F419D85005BFD3A /* Debug.xcconfig in Resources */,
-				E98FB7222F419D66005BFD3A /* Release.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -258,7 +258,7 @@
 /* Begin XCBuildConfiguration section */
 		E5C79B222E15281B00E461C3 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = E98FB7232F419D85005BFD3A /* Debug.xcconfig */;
+			baseConfigurationReference = 3A7ECAC82F631F9D005B8F32 /* Debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon$(BUNDLE_ID_SUFFIX)";
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -267,8 +267,13 @@
 				CODE_SIGN_ENTITLEMENTS = Hilingual/Hilingual.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
+<<<<<<< HEAD
 				CURRENT_PROJECT_VERSION = 2025022201;
 				DEVELOPMENT_TEAM = C9XX799UJH;
+=======
+				CURRENT_PROJECT_VERSION = 2025032201;
+				DEVELOPMENT_TEAM = 25T76RX27Y;
+>>>>>>> 2.1.4
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Hilingual/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "Hilingual에서 제공하는 일기 텍스트 스캔기능을 위해 카메라 접근 권한이 필요합니다. 설정에서 이를 변경할 수 있습니다.";
@@ -283,7 +288,11 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+<<<<<<< HEAD
 				MARKETING_VERSION = 2.1.2;
+=======
+				MARKETING_VERSION = 2.1.4;
+>>>>>>> 2.1.4
 				PRODUCT_BUNDLE_IDENTIFIER = "com.Hilingual$(BUNDLE_ID_SUFFIX)";
 				PRODUCT_NAME = "Hilingual-Dev";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -298,7 +307,7 @@
 		};
 		E5C79B232E15281B00E461C3 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = E98FB7212F419D66005BFD3A /* Release.xcconfig */;
+			baseConfigurationReference = 3A7ECAC62F631F8E005B8F32 /* Release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon$(BUNDLE_ID_SUFFIX)";
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -307,7 +316,11 @@
 				CODE_SIGN_ENTITLEMENTS = Hilingual/Hilingual.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
+<<<<<<< HEAD
 				CURRENT_PROJECT_VERSION = 2025022201;
+=======
+				CURRENT_PROJECT_VERSION = 2025032201;
+>>>>>>> 2.1.4
 				DEVELOPMENT_TEAM = C9XX799UJH;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Hilingual/Info.plist;
@@ -323,7 +336,11 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+<<<<<<< HEAD
 				MARKETING_VERSION = 2.1.2;
+=======
+				MARKETING_VERSION = 2.1.4;
+>>>>>>> 2.1.4
 				PRODUCT_BUNDLE_IDENTIFIER = "com.Hilingual$(BUNDLE_ID_SUFFIX)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -338,7 +355,7 @@
 		};
 		E5C79B242E15281B00E461C3 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = E98FB7232F419D85005BFD3A /* Debug.xcconfig */;
+			baseConfigurationReference = 3A7ECAC82F631F9D005B8F32 /* Debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -402,7 +419,7 @@
 		};
 		E5C79B252E15281B00E461C3 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = E98FB7212F419D66005BFD3A /* Release.xcconfig */;
+			baseConfigurationReference = 3A7ECAC62F631F8E005B8F32 /* Release.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;

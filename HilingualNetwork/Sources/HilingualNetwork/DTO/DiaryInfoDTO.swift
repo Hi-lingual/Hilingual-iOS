@@ -13,5 +13,6 @@ public struct DiaryInfoDTO: Decodable {
         public let imageUrl: String?
         public let originalText: String
         public let isPublished: Bool
+        public let isAdWatched: Bool
     }
 }
