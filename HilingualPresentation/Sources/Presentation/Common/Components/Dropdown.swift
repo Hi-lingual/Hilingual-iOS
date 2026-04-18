@@ -7,6 +7,32 @@
 
 import UIKit
 
+enum DropdownStyle {
+    case today
+    case selectedDate
+
+    var backgroundColor: UIColor {
+        switch self {
+        case .today: return .gray100
+        case .selectedDate: return .white
+        }
+    }
+
+    var contentBackgroundColor: UIColor {
+        switch self {
+        case .today: return .white
+        case .selectedDate: return .gray100
+        }
+    }
+    
+    var titleText: String {
+        switch self {
+        case .today: return "오늘의 추천 주제 참고하기"
+        case .selectedDate: return "이날의 추천 주제 참고하기"
+        }
+    }
+}
+
 final class Dropdown: UIView {
 
     // MARK: - Properties
@@ -103,6 +129,15 @@ final class Dropdown: UIView {
         setActions()
     }
 
+    init(frame: CGRect = .zero, style: DropdownStyle) {
+        super.init(frame: frame)
+        setStyle()
+        setUI()
+        setLayout()
+        setActions()
+        applyStyle(style)
+    }
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -183,5 +218,21 @@ final class Dropdown: UIView {
     // MARK: - Public Methods
     func addDropdownToggleAction(_ action: @escaping () -> Void) {
         self.onToggleAction = action
+    }
+}
+
+// MARK: - Extension
+
+extension Dropdown {
+
+    func applyStyle(_ style: DropdownStyle) {
+        backgroundColor = style.backgroundColor
+        
+        dropdownBackgroundStack.backgroundColor = style.backgroundColor
+        dropdownHeaderStack.backgroundColor = style.backgroundColor
+        
+        dropdownContentStack.backgroundColor = style.contentBackgroundColor
+        
+        titleLabel.text = style.titleText
     }
 }

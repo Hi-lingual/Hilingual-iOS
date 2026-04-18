@@ -39,7 +39,9 @@ final class FeedbackView: BaseUIView {
         label.text = "교정된 일기"
         return label
     }()
-
+    
+    let dropdown = Dropdown(style: .selectedDate)
+    
     lazy var controlSwitch: CustomToggle = {
         let toggle = CustomToggle(frame: CGRect(x: 0, y: 0, width: 52, height: 28))
         toggle.addTarget(self, action: #selector(toggleButtonTapped), for: .valueChanged)
@@ -122,7 +124,7 @@ final class FeedbackView: BaseUIView {
         addSubview(scrollView)
         scrollView.addSubview(contentView)
         contentView.axis = .vertical
-        contentView.addArrangedSubviews(headerStackView, diaryTextView, feedbackStackView, bottomSpacingView)
+        contentView.addArrangedSubviews(headerStackView, dropdown, diaryTextView, feedbackStackView, bottomSpacingView)
         headerStackView.addArrangedSubviews(dateLabel, AILabel, controlSwitch)
         feedbackStackView.addArrangedSubview(feedbackLabel)
 
@@ -138,6 +140,7 @@ final class FeedbackView: BaseUIView {
         }
 
         contentView.setCustomSpacing(12, after: headerStackView)
+        contentView.setCustomSpacing(12, after: dropdown)
         headerStackView.setCustomSpacing(4, after: AILabel)
 
         controlSwitch.snp.makeConstraints {
@@ -148,6 +151,10 @@ final class FeedbackView: BaseUIView {
         contentView.layoutMargins = UIEdgeInsets(top: 18, left: 16, bottom: 0, right: 16)
         contentView.isLayoutMarginsRelativeArrangement = true
 
+        dropdown.snp.makeConstraints {
+            $0.centerX.equalToSuperview()
+        }
+        
         diaryTextView.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview().inset(16)
         }
@@ -194,6 +201,10 @@ final class FeedbackView: BaseUIView {
     }
 
     // MARK: - Configure
+
+    func setTopic(kor: String, en: String) {
+        dropdown.configure(kor: kor, en: en)
+    }
 
     func configureDiary(data: DiaryViewData) {
         currentDiaryData = data
