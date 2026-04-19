@@ -110,6 +110,17 @@
 
 <br>
 
+## 🌐 GitHub Pages
+
+This repository includes a `docs/` directory for GitHub Pages publishing.
+
+- Landing page: `docs/index.html`
+- AdMob seller declaration: `docs/app-ads.txt`
+
+If you enable GitHub Pages with the `main` branch and `/docs` folder, the site will be published automatically.
+
+<br>
+
 ## 📂 프로젝트 구조
 ```swift
 📦 HilingualNetwork (SPM 패키지)
@@ -238,4 +249,3 @@ fix: #5 캘린더 날짜 선택 오류 수정
 
 문제 해결 과정은 아래 Notion 페이지에 정리되어 있습니다.  
 [🔗 Trouble Shooting 바로가기](https://hilingual.notion.site/Trouble-Shooting-230829677ebf81028a15c2970ecba082?source=copy_link)
-
