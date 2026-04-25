@@ -5,6 +5,7 @@
 //  Created by 성현주 on 3/21/26.
 //
 
+import Foundation
 import Moya
 
 public enum DeviceAPI {
@@ -36,7 +37,8 @@ extension DeviceAPI: BaseTargetType {
     public var headers: [String: String]? {
         [
             "Content-Type": "application/json",
-            "Authorization": "Bearer \(UserDefaultHandler.accessToken)"
+            "Authorization": "Bearer \(UserDefaultHandler.accessToken)",
+            "X-Timezone": TimeZone.autoupdatingCurrent.identifier
         ]
     }
 }

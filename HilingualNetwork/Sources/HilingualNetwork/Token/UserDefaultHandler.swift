@@ -13,7 +13,4 @@ public struct UserDefaultHandler {
 
     @UserDefault(key: "refreshToken", defaultValue: "")
     public static var refreshToken: String
-
-    @UserDefault(key: "lastKnownTimezone", defaultValue: "")
-    public static var lastKnownTimezone: String
 }

@@ -136,7 +136,6 @@ public final class SplashViewModel: BaseViewModel {
         deviceUseCase.updateCurrentDevice()
             .handleEvents(receiveOutput: {
                 print("[SplashVM] ✅ device API 성공")
-                UserDefaults.standard.set(TimeZone.current.identifier, forKey: "lastKnownTimezone")
             })
             .map { response }
             .eraseToAnyPublisher()

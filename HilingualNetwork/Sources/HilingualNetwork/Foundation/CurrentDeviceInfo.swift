@@ -29,7 +29,7 @@ struct CurrentDeviceInfo {
         }()
 
         return CurrentDeviceInfo(
-            timezone: TimeZone.current.identifier,
+            timezone: TimeZone.autoupdatingCurrent.identifier,
             deviceUUID: deviceUUID,
             deviceName: UIDevice.current.name,
             deviceType: {

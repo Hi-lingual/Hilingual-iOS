@@ -87,7 +87,6 @@ public final class LoginViewModel: BaseViewModel {
         deviceUseCase.updateCurrentDevice()
             .handleEvents(receiveOutput: {
                 print("[LoginVM] ✅ device API 성공")
-                UserDefaults.standard.set(TimeZone.current.identifier, forKey: "lastKnownTimezone")
             })
             .map { result }
             .eraseToAnyPublisher()
