@@ -51,7 +51,10 @@ extension OnBoardingAPI: BaseTargetType {
     }
 
     public var headers: [String: String]? {
-        var headers = ["Content-Type": "application/json"]
+        var headers = [
+            "Content-Type": "application/json",
+            "X-Timezone": TimeZone.autoupdatingCurrent.identifier
+        ]
         switch self {
         case .registerProfile:
             headers["Authorization"] = "Bearer \(UserDefaultHandler.accessToken)"

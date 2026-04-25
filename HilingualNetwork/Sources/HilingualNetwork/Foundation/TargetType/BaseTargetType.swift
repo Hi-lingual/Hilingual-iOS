@@ -18,7 +18,8 @@ extension BaseTargetType {
 
     public var headers: [String: String]? {
         let baseHeaders: [String: String] = [
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "X-Timezone": TimeZone.autoupdatingCurrent.identifier
         ]
 
 //        let accessToken = UserDefaultHandler.accessToken

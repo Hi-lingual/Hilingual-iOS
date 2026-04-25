@@ -28,6 +28,7 @@ public final class SplashViewModel: BaseViewModel {
 
     private let tokenStore: TokenStoreUseCase
     private let socialLoginUseCase: SocialLoginUseCase
+    private let deviceUseCase: DeviceUseCase
 
     // MARK: - Subjects
 
@@ -40,10 +41,12 @@ public final class SplashViewModel: BaseViewModel {
 
     public init(
         tokenStore: TokenStoreUseCase,
-        socialLoginUseCase: SocialLoginUseCase
+        socialLoginUseCase: SocialLoginUseCase,
+        deviceUseCase: DeviceUseCase
     ) {
         self.tokenStore = tokenStore
         self.socialLoginUseCase = socialLoginUseCase
+        self.deviceUseCase = deviceUseCase
     }
 
     // MARK: - Transform
@@ -88,15 +91,21 @@ public final class SplashViewModel: BaseViewModel {
         print("[SplashVM] 🔁 토큰 재발급 시도")
 
         socialLoginUseCase.executeRefresh(with: refreshToken)
+            .flatMap { [weak self] result -> AnyPublisher<LoginResponseEntity, Error> in
+                guard let self else {
+                    return Fail(error: NSError(domain: "SplashViewModel", code: -1)).eraseToAnyPublisher()
+                }
+                return self.syncDevice(after: result)
+            }
             .sink(
                 receiveCompletion: { [weak self] completion in
                     if case .failure(let error) = completion {
-                        print("[SplashVM] ❌ 토큰 재발급 실패 → 로그인 이동 (\(error))")
+                        print("[SplashVM] ❌ 자동 로그인 실패 → 로그인 이동 (\(error))")
                         self?.loginSubject.send()
                     }
                 },
                 receiveValue: { [weak self] response in
-                    print("[SplashVM] ✅ 토큰 재발급 성공")
+                    print("[SplashVM] ✅ 자동 로그인 성공")
 
                     self?.tokenStore.save(
                         accessToken: response.accessToken,
@@ -123,4 +132,12 @@ public final class SplashViewModel: BaseViewModel {
             .store(in: &cancellables)
     }
 
+    private func syncDevice(after response: LoginResponseEntity) -> AnyPublisher<LoginResponseEntity, Error> {
+        deviceUseCase.updateCurrentDevice()
+            .handleEvents(receiveOutput: {
+                print("[SplashVM] ✅ device API 성공")
+            })
+            .map { response }
+            .eraseToAnyPublisher()
+    }
 }

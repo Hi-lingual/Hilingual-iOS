@@ -182,17 +182,19 @@ public final class FeedbackViewController: BaseUIViewController<FeedbackViewMode
                         )
                     }
 
+                    let displayDate = DisplayDateFormatter.diaryDetailDate(apiDate: entity.date)
+
                     let diaryViewData = DiaryViewData(
                         imageURL: entity.image,
-                        date: entity.date,
+                        date: displayDate,
                         originalText: entity.originalText,
                         rewriteText: entity.rewriteText,
                         diffRanges: diffRanges,
                         isHighlightingEnabled: true,
                         isPublished: entity.isPublished
                     )
-                    self?.date = entity.date
-                    self?.onDateLoaded?(entity.date)
+                    self?.date = displayDate
+                    self?.onDateLoaded?(displayDate)
                     self?.publishedInfoLoaded?(entity.isPublished)
 
                     self?.feedbackView.configureDiary(data: diaryViewData)

@@ -5,6 +5,7 @@
 //  Created by 성현주 on 7/15/25.
 //
 
+import Foundation
 import Moya
 
 public enum AuthAPI {
@@ -59,22 +60,26 @@ extension AuthAPI: NoAuthorizeTargetType {
         case let .socialLogin(_, providerToken):
             return [
                 "Content-Type": "application/json",
-                "Provider-Token": providerToken
+                "Provider-Token": providerToken,
+                "X-Timezone": TimeZone.autoupdatingCurrent.identifier
             ]
         case let .refreshToken(refreshToken):
             return [
                 "Content-Type": "application/json",
-                "Authorization": "Bearer \(refreshToken)"
+                "Authorization": "Bearer \(refreshToken)",
+                "X-Timezone": TimeZone.autoupdatingCurrent.identifier
             ]
         case .withdraw:
             return [
                 "Content-Type": "application/json",
-                "Authorization": "Bearer \(UserDefaultHandler.accessToken)"
+                "Authorization": "Bearer \(UserDefaultHandler.accessToken)",
+                "X-Timezone": TimeZone.autoupdatingCurrent.identifier
             ]
         case .logout:
             return [
                 "Content-Type": "application/json",
-                "Authorization": "Bearer \(UserDefaultHandler.accessToken)"
+                "Authorization": "Bearer \(UserDefaultHandler.accessToken)",
+                "X-Timezone": TimeZone.autoupdatingCurrent.identifier
             ]
         }
     }

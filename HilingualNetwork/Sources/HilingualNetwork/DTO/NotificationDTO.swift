@@ -12,6 +12,7 @@ public struct GeneralNotificationDTO: Decodable {
     public let targetId: Int
     public let isRead: Bool
     public let publishedAt: String
+    public let publishedAtUtc: String?
 }
 
 public struct NoticeNotificationDTO: Decodable {
@@ -20,4 +21,5 @@ public struct NoticeNotificationDTO: Decodable {
     public let title: String
     public let isRead: Bool
     public let publishedAt: String
+    public let publishedAtUtc: String?
 }

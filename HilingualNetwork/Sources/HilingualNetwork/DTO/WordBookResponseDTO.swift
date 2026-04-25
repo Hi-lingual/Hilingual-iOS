@@ -43,6 +43,8 @@ public struct WordDetailResponseDTO: Decodable {
     public let phrase: String
     public let phraseType: [String]
     public let explanation: String
-    public let writtenFrom: String
+    public let writtenFrom: String?
+    public let writtenDate: String?
+    public let savedRoot: Int?
     public let isBookmarked: Bool
 }

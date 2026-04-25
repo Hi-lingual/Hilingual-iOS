@@ -31,7 +31,9 @@ public final class DefaultWordRepository: WordBookRepository {
                             explanation: nil,
                             example: nil,
                             isMarked: wordDTO.isBookmarked,
-                            createdAt: nil
+                            writtenFrom: nil,
+                            writtenDate: nil,
+                            savedRoot: nil
                         )
                     }
                     let localizedGroup = (group.group == "today") ? "오늘" : group.group
@@ -54,7 +56,9 @@ public final class DefaultWordRepository: WordBookRepository {
                     explanation: dto.explanation,
                     example: nil,
                     isMarked: dto.isBookmarked,
-                    createdAt: dto.writtenFrom
+                    writtenFrom: dto.writtenFrom,
+                    writtenDate: dto.writtenDate,
+                    savedRoot: dto.savedRoot
                 )
             }
             .eraseToAnyPublisher()

@@ -197,7 +197,8 @@ extension AppDIContainer {
     func makeSplashViewModel() -> SplashViewModel {
         return SplashViewModel(
             tokenStore: makeTokenStoreUseCase(),
-            socialLoginUseCase: makeSocialLoginUseCase()
+            socialLoginUseCase: makeSocialLoginUseCase(),
+            deviceUseCase: makeDeviceUseCase()
         )
     }
 }
@@ -233,14 +234,31 @@ extension AppDIContainer {
          DefaultAuthService()
      }
 
+    private func makeDeviceService() -> DeviceService {
+        DefaultDeviceService()
+    }
+
+    private func makeDeviceRepository() -> DeviceRepository {
+        DefaultDeviceRepository(service: makeDeviceService())
+    }
+
+    private func makeDeviceUseCase() -> DeviceUseCase {
+        DefaultDeviceUseCase(repository: makeDeviceRepository())
+    }
+
 
     private func makeSocialLoginUseCase() -> SocialLoginUseCase {
-        DefaultSocialLoginUseCase(appleLoginUseCase: makeAppleLoginUseCase(), authRepository: makeAuthRepository())
+        DefaultSocialLoginUseCase(
+            appleLoginUseCase: makeAppleLoginUseCase(),
+            authRepository: makeAuthRepository()
+        )
     }
 
     private func makeLoginViewModel() -> LoginViewModel {
         return LoginViewModel(
-            socialLoginUseCase: makeSocialLoginUseCase(), tokenStore: makeTokenStoreUseCase()
+            socialLoginUseCase: makeSocialLoginUseCase(),
+            deviceUseCase: makeDeviceUseCase(),
+            tokenStore: makeTokenStoreUseCase()
         )
     }
 
@@ -286,7 +304,11 @@ extension AppDIContainer {
     }
 
     private func makeOnBoardingViewModel() -> OnBoardingViewModel {
-        OnBoardingViewModel(useCase: makeOnBoardingUseCase(), uploadImageUseCase: makeUploadImageUseCase())
+        OnBoardingViewModel(
+            useCase: makeOnBoardingUseCase(),
+            deviceUseCase: makeDeviceUseCase(),
+            uploadImageUseCase: makeUploadImageUseCase()
+        )
     }
 }
 
@@ -797,4 +819,3 @@ extension AppDIContainer {
         return EditProfileViewModel(fetchUserProfileUseCase: makefetchUserProfileUseCase(), uploadImageUseCase: makeUploadImageUseCase(), mypageUseCase: makeMypageUseCase())
     }
 }
-
