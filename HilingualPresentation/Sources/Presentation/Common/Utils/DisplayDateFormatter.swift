@@ -42,24 +42,29 @@ public enum DisplayDateFormatter {
         return value.toAPIDate() ?? value
     }
 
-    public static func wordSavedSource(writtenFrom: String?, fromFeed: Bool?) -> String {
-        if fromFeed == true {
-            return "피드에서 저장됨"
+    public static func wordSavedSource(writtenFrom: String?, writtenDate: String?, savedRoot: Int?) -> String {
+        if let savedRoot {
+            if savedRoot == 1 {
+                guard let writtenDate,
+                      let date = parseAPIDate(writtenDate) else {
+                    return writtenFrom ?? ""
+                }
+
+                let formatter = DateFormatter()
+                formatter.locale = Locale(identifier: "ko_KR")
+                formatter.timeZone = .autoupdatingCurrent
+                formatter.dateFormat = "yy.MM.dd"
+                return "\(formatter.string(from: date)) 일기에서 저장됨"
+            }
+
+            if savedRoot == 2 {
+                return "피드에서 저장됨"
+            }
+
+            return writtenFrom ?? ""
         }
 
-        guard let writtenFrom, !writtenFrom.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            return ""
-        }
-
-        guard let date = parseAPIDate(writtenFrom) else {
-            return writtenFrom
-        }
-
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "ko_KR")
-        formatter.timeZone = .autoupdatingCurrent
-        formatter.dateFormat = "yy.MM.dd"
-        return "\(formatter.string(from: date)) 일기에서 저장됨"
+        return writtenFrom ?? ""
     }
 
     private static func parseISO8601(_ string: String) -> Date? {
