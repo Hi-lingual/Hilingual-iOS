@@ -49,7 +49,10 @@ public final class NotificationDetailViewModel: BaseViewModel {
             .map {
                 NotificationDetailModel(
                     title: $0.title,
-                    date: $0.createdAt,
+                    date: DisplayDateFormatter.notificationDate(
+                        utcString: $0.createdAtUtc,
+                        fallback: $0.createdAt
+                    ),
                     content: $0.content
                 )
             }

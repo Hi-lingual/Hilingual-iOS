@@ -5,8 +5,6 @@
 //  Created by 성현주 on 8/26/25.
 //
 
-import Foundation
-
 import HilingualDomain
 import HilingualNetwork
 
@@ -15,6 +13,7 @@ extension NotificationDetailDTO {
         return NotificationDetailEntity(
             title: title,
             createdAt: createdAt,
+            createdAtUtc: createdAtUtc,
             content: content
         )
     }

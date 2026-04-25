@@ -115,7 +115,10 @@ public final class NotificationViewModel: BaseViewModel {
             type: type,
             title: entity.title,
             isRead: entity.isRead,
-            publishedAt: entity.publishedAt,
+            publishedAt: DisplayDateFormatter.notificationDate(
+                utcString: entity.publishedAtUtc,
+                fallback: entity.publishedAt
+            ),
             targetId: entity.targetId
         )
     }
