@@ -62,15 +62,10 @@ public final class LoginViewModel: BaseViewModel {
         print("[LoginVM] 🚀 소셜 로그인 UseCase 실행 시작")
 
         return socialLoginUseCase.execute()
-            .flatMap { [weak self] result -> AnyPublisher<LoginResponseEntity, Error> in
-                guard let self else {
-                    return Fail(error: NSError(domain: "LoginViewModel", code: -1)).eraseToAnyPublisher()
-                }
-                return self.syncDevice(after: result)
-            }
             .handleEvents(
                 receiveOutput: { [weak self] result in
                     self?.handleLoginSuccess(result)
+                    self?.syncDevice()
                 },
                 receiveCompletion: { completion in
                     print("[LoginVM] 🔚 로그인 흐름 완료: \(completion)")
@@ -83,13 +78,20 @@ public final class LoginViewModel: BaseViewModel {
             .eraseToAnyPublisher()
     }
 
-    private func syncDevice(after result: LoginResponseEntity) -> AnyPublisher<LoginResponseEntity, Error> {
+    private func syncDevice() {
         deviceUseCase.updateCurrentDevice()
             .handleEvents(receiveOutput: {
                 print("[LoginVM] ✅ device API 성공")
             })
-            .map { result }
-            .eraseToAnyPublisher()
+            .sink(
+                receiveCompletion: { completion in
+                    if case let .failure(error) = completion {
+                        print("[LoginVM] ⚠️ device API 실패: \(error.localizedDescription)")
+                    }
+                },
+                receiveValue: { _ in }
+            )
+            .store(in: &cancellables)
     }
 
     private func handleLoginSuccess(_ result: LoginResponseEntity) {
