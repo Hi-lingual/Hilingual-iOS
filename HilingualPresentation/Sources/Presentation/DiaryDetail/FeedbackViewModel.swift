@@ -80,22 +80,21 @@ public final class FeedbackViewModel: BaseViewModel{
                             guard let self else { return }
                             
                             self.diaryDetailSubject.send(detail)
-                            
-                            if let apiDate = detail.date.toAPIDate() {
-                                self.homeUseCase.fetchTopic(for: apiDate)
-                                    .sink(
-                                        receiveCompletion: { completion in
-                                            if case let .failure(error) = completion {
-                                                print("일기 상세화면 - 주제 조회 실패:", error)
-                                            }
-                                        },
-                                        receiveValue: { [weak self] topic in
-                                            guard let topic else { return }
-                                            self?.topicSubject.send(topic)
+                            let topicDate = DisplayDateFormatter.normalizedAPIDate(detail.date)
+
+                            self.homeUseCase.fetchTopic(for: topicDate)
+                                .sink(
+                                    receiveCompletion: { completion in
+                                        if case let .failure(error) = completion {
+                                            print("일기 상세화면 - 주제 조회 실패:", error)
                                         }
-                                    )
-                                    .store(in: &self.cancellables)
-                            }
+                                    },
+                                    receiveValue: { [weak self] topic in
+                                        guard let topic else { return }
+                                        self?.topicSubject.send(topic)
+                                    }
+                                )
+                                .store(in: &self.cancellables)
                         }
                     )
                     .store(in: &self.cancellables)

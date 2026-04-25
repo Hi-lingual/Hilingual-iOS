@@ -13,7 +13,7 @@ public final class MockDiaryDetailUseCase: DiaryDetailUseCase {
 
     public func fetchDiaryDetail(diaryId: Int) -> AnyPublisher<DiaryDetailEntity, Error> {
         let dummyDetail = DiaryDetailEntity(
-            date: "8월 3일 일요일",
+            date: "2025-08-03",
             image: "https://avatars.githubusercontent.com/u/42905243?v=4",
             originalText: "I goes to school every day and eat lunch with friends.",
             rewriteText: "I go to school every day and have lunch with friends.",
