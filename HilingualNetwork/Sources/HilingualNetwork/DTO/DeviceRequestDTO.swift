@@ -1,21 +1,14 @@
 //
-//  LoginResponseDTO.swift
+//  DeviceRequestDTO.swift
 //  HilingualNetwork
 //
-//  Created by 성현주 on 7/15/25.
+//  Created by 성현주 on 3/21/26.
 //
 
 import Foundation
 
-public struct LoginResponseDTO: Decodable {
-    public let accessToken: String
-    public let refreshToken: String
-    public let registerStatus: Bool
-}
-
-public struct AuthLoginRequestDTO: Encodable {
-    public let provider: String
-    public let role: String
+public struct DeviceRequestDTO: Encodable {
+    public let timezone: String
     public let deviceUuid: String
     public let deviceName: String
     public let deviceType: String
@@ -24,8 +17,7 @@ public struct AuthLoginRequestDTO: Encodable {
     public let appVersion: String
 
     public init(
-        provider: String,
-        role: String,
+        timezone: String,
         deviceUuid: String,
         deviceName: String,
         deviceType: String,
@@ -33,8 +25,7 @@ public struct AuthLoginRequestDTO: Encodable {
         osVersion: String,
         appVersion: String
     ) {
-        self.provider = provider
-        self.role = role
+        self.timezone = timezone
         self.deviceUuid = deviceUuid
         self.deviceName = deviceName
         self.deviceType = deviceType

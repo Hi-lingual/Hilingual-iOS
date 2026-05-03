@@ -111,7 +111,11 @@ public final class WordBookViewModel: BaseViewModel {
                             phrase: entity.phrase,
                             explanation: entity.explanation ?? "",
                             reason: "",
-                            createdAt: entity.createdAt ?? "",
+                            createdAt: DisplayDateFormatter.wordSavedSource(
+                                writtenFrom: entity.writtenFrom,
+                                writtenDate: entity.writtenDate,
+                                savedRoot: entity.savedRoot
+                            ),
                             isMarked: entity.isMarked
                         )
                     }
@@ -135,7 +139,11 @@ public final class WordBookViewModel: BaseViewModel {
                     phrase: $0.phrase,
                     explanation: $0.explanation ?? "",
                     reason: "",
-                    createdAt: $0.createdAt ?? "",
+                    createdAt: DisplayDateFormatter.wordSavedSource(
+                        writtenFrom: $0.writtenFrom,
+                        writtenDate: $0.writtenDate,
+                        savedRoot: $0.savedRoot
+                    ),
                     isMarked: $0.isMarked
                 )
             }
@@ -194,7 +202,11 @@ public final class WordBookViewModel: BaseViewModel {
                         phrase: entity.phrase,
                         explanation: entity.explanation ?? "",
                         reason: entity.example ?? "",
-                        createdAt: entity.createdAt ?? "",
+                        createdAt: DisplayDateFormatter.wordSavedSource(
+                            writtenFrom: entity.writtenFrom,
+                            writtenDate: entity.writtenDate,
+                            savedRoot: entity.savedRoot
+                        ),
                         isMarked: entity.isMarked
                     )
                 }

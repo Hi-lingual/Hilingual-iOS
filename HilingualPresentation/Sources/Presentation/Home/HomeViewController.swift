@@ -235,20 +235,6 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         self.homeView.selectedInfo.setSelectedDate(date)
         self.homeView.selectedInfo.currentDiaryId = nil
         
-        // 미래 날짜는 바로 리턴
-        if selectedDay > today {
-            self.homeView.selectedInfo.updateView(
-                for: date,
-                diaryId: nil,
-                isPublished: nil,
-                remainingTime: 0,
-                topicData: nil,
-                diaryData: nil,
-                imageURL: nil
-            )
-            return
-        }
-        
         let isDiaryDate = self.homeView.calendarView.filledDates.contains {
             calendar.isDate($0, inSameDayAs: date)
         }
@@ -270,11 +256,35 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                             imageURL: diary.imageUrl
                         )
                     } else {
-                        self.fetchTopicIfNeeded(for: date, today: today, yesterday: yesterday)
+                        if selectedDay > today {
+                            self.homeView.selectedInfo.updateView(
+                                for: date,
+                                diaryId: nil,
+                                isPublished: nil,
+                                remainingTime: 0,
+                                topicData: nil,
+                                diaryData: nil,
+                                imageURL: nil
+                            )
+                        } else {
+                            self.fetchTopicIfNeeded(for: date, today: today, yesterday: yesterday)
+                        }
                     }
                 })
         } else {
-            self.fetchTopicIfNeeded(for: date, today: today, yesterday: yesterday)
+            if selectedDay > today {
+                self.homeView.selectedInfo.updateView(
+                    for: date,
+                    diaryId: nil,
+                    isPublished: nil,
+                    remainingTime: 0,
+                    topicData: nil,
+                    diaryData: nil,
+                    imageURL: nil
+                )
+            } else {
+                self.fetchTopicIfNeeded(for: date, today: today, yesterday: yesterday)
+            }
         }
         
         self.currentDateRequestCancellable?.store(in: &self.viewModel!.cancellables)

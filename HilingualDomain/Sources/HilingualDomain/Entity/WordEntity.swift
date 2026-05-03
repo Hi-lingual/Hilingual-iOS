@@ -19,7 +19,9 @@ public struct WordEntity: Equatable, Hashable {
     public let explanation: String?
     public let example: String?
     public let isMarked: Bool
-    public let createdAt: String?
+    public let writtenFrom: String?
+    public let writtenDate: String?
+    public let savedRoot: Int?
 
     public init(
         phraseId: Int,
@@ -28,7 +30,9 @@ public struct WordEntity: Equatable, Hashable {
         explanation: String?,
         example: String?,
         isMarked: Bool,
-        createdAt: String?
+        writtenFrom: String?,
+        writtenDate: String?,
+        savedRoot: Int?
     ) {
         self.phraseId = phraseId
         self.phraseType = phraseType
@@ -36,6 +40,8 @@ public struct WordEntity: Equatable, Hashable {
         self.explanation = explanation
         self.example = example
         self.isMarked = isMarked
-        self.createdAt = createdAt
+        self.writtenFrom = writtenFrom
+        self.writtenDate = writtenDate
+        self.savedRoot = savedRoot
     }
 }
