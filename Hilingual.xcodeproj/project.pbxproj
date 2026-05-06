@@ -201,6 +201,11 @@
 			mainGroup = E5C79B052E15281900E461C3;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
+				E5A100002FCA000100000001 /* XCLocalSwiftPackageReference "HilingualCore" */,
+				E5A100012FCA000100000001 /* XCLocalSwiftPackageReference "HilingualNetwork" */,
+				E5A100022FCA000100000001 /* XCLocalSwiftPackageReference "HilingualDomain" */,
+				E5A100032FCA000100000001 /* XCLocalSwiftPackageReference "HilingualData" */,
+				E5A100042FCA000100000001 /* XCLocalSwiftPackageReference "HilingualPresentation" */,
 				E5CBCFB22EC4B3E100475E81 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				3A1464172F59BD11001D047C /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */,
 			);
@@ -267,8 +272,8 @@
 				CODE_SIGN_ENTITLEMENTS = Hilingual/Hilingual.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2025032201;
-				DEVELOPMENT_TEAM = 25T76RX27Y;
+				CURRENT_PROJECT_VERSION = 2025042501;
+				DEVELOPMENT_TEAM = C9XX799UJH;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Hilingual/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "Hilingual에서 제공하는 일기 텍스트 스캔기능을 위해 카메라 접근 권한이 필요합니다. 설정에서 이를 변경할 수 있습니다.";
@@ -283,7 +288,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.1.4;
+				MARKETING_VERSION = 2.1.6;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.Hilingual$(BUNDLE_ID_SUFFIX)";
 				PRODUCT_NAME = "Hilingual-Dev";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -307,7 +312,7 @@
 				CODE_SIGN_ENTITLEMENTS = Hilingual/Hilingual.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2025032201;
+				CURRENT_PROJECT_VERSION = 2025042501;
 				DEVELOPMENT_TEAM = C9XX799UJH;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Hilingual/Info.plist;
@@ -323,7 +328,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.1.4;
+				MARKETING_VERSION = 2.1.6;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.Hilingual$(BUNDLE_ID_SUFFIX)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -478,6 +483,29 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCLocalSwiftPackageReference section */
+		E5A100002FCA000100000001 /* XCLocalSwiftPackageReference "HilingualCore" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = HilingualCore;
+		};
+		E5A100012FCA000100000001 /* XCLocalSwiftPackageReference "HilingualNetwork" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = HilingualNetwork;
+		};
+		E5A100022FCA000100000001 /* XCLocalSwiftPackageReference "HilingualDomain" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = HilingualDomain;
+		};
+		E5A100032FCA000100000001 /* XCLocalSwiftPackageReference "HilingualData" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = HilingualData;
+		};
+		E5A100042FCA000100000001 /* XCLocalSwiftPackageReference "HilingualPresentation" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = HilingualPresentation;
+		};
+/* End XCLocalSwiftPackageReference section */
+
 /* Begin XCRemoteSwiftPackageReference section */
 		3A1464172F59BD11001D047C /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */ = {
 			isa = XCRemoteSwiftPackageReference;
@@ -500,6 +528,7 @@
 /* Begin XCSwiftPackageProductDependency section */
 		0512DDBB07374DA5A2F41BA2 /* HilingualCore */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = E5A100002FCA000100000001 /* XCLocalSwiftPackageReference "HilingualCore" */;
 			productName = HilingualCore;
 		};
 		3A1464182F59BD11001D047C /* GoogleMobileAds */ = {
@@ -509,10 +538,12 @@
 		};
 		E5C2F3942E170A01003DF6C4 /* HilingualNetwork */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = E5A100012FCA000100000001 /* XCLocalSwiftPackageReference "HilingualNetwork" */;
 			productName = HilingualNetwork;
 		};
 		E5C2F3982E171575003DF6C4 /* HilingualDomain */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = E5A100022FCA000100000001 /* XCLocalSwiftPackageReference "HilingualDomain" */;
 			productName = HilingualDomain;
 		};
 		E5CBCFB32EC4B3E100475E81 /* FirebaseCore */ = {
@@ -527,10 +558,12 @@
 		};
 		E5D5D0A82E171AC300DABE8D /* HilingualData */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = E5A100032FCA000100000001 /* XCLocalSwiftPackageReference "HilingualData" */;
 			productName = HilingualData;
 		};
 		E5D5D0AB2E17289000DABE8D /* HilingualPresentation */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = E5A100042FCA000100000001 /* XCLocalSwiftPackageReference "HilingualPresentation" */;
 			productName = HilingualPresentation;
 		};
 /* End XCSwiftPackageProductDependency section */

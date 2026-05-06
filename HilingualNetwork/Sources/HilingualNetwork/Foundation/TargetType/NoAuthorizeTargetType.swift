@@ -19,7 +19,8 @@ extension NoAuthorizeTargetType {
 
     public var headers: [String : String]? {
         let header = [
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "X-Timezone": TimeZone.autoupdatingCurrent.identifier
         ]
         return header
     }
