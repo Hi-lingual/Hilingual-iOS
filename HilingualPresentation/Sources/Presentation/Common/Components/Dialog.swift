@@ -192,6 +192,9 @@ final class Dialog: UIView {
             }
             
         case .withImage:
+            buttonStackView.axis = .vertical
+            buttonStackView.spacing = 12
+            
             dialogErrorImageView.isHidden = false
             dialogContentLabel.isHidden = false
             leftButton.isHidden = false
@@ -212,22 +215,26 @@ final class Dialog: UIView {
                 $0.height.equalTo(133)
                 $0.width.equalTo(295)
             }
-
+            
             buttonStackView.snp.makeConstraints {
-                $0.top.equalTo(dialogErrorImageView.snp.bottom).offset(32)
+                $0.top.equalTo(dialogErrorImageView.snp.bottom).offset(30)
                 $0.horizontalEdges.equalToSuperview().inset(24)
                 $0.bottom.equalToSuperview().inset(24)
             }
-
-            leftButton.snp.makeConstraints {
-                $0.height.equalTo(48)
-                $0.width.equalTo(141)
-            }
-
+            
             rightButton.snp.makeConstraints {
                 $0.height.equalTo(48)
-                $0.width.equalTo(141)
             }
+            
+            leftButton.backgroundColor = .clear
+            leftButton.snp.makeConstraints {
+                $0.height.equalTo(17)
+            }
+            
+            buttonStackView.removeArrangedSubview(leftButton)
+            buttonStackView.removeArrangedSubview(rightButton)
+            buttonStackView.addArrangedSubview(rightButton)
+            buttonStackView.addArrangedSubview(leftButton)
         }
     }
 

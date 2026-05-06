@@ -35,7 +35,7 @@ final class NotificationPermissionModalView: BaseUIView {
             title: "중요한 소식을 놓치지 마세요.",
             content: "알림을 켜고 누가 당신의 일기에 반응했는지\n바로 확인해 보세요.",
             leftButtonTitle: "나중에 보기",
-            rightButtonTitle: "알림 켜기",
+            rightButtonTitle: "알림 설정 변경하기",
             leftAction: laterAction,
             rightAction: enableAction
         )
