@@ -16,6 +16,7 @@ final class Dialog: UIView {
     enum DialogStyle {
         case normal
         case error
+        case withImage
     }
 
     // MARK: - Properties
@@ -131,13 +132,6 @@ final class Dialog: UIView {
             $0.width.equalTo(343)
         }
 
-        dialogErrorImageView.snp.makeConstraints {
-            $0.top.equalToSuperview().inset(20)
-            $0.centerX.equalToSuperview()
-            $0.height.equalTo(175)
-            $0.width.equalTo(200)
-        }
-
         switch style {
         case .normal:
             dialogErrorImageView.isHidden = true
@@ -174,6 +168,13 @@ final class Dialog: UIView {
             dialogErrorImageView.isHidden = false
             dialogContentLabel.isHidden = true
             leftButton.isHidden = true
+            
+            dialogErrorImageView.snp.makeConstraints {
+                $0.top.equalToSuperview().inset(20)
+                $0.centerX.equalToSuperview()
+                $0.height.equalTo(175)
+                $0.width.equalTo(200)
+            }
 
             dialogTitleLabel.snp.makeConstraints {
                 $0.top.equalTo(dialogErrorImageView.snp.bottom).offset(8)
@@ -188,6 +189,44 @@ final class Dialog: UIView {
 
             rightButton.snp.makeConstraints {
                 $0.height.equalTo(48)
+            }
+            
+        case .withImage:
+            dialogErrorImageView.isHidden = false
+            dialogContentLabel.isHidden = false
+            leftButton.isHidden = false
+
+            dialogTitleLabel.snp.makeConstraints {
+                $0.top.equalToSuperview().inset(34)
+                $0.horizontalEdges.equalToSuperview().inset(24)
+            }
+
+            dialogContentLabel.snp.makeConstraints {
+                $0.top.equalTo(dialogTitleLabel.snp.bottom).offset(8)
+                $0.horizontalEdges.equalTo(dialogTitleLabel)
+            }
+            
+            dialogErrorImageView.snp.makeConstraints {
+                $0.top.equalTo(dialogContentLabel.snp.bottom).offset(8)
+                $0.centerX.equalToSuperview()
+                $0.height.equalTo(133)
+                $0.width.equalTo(295)
+            }
+
+            buttonStackView.snp.makeConstraints {
+                $0.top.equalTo(dialogErrorImageView.snp.bottom).offset(32)
+                $0.horizontalEdges.equalToSuperview().inset(24)
+                $0.bottom.equalToSuperview().inset(24)
+            }
+
+            leftButton.snp.makeConstraints {
+                $0.height.equalTo(48)
+                $0.width.equalTo(141)
+            }
+
+            rightButton.snp.makeConstraints {
+                $0.height.equalTo(48)
+                $0.width.equalTo(141)
             }
         }
     }
