@@ -54,6 +54,9 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     public override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         showOnboardingBottomSheet()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+            self?.checkAndShowNotificationPermissionModal()
+        }
     }
     
     // MARK: - Bind
@@ -205,7 +208,31 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     }
     
     // MARK: - Private Methods
-
+    
+    private func checkAndShowNotificationPermissionModal() {
+        guard let window = self.view.window else { return }
+        
+        let modalView = NotificationPermissionModalView()
+        window.addSubview(modalView)
+        modalView.snp.makeConstraints { $0.edges.equalToSuperview() }
+        modalView.configure(
+            laterAction: {
+                modalView.dialog.dismiss()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                    modalView.removeFromSuperview()
+                }
+            },
+            enableAction: {
+                modalView.dialog.dismiss()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                    modalView.removeFromSuperview()
+                    self.openSystemSettings()
+                }
+            }
+        )
+        modalView.dialog.showAnimation()
+    }
+    
     private func showOnboardingBottomSheet() {
         guard UserDefaults.standard.bool(forKey: "showHomeOnboarding") else { return }
 

@@ -110,4 +110,8 @@ final class NotificationSettingView: BaseUIView {
         marketingToggle.setOn(marketingOn, animated: false)
         feedToggle.setOn(feedOn, animated: false)
     }
+    
+    func setBannerVisible(_ visible: Bool) {
+        notificationBannerView.isHidden = !visible
+    }
 }
