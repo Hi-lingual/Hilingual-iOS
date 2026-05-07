@@ -8,6 +8,7 @@
 import Foundation
 import Combine
 import UIKit
+import UserNotifications
 
 public final class NotificationSettingViewController: BaseUIViewController<NotificationSettingViewModel> {
     
@@ -23,12 +24,16 @@ public final class NotificationSettingViewController: BaseUIViewController<Notif
 
     private let marketingToggledSubject = PassthroughSubject<Void, Never>()
     private let feedToggledSubject = PassthroughSubject<Void, Never>()
+    private let viewWillAppearSubject = PassthroughSubject<Void, Never>()
+    private let permissionSubject = CurrentValueSubject<Bool, Never>(true)
 
     // MARK: - Life Cycle
 
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(false, animated: animated)
+        viewWillAppearSubject.send(())
+        sendPermissionStatus()
     }
 
     public override func loadView() {
@@ -38,14 +43,15 @@ public final class NotificationSettingViewController: BaseUIViewController<Notif
     public override func navigationType() -> NavigationType? {
         return .backTitle("알림 설정")
     }
-
+    
     // MARK: - Bind
-
+    
     public override func bind(viewModel: NotificationSettingViewModel) {
         let input = NotificationSettingViewModel.Input(
-            viewDidLoad: Just(()).eraseToAnyPublisher(),
+            viewDidLoad: viewWillAppearSubject.eraseToAnyPublisher(),
             marketingToggled: marketingToggledSubject.eraseToAnyPublisher(),
-            feedToggled: feedToggledSubject.eraseToAnyPublisher()
+            feedToggled: feedToggledSubject.eraseToAnyPublisher(),
+            isSystemPermissionGranted: permissionSubject.eraseToAnyPublisher()
         )
         
         let output = viewModel.transform(input: input)
@@ -56,7 +62,6 @@ public final class NotificationSettingViewController: BaseUIViewController<Notif
                 guard let self else { return }
                 self.isMarketingOn = isOn
                 self.alarmSettingView.marketingToggle.setOn(isOn, animated: true)
-                self.alarmSettingView.setBannerVisible(!isOn || !self.isFeedOn)
             }
             .store(in: &cancellables)
 
@@ -66,7 +71,13 @@ public final class NotificationSettingViewController: BaseUIViewController<Notif
                 guard let self else { return }
                 self.isFeedOn = isOn
                 self.alarmSettingView.feedToggle.setOn(isOn, animated: true)
-                self.alarmSettingView.setBannerVisible(!self.isMarketingOn || !isOn)
+            }
+            .store(in: &cancellables)
+        
+        output.shouldShowBanner
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] shouldShow in
+                self?.alarmSettingView.setBannerVisible(shouldShow)
             }
             .store(in: &cancellables)
     }
@@ -77,6 +88,14 @@ public final class NotificationSettingViewController: BaseUIViewController<Notif
         alarmSettingView.onBannerTapped = { [weak self] in
             self?.openSystemSettings()
         }
+        
+        NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)
+            .sink { [weak self] _ in
+                self?.viewWillAppearSubject.send(())
+                self?.sendPermissionStatus()
+            }
+            .store(in: &cancellables)
+        
         let marketingTap = UITapGestureRecognizer(target: self, action: #selector(toggleTapped(_:)))
         alarmSettingView.marketingToggle.addGestureRecognizer(marketingTap)
         alarmSettingView.marketingToggle.isUserInteractionEnabled = true
@@ -89,19 +108,22 @@ public final class NotificationSettingViewController: BaseUIViewController<Notif
     @objc private func toggleTapped(_ gesture: UITapGestureRecognizer) {
         guard let sender = gesture.view as? CustomToggle else { return }
         
-        if !alarmSettingView.notificationBannerView.isHidden {
+        let isCurrentlyOn = sender.isOn
+        let newState = !isCurrentlyOn
+        
+        if !permissionSubject.value && newState == true {
             showPermissionDialog()
+            return
+        }
+        
+        sender.setOn(newState, animated: true)
+        
+        if sender == alarmSettingView.marketingToggle {
+            isMarketingOn = newState
+            marketingToggledSubject.send(())
         } else {
-            let newState = !sender.isOn
-            sender.setOn(newState, animated: true)
-            
-            if sender == alarmSettingView.marketingToggle {
-                isMarketingOn = newState
-                marketingToggledSubject.send(())
-            } else {
-                isFeedOn = newState
-                feedToggledSubject.send(())
-            }
+            isFeedOn = newState
+            feedToggledSubject.send(())
         }
     }
     
@@ -123,5 +145,18 @@ public final class NotificationSettingViewController: BaseUIViewController<Notif
             }
         )
         dialog.showAnimation()
+    }
+    
+    nonisolated private func sendPermissionStatus() {
+        Task {
+            let isGranted = await withCheckedContinuation { continuation in
+                UNUserNotificationCenter.current().getNotificationSettings { settings in
+                    continuation.resume(returning: settings.authorizationStatus == .authorized)
+                }
+            }
+            await MainActor.run { [weak self] in
+                self?.permissionSubject.send(isGranted)
+            }
+        }
     }
 }

@@ -17,6 +17,7 @@ public final class NotificationSettingViewModel: BaseViewModel {
         let viewDidLoad: AnyPublisher<Void, Never>
         let marketingToggled: AnyPublisher<Void, Never>
         let feedToggled: AnyPublisher<Void, Never>
+        let isSystemPermissionGranted: AnyPublisher<Bool, Never>
     }
 
     // MARK: - Output
@@ -25,6 +26,7 @@ public final class NotificationSettingViewModel: BaseViewModel {
         let isMarketingOn: AnyPublisher<Bool, Never>
         let isFeedOn: AnyPublisher<Bool, Never>
         let settingUpdateError: AnyPublisher<Error, Never>
+        let shouldShowBanner: AnyPublisher<Bool, Never>
     }
 
     // MARK: - Private Subjects
@@ -58,6 +60,7 @@ public final class NotificationSettingViewModel: BaseViewModel {
                     }
                     .eraseToAnyPublisher()
             }
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] entity in
                 self?.marketingSubject.send(entity.isMarketingAlarmOn)
                 self?.feedSubject.send(entity.isFeedAlarmOn)
@@ -79,11 +82,16 @@ public final class NotificationSettingViewModel: BaseViewModel {
                 self.toggleSetting(for: "FEED", isOn: newValue)
             }
             .store(in: &cancellables)
+        
+        let shouldShowBanner = input.isSystemPermissionGranted
+            .map { !$0 }
+            .eraseToAnyPublisher()
 
         return Output(
             isMarketingOn: marketingSubject.eraseToAnyPublisher(),
             isFeedOn: feedSubject.eraseToAnyPublisher(),
-            settingUpdateError: errorSubject.eraseToAnyPublisher()
+            settingUpdateError: errorSubject.eraseToAnyPublisher(),
+            shouldShowBanner: shouldShowBanner
         )
     }
 
@@ -91,6 +99,7 @@ public final class NotificationSettingViewModel: BaseViewModel {
 
     private func toggleSetting(for type: String, isOn: Bool) {
         useCase.toggleNotificationSetting(notiType: type)
+            .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { [weak self] completion in
                 if case .failure(let error) = completion {
                     self?.errorSubject.send(error)
