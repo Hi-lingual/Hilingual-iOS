@@ -182,7 +182,7 @@ final class AppDIContainer: ViewControllerFactory {
     }
 
     public func makeNotificationSettingViewController() -> NotificationSettingViewController {
-        return NotificationSettingViewController(viewModel: makeNotificationViewModel(), diContainer: self)
+        return NotificationSettingViewController(viewModel: makeNotificationSettingViewModel(), diContainer: self)
     }
 
     public func makeFeedSearchViewController() -> FeedSearchViewController {
@@ -563,15 +563,15 @@ extension AppDIContainer {
         return DefaultNotificationSettingService()
     }
 
-    private func makeNotificationRepository() -> AlarmSettingRepository {
+    private func makeNotificationSettingRepository() -> AlarmSettingRepository {
         return DefaultAlarmSettingRepository(service: makeNotificationSettingService())
     }
 
     private func makeNotificationUseCase() -> AlarmSettingUseCase {
-        return DefaultAlarmSettingUseCase(repository: makeNotificationRepository())
+        return DefaultAlarmSettingUseCase(repository: makeNotificationSettingRepository())
     }
 
-    private func makeNotificationViewModel() -> NotificationSettingViewModel {
+    private func makeNotificationSettingViewModel() -> NotificationSettingViewModel {
         return NotificationSettingViewModel(useCase: makeNotificationUseCase())
     }
 }
