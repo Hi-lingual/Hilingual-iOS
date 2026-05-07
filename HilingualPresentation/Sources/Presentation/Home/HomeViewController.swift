@@ -131,6 +131,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                 self.fetchAndShowDateInfo(for: self.homeView.calendarView.selectedDate ?? Date())
             }
             .store(in: &viewModel.cancellables)
+        
         viewModel.hasDraft
             .receive(on: RunLoop.main)
             .sink { [weak self] hasDraft in
@@ -210,6 +211,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     // MARK: - Private Methods
     
     private func checkAndShowNotificationPermissionModal() {
+        guard AppVersionChecker.shouldShowModal else { return }
         guard let window = self.view.window else { return }
         
         let modalView = NotificationPermissionModalView()
@@ -217,12 +219,14 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         modalView.snp.makeConstraints { $0.edges.equalToSuperview() }
         modalView.configure(
             laterAction: {
+                AppVersionChecker.markAsShown()
                 modalView.dialog.dismiss()
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                     modalView.removeFromSuperview()
                 }
             },
             enableAction: {
+                AppVersionChecker.markAsShown()
                 modalView.dialog.dismiss()
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                     modalView.removeFromSuperview()
