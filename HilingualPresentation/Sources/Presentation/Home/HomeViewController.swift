@@ -220,14 +220,12 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         modalView.configure(
             laterAction: {
                 AppVersionChecker.markAsShown()
-                modalView.dialog.dismiss()
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                     modalView.removeFromSuperview()
                 }
             },
             enableAction: {
                 AppVersionChecker.markAsShown()
-                modalView.dialog.dismiss()
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                     modalView.removeFromSuperview()
                     self.openSystemSettings()
