@@ -130,7 +130,7 @@ public final class NotificationSettingViewController: BaseUIViewController<Notif
     private func showPermissionDialog() {
         guard let window = self.view.window else { return }
         window.addSubview(dialog)
-        dialog.snp.makeConstraints { $0.edges.equalToSuperview() }
+        dialog.snp.remakeConstraints { $0.edges.equalToSuperview() }
 
         dialog.configure(
             style: .normal,
