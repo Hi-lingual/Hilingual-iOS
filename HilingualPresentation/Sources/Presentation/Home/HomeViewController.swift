@@ -213,7 +213,33 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     private func checkAndShowNotificationPermissionModal() {
         guard AppVersionChecker.shouldShowModal else { return }
         guard let window = self.view.window else { return }
-        
+
+        Task {
+            let isGranted = await fetchNotificationPermission()
+
+            await MainActor.run { [weak self] in
+                guard let self else { return }
+                guard !isGranted else {
+                    AppVersionChecker.markAsShown()
+                    return
+                }
+                self.presentNotificationPermissionModal(on: window)
+            }
+        }
+    }
+
+    nonisolated private func fetchNotificationPermission() async -> Bool {
+        await withCheckedContinuation { continuation in
+            UNUserNotificationCenter.current().getNotificationSettings { settings in
+                let status = settings.authorizationStatus
+                continuation.resume(returning: status == .authorized
+                                            || status == .provisional
+                                            || status == .ephemeral)
+            }
+        }
+    }
+
+    private func presentNotificationPermissionModal(on window: UIWindow) {
         let modalView = NotificationPermissionModalView()
         window.addSubview(modalView)
         modalView.snp.makeConstraints { $0.edges.equalToSuperview() }
