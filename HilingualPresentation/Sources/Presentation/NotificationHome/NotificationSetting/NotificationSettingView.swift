@@ -14,9 +14,6 @@ final class NotificationSettingView: BaseUIView {
     
     var onBannerTapped: (() -> Void)?
     
-    private var rowsStackTopToSafeArea: Constraint?
-    private var rowsStackTopToBanner: Constraint?
-
     // MARK: - UI Components
     
     let notificationBannerView = NotificationDisabledBannerView()
