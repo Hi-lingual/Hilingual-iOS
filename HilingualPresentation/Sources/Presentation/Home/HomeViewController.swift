@@ -218,17 +218,17 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         window.addSubview(modalView)
         modalView.snp.makeConstraints { $0.edges.equalToSuperview() }
         modalView.configure(
-            laterAction: {
+            laterAction: { [weak modalView] in
                 AppVersionChecker.markAsShown()
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                    modalView.removeFromSuperview()
+                    modalView?.removeFromSuperview()
                 }
             },
-            enableAction: {
+            enableAction: { [weak modalView, weak self] in
                 AppVersionChecker.markAsShown()
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                    modalView.removeFromSuperview()
-                    self.openSystemSettings()
+                    modalView?.removeFromSuperview()
+                    self?.openSystemSettings()
                 }
             }
         )
