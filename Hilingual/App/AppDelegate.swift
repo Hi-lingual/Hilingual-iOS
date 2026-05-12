@@ -7,6 +7,8 @@
 
 import UIKit
 import FirebaseCore
+import FirebaseMessaging
+import UserNotifications
 import HilingualData
 
 @main
@@ -21,8 +23,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 //            UserDefaults.standard.removeObject(forKey: key.description)
 //        }
         _ = CoreDataStorage.shared
+        
+        Messaging.messaging().delegate = self
+        UIApplication.shared.registerForRemoteNotifications()
 
-//
         return true
     }
 
@@ -39,6 +43,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // If any sessions were discarded while the application was not running, this will be called shortly after application:didFinishLaunchingWithOptions.
         // Use this method to release any resources that were specific to the discarded scenes, as they will not return.
     }
+}
 
-
+// MARK: - MessagingDelegate
+extension AppDelegate: MessagingDelegate {
+    nonisolated func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
+        guard let fcmToken else { return }
+        print("[FCM] 토큰 갱신: \(fcmToken)")
+        UserDefaults.standard.set(fcmToken, forKey: "fcmToken")
+    }
 }

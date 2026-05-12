@@ -164,7 +164,8 @@ public final class SplashViewController: BaseUIViewController<SplashViewModel> {
 
     public override func bind(viewModel: SplashViewModel) {
         let output = viewModel.transform(input: .init(
-            viewDidLoad: viewDidAppearSubject.eraseToAnyPublisher()
+            viewDidLoad: viewDidAppearSubject.eraseToAnyPublisher(),
+            uuid: UIDevice.current.identifierForVendor?.uuidString ?? ""
         ))
 
         output.navigateToHome

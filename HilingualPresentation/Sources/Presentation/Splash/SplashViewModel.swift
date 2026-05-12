@@ -8,6 +8,7 @@
 import Foundation
 import Combine
 import HilingualDomain
+import UIKit
 
 public final class SplashViewModel: BaseViewModel {
 
@@ -15,6 +16,7 @@ public final class SplashViewModel: BaseViewModel {
 
     public struct Input {
         let viewDidLoad: AnyPublisher<Void, Never>
+        let uuid: String
     }
 
     public struct Output {
@@ -54,7 +56,7 @@ public final class SplashViewModel: BaseViewModel {
     public func transform(input: Input) -> Output {
         input.viewDidLoad
             .sink { [weak self] _ in
-                self?.handleAutoLogin()
+                self?.handleAutoLogin(uuid: input.uuid)
             }
             .store(in: &cancellables)
 
@@ -68,7 +70,7 @@ public final class SplashViewModel: BaseViewModel {
 
     // MARK: - Logic
 
-    private func handleAutoLogin() {
+    private func handleAutoLogin(uuid: String) { 
         let accessToken = tokenStore.loadAccessToken()
         let refreshToken = tokenStore.loadRefreshToken()
 
@@ -95,7 +97,7 @@ public final class SplashViewModel: BaseViewModel {
                 guard let self else {
                     return Fail(error: NSError(domain: "SplashViewModel", code: -1)).eraseToAnyPublisher()
                 }
-                return self.syncDevice(after: result)
+                return self.syncDevice(after: result, uuid: uuid)
             }
             .sink(
                 receiveCompletion: { [weak self] completion in
@@ -131,12 +133,23 @@ public final class SplashViewModel: BaseViewModel {
             )
             .store(in: &cancellables)
     }
-
-    private func syncDevice(after response: LoginResponseEntity) -> AnyPublisher<LoginResponseEntity, Error> {
-        deviceUseCase.updateCurrentDevice()
+    
+    private func syncDevice(after response: LoginResponseEntity, uuid: String) -> AnyPublisher<LoginResponseEntity, Error> {
+        return deviceUseCase.updateCurrentDevice()
+            .flatMap { [weak self] _ -> AnyPublisher<Void, Error> in
+                guard let self else {
+                    return Fail(error: NSError(domain: "SplashViewModel", code: -1)).eraseToAnyPublisher()
+                }
+                let fcmToken = UserDefaults.standard.string(forKey: "fcmToken") ?? ""
+                return self.deviceUseCase.updateFcmToken(uuid: uuid, fcmToken: fcmToken)
+            }
             .handleEvents(receiveOutput: {
-                print("[SplashVM] ✅ device API 성공")
+                print("[SplashVM] ✅ device + FCM API 성공")
             })
+            .catch { error -> AnyPublisher<Void, Error> in
+                print("[SplashVM] ⚠️ device API 실패 (무시하고 진행): \(error)")
+                return Just(()).setFailureType(to: Error.self).eraseToAnyPublisher()
+            }
             .map { response }
             .eraseToAnyPublisher()
     }

@@ -8,13 +8,13 @@
 
 /* Begin PBXBuildFile section */
 		1988F8F82B0F4E84A7827BF3 /* HilingualCore in Frameworks */ = {isa = PBXBuildFile; productRef = 0512DDBB07374DA5A2F41BA2 /* HilingualCore */; };
+		242E8A4E2FB1F182006F7E0C /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 242E8A4D2FB1F182006F7E0C /* FirebaseMessaging */; };
 		3A091AE82F8F922B004D27CF /* Release.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 3A091AE72F8F922B004D27CF /* Release.xcconfig */; };
 		3A091AEA2F8F923E004D27CF /* Debug.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 3A091AE92F8F923E004D27CF /* Debug.xcconfig */; };
 		3A1464192F59BD11001D047C /* GoogleMobileAds in Frameworks */ = {isa = PBXBuildFile; productRef = 3A1464182F59BD11001D047C /* GoogleMobileAds */; };
 		E51B4C542E28DC11000B16D0 /* AppIcon.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E51B4C532E28DC11000B16D0 /* AppIcon.xcassets */; };
 		E51DB2052E1D9E8B000C2BEA /* AppConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = E51DB2042E1D9E8B000C2BEA /* AppConfig.swift */; };
 		E51DB2242E1E4407000C2BEA /* AppBaseURLProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E51DB2232E1E4407000C2BEA /* AppBaseURLProvider.swift */; };
-
 		E5C2F3952E170A01003DF6C4 /* HilingualNetwork in Frameworks */ = {isa = PBXBuildFile; productRef = E5C2F3942E170A01003DF6C4 /* HilingualNetwork */; };
 		E5C2F3992E171575003DF6C4 /* HilingualDomain in Frameworks */ = {isa = PBXBuildFile; productRef = E5C2F3982E171575003DF6C4 /* HilingualDomain */; };
 		E5C79B322E15282100E461C3 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E5C79B2A2E15282100E461C3 /* LaunchScreen.storyboard */; };
@@ -49,7 +49,6 @@
 		E51DB2002E1CF7AD000C2BEA /* Hilingual.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Hilingual.entitlements; sourceTree = "<group>"; };
 		E51DB2042E1D9E8B000C2BEA /* AppConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfig.swift; sourceTree = "<group>"; };
 		E51DB2232E1E4407000C2BEA /* AppBaseURLProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppBaseURLProvider.swift; sourceTree = "<group>"; };
-
 		E5C2F3932E1709DC003DF6C4 /* HilingualNetwork */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = HilingualNetwork; sourceTree = "<group>"; };
 		E5C2F3972E171509003DF6C4 /* HilingualDomain */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = HilingualDomain; sourceTree = "<group>"; };
 		E5C79B0E2E15281900E461C3 /* Hilingual-Dev.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Hilingual-Dev.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -68,6 +67,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				242E8A4E2FB1F182006F7E0C /* FirebaseMessaging in Frameworks */,
 				E5D5D0A92E171AC300DABE8D /* HilingualData in Frameworks */,
 				E5CBCFB42EC4B3E100475E81 /* FirebaseCore in Frameworks */,
 				E5C2F3992E171575003DF6C4 /* HilingualDomain in Frameworks */,
@@ -140,7 +140,6 @@
 			children = (
 				E5C79B262E15282100E461C3 /* AppDelegate.swift */,
 				E5C79B2D2E15282100E461C3 /* SceneDelegate.swift */,
-
 				E5C84AC82E1538C700CBD669 /* AppDIContainer.swift */,
 				E5C79B2A2E15282100E461C3 /* LaunchScreen.storyboard */,
 				E51DB2032E1D9E47000C2BEA /* Config */,
@@ -174,6 +173,7 @@
 				E5CBCFB32EC4B3E100475E81 /* FirebaseCore */,
 				E5CBCFB52EC4B3E100475E81 /* FirebaseRemoteConfig */,
 				3A1464182F59BD11001D047C /* GoogleMobileAds */,
+				242E8A4D2FB1F182006F7E0C /* FirebaseMessaging */,
 			);
 			productName = Hilingual;
 			productReference = E5C79B0E2E15281900E461C3 /* Hilingual-Dev.app */;
@@ -245,7 +245,6 @@
 				E51DB2242E1E4407000C2BEA /* AppBaseURLProvider.swift in Sources */,
 				E5C84AC92E1538C700CBD669 /* AppDIContainer.swift in Sources */,
 				E51DB2052E1D9E8B000C2BEA /* AppConfig.swift in Sources */,
-
 				E5C79B342E15282100E461C3 /* AppDelegate.swift in Sources */,
 				E5C79B352E15282100E461C3 /* SceneDelegate.swift in Sources */,
 			);
@@ -282,6 +281,7 @@
 				INFOPLIST_FILE = Hilingual/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "Hilingual에서 제공하는 일기 텍스트 스캔기능을 위해 카메라 접근 권한이 필요합니다. 설정에서 이를 변경할 수 있습니다.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "프로필 사진 첨부, 게시글 사진 첨부, 일기 텍스트 스캔 기능 사용을 위해 사진 라이브러리 접근 권한 동의가 필요합니다. 설정에서 이를 변경할 수 있습니다.";
+				INFOPLIST_KEY_NSUserTrackingUsageDescription = "사용자의 관심사에 맞는 광고를 표시하고 광고 효과를 측정하기 위해 기기 식별자를 사용합니다. 수집된 데이터는 광고 목적으로만 활용됩니다.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -322,6 +322,7 @@
 				INFOPLIST_FILE = Hilingual/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "Hilingual에서 제공하는 일기 텍스트 스캔기능을 위해 카메라 접근 권한이 필요합니다. 설정에서 이를 변경할 수 있습니다.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "프로필 사진 첨부, 게시글 사진 첨부, 일기 텍스트 스캔 기능 사용을 위해 사진 라이브러리 접근 권한 동의가 필요합니다. 설정에서 이를 변경할 수 있습니다.";
+				INFOPLIST_KEY_NSUserTrackingUsageDescription = "사용자의 관심사에 맞는 광고를 표시하고 광고 효과를 측정하기 위해 기기 식별자를 사용합니다. 수집된 데이터는 광고 목적으로만 활용됩니다.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -534,6 +535,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = E5A100002FCA000100000001 /* XCLocalSwiftPackageReference "HilingualCore" */;
 			productName = HilingualCore;
+		};
+		242E8A4D2FB1F182006F7E0C /* FirebaseMessaging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E5CBCFB22EC4B3E100475E81 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseMessaging;
 		};
 		3A1464182F59BD11001D047C /* GoogleMobileAds */ = {
 			isa = XCSwiftPackageProductDependency;

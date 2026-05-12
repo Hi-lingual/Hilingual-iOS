@@ -27,8 +27,6 @@
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
-	<key>NSUserTrackingUsageDescription</key>
-	<string>사용자의 관심사에 맞는 광고를 표시하고 광고 효과를 측정하기 위해 기기 식별자를 사용합니다. 수집된 데이터는 광고 목적으로만 활용됩니다.</string>
 	<key>SKAdNetworkItems</key>
 	<array>
 		<dict>

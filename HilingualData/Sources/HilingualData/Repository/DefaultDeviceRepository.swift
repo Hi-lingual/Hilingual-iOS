@@ -6,6 +6,7 @@
 //
 
 import Combine
+import UIKit
 
 import HilingualDomain
 import HilingualNetwork
@@ -17,8 +18,12 @@ public final class DefaultDeviceRepository: DeviceRepository {
     public init(service: DeviceService) {
         self.service = service
     }
-
+    
     public func updateCurrentDevice() -> AnyPublisher<Void, Error> {
         return service.updateCurrentDevice()
+    }
+    
+    public func updateFcmToken(uuid: String, fcmToken: String) -> AnyPublisher<Void, Error> {
+        return service.updateFcmToken(uuid: uuid, fcmToken: fcmToken)
     }
 }
