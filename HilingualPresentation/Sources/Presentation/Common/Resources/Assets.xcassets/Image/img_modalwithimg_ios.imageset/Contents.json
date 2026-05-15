@@ -1,17 +1,15 @@
 {
   "images" : [
     {
-      "filename" : "img_login_ios.svg",
+      "filename" : "img_modalwithimg_ios.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "img_login_ios 1.svg",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "img_login_ios 2.svg",
       "idiom" : "universal",
       "scale" : "3x"
     }

@@ -9,9 +9,14 @@ import UIKit
 import SnapKit
 
 final class NotificationSettingView: BaseUIView {
-
+    
+    // MARK: - Properties
+    
+    var onBannerTapped: (() -> Void)?
+    
     // MARK: - UI Components
-
+    
+    let notificationBannerView = NotificationDisabledBannerView()
     let marketingToggle = CustomToggle()
     let feedToggle = CustomToggle()
 
@@ -46,24 +51,33 @@ final class NotificationSettingView: BaseUIView {
     }()
 
     private lazy var rowsStack: UIStackView = {
-        let stack = UIStackView(arrangedSubviews: [marketingRow, feedRow])
+        let stack = UIStackView(arrangedSubviews: [notificationBannerView, marketingRow, feedRow])
         stack.axis = .vertical
         stack.spacing = 20
         return stack
     }()
 
     // MARK: - Custom Method
-
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        setAction()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func setUI() {
         backgroundColor = .white
+        notificationBannerView.isHidden = true
         addSubviews(rowsStack)
     }
-
+    
     override func setLayout() {
-
         rowsStack.snp.makeConstraints {
-            $0.top.equalTo(safeAreaLayoutGuide).offset(32)
-            $0.leading.trailing.equalToSuperview().inset(20)
+            $0.top.equalTo(safeAreaLayoutGuide).offset(8)
+            $0.horizontalEdges.equalToSuperview().inset(16)
         }
 
         marketingToggle.snp.makeConstraints {
@@ -76,11 +90,25 @@ final class NotificationSettingView: BaseUIView {
             $0.height.equalTo(28)
         }
     }
+    
+    private func setAction() {
+        let tap = UITapGestureRecognizer(target: self, action: #selector(bannerTapped))
+        notificationBannerView.addGestureRecognizer(tap)
+        notificationBannerView.isUserInteractionEnabled = true
+    }
+    
+    @objc private func bannerTapped() {
+        onBannerTapped?()
+    }
 
     // MARK: - Public fu
 
     func configure(marketingOn: Bool, feedOn: Bool) {
         marketingToggle.setOn(marketingOn, animated: false)
         feedToggle.setOn(feedOn, animated: false)
+    }
+    
+    func setBannerVisible(_ visible: Bool) {
+        notificationBannerView.isHidden = !visible
     }
 }

@@ -54,6 +54,9 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     public override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         showOnboardingBottomSheet()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+            self?.checkAndShowNotificationPermissionModal()
+        }
     }
     
     // MARK: - Bind
@@ -128,6 +131,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                 self.fetchAndShowDateInfo(for: self.homeView.calendarView.selectedDate ?? Date())
             }
             .store(in: &viewModel.cancellables)
+        
         viewModel.hasDraft
             .receive(on: RunLoop.main)
             .sink { [weak self] hasDraft in
@@ -205,7 +209,58 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     }
     
     // MARK: - Private Methods
+    
+    private func checkAndShowNotificationPermissionModal() {
+        guard AppVersionChecker.shouldShowModal else { return }
+        guard let window = self.view.window else { return }
 
+        Task {
+            let isGranted = await fetchNotificationPermission()
+
+            await MainActor.run { [weak self] in
+                guard let self else { return }
+                guard !isGranted else {
+                    AppVersionChecker.markAsShown()
+                    return
+                }
+                self.presentNotificationPermissionModal(on: window)
+            }
+        }
+    }
+
+    nonisolated private func fetchNotificationPermission() async -> Bool {
+        await withCheckedContinuation { continuation in
+            UNUserNotificationCenter.current().getNotificationSettings { settings in
+                let status = settings.authorizationStatus
+                continuation.resume(returning: status == .authorized
+                                            || status == .provisional
+                                            || status == .ephemeral)
+            }
+        }
+    }
+
+    private func presentNotificationPermissionModal(on window: UIWindow) {
+        let modalView = NotificationPermissionModalView()
+        window.addSubview(modalView)
+        modalView.snp.makeConstraints { $0.edges.equalToSuperview() }
+        modalView.configure(
+            laterAction: { [weak modalView] in
+                AppVersionChecker.markAsShown()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                    modalView?.removeFromSuperview()
+                }
+            },
+            enableAction: { [weak modalView, weak self] in
+                AppVersionChecker.markAsShown()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                    modalView?.removeFromSuperview()
+                    self?.openSystemSettings()
+                }
+            }
+        )
+        modalView.dialog.showAnimation()
+    }
+    
     private func showOnboardingBottomSheet() {
         guard UserDefaults.standard.bool(forKey: "showHomeOnboarding") else { return }
 

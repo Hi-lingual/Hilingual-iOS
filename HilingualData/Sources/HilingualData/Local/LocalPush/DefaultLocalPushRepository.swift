@@ -31,7 +31,7 @@ public final class DefaultLocalPushRepository: LocalPushRepository {
         content.title = title
         content.body = body
         content.sound = .default
-        content.userInfo = ["url": "hilingual://notification/home"]
+        content.userInfo = ["url": "hilingual://app/home"]
 
         var dateComponents = DateComponents()
         dateComponents.weekday = weekday
