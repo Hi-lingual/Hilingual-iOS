@@ -9,6 +9,7 @@ import Foundation
 import Combine
 
 import SafariServices
+import FirebaseMessaging
 
 public final class LoginViewController: BaseUIViewController<LoginViewModel> {
 
@@ -68,7 +69,8 @@ public final class LoginViewController: BaseUIViewController<LoginViewModel> {
 
     private func makeInput() -> LoginViewModel.Input {
         return LoginViewModel.Input(
-            loginTapped: loginView.appleLoginButton.publisher(for: .touchUpInside)
+            loginTapped: loginView.appleLoginButton.publisher(for: .touchUpInside),
+            fcmToken: Messaging.messaging().fcmToken ?? ""
         )
     }
 

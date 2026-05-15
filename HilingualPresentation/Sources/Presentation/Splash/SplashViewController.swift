@@ -11,6 +11,7 @@ import GoogleMobileAds
 import UIKit
 import FirebaseCore
 import FirebaseRemoteConfig
+import FirebaseMessaging
 
 public final class SplashViewController: BaseUIViewController<SplashViewModel> {
 
@@ -165,7 +166,7 @@ public final class SplashViewController: BaseUIViewController<SplashViewModel> {
     public override func bind(viewModel: SplashViewModel) {
         let output = viewModel.transform(input: .init(
             viewDidLoad: viewDidAppearSubject.eraseToAnyPublisher(),
-            uuid: UIDevice.current.identifierForVendor?.uuidString ?? ""
+            fcmToken: Messaging.messaging().fcmToken ?? ""
         ))
 
         output.navigateToHome

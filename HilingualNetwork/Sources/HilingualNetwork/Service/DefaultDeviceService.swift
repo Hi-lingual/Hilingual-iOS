@@ -10,7 +10,7 @@ import Foundation
 
 public protocol DeviceService {
     func updateCurrentDevice() -> AnyPublisher<Void, Error>
-    func updateFcmToken(uuid: String, fcmToken: String) -> AnyPublisher<Void, Error>
+    func updateFcmToken(fcmToken: String) -> AnyPublisher<Void, Error>
 }
 
 public final class DefaultDeviceService: BaseService<DeviceAPI>, DeviceService {
@@ -33,7 +33,8 @@ public final class DefaultDeviceService: BaseService<DeviceAPI>, DeviceService {
             .eraseToAnyPublisher()
     }
     
-    public func updateFcmToken(uuid: String, fcmToken: String) -> AnyPublisher<Void, Error> {
+    public func updateFcmToken(fcmToken: String) -> AnyPublisher<Void, Error> {
+        let uuid = KeychainHandler.deviceUUID
         let requestDTO = FcmTokenRequestDTO(uuid: uuid, fcmToken: fcmToken)
         return requestPlain(.updateFcmToken(requestDTO: requestDTO))
             .mapError { $0 as Error }

@@ -23,7 +23,7 @@ public final class DefaultDeviceRepository: DeviceRepository {
         return service.updateCurrentDevice()
     }
     
-    public func updateFcmToken(uuid: String, fcmToken: String) -> AnyPublisher<Void, Error> {
-        return service.updateFcmToken(uuid: uuid, fcmToken: fcmToken)
+    public func updateFcmToken(fcmToken: String) -> AnyPublisher<Void, Error> {
+        return service.updateFcmToken(fcmToken: fcmToken)
     }
 }
