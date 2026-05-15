@@ -10,9 +10,12 @@ import FirebaseCore
 import FirebaseMessaging
 import UserNotifications
 import HilingualData
+import HilingualPresentation
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
+    
+    var pendingDeeplinkURL: String?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
@@ -25,6 +28,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         _ = CoreDataStorage.shared
         
         Messaging.messaging().delegate = self
+        UNUserNotificationCenter.current().delegate = self
         UIApplication.shared.registerForRemoteNotifications()
 
         return true
@@ -50,5 +54,24 @@ extension AppDelegate: MessagingDelegate {
     nonisolated func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
         guard let fcmToken else { return }
         print("[FCM] 토큰 갱신: \(fcmToken)")
+    }
+}
+
+extension AppDelegate: @preconcurrency UNUserNotificationCenterDelegate {
+    nonisolated func userNotificationCenter(_ center: UNUserNotificationCenter,
+                                willPresent notification: UNNotification) async -> UNNotificationPresentationOptions {
+        return [.banner, .sound, .badge]
+    }
+
+    @MainActor
+    func userNotificationCenter(_ center: UNUserNotificationCenter,
+                                didReceive response: UNNotificationResponse) async {
+        let userInfo = response.notification.request.content.userInfo
+        guard let link = userInfo["link"] as? String,
+              let url = URL(string: link),
+              let destination = DeeplinkParser.parse(url: url) else { return }
+        
+        print("[Deeplink] 푸시 탭 → \(destination)")
+        DeeplinkManager.shared.pendingDestination = destination
     }
 }
