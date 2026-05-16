@@ -25,4 +25,8 @@ public final class DefaultUserProfileRepository: UserProfileRepository {
     public func updateProfileImage(fileKey: String) -> AnyPublisher<Void, Error> {
            service.updateProfileImage(fileKey: fileKey)
     }
+
+    public func updateNickname(nickname: String) -> AnyPublisher<Void, Error> {
+        service.updateNickname(nickname: nickname)
+    }
 }
