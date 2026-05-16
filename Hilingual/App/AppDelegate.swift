@@ -57,21 +57,27 @@ extension AppDelegate: MessagingDelegate {
     }
 }
 
-extension AppDelegate: @preconcurrency UNUserNotificationCenterDelegate {
-    nonisolated func userNotificationCenter(_ center: UNUserNotificationCenter,
-                                willPresent notification: UNNotification) async -> UNNotificationPresentationOptions {
+extension AppDelegate: UNUserNotificationCenterDelegate {
+    nonisolated func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        willPresent notification: UNNotification
+    ) async -> UNNotificationPresentationOptions {
         return [.banner, .sound, .badge]
     }
 
-    @MainActor
-    func userNotificationCenter(_ center: UNUserNotificationCenter,
-                                didReceive response: UNNotificationResponse) async {
+    nonisolated func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        didReceive response: UNNotificationResponse
+    ) async {
         let userInfo = response.notification.request.content.userInfo
         guard let link = userInfo["link"] as? String,
               let url = URL(string: link),
               let destination = DeeplinkParser.parse(url: url) else { return }
-        
+
         print("[Deeplink] 푸시 탭 → \(destination)")
-        DeeplinkManager.shared.pendingDestination = destination
+
+        await MainActor.run {
+            DeeplinkManager.shared.pendingDestination = destination
+        }
     }
 }
