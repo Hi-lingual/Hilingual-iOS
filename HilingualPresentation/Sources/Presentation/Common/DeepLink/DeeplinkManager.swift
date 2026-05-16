@@ -11,17 +11,17 @@ import UIKit
 public final class DeeplinkManager {
 
     @MainActor public static let shared = DeeplinkManager()
-    @MainActor public var onPendingDestinationSet: ((DeeplinkDestination) -> Void)?
+    @MainActor public var onPendingDestinationSet: ((DeeplinkDestination) -> Bool)?
     
     @MainActor public var pendingDestination: DeeplinkDestination? {
         didSet {
-            if let destination = pendingDestination {
-                onPendingDestinationSet?(destination)
+            guard let destination = pendingDestination else { return }
+
+            if onPendingDestinationSet?(destination) == true {
                 pendingDestination = nil
             }
         }
     }
-
     private init() {}
 
     @MainActor

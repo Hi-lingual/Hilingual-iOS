@@ -87,10 +87,13 @@ public final class TabBarViewController: UIViewController {
     
     private func setupDeeplinkObserver() {
         DeeplinkManager.shared.onPendingDestinationSet = { [weak self] destination in
-            guard let self else { return }
+            guard let self else { return false }
+
             let homeNav = self.childNavigationControllers[0]
             DeeplinkManager.shared.handle(destination, from: homeNav, di: self.factory)
             self.selectTab(at: 0)
+
+            return true
         }
     }
     

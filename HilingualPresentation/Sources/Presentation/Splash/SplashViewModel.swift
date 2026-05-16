@@ -8,7 +8,6 @@
 import Foundation
 import Combine
 import HilingualDomain
-import UIKit
 
 public final class SplashViewModel: BaseViewModel {
 
