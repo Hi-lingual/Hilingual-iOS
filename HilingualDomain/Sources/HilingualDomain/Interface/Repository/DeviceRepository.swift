@@ -9,4 +9,5 @@ import Combine
 
 public protocol DeviceRepository {
     func updateCurrentDevice() -> AnyPublisher<Void, Error>
+    func updateFcmToken(fcmToken: String) -> AnyPublisher<Void, Error>
 }

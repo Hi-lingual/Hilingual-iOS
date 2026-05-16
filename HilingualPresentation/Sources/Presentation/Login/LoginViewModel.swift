@@ -10,6 +10,7 @@ import Combine
 import HilingualDomain
 
 public final class LoginViewModel: BaseViewModel {
+    
     public struct Input {
         let loginTapped: AnyPublisher<Void, Never>
     }
@@ -64,8 +65,9 @@ public final class LoginViewModel: BaseViewModel {
         return socialLoginUseCase.execute()
             .handleEvents(
                 receiveOutput: { [weak self] result in
-                    self?.handleLoginSuccess(result)
-                    self?.syncDevice()
+                    guard let self else { return }
+                    self.handleLoginSuccess(result)
+                    self.syncDevice()
                 },
                 receiveCompletion: { completion in
                     print("[LoginVM] 🔚 로그인 흐름 완료: \(completion)")
@@ -79,17 +81,27 @@ public final class LoginViewModel: BaseViewModel {
     }
 
     private func syncDevice() {
+        let fcmToken = FCMTokenManager.shared.currentToken ?? ""
         deviceUseCase.updateCurrentDevice()
-            .handleEvents(receiveOutput: {
-                print("[LoginVM] ✅ device API 성공")
-            })
+            .flatMap { [weak self] _ -> AnyPublisher<Void, Error> in
+                guard let self else {
+                    return Fail(error: NSError(domain: "LoginViewModel", code: -1)).eraseToAnyPublisher()
+                }
+                guard !fcmToken.isEmpty else {
+                    print("[LoginVM] ⚠️ FCM 토큰 없음 → 스킵")
+                    return Just(()).setFailureType(to: Error.self).eraseToAnyPublisher()
+                }
+                return self.deviceUseCase.updateFcmToken(fcmToken: fcmToken)
+            }
             .sink(
                 receiveCompletion: { completion in
                     if case let .failure(error) = completion {
                         print("[LoginVM] ⚠️ device API 실패: \(error.localizedDescription)")
                     }
                 },
-                receiveValue: { _ in }
+                receiveValue: { _ in
+                    print("[LoginVM] ✅ device + FCM API 성공")
+                }
             )
             .store(in: &cancellables)
     }

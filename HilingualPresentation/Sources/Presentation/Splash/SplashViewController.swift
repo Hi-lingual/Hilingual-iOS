@@ -5,10 +5,13 @@
 //  Created by 성현주 on 7/15/25.
 //
 
+import AppTrackingTransparency
 import Combine
+import GoogleMobileAds
 import UIKit
 import FirebaseCore
 import FirebaseRemoteConfig
+import FirebaseMessaging
 
 public final class SplashViewController: BaseUIViewController<SplashViewModel> {
 
@@ -19,6 +22,10 @@ public final class SplashViewController: BaseUIViewController<SplashViewModel> {
     // MARK: - Combine
 
     private let viewDidAppearSubject = PassthroughSubject<Void, Never>()
+
+    // MARK: - Ad
+
+    private var didInitializeMobileAds = false
 
     // MARK: - Firebase Remote Config
     private let remoteConfig = RemoteConfig.remoteConfig()
@@ -37,6 +44,30 @@ public final class SplashViewController: BaseUIViewController<SplashViewModel> {
 
     public override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        requestTrackingAuthorizationAndInitializeAds()
+    }
+
+    // MARK: - ATT & AdMob
+
+    private func requestTrackingAuthorizationAndInitializeAds() {
+        guard !didInitializeMobileAds else { return }
+
+        if #available(iOS 14, *),
+           ATTrackingManager.trackingAuthorizationStatus == .notDetermined {
+            ATTrackingManager.requestTrackingAuthorization { [weak self] _ in
+                Task { @MainActor in
+                    self?.initializeMobileAdsAndProceed()
+                }
+            }
+        } else {
+            initializeMobileAdsAndProceed()
+        }
+    }
+
+    private func initializeMobileAdsAndProceed() {
+        guard !didInitializeMobileAds else { return }
+        didInitializeMobileAds = true
+        MobileAds.shared.start()
         checkRemoteConfigVersion()
     }
 
@@ -134,7 +165,8 @@ public final class SplashViewController: BaseUIViewController<SplashViewModel> {
 
     public override func bind(viewModel: SplashViewModel) {
         let output = viewModel.transform(input: .init(
-            viewDidLoad: viewDidAppearSubject.eraseToAnyPublisher()
+            viewDidLoad: viewDidAppearSubject.eraseToAnyPublisher(),
+            fcmToken: Messaging.messaging().fcmToken ?? ""
         ))
 
         output.navigateToHome
