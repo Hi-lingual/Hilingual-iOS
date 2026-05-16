@@ -94,7 +94,7 @@ public final class NicknameEditViewModel: BaseViewModel {
         case .empty:
             nicknameStateSubject.send(.normal)
         case .tooShort:
-            nicknameStateSubject.send(.error("최소 2글자 이상 입력해주세요."))
+            nicknameStateSubject.send(.error("최소 2글자 이상 입력해주세요.", shouldShake: false))
         case .containsInvalidCharacters:
             nicknameStateSubject.send(.error("특수문자, 이모지는 사용이 불가능해요."))
         case .valid:

@@ -8,16 +8,16 @@
 import UIKit
 import SnapKit
 
-final class ProfileRow: UIView {
+enum ProfileRowType {
+    case none
+    case editable
+}
 
-    enum RowType {
-        case none
-        case editable
-    }
+final class ProfileRow: UIView {
 
     // MARK: - Properties
 
-    private let type: RowType
+    private let type: ProfileRowType
 
     // MARK: - UI Components
 
@@ -38,7 +38,9 @@ final class ProfileRow: UIView {
 
     private let editImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = UIImage(named: "ic_pen_24_ios", in: .module, compatibleWith: nil)
+        imageView.image = UIImage(named: "ic_pen_24_ios", in: .module, compatibleWith: nil)?
+            .withRenderingMode(.alwaysTemplate)
+        imageView.tintColor = .gray300
         imageView.contentMode = .scaleAspectFit
         return imageView
     }()
@@ -62,7 +64,7 @@ final class ProfileRow: UIView {
 
     // MARK: - Init
 
-    init(title: String, value: String, type: RowType = .none) {
+    init(title: String, value: String, type: ProfileRowType = .none) {
         self.type = type
         super.init(frame: .zero)
         titleLabel.text = title
