@@ -51,7 +51,7 @@ final class NicknameEditView: BaseUIView {
 
         changeButton.snp.makeConstraints {
             $0.horizontalEdges.equalToSuperview().inset(16)
-            $0.bottom.equalToSuperview().inset(50)
+            $0.bottom.equalTo(keyboardLayoutGuide.snp.top).offset(-16)
         }
     }
 

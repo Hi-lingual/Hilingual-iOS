@@ -39,6 +39,11 @@ public final class NicknameEditViewController: BaseUIViewController<NicknameEdit
         nicknameSubject.send(currentNickname)
     }
 
+    public override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        nicknameEditView.nicknameTextField.textField.becomeFirstResponder()
+    }
+
     // MARK: - Setup
 
     public override func setUI() {
