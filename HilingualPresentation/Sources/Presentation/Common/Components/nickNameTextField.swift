@@ -119,6 +119,13 @@ final class nickNameTextField: BaseUIView {
         )
     }
 
+    func setText(_ text: String) {
+        let noSpaces = text.replacingOccurrences(of: " ", with: "")
+        let trimmed = noSpaces.count > maxLength ? String(noSpaces.prefix(maxLength)) : noSpaces
+        textField.attributedText = .pretendard(.body_m_16, text: trimmed)
+        updateCharacterCount()
+    }
+
     func updateState(_ state: State) {
         switch state {
         case .normal:
@@ -205,9 +212,6 @@ final class nickNameTextField: BaseUIView {
     @objc
     private func textDidChange() {
         let current = textField.text ?? ""
-        let noSpaces = current.replacingOccurrences(of: " ", with: "")
-        let trimmed = noSpaces.count > maxLength ? String(noSpaces.prefix(maxLength)) : noSpaces
-        textField.attributedText = .pretendard(.body_m_16, text: trimmed)
-        updateCharacterCount()
+        setText(current)
     }
 }
