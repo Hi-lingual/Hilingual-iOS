@@ -11,11 +11,8 @@ import HilingualDomain
 
 public final class LoginViewModel: BaseViewModel {
     
-    private var fcmToken: String = ""
-    
     public struct Input {
         let loginTapped: AnyPublisher<Void, Never>
-        let fcmToken: String
     }
 
     public struct Output {
@@ -43,8 +40,6 @@ public final class LoginViewModel: BaseViewModel {
     }
 
     public func transform(input: Input) -> Output {
-        fcmToken = input.fcmToken
-        
         input.loginTapped
             .handleEvents(receiveOutput: { _ in
                 print("[LoginVM] 🔘 로그인 버튼 탭 감지됨")
@@ -72,7 +67,7 @@ public final class LoginViewModel: BaseViewModel {
                 receiveOutput: { [weak self] result in
                     guard let self else { return }
                     self.handleLoginSuccess(result)
-                    self.syncDevice(fcmToken: self.fcmToken)
+                    self.syncDevice()
                 },
                 receiveCompletion: { completion in
                     print("[LoginVM] 🔚 로그인 흐름 완료: \(completion)")
@@ -85,7 +80,8 @@ public final class LoginViewModel: BaseViewModel {
             .eraseToAnyPublisher()
     }
 
-    private func syncDevice(fcmToken: String) {
+    private func syncDevice() {
+        let fcmToken = FCMTokenManager.shared.currentToken ?? ""
         deviceUseCase.updateCurrentDevice()
             .flatMap { [weak self] _ -> AnyPublisher<Void, Error> in
                 guard let self else {

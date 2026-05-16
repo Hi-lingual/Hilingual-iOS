@@ -5,7 +5,6 @@
 //  Created by 성현주 on 8/26/25.
 //
 
-
 import UIKit
 
 public final class DeeplinkManager {

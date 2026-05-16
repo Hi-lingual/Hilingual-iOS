@@ -53,10 +53,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 extension AppDelegate: MessagingDelegate {
     nonisolated func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
         guard let fcmToken else { return }
+        
         print("[FCM] 토큰 갱신: \(fcmToken)")
+        
+        Task { @MainActor in
+            FCMTokenManager.shared.currentToken = fcmToken
+        }
     }
 }
-
 extension AppDelegate: UNUserNotificationCenterDelegate {
     nonisolated func userNotificationCenter(
         _ center: UNUserNotificationCenter,
