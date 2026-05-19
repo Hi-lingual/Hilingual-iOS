@@ -18,6 +18,8 @@ public final class MypageViewController: BaseUIViewController<MypageViewModel> {
     private let logoutTappedSubject = PassthroughSubject<Void, Never>()
     private var hasReceivedBannerOnce = false
     private var didLoadBannerAd = false
+    private var bannerRetryCount = 0
+    private let maxBannerRetryCount = 3
     
     // MARK: - Life Cycle
     
@@ -173,8 +175,6 @@ public final class MypageViewController: BaseUIViewController<MypageViewModel> {
         let adSize = adSizeFor(
             cgSize: CGSize(width: width, height: 70)
         )
-        let banner = BannerView()
-
 
         mypageView.bannerView.delegate = self
         mypageView.bannerView.adSize = adSize
@@ -192,19 +192,40 @@ public final class MypageViewController: BaseUIViewController<MypageViewModel> {
 extension MypageViewController: BannerViewDelegate {
     
     public func bannerViewDidReceiveAd(_ bannerView: BannerView) {
+        bannerRetryCount = 0
+
         mypageView.bannerPlaceholderImageView.removeFromSuperview()
-        
+
         hasReceivedBannerOnce = true
         bannerView.alpha = 0
-        
+
         UIView.animate(withDuration: 1) {
             bannerView.alpha = 1
         }
-        
+
         mypageView.updateBannerHeight(bannerView.adSize.size.height)
     }
     
-    public func bannerView(_ bannerView: BannerView, didFailToReceiveAdWithError error: Error) {
+    public func bannerView(
+        _ bannerView: BannerView,
+        didFailToReceiveAdWithError error: Error
+    ) {
         print("AdMob error:", error)
+
+        didLoadBannerAd = false
+
+        guard bannerRetryCount < maxBannerRetryCount else { return }
+
+        bannerRetryCount += 1
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5) { [weak self] in
+            guard let self else { return }
+
+            let width = floor(self.view.bounds.width)
+            guard width > 0 else { return }
+
+            self.didLoadBannerAd = true
+            self.loadBannerAd(width: width)
+        }
     }
 }
