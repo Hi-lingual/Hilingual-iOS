@@ -16,8 +16,10 @@ public final class MypageViewController: BaseUIViewController<MypageViewModel> {
     
     private let mypageView = MypageView()
     private let logoutTappedSubject = PassthroughSubject<Void, Never>()
-    private var lastLoadedBannerWidth: CGFloat = 0
     private var hasReceivedBannerOnce = false
+    private var didLoadBannerAd = false
+    private var bannerRetryCount = 0
+    private let maxBannerRetryCount = 3
     
     // MARK: - Life Cycle
     
@@ -29,7 +31,14 @@ public final class MypageViewController: BaseUIViewController<MypageViewModel> {
     
     public override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        loadBannerAd()
+        
+        guard !didLoadBannerAd else { return }
+        
+        let width = floor(view.bounds.width)
+        guard width > 0 else { return }
+        
+        didLoadBannerAd = true
+        loadBannerAd(width: width)
     }
     
     // MARK: - Custom Method
@@ -95,14 +104,14 @@ public final class MypageViewController: BaseUIViewController<MypageViewModel> {
             .sink { [weak self] in
                 guard let self else { return }
                 let onboardingVC = self.diContainer.makeSplashViewController()
-                changeRootVC(onboardingVC,animated: true)
+                changeRootVC(onboardingVC, animated: true)
             }
             .store(in: &cancellables)
         
         output.logoutError
             .receive(on: RunLoop.main)
             .sink { [weak self] error in
-                //TODO: - error 모달 추가하기
+                // TODO: - error 모달 추가하기
             }
             .store(in: &cancellables)
         
@@ -116,13 +125,12 @@ public final class MypageViewController: BaseUIViewController<MypageViewModel> {
                 )
             }
             .store(in: &cancellables)
-        
     }
     
-    // MARK: - PrivatMethod
+    // MARK: - Private Methods
     
     @objc
-    func presentLogoutDialog() {
+    private func presentLogoutDialog() {
         guard let window = UIApplication.shared.windows.first else { return }
         
         let dialog = Dialog()
@@ -150,32 +158,30 @@ public final class MypageViewController: BaseUIViewController<MypageViewModel> {
     }
     
     @objc
-    func editButtonTapped() {
+    private func editButtonTapped() {
         let editProfileVC = self.diContainer.makeEditProfileViewController()
         editProfileVC.hidesBottomBarWhenPushed = true
         navigationController?.pushViewController(editProfileVC, animated: true)
     }
     
     @objc
-    func myFeedProfileButtonTapped() {
+    private func myFeedProfileButtonTapped() {
         let myFeedProfileVC = self.diContainer.makeMyFeedProfileViewController()
         myFeedProfileVC.hidesBottomBarWhenPushed = true
         navigationController?.pushViewController(myFeedProfileVC, animated: true)
     }
     
-    private func loadBannerAd() {
-        let width = floor(mypageView.bannerContainerView.bounds.width)
-        guard width > 0 else { return }
-        guard abs(lastLoadedBannerWidth - width) > 0.5 else { return }
-        lastLoadedBannerWidth = width
-
-        let adSize = largeAnchoredAdaptiveBanner(width: width)
+    private func loadBannerAd(width: CGFloat) {
+        let adSize = adSizeFor(
+            cgSize: CGSize(width: width, height: 70)
+        )
 
         mypageView.bannerView.delegate = self
         mypageView.bannerView.adSize = adSize
         mypageView.bannerView.rootViewController = self
         mypageView.bannerView.adUnitID = Bundle.main.infoDictionary?["AD_BANNER_UNIT_ID"] as? String ?? ""
-        mypageView.updateBannerHeight(adSize.size.height)
+
+        mypageView.updateBannerHeight(70)
 
         mypageView.bannerView.load(Request())
     }
@@ -184,21 +190,42 @@ public final class MypageViewController: BaseUIViewController<MypageViewModel> {
 // MARK: - BannerViewDelegate
 
 extension MypageViewController: BannerViewDelegate {
-
+    
     public func bannerViewDidReceiveAd(_ bannerView: BannerView) {
+        bannerRetryCount = 0
+
         mypageView.bannerPlaceholderImageView.removeFromSuperview()
 
         hasReceivedBannerOnce = true
         bannerView.alpha = 0
+
         UIView.animate(withDuration: 1) {
             bannerView.alpha = 1
         }
+
         mypageView.updateBannerHeight(bannerView.adSize.size.height)
     }
-
-    public func bannerView(_ bannerView: BannerView, didFailToReceiveAdWithError error: Error) {
+    
+    public func bannerView(
+        _ bannerView: BannerView,
+        didFailToReceiveAdWithError error: Error
+    ) {
         print("AdMob error:", error)
-        guard hasReceivedBannerOnce == false else { return }
-        mypageView.updateBannerHeight(0)
+
+        didLoadBannerAd = false
+
+        guard bannerRetryCount < maxBannerRetryCount else { return }
+
+        bannerRetryCount += 1
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5) { [weak self] in
+            guard let self else { return }
+
+            let width = floor(self.view.bounds.width)
+            guard width > 0 else { return }
+
+            self.didLoadBannerAd = true
+            self.loadBannerAd(width: width)
+        }
     }
 }
