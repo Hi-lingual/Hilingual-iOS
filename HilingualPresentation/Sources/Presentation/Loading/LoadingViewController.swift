@@ -13,6 +13,10 @@ public final class LoadingViewController: BaseUIViewController<LoadingViewModel>
     
     // MARK: - Properties
     
+    private var adLoadRetryCount = 0
+    private static let maxAdRetryCount = 3
+    private var pendingDiaryId: Int?
+    
     private let loadingView = LoadingView()
     private var interstitial: InterstitialAd?
     
@@ -126,25 +130,56 @@ public final class LoadingViewController: BaseUIViewController<LoadingViewModel>
             with: Bundle.main.infoDictionary?["AD_INTERSTITIAL_UNIT_ID"] as? String ?? "",
             request: Request()
         ) { [weak self] ad, error in
+            guard let self else { return }
             if let error {
                 print("Interstitial load failed: \(error)")
+                self.retryLoadingAdIfNeeded()
                 return
             }
-            self?.interstitial = ad
-            self?.interstitial?.fullScreenContentDelegate = self
+            self.adLoadRetryCount = 0
+            self.interstitial = ad
+            self.interstitial?.fullScreenContentDelegate = self
+            
+            if let pendingDiaryId = self.pendingDiaryId, let ad = ad {
+                self.pendingDiaryId = nil
+                self.currentDiaryId = pendingDiaryId
+                ad.present(from: self)
+            }
         }
     }
-    
+    private func retryLoadingAdIfNeeded() {
+        guard adLoadRetryCount < Self.maxAdRetryCount else {
+            print("Ad load failed after \(Self.maxAdRetryCount) retries")
+            if let pendingDiaryId = self.pendingDiaryId {
+                self.pendingDiaryId = nil
+                DispatchQueue.main.async {
+                    self.pushDiaryDetail(diaryId: pendingDiaryId)
+                }
+            }
+            return
+        }
+        
+        let delay = pow(2.0, Double(adLoadRetryCount))
+        adLoadRetryCount += 1
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
+            self?.loadInterstitialAd()
+        }
+    }
+
     private func goToNextView() {
         viewModel?.diaryIdPublisher
             .compactMap { $0 }
             .first()
             .sink { [weak self] (diaryId: Int) in
-                guard let self = self else { return }
-                self.currentDiaryId = diaryId
+                guard let self else { return }
                 if let ad = self.interstitial {
+                    self.currentDiaryId = diaryId
                     ad.present(from: self)
+                } else if self.adLoadRetryCount < Self.maxAdRetryCount {
+                    self.pendingDiaryId = diaryId
                 } else {
+                    self.currentDiaryId = diaryId
                     self.pushDiaryDetail(diaryId: diaryId)
                 }
             }
@@ -166,13 +201,14 @@ public final class LoadingViewController: BaseUIViewController<LoadingViewModel>
 
 extension LoadingViewController: FullScreenContentDelegate {
     public func adDidDismissFullScreenContent(_ ad: FullScreenPresentingAd) {
+        interstitial = nil
         guard let diaryId = currentDiaryId else { return }
         viewModel?.patchAdWatch(diaryId: diaryId)
         pushDiaryDetail(diaryId: diaryId)
     }
     
     public func ad(_ ad: FullScreenPresentingAd, didFailToPresentFullScreenContentWithError error: Error) {
-        print("Interstitial present failed: \(error)")
+        interstitial = nil
         guard let diaryId = currentDiaryId else { return }
         pushDiaryDetail(diaryId: diaryId)
     }
