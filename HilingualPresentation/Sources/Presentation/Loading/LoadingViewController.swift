@@ -20,6 +20,8 @@ public final class LoadingViewController: BaseUIViewController<LoadingViewModel>
     private let loadingView = LoadingView()
     private var interstitial: InterstitialAd?
     
+    private var adLoadTimestamp: Date?
+    
     private let retryTappedSubject = PassthroughSubject<Void, Never>()
     private let closeTappedSubject = PassthroughSubject<Void, Never>()
     
@@ -31,7 +33,6 @@ public final class LoadingViewController: BaseUIViewController<LoadingViewModel>
         super.viewDidLoad()
         addTarget()
         setStyle()
-        loadInterstitialAd()
     }
     
     public override func viewWillAppear(_ animated: Bool) {
@@ -125,20 +126,25 @@ public final class LoadingViewController: BaseUIViewController<LoadingViewModel>
     
     // MARK: - Navigation
     
-    private func loadInterstitialAd() {
-        InterstitialAd.load(
-            with: Bundle.main.infoDictionary?["AD_INTERSTITIAL_UNIT_ID"] as? String ?? "",
-            request: Request()
-        ) { [weak self] ad, error in
-            guard let self else { return }
-            if let error {
-                print("Interstitial load failed: \(error)")
+    public func preloadAd() {
+        if let _ = interstitial, isAdValid() { return }
+        
+        let unitID = Bundle.main.infoDictionary?["AD_INTERSTITIAL_UNIT_ID"] as? String ?? ""
+        
+        InterstitialAd.load(with: unitID, request: Request()) { [weak self] ad, error in
+            guard let self = self else { return }
+            
+            if let error = error {
+                print("❌ 광고 로드 실패: \(error.localizedDescription)")
                 self.retryLoadingAdIfNeeded()
                 return
             }
+            
             self.adLoadRetryCount = 0
             self.interstitial = ad
             self.interstitial?.fullScreenContentDelegate = self
+            self.adLoadTimestamp = Date()
+            print("✅ 광고 로드 완료")
             
             if let pendingDiaryId = self.pendingDiaryId, let ad = ad {
                 self.pendingDiaryId = nil
@@ -147,9 +153,15 @@ public final class LoadingViewController: BaseUIViewController<LoadingViewModel>
             }
         }
     }
+    
+    private func isAdValid() -> Bool {
+        guard let timestamp = adLoadTimestamp else { return false }
+        return Date().timeIntervalSince(timestamp) < 3600
+    }
+    
     private func retryLoadingAdIfNeeded() {
         guard adLoadRetryCount < Self.maxAdRetryCount else {
-            print("Ad load failed after \(Self.maxAdRetryCount) retries")
+            print("🚨 재시도 횟수 초과 (\(Self.maxAdRetryCount)회) -> 광고 없이 화면 이동")
             if let pendingDiaryId = self.pendingDiaryId {
                 self.pendingDiaryId = nil
                 DispatchQueue.main.async {
@@ -161,24 +173,28 @@ public final class LoadingViewController: BaseUIViewController<LoadingViewModel>
         
         let delay = pow(2.0, Double(adLoadRetryCount))
         adLoadRetryCount += 1
+        print("🔄 광고 재시도 예약: \(delay)초 후 로드 (시도 \(adLoadRetryCount)/\(Self.maxAdRetryCount))")
         
         DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
-            self?.loadInterstitialAd()
+            self?.preloadAd()
         }
     }
-
+    
     private func goToNextView() {
         viewModel?.diaryIdPublisher
             .compactMap { $0 }
             .first()
             .sink { [weak self] (diaryId: Int) in
-                guard let self else { return }
-                if let ad = self.interstitial {
+                guard let self = self else { return }
+                
+                if let ad = self.interstitial, self.isAdValid() {
                     self.currentDiaryId = diaryId
                     ad.present(from: self)
-                } else if self.adLoadRetryCount < Self.maxAdRetryCount {
+                }
+                else if self.adLoadRetryCount < Self.maxAdRetryCount {
                     self.pendingDiaryId = diaryId
-                } else {
+                }
+                else {
                     self.currentDiaryId = diaryId
                     self.pushDiaryDetail(diaryId: diaryId)
                 }
@@ -202,6 +218,8 @@ public final class LoadingViewController: BaseUIViewController<LoadingViewModel>
 extension LoadingViewController: FullScreenContentDelegate {
     public func adDidDismissFullScreenContent(_ ad: FullScreenPresentingAd) {
         interstitial = nil
+        adLoadTimestamp = nil
+        
         guard let diaryId = currentDiaryId else { return }
         viewModel?.patchAdWatch(diaryId: diaryId)
         pushDiaryDetail(diaryId: diaryId)
@@ -209,6 +227,8 @@ extension LoadingViewController: FullScreenContentDelegate {
     
     public func ad(_ ad: FullScreenPresentingAd, didFailToPresentFullScreenContentWithError error: Error) {
         interstitial = nil
+        adLoadTimestamp = nil
+        
         guard let diaryId = currentDiaryId else { return }
         pushDiaryDetail(diaryId: diaryId)
     }

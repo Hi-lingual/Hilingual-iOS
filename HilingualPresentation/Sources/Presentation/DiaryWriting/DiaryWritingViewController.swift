@@ -223,6 +223,7 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
 
         let loadingVC = diContainer.makeLoadingViewController()
         loadingVC.viewModel?.postDiary(originalText: text, date: dateString, imageFile: imageData)
+        loadingVC.preloadAd()
         navigationController?.pushViewController(loadingVC, animated: true)
     }
 
