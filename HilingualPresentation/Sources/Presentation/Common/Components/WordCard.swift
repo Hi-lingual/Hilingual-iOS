@@ -57,7 +57,7 @@ final class WordCard: UIView {
         isPronouncing = false
         
         updateBookmarkImage()
-        updatePronunciationButtonImage()
+        setPronouncing(false)
         pronunciationButton.isHidden = !showsPronunciationButton
         bookmarkButton.setNeedsLayout()
         pronunciationButton.setNeedsLayout()
@@ -92,7 +92,7 @@ final class WordCard: UIView {
             }
             reasonLabel.snp.remakeConstraints {
                 $0.height.equalTo(0)
-                $0.trailing.equalTo(bookmarkButton.snp.leading).offset(-17)
+                $0.trailing.equalTo(bookmarkButton.snp.leading).inset(17)
             }
             savedDateLabel.snp.remakeConstraints {
                 $0.height.equalTo(0)
@@ -100,7 +100,7 @@ final class WordCard: UIView {
             phraseLabel.snp.remakeConstraints {
                 $0.top.equalTo(chipStackView.snp.bottom).offset(4)
                 $0.leading.equalToSuperview().inset(12)
-                $0.trailing.equalTo(bookmarkButton.snp.leading).offset(-4)
+                $0.trailing.equalTo(bookmarkButton.snp.leading).inset(4)
                 $0.bottom.equalToSuperview().inset(12)
             }
 
@@ -124,7 +124,7 @@ final class WordCard: UIView {
             reasonLabel.snp.makeConstraints {
                 $0.top.equalTo(explanationLabel.snp.bottom).offset(8)
                 $0.leading.equalToSuperview().inset(12)
-                $0.trailing.equalTo(bookmarkButton.snp.leading).offset(-17)
+                $0.trailing.equalTo(bookmarkButton.snp.leading).inset(17)
                 $0.bottom.equalToSuperview().inset(12)
             }
 
@@ -143,13 +143,13 @@ final class WordCard: UIView {
             phraseLabel.snp.remakeConstraints {
                 $0.top.equalTo(chipStackView.snp.bottom).offset(4)
                 $0.leading.equalToSuperview().inset(24)
-                $0.trailing.equalTo(bookmarkButton.snp.leading).offset(-8)
+                $0.trailing.equalTo(bookmarkButton.snp.leading).inset(8)
             }
 
             explanationLabel.snp.remakeConstraints {
                 $0.top.equalTo(phraseLabel.snp.bottom).offset(4)
                 $0.leading.equalToSuperview().inset(24)
-                $0.trailing.equalTo(bookmarkButton.snp.leading).offset(-8)
+                $0.trailing.equalTo(bookmarkButton.snp.leading).inset(8)
             }
             
             savedDateLabel.snp.remakeConstraints {
@@ -172,7 +172,7 @@ final class WordCard: UIView {
                 $0.bottom.equalTo(savedDateLabel)
             } else {
                 $0.top.equalToSuperview().inset(12)
-                $0.trailing.equalTo(bookmarkButton.snp.leading).offset(-4)
+                $0.trailing.equalTo(bookmarkButton.snp.leading).inset(4)
             }
             $0.width.height.equalTo(24)
         }
@@ -227,18 +227,19 @@ final class WordCard: UIView {
     @objc private func didTapPronunciation() {
         if isPronouncing {
             EnglishPronunciationPlayer.shared.stop()
-            return
+        } else {
+            EnglishPronunciationPlayer.shared.speak(phrase, didFinish: { [weak self] in
+                self?.setPronouncing(false)
+            }, didCancel: { [weak self] in
+                self?.setPronouncing(false)
+            })
         }
-
-        EnglishPronunciationPlayer.shared.speak(phrase) { [weak self] isSpeaking in
-            self?.isPronouncing = isSpeaking
-            self?.updatePronunciationButtonImage()
-        }
+        setPronouncing(!isPronouncing)
     }
 
-    private func updatePronunciationButtonImage() {
-        let imageName = isPronouncing ? "ic_play_gray_24_ios" : "ic_play_black_24_ios"
-        let image = UIImage(named: imageName, in: .module, compatibleWith: nil)?.withRenderingMode(.alwaysOriginal)
+    private func setPronouncing(_ value: Bool) {
+        isPronouncing = value
+        let image = UIImage(resource: value ? .icPlayGray24Ios : .icPlayBlack24Ios).withRenderingMode(.alwaysOriginal)
         pronunciationButton.setImage(image, for: .normal)
     }
 

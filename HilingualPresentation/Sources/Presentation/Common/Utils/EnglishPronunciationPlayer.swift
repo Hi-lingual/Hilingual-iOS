@@ -9,29 +9,18 @@ import AVFoundation
 
 public final class EnglishPronunciationPlayer: NSObject {
 
-    // MARK: - Properties
-
     public static let shared = EnglishPronunciationPlayer()
 
     private let synthesizer = AVSpeechSynthesizer()
     private var currentUtteranceIdentifier: ObjectIdentifier?
-    private var stateChanged: ((Bool) -> Void)?
     private var willSpeakRange: ((NSRange) -> Void)?
     private var didFinishSpeaking: (() -> Void)?
     private var didCancelSpeaking: (() -> Void)?
     private var preferredVoice: AVSpeechSynthesisVoice?
-    private var isPrepared = false
     private var isSessionActive = false
 
-    public var isSpeaking: Bool {
-        synthesizer.isSpeaking
-    }
-
-    public var isPaused: Bool {
-        synthesizer.isPaused
-    }
-
-    // MARK: - Init
+    public var isSpeaking: Bool { synthesizer.isSpeaking }
+    public var isPaused: Bool { synthesizer.isPaused }
 
     private override init() {
         super.init()
@@ -41,16 +30,19 @@ public final class EnglishPronunciationPlayer: NSObject {
     // MARK: - Public Method
 
     public func prepare() {
-        guard !isPrepared else { return }
-        isPrepared = true
-        configureAudioSession()
+        guard preferredVoice == nil else { return }
+        do {
+            let session = AVAudioSession.sharedInstance()
+            try session.setCategory(.playback, mode: .spokenAudio, options: [.duckOthers])
+        } catch {
+            print("오디오 세션 설정 실패: \(error.localizedDescription)")
+        }
         preferredVoice = AVSpeechSynthesisVoice(language: "en-US")
         preloadEngine()
     }
 
-    func speak(
+    public func speak(
         _ text: String,
-        stateChanged: ((Bool) -> Void)? = nil,
         willSpeakRange: ((NSRange) -> Void)? = nil,
         didFinish: (() -> Void)? = nil,
         didCancel: (() -> Void)? = nil
@@ -61,12 +53,10 @@ public final class EnglishPronunciationPlayer: NSObject {
         prepare()
 
         if synthesizer.isSpeaking {
-            self.stateChanged?(false)
-            clearCallbacks()
+            completeUtterance()
             synthesizer.stopSpeaking(at: .immediate)
         }
 
-        self.stateChanged = stateChanged
         self.willSpeakRange = willSpeakRange
         self.didFinishSpeaking = didFinish
         self.didCancelSpeaking = didCancel
@@ -75,11 +65,8 @@ public final class EnglishPronunciationPlayer: NSObject {
         let utterance = AVSpeechUtterance(string: phrase)
         utterance.voice = preferredVoice
         utterance.rate = AVSpeechUtteranceDefaultSpeechRate * 0.9
-        utterance.pitchMultiplier = 1.0
-        utterance.volume = 1.0
 
         currentUtteranceIdentifier = ObjectIdentifier(utterance)
-        stateChanged?(true)
         synthesizer.speak(utterance)
     }
 
@@ -99,7 +86,7 @@ public final class EnglishPronunciationPlayer: NSObject {
         synthesizer.stopSpeaking(at: .immediate)
     }
 
-    // MARK: - Private Method
+    // MARK: - Private
 
     private func preloadEngine() {
         activateAudioSession()
@@ -108,35 +95,32 @@ public final class EnglishPronunciationPlayer: NSObject {
         synthesizer.write(utterance) { _ in }
     }
 
-    private func configureAudioSession() {
-        do {
-            let session = AVAudioSession.sharedInstance()
-            try session.setCategory(.playback, mode: .spokenAudio, options: [.duckOthers])
-        } catch {
-            print("발음 재생 오디오 세션 설정 실패: \(error.localizedDescription)")
-        }
-    }
-
     private func activateAudioSession() {
         guard !isSessionActive else { return }
         do {
-            let session = AVAudioSession.sharedInstance()
-            try session.setActive(true)
+            try AVAudioSession.sharedInstance().setActive(true)
             isSessionActive = true
         } catch {
-            print("발음 재생 오디오 세션 활성화 실패: \(error.localizedDescription)")
+            print("오디오 세션 활성화 실패: \(error.localizedDescription)")
         }
     }
 
     private func deactivateAudioSession() {
         guard isSessionActive else { return }
         do {
-            let session = AVAudioSession.sharedInstance()
-            try session.setActive(false, options: [.notifyOthersOnDeactivation])
+            try AVAudioSession.sharedInstance().setActive(false, options: [.notifyOthersOnDeactivation])
             isSessionActive = false
         } catch {
-            print("발음 재생 오디오 세션 비활성화 실패: \(error.localizedDescription)")
+            print("오디오 세션 비활성화 실패: \(error.localizedDescription)")
         }
+    }
+
+    private func completeUtterance() {
+        currentUtteranceIdentifier = nil
+        deactivateAudioSession()
+        willSpeakRange = nil
+        didFinishSpeaking = nil
+        didCancelSpeaking = nil
     }
 }
 
@@ -160,10 +144,7 @@ extension EnglishPronunciationPlayer: AVSpeechSynthesizerDelegate {
         DispatchQueue.main.async { [weak self] in
             guard let self, self.currentUtteranceIdentifier == utteranceID else { return }
             self.didFinishSpeaking?()
-            self.stateChanged?(false)
-            self.currentUtteranceIdentifier = nil
-            self.deactivateAudioSession()
-            self.clearCallbacks()
+            self.completeUtterance()
         }
     }
 
@@ -172,17 +153,7 @@ extension EnglishPronunciationPlayer: AVSpeechSynthesizerDelegate {
         DispatchQueue.main.async { [weak self] in
             guard let self, self.currentUtteranceIdentifier == utteranceID else { return }
             self.didCancelSpeaking?()
-            self.stateChanged?(false)
-            self.currentUtteranceIdentifier = nil
-            self.deactivateAudioSession()
-            self.clearCallbacks()
+            self.completeUtterance()
         }
-    }
-
-    private func clearCallbacks() {
-        stateChanged = nil
-        willSpeakRange = nil
-        didFinishSpeaking = nil
-        didCancelSpeaking = nil
     }
 }

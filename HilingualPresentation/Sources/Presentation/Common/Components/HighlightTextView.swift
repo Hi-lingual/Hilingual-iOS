@@ -138,16 +138,8 @@ final class HighlightTextView: BaseUIView {
     }
     
     func stopSpeech() {
-        stopHighlightTimer()
         EnglishPronunciationPlayer.shared.stop()
-        readingStartLocation = nil
-        speechButton.updateState(isListening: false)
-
-        if displayedText == highlightText {
-            highlightCorrections(textType: highlightText, diffRanges: diffRanges)
-        } else {
-            textView.attributedText = makeBaseAttributedText(originalText, color: .hilingualBlack, forceWrap: true)
-        }
+        resetReadingHighlight()
     }
 
     func toggleText() {
@@ -226,14 +218,10 @@ private extension HighlightTextView {
         targetHighlightPosition = target
         guard highlightTimer == nil else { return }
         highlightTimer = Timer.scheduledTimer(withTimeInterval: 0.055, repeats: true) { [weak self] _ in
-            self?.tickHighlight()
+            guard let self, self.currentHighlightPosition < self.targetHighlightPosition else { return }
+            self.currentHighlightPosition += 1
+            self.renderReadingHighlight(upTo: self.currentHighlightPosition)
         }
-    }
-
-    func tickHighlight() {
-        guard currentHighlightPosition < targetHighlightPosition else { return }
-        currentHighlightPosition += 1
-        renderReadingHighlight(upTo: currentHighlightPosition)
     }
 
     func stopHighlightTimer() {
@@ -273,6 +261,16 @@ private extension HighlightTextView {
         startReading(from: 0)
     }
 
+    func firstNonWhitespaceLocation(from location: Int, in text: NSString) -> Int {
+        var index = min(max(location, 0), text.length)
+        while index < text.length {
+            let char = text.substring(with: NSRange(location: index, length: 1))
+            if char.rangeOfCharacter(from: .whitespacesAndNewlines) == nil { break }
+            index += 1
+        }
+        return index
+    }
+
     func startReading(from location: Int) {
         let nsText = highlightText as NSString
         guard !highlightText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
@@ -281,13 +279,7 @@ private extension HighlightTextView {
             EnglishPronunciationPlayer.shared.stop()
         }
 
-        var startLocation = min(max(location, 0), nsText.length)
-        while startLocation < nsText.length {
-            let current = nsText.substring(with: NSRange(location: startLocation, length: 1))
-            if current.rangeOfCharacter(from: .whitespacesAndNewlines) == nil { break }
-            startLocation += 1
-        }
-
+        let startLocation = firstNonWhitespaceLocation(from: location, in: nsText)
         let text = nsText.substring(from: startLocation)
         guard !text.isEmpty else { return }
 
@@ -299,9 +291,6 @@ private extension HighlightTextView {
 
         EnglishPronunciationPlayer.shared.speak(
             text,
-            stateChanged: { [weak self] isSpeaking in
-                self?.speechButton.updateState(isListening: isSpeaking)
-            },
             willSpeakRange: { [weak self] characterRange in
                 guard let self, let start = self.readingStartLocation else { return }
                 self.animateHighlight(to: start + NSMaxRange(characterRange))
@@ -324,26 +313,30 @@ private extension HighlightTextView {
 
     // MARK: - Reading Highlight
 
+    func readRange(upTo location: Int, length: Int) -> NSRange? {
+        let progressLocation = min(max(location, 0), length)
+        let startLocation = min(max(readingStartLocation ?? 0, 0), progressLocation)
+        guard progressLocation > startLocation else { return nil }
+        return NSRange(location: startLocation, length: progressLocation - startLocation)
+    }
+
     func renderReadingHighlight(upTo location: Int) {
         let text = displayedText
         let attributedString = makeBaseAttributedText(text, color: .gray400)
-        let isHighlight = (text == highlightText)
+        let isHighlightText = (text == highlightText)
 
-        if isHighlight {
+        if isHighlightText {
             applyDiffHighlights(to: attributedString, color: UIColor.hilingualOrange.withAlphaComponent(0.55))
         }
 
-        let progressLocation = min(max(location, 0), attributedString.length)
-        let startLocation = min(max(readingStartLocation ?? 0, 0), progressLocation)
-        guard progressLocation > startLocation else {
+        guard let readRange = readRange(upTo: location, length: attributedString.length) else {
             textView.attributedText = attributedString
             return
         }
 
-        let readRange = NSRange(location: startLocation, length: progressLocation - startLocation)
         attributedString.addAttribute(.foregroundColor, value: UIColor.hilingualBlack, range: readRange)
 
-        if isHighlight {
+        if isHighlightText {
             applyDiffHighlights(to: attributedString, color: .hilingualOrange, in: readRange)
         }
 
@@ -354,6 +347,7 @@ private extension HighlightTextView {
 
     @objc func didTapTextView(_ gesture: UITapGestureRecognizer) {
         guard gesture.state == .ended,
+              !isHighlightingEnabled,
               !highlightText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
 
         let location = gesture.location(in: textView)
@@ -361,42 +355,26 @@ private extension HighlightTextView {
         startReading(from: sentenceStartLocation)
     }
 
-    func characterIndex(at point: CGPoint) -> Int {
+    func sentenceStartLocation(at point: CGPoint) -> Int? {
         textView.layoutManager.ensureLayout(for: textView.textContainer)
-        return textView.layoutManager.characterIndex(
-            for: point,
-            in: textView.textContainer,
-            fractionOfDistanceBetweenInsertionPoints: nil
+        let index = textView.layoutManager.characterIndex(
+            for: point, in: textView.textContainer, fractionOfDistanceBetweenInsertionPoints: nil
         )
-    }
 
-    func sentenceRange(containing characterIndex: Int, in text: NSString) -> NSRange {
-        var result = NSRange(location: 0, length: 0)
-        text.enumerateSubstrings(
-            in: NSRange(location: 0, length: text.length),
-            options: .bySentences
-        ) { _, substringRange, _, stop in
-            if NSLocationInRange(characterIndex, substringRange) {
-                result = substringRange
+        let text = highlightText as NSString
+        guard index < text.length else { return nil }
+
+        var sentenceRange = NSRange(location: 0, length: 0)
+        text.enumerateSubstrings(in: NSRange(location: 0, length: text.length), options: .bySentences) { _, range, _, stop in
+            if NSLocationInRange(index, range) {
+                sentenceRange = range
                 stop.pointee = true
             }
         }
-        return result
-    }
 
-    func trimmedStartLocation(of sentenceRange: NSRange, in text: NSString) -> Int? {
         let sentence = text.substring(with: sentenceRange)
-        let leadingWhitespaceCount = sentence.prefix(while: { $0.isWhitespace }).count
-        let start = sentenceRange.location + leadingWhitespaceCount
+        let start = sentenceRange.location + sentence.prefix(while: { $0.isWhitespace }).count
         return start < NSMaxRange(sentenceRange) ? start : nil
-    }
-
-    func sentenceStartLocation(at point: CGPoint) -> Int? {
-        let text = highlightText as NSString
-        let index = characterIndex(at: point)
-        guard index < text.length else { return nil }
-        let range = sentenceRange(containing: index, in: text)
-        return trimmedStartLocation(of: range, in: text)
     }
 
     @objc func handleTapGesture() {
