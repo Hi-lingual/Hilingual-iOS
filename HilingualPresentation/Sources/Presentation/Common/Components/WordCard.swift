@@ -23,12 +23,16 @@ final class WordCard: UIView {
     private let explanationLabel = UILabel()
     private let savedDateLabel = UILabel()
     private let reasonLabel = UILabel()
+    private let pronunciationButton = UIButton(type: .custom)
     private let bookmarkButton = UIButton(type: .custom)
 
     // MARK: - State
 
     private var isMarked: Bool = false
     private var cardType: WordCardType = .basic
+    private var phrase: String = ""
+    private var showsPronunciationButton: Bool = false
+    private var isPronouncing: Bool = false
     var onBookmarkToggled: ((Bool) -> Void)?
 
     // MARK: - Init
@@ -45,12 +49,18 @@ final class WordCard: UIView {
 
     // MARK: - Configure
 
-    func configure(type: WordCardType, data: PhraseData) {
+    func configure(type: WordCardType, data: PhraseData, showsPronunciationButton: Bool = false) {
         self.cardType = type
         isMarked = data.isMarked
+        phrase = data.phrase
+        self.showsPronunciationButton = showsPronunciationButton
+        isPronouncing = false
         
         updateBookmarkImage()
+        updatePronunciationButtonImage()
+        pronunciationButton.isHidden = !showsPronunciationButton
         bookmarkButton.setNeedsLayout()
+        pronunciationButton.setNeedsLayout()
         layoutIfNeeded()
         
         // Chip 초기화 및 추가
@@ -90,7 +100,7 @@ final class WordCard: UIView {
             phraseLabel.snp.remakeConstraints {
                 $0.top.equalTo(chipStackView.snp.bottom).offset(4)
                 $0.leading.equalToSuperview().inset(12)
-                $0.trailing.equalToSuperview().inset(40)
+                $0.trailing.equalTo(bookmarkButton.snp.leading).offset(-4)
                 $0.bottom.equalToSuperview().inset(12)
             }
 
@@ -133,19 +143,19 @@ final class WordCard: UIView {
             phraseLabel.snp.remakeConstraints {
                 $0.top.equalTo(chipStackView.snp.bottom).offset(4)
                 $0.leading.equalToSuperview().inset(24)
-                $0.trailing.equalToSuperview().inset(68)
+                $0.trailing.equalTo(bookmarkButton.snp.leading).offset(-8)
             }
 
             explanationLabel.snp.remakeConstraints {
                 $0.top.equalTo(phraseLabel.snp.bottom).offset(4)
                 $0.leading.equalToSuperview().inset(24)
-                $0.trailing.equalToSuperview().inset(68)
+                $0.trailing.equalTo(bookmarkButton.snp.leading).offset(-8)
             }
             
             savedDateLabel.snp.remakeConstraints {
                 $0.top.equalTo(explanationLabel.snp.bottom).offset(80)
                 $0.trailing.equalToSuperview().inset(24)
-                $0.bottom.equalToSuperview().inset(40)
+                $0.bottom.equalToSuperview().inset(33)
             }
         }
         
@@ -154,6 +164,17 @@ final class WordCard: UIView {
             let size: CGFloat = (type == .withDate) ? 36 : 28
             $0.top.trailing.equalToSuperview().inset(inset)
             $0.width.height.equalTo(size)
+        }
+
+        pronunciationButton.snp.remakeConstraints {
+            if type == .withDate {
+                $0.leading.equalToSuperview().inset(24)
+                $0.bottom.equalTo(savedDateLabel)
+            } else {
+                $0.top.equalToSuperview().inset(12)
+                $0.trailing.equalTo(bookmarkButton.snp.leading).offset(-4)
+            }
+            $0.width.height.equalTo(24)
         }
     }
 
@@ -174,9 +195,19 @@ final class WordCard: UIView {
         savedDateLabel.font = .pretendard(.cap_r_12)
         savedDateLabel.textColor = .gray400
 
+        pronunciationButton.addTarget(self, action: #selector(didTapPronunciation), for: .touchUpInside)
+
         bookmarkButton.addTarget(self, action: #selector(didTapBookmark), for: .touchUpInside)
 
-        addSubviews(chipStackView, phraseLabel, explanationLabel, savedDateLabel, reasonLabel, bookmarkButton)
+        addSubviews(
+            chipStackView,
+            phraseLabel,
+            explanationLabel,
+            savedDateLabel,
+            reasonLabel,
+            pronunciationButton,
+            bookmarkButton
+        )
     }
 
     private func setLayout() {
@@ -191,6 +222,24 @@ final class WordCard: UIView {
         isMarked.toggle()
         updateBookmarkImage()
         onBookmarkToggled?(isMarked)
+    }
+
+    @objc private func didTapPronunciation() {
+        if isPronouncing {
+            EnglishPronunciationPlayer.shared.stop()
+            return
+        }
+
+        EnglishPronunciationPlayer.shared.speak(phrase) { [weak self] isSpeaking in
+            self?.isPronouncing = isSpeaking
+            self?.updatePronunciationButtonImage()
+        }
+    }
+
+    private func updatePronunciationButtonImage() {
+        let imageName = isPronouncing ? "ic_play_gray_24_ios" : "ic_play_black_24_ios"
+        let image = UIImage(named: imageName, in: .module, compatibleWith: nil)?.withRenderingMode(.alwaysOriginal)
+        pronunciationButton.setImage(image, for: .normal)
     }
 
     private func updateBookmarkImage() {

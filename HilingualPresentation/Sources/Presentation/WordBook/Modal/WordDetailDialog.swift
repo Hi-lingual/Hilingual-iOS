@@ -69,7 +69,7 @@ final class WordDetailDialog: UIView {
     // MARK: - Public Method
 
     func configure(data: PhraseData) {
-        wordCard.configure(type: .withDate, data: data)
+        wordCard.configure(type: .withDate, data: data, showsPronunciationButton: true)
 
         wordCard.onBookmarkToggled = { [weak self] isMarked in
             self?.onBookmarkToggled?(Int(data.phraseId), isMarked)
