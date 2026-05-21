@@ -24,6 +24,9 @@ final class HighlightTextView: BaseUIView {
     private var diffRanges: [DiffRange] = []
     private var isHighlightingEnabled: Bool = true
     private var readingStartLocation: Int?
+    private var currentHighlightPosition: Int = 0
+    private var targetHighlightPosition: Int = 0
+    private var highlightTimer: Timer?
     
     
     // MARK: - UI Components
@@ -85,21 +88,23 @@ final class HighlightTextView: BaseUIView {
             $0.leading.trailing.equalToSuperview().inset(12)
         }
         
-        textCountLabel.snp.makeConstraints {
-            $0.trailing.equalToSuperview().inset(12)
-            $0.bottom.equalTo(speechButton)
-        }
-
         speechButton.snp.makeConstraints {
-            $0.top.equalTo(textView.snp.bottom).offset(16)
+            $0.top.equalTo(textView.snp.bottom).offset(12)
             $0.leading.equalToSuperview().inset(12)
             $0.width.equalTo(44)
             $0.height.equalTo(28)
             $0.bottom.equalToSuperview().inset(12)
         }
+
+        textCountLabel.snp.makeConstraints {
+            $0.trailing.equalToSuperview().inset(12)
+            $0.centerY.equalTo(speechButton)
+        }
     }
     
     func configure(image: String?, originalText: String, highlightText: String, diffRanges: [DiffRange], isHighlightingEnabled: Bool) {
+        EnglishPronunciationPlayer.shared.prepare()
+
         if EnglishPronunciationPlayer.shared.isSpeaking {
             EnglishPronunciationPlayer.shared.stop()
         }
@@ -127,30 +132,67 @@ final class HighlightTextView: BaseUIView {
     }
     
     func highlightCorrections(textType: String, diffRanges: [DiffRange]) {
-        let attributed = NSMutableAttributedString(attributedString: .pretendard(.body_r_15, text: textType, lineBreakMode: .byWordWrapping))
-        attributed.addAttribute(.foregroundColor, value: UIColor.hilingualBlack, range: NSRange(location: 0, length: attributed.length))
-        
-        for range in diffRanges {
-            let nsRange = NSRange(location: range.start, length: range.end - range.start)
-            attributed.addAttributes([.font: UIFont.pretendard(.body_m_15),
-                                      .foregroundColor: UIColor.hilingualOrange],
-                                     range: nsRange)
-        }
-        
-        textView.attributedText = attributed
+        let attributedString = makeBaseAttributedText(textType, color: .hilingualBlack)
+        applyDiffHighlights(to: attributedString, color: .hilingualOrange)
+        textView.attributedText = attributedString
     }
     
+    func stopSpeech() {
+        stopHighlightTimer()
+        EnglishPronunciationPlayer.shared.stop()
+        readingStartLocation = nil
+        speechButton.updateState(isListening: false)
+
+        if displayedText == highlightText {
+            highlightCorrections(textType: highlightText, diffRanges: diffRanges)
+        } else {
+            textView.attributedText = makeBaseAttributedText(originalText, color: .hilingualBlack, forceWrap: true)
+        }
+    }
+
     func toggleText() {
         if isHighlightingEnabled {
             highlightCorrections(textType: highlightText, diffRanges: diffRanges)
             textCountLabel.text = "\(highlightText.count)/1500"
+            let showButton = !highlightText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            updateSpeechButtonVisibility(isVisible: showButton)
         } else {
-            let attr = NSMutableAttributedString(attributedString: .pretendard(.body_r_15, text: originalText, lineBreakMode: .byWordWrapping, forceWrap: true))
-            attr.addAttribute(.foregroundColor, value: UIColor.hilingualBlack, range: NSRange(location: 0, length: attr.length))
-            textView.attributedText = attr
+            stopSpeech()
+            textView.attributedText = makeBaseAttributedText(originalText, color: .hilingualBlack, forceWrap: true)
             textCountLabel.text = "\(originalText.count)/1000"
+            updateSpeechButtonVisibility(isVisible: false)
         }
         isHighlightingEnabled.toggle()
+    }
+
+    private func updateSpeechButtonVisibility(isVisible: Bool) {
+        speechButton.isHidden = !isVisible
+
+        if isVisible {
+            speechButton.snp.remakeConstraints {
+                $0.top.equalTo(textView.snp.bottom).offset(12)
+                $0.leading.equalToSuperview().inset(12)
+                $0.width.equalTo(44)
+                $0.height.equalTo(28)
+                $0.bottom.equalToSuperview().inset(12)
+            }
+            textCountLabel.snp.remakeConstraints {
+                $0.trailing.equalToSuperview().inset(12)
+                $0.bottom.equalTo(speechButton)
+            }
+        } else {
+            speechButton.snp.remakeConstraints {
+                $0.top.equalTo(textView.snp.bottom)
+                $0.leading.equalToSuperview().inset(12)
+                $0.width.equalTo(0)
+                $0.height.equalTo(0)
+            }
+            textCountLabel.snp.remakeConstraints {
+                $0.top.equalTo(textView.snp.bottom).offset(12)
+                $0.trailing.equalToSuperview().inset(12)
+                $0.bottom.equalToSuperview().inset(12)
+            }
+        }
     }
 }
 
@@ -161,25 +203,70 @@ private extension HighlightTextView {
         textView.attributedText?.string ?? ""
     }
 
+    // MARK: - Attributed Text Helpers
+
+    func makeBaseAttributedText(_ text: String, color: UIColor, forceWrap: Bool = false) -> NSMutableAttributedString {
+        let attributedString = NSMutableAttributedString(attributedString: .pretendard(.body_r_15, text: text, lineBreakMode: .byWordWrapping, forceWrap: forceWrap))
+        attributedString.addAttribute(.foregroundColor, value: color, range: NSRange(location: 0, length: attributedString.length))
+        return attributedString
+    }
+
+    func applyDiffHighlights(to attributedString: NSMutableAttributedString, color: UIColor, in clampRange: NSRange? = nil) {
+        for diffRange in diffRanges {
+            var range = NSRange(location: diffRange.start, length: diffRange.end - diffRange.start)
+            if let clampRange { range = NSIntersectionRange(clampRange, range) }
+            guard range.length > 0, NSMaxRange(range) <= attributedString.length else { continue }
+            attributedString.addAttributes([.font: UIFont.pretendard(.body_m_15), .foregroundColor: color], range: range)
+        }
+    }
+
     // MARK: - Speech
 
+    func animateHighlight(to target: Int) {
+        targetHighlightPosition = target
+        guard highlightTimer == nil else { return }
+        highlightTimer = Timer.scheduledTimer(withTimeInterval: 0.055, repeats: true) { [weak self] _ in
+            self?.tickHighlight()
+        }
+    }
+
+    func tickHighlight() {
+        guard currentHighlightPosition < targetHighlightPosition else { return }
+        currentHighlightPosition += 1
+        renderReadingHighlight(upTo: currentHighlightPosition)
+    }
+
+    func stopHighlightTimer() {
+        highlightTimer?.invalidate()
+        highlightTimer = nil
+    }
+
     func resetReadingHighlight() {
+        stopHighlightTimer()
         readingStartLocation = nil
         speechButton.updateState(isListening: false)
 
         if displayedText == highlightText {
             highlightCorrections(textType: highlightText, diffRanges: diffRanges)
         } else {
-            let attr = NSMutableAttributedString(attributedString: .pretendard(.body_r_15, text: originalText, lineBreakMode: .byWordWrapping, forceWrap: true))
-            attr.addAttribute(.foregroundColor, value: UIColor.hilingualBlack, range: NSRange(location: 0, length: attr.length))
-            textView.attributedText = attr
+            textView.attributedText = makeBaseAttributedText(originalText, color: .hilingualBlack, forceWrap: true)
         }
     }
 
     @objc func didTapSpeechButton() {
-        if EnglishPronunciationPlayer.shared.isSpeaking {
-            EnglishPronunciationPlayer.shared.stop()
-            resetReadingHighlight()
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        let player = EnglishPronunciationPlayer.shared
+
+        if player.isPaused {
+            player.resume()
+            speechButton.updateState(isListening: true)
+            return
+        }
+
+        if player.isSpeaking {
+            player.pause()
+            stopHighlightTimer()
+            speechButton.updateState(isListening: false)
             return
         }
 
@@ -205,6 +292,8 @@ private extension HighlightTextView {
         guard !text.isEmpty else { return }
 
         readingStartLocation = startLocation
+        currentHighlightPosition = startLocation
+        targetHighlightPosition = startLocation
         speechButton.updateState(isListening: true)
         renderReadingHighlight(upTo: startLocation)
 
@@ -215,20 +304,20 @@ private extension HighlightTextView {
             },
             willSpeakRange: { [weak self] characterRange in
                 guard let self, let start = self.readingStartLocation else { return }
-                self.renderReadingHighlight(upTo: start + NSMaxRange(characterRange))
+                self.animateHighlight(to: start + NSMaxRange(characterRange))
             },
             didFinish: { [weak self] in
                 guard let self else { return }
+                self.stopHighlightTimer()
                 self.renderReadingHighlight(upTo: (self.displayedText as NSString).length)
-
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) { [weak self] in
                     guard let self, !EnglishPronunciationPlayer.shared.isSpeaking else { return }
                     self.resetReadingHighlight()
                 }
             },
             didCancel: { [weak self] in
-                guard let self else { return }
-                self.resetReadingHighlight()
+                self?.stopHighlightTimer()
+                self?.resetReadingHighlight()
             }
         )
     }
@@ -237,43 +326,28 @@ private extension HighlightTextView {
 
     func renderReadingHighlight(upTo location: Int) {
         let text = displayedText
-        let attributed = NSMutableAttributedString(attributedString: .pretendard(.body_r_15, text: text, lineBreakMode: .byWordWrapping))
-        attributed.addAttribute(.foregroundColor, value: UIColor.gray400, range: NSRange(location: 0, length: attributed.length))
+        let attributedString = makeBaseAttributedText(text, color: .gray400)
+        let isHighlight = (text == highlightText)
 
-        if text == highlightText {
-            diffRanges.forEach {
-                let range = NSRange(location: $0.start, length: $0.end - $0.start)
-                guard NSMaxRange(range) <= attributed.length else { return }
-                attributed.addAttributes([
-                    .font: UIFont.pretendard(.body_m_15),
-                    .foregroundColor: UIColor.hilingualOrange.withAlphaComponent(0.55)
-                ], range: range)
-            }
+        if isHighlight {
+            applyDiffHighlights(to: attributedString, color: UIColor.hilingualOrange.withAlphaComponent(0.55))
         }
 
-        let progressLocation = min(max(location, 0), attributed.length)
+        let progressLocation = min(max(location, 0), attributedString.length)
         let startLocation = min(max(readingStartLocation ?? 0, 0), progressLocation)
         guard progressLocation > startLocation else {
-            textView.attributedText = attributed
+            textView.attributedText = attributedString
             return
         }
 
         let readRange = NSRange(location: startLocation, length: progressLocation - startLocation)
-        attributed.addAttribute(.foregroundColor, value: UIColor.hilingualBlack, range: readRange)
+        attributedString.addAttribute(.foregroundColor, value: UIColor.hilingualBlack, range: readRange)
 
-        if text == highlightText {
-            diffRanges.forEach {
-                let correctionRange = NSRange(location: $0.start, length: $0.end - $0.start)
-                let range = NSIntersectionRange(readRange, correctionRange)
-                guard range.length > 0, NSMaxRange(range) <= attributed.length else { return }
-                attributed.addAttributes([
-                    .font: UIFont.pretendard(.body_m_15),
-                    .foregroundColor: UIColor.hilingualOrange
-                ], range: range)
-            }
+        if isHighlight {
+            applyDiffHighlights(to: attributedString, color: .hilingualOrange, in: readRange)
         }
 
-        textView.attributedText = attributed
+        textView.attributedText = attributedString
     }
 
     // MARK: - Text Selection
@@ -284,57 +358,50 @@ private extension HighlightTextView {
 
         let location = gesture.location(in: textView)
         guard let sentenceStartLocation = sentenceStartLocation(at: location) else { return }
-
         startReading(from: sentenceStartLocation)
     }
 
-    func sentenceStartLocation(at point: CGPoint) -> Int? {
+    func characterIndex(at point: CGPoint) -> Int {
         textView.layoutManager.ensureLayout(for: textView.textContainer)
-
-        let textContainer = textView.textContainer
-        let usedRect = textView.layoutManager.usedRect(for: textContainer)
-        let offset = CGPoint(
-            x: (textView.bounds.width - usedRect.width) * 0.5 - usedRect.origin.x,
-            y: (textView.bounds.height - usedRect.height) * 0.5 - usedRect.origin.y
-        )
-        let containerPoint = CGPoint(
-            x: point.x - offset.x - textView.textContainerInset.left,
-            y: point.y - offset.y - textView.textContainerInset.top
-        )
-
-        let index = textView.layoutManager.characterIndex(
-            for: containerPoint,
-            in: textContainer,
+        return textView.layoutManager.characterIndex(
+            for: point,
+            in: textView.textContainer,
             fractionOfDistanceBetweenInsertionPoints: nil
         )
-
-        let nsText = highlightText as NSString
-        guard index < nsText.length else { return nil }
-
-        let previousPeriodRange = nsText.range(
-            of: ".",
-            options: .backwards,
-            range: NSRange(location: 0, length: index)
-        )
-        let nextPeriodRange = nsText.range(
-            of: ".",
-            range: NSRange(location: index, length: nsText.length - index)
-        )
-
-        let sentenceStart = previousPeriodRange.location == NSNotFound ? 0 : NSMaxRange(previousPeriodRange)
-        let sentenceEnd = nextPeriodRange.location == NSNotFound ? nsText.length : NSMaxRange(nextPeriodRange)
-        let sentence = nsText.substring(with: NSRange(location: sentenceStart, length: sentenceEnd - sentenceStart))
-        let leadingWhitespaceCount = sentence.prefix { $0.isWhitespace }.count
-
-        let start = sentenceStart + leadingWhitespaceCount
-        return start < sentenceEnd ? start : nil
     }
-    
+
+    func sentenceRange(containing characterIndex: Int, in text: NSString) -> NSRange {
+        var result = NSRange(location: 0, length: 0)
+        text.enumerateSubstrings(
+            in: NSRange(location: 0, length: text.length),
+            options: .bySentences
+        ) { _, substringRange, _, stop in
+            if NSLocationInRange(characterIndex, substringRange) {
+                result = substringRange
+                stop.pointee = true
+            }
+        }
+        return result
+    }
+
+    func trimmedStartLocation(of sentenceRange: NSRange, in text: NSString) -> Int? {
+        let sentence = text.substring(with: sentenceRange)
+        let leadingWhitespaceCount = sentence.prefix(while: { $0.isWhitespace }).count
+        let start = sentenceRange.location + leadingWhitespaceCount
+        return start < NSMaxRange(sentenceRange) ? start : nil
+    }
+
+    func sentenceStartLocation(at point: CGPoint) -> Int? {
+        let text = highlightText as NSString
+        let index = characterIndex(at: point)
+        guard index < text.length else { return nil }
+        let range = sentenceRange(containing: index, in: text)
+        return trimmedStartLocation(of: range, in: text)
+    }
+
     @objc func handleTapGesture() {
         guard let image = diaryImageView.image else { return }
-
         let detailImageView = DetailImageView(image: image)
-        
         if let window = UIApplication.shared.windows.first(where: { $0.isKeyWindow }) {
             detailImageView.frame = window.bounds
             window.addSubview(detailImageView)

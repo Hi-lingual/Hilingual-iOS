@@ -74,6 +74,11 @@ public final class FeedbackViewController: BaseUIViewController<FeedbackViewMode
         super.viewDidAppear(animated)
     }
 
+    public override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        feedbackView.stopSpeech()
+    }
+
     // MARK: - Custom Method
 
     public override func setUI() {

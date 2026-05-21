@@ -174,6 +174,10 @@ final class FeedbackView: BaseUIView {
         contentView.setCustomSpacing(40, after: diaryTextView)
     }
 
+    func stopSpeech() {
+        diaryTextView.stopSpeech()
+    }
+
     func scrollToTop() {
         scrollView.setContentOffset(.zero, animated: true)
     }

@@ -5,9 +5,8 @@
 //  Created by 성현주 on 5/16/26.
 //
 
-@preconcurrency import AVFoundation
+import AVFoundation
 
-@MainActor
 public final class EnglishPronunciationPlayer: NSObject {
 
     // MARK: - Properties
@@ -15,17 +14,21 @@ public final class EnglishPronunciationPlayer: NSObject {
     public static let shared = EnglishPronunciationPlayer()
 
     private let synthesizer = AVSpeechSynthesizer()
+    private var currentUtteranceIdentifier: ObjectIdentifier?
     private var stateChanged: ((Bool) -> Void)?
     private var willSpeakRange: ((NSRange) -> Void)?
     private var didFinishSpeaking: (() -> Void)?
     private var didCancelSpeaking: (() -> Void)?
-    private var shouldIgnoreNextCancel = false
     private var preferredVoice: AVSpeechSynthesisVoice?
     private var isPrepared = false
-    private var isWarmingUp = false
+    private var isSessionActive = false
 
     public var isSpeaking: Bool {
         synthesizer.isSpeaking
+    }
+
+    public var isPaused: Bool {
+        synthesizer.isPaused
     }
 
     // MARK: - Init
@@ -38,8 +41,11 @@ public final class EnglishPronunciationPlayer: NSObject {
     // MARK: - Public Method
 
     public func prepare() {
-        prepareIfNeeded()
-        warmUpSynthesizer()
+        guard !isPrepared else { return }
+        isPrepared = true
+        configureAudioSession()
+        preferredVoice = AVSpeechSynthesisVoice(language: "en-US")
+        preloadEngine()
     }
 
     func speak(
@@ -52,15 +58,11 @@ public final class EnglishPronunciationPlayer: NSObject {
         let phrase = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !phrase.isEmpty else { return }
 
-        prepareIfNeeded()
+        prepare()
 
-        if isWarmingUp {
-            isWarmingUp = false
-            shouldIgnoreNextCancel = true
-            synthesizer.stopSpeaking(at: .immediate)
-        } else if synthesizer.isSpeaking {
+        if synthesizer.isSpeaking {
             self.stateChanged?(false)
-            shouldIgnoreNextCancel = true
+            clearCallbacks()
             synthesizer.stopSpeaking(at: .immediate)
         }
 
@@ -76,22 +78,34 @@ public final class EnglishPronunciationPlayer: NSObject {
         utterance.pitchMultiplier = 1.0
         utterance.volume = 1.0
 
+        currentUtteranceIdentifier = ObjectIdentifier(utterance)
         stateChanged?(true)
         synthesizer.speak(utterance)
     }
 
+    public func pause() {
+        guard synthesizer.isSpeaking, !synthesizer.isPaused else { return }
+        synthesizer.pauseSpeaking(at: .immediate)
+    }
+
+    public func resume() {
+        guard synthesizer.isPaused else { return }
+        synthesizer.continueSpeaking()
+    }
+
     public func stop() {
         guard synthesizer.isSpeaking else { return }
+        currentUtteranceIdentifier = nil
         synthesizer.stopSpeaking(at: .immediate)
     }
 
     // MARK: - Private Method
 
-    private func prepareIfNeeded() {
-        guard !isPrepared else { return }
-        configureAudioSession()
-        preferredVoice = AVSpeechSynthesisVoice(language: "en-US")
-        isPrepared = true
+    private func preloadEngine() {
+        activateAudioSession()
+        let utterance = AVSpeechUtterance(string: "a")
+        utterance.voice = preferredVoice
+        synthesizer.write(utterance) { _ in }
     }
 
     private func configureAudioSession() {
@@ -104,78 +118,62 @@ public final class EnglishPronunciationPlayer: NSObject {
     }
 
     private func activateAudioSession() {
+        guard !isSessionActive else { return }
         do {
             let session = AVAudioSession.sharedInstance()
             try session.setActive(true)
+            isSessionActive = true
         } catch {
             print("발음 재생 오디오 세션 활성화 실패: \(error.localizedDescription)")
         }
     }
 
     private func deactivateAudioSession() {
+        guard isSessionActive else { return }
         do {
             let session = AVAudioSession.sharedInstance()
             try session.setActive(false, options: [.notifyOthersOnDeactivation])
+            isSessionActive = false
         } catch {
             print("발음 재생 오디오 세션 비활성화 실패: \(error.localizedDescription)")
         }
     }
-
-    private func warmUpSynthesizer() {
-        guard !synthesizer.isSpeaking else { return }
-
-        isWarmingUp = true
-        activateAudioSession()
-
-        let utterance = AVSpeechUtterance(string: ".")
-        utterance.voice = preferredVoice
-        utterance.rate = AVSpeechUtteranceDefaultSpeechRate
-        utterance.volume = 0.01
-        synthesizer.speak(utterance)
-    }
 }
 
+// MARK: - AVSpeechSynthesizerDelegate
+
 extension EnglishPronunciationPlayer: AVSpeechSynthesizerDelegate {
-    nonisolated public func speechSynthesizer(
+    public func speechSynthesizer(
         _ synthesizer: AVSpeechSynthesizer,
         willSpeakRangeOfSpeechString characterRange: NSRange,
         utterance: AVSpeechUtterance
     ) {
-        Task { @MainActor in
+        let utteranceID = ObjectIdentifier(utterance)
+        DispatchQueue.main.async { [weak self] in
+            guard let self, self.currentUtteranceIdentifier == utteranceID else { return }
             self.willSpeakRange?(characterRange)
         }
     }
 
-    nonisolated public func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
-        Task { @MainActor in
-            if self.isWarmingUp {
-                self.isWarmingUp = false
-                self.deactivateAudioSession()
-                return
-            }
-
+    public func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
+        let utteranceID = ObjectIdentifier(utterance)
+        DispatchQueue.main.async { [weak self] in
+            guard let self, self.currentUtteranceIdentifier == utteranceID else { return }
             self.didFinishSpeaking?()
             self.stateChanged?(false)
+            self.currentUtteranceIdentifier = nil
             self.deactivateAudioSession()
             self.clearCallbacks()
         }
     }
 
-    nonisolated public func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didCancel utterance: AVSpeechUtterance) {
-        Task { @MainActor in
-            if self.isWarmingUp {
-                self.isWarmingUp = false
-                self.deactivateAudioSession()
-                return
-            }
-
-            if self.shouldIgnoreNextCancel {
-                self.shouldIgnoreNextCancel = false
-                return
-            }
-
+    public func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didCancel utterance: AVSpeechUtterance) {
+        let utteranceID = ObjectIdentifier(utterance)
+        DispatchQueue.main.async { [weak self] in
+            guard let self, self.currentUtteranceIdentifier == utteranceID else { return }
             self.didCancelSpeaking?()
             self.stateChanged?(false)
+            self.currentUtteranceIdentifier = nil
             self.deactivateAudioSession()
             self.clearCallbacks()
         }
