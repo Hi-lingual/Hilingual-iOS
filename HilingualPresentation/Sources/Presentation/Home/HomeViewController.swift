@@ -29,7 +29,8 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     private var pendingRecoveryDate: Date?
     private var recoveryTickets = 0
     private var didLoadFilledDates = false
-    private var dismissedRecoveryModalMonthInCurrentAppearance: String?
+    private var temporarilyDismissedRecoveryMonth: String?
+    private var isRecoveryWritingFlowActive = false
     private var recoveredDateKeys: Set<String> = []
     private let recoveredDateStorageKey = "home.recoveredDateKeys"
     private let dismissedRecoveryModalMonthStorageKey = "home.dismissedRecoveryModalMonth"
@@ -75,6 +76,14 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         if !showOnboardingBottomSheet() {
             showNextHomeModal()
         }
+        finishRecoveryWritingFlowIfNeeded()
+    }
+    
+    public override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        
+        if isRecoveryWritingFlowActive { return }
+        temporarilyDismissedRecoveryMonth = nil
     }
     
     // MARK: - Bind
@@ -254,6 +263,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
             guard let selectedDate = self.homeView.calendarView.selectedDate else { return }
 
             self.pendingRecoveryDate = selectedDate
+            self.isRecoveryWritingFlowActive = true
             self.loadInterstitialAdAndPresent()
         }
     }
@@ -291,6 +301,15 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         if !showUpdateNoticeModalIfNeeded() {
             showRecoveryModalIfNeeded()
         }
+    }
+    
+    private func finishRecoveryWritingFlowIfNeeded() {
+        guard isRecoveryWritingFlowActive else { return }
+        guard pendingRecoveryDate == nil,
+              rewardedInterstitial == nil,
+              recoveryTransitionOverlay == nil else { return }
+        
+        isRecoveryWritingFlowActive = false
     }
     
     private func showUpdateNoticeModalIfNeeded() -> Bool {
@@ -407,13 +426,13 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         let lastDay = calendar.range(of: .day, in: .month, for: today)?.count ?? 31
         let currentMonthKey = monthKey(today)
         let alreadyDismissed = UserDefaults.standard.string(forKey: dismissedRecoveryModalMonthStorageKey) == currentMonthKey
-        let alreadyDismissedInCurrentAppearance = dismissedRecoveryModalMonthInCurrentAppearance == currentMonthKey
+        let temporarilyDismissed = temporarilyDismissedRecoveryMonth == currentMonthKey
         
         return didLoadFilledDates
         && recoveryTickets > 0
         && calendar.isDate(selectedDate, equalTo: today, toGranularity: .month)
         && !alreadyDismissed
-        && !alreadyDismissedInCurrentAppearance
+        && !temporarilyDismissed
         && calendar.component(.day, from: today) == lastDay - 7
     }
     
@@ -448,7 +467,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         }
         
         homeModal.onDismiss = { [weak self] in
-            self?.dismissedRecoveryModalMonthInCurrentAppearance = self?.monthKey(Date())
+            self?.temporarilyDismissedRecoveryMonth = self?.monthKey(Date())
         }
         homeModal.isHidden = false
         homeModal.configure(
@@ -953,6 +972,10 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         shouldLoadDraft: Bool = false,
         isRecoveryWriting: Bool = false
     ) {
+        if isRecoveryWriting {
+            isRecoveryWritingFlowActive = true
+        }
+        
         let diaryWritingVC = diContainer.makeDiaryWritingViewController(
             topicData: topicData,
             selectedDate: selectedDate ?? Date(),
@@ -1065,6 +1088,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         pendingRecoveryDate = nil
         rewardedInterstitial = nil
         didEarnRecoveryReward = false
+        isRecoveryWritingFlowActive = false
         hideRecoveryTransitionOverlay()
     }
 
