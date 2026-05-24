@@ -20,6 +20,7 @@ public final class MypageViewController: BaseUIViewController<MypageViewModel> {
     private var didLoadBannerAd = false
     private var bannerRetryCount = 0
     private let maxBannerRetryCount = 3
+    private var bannerRetryToken: Int = 0
     
     // MARK: - Life Cycle
     
@@ -193,6 +194,7 @@ extension MypageViewController: BannerViewDelegate {
     
     public func bannerViewDidReceiveAd(_ bannerView: BannerView) {
         bannerRetryCount = 0
+        bannerRetryToken &+= 1
 
         mypageView.bannerPlaceholderImageView.removeFromSuperview()
 
@@ -218,8 +220,12 @@ extension MypageViewController: BannerViewDelegate {
 
         bannerRetryCount += 1
 
+        bannerRetryToken &+= 1
+        let currentToken = bannerRetryToken
+
         DispatchQueue.main.asyncAfter(deadline: .now() + 5) { [weak self] in
             guard let self else { return }
+            guard currentToken == self.bannerRetryToken else { return }
 
             let width = floor(self.view.bounds.width)
             guard width > 0 else { return }
