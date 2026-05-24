@@ -38,7 +38,7 @@ final class ProfileRow: UIView {
 
     private let editImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = UIImage(named: "ic_pen_24_ios", in: .module, compatibleWith: nil)?
+        imageView.image = UIImage(resource: .icPen24Ios)
             .withRenderingMode(.alwaysTemplate)
         imageView.tintColor = .gray300
         imageView.contentMode = .scaleAspectFit
@@ -102,7 +102,7 @@ final class ProfileRow: UIView {
         trailingStackView.snp.makeConstraints {
             $0.trailing.equalToSuperview().inset(16)
             $0.centerY.equalToSuperview()
-            $0.leading.greaterThanOrEqualTo(titleLabel.snp.trailing).offset(12)
+            $0.leading.equalTo(titleLabel.snp.trailing).offset(12)
         }
     }
 
