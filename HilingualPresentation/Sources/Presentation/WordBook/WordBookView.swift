@@ -159,7 +159,7 @@ final class WordBookView: BaseUIView {
         )
         showHeaderView(true)
         tableView.refreshControl = refreshControl
-        setStudyButtonVisible(false)
+        setStudyButtonVisible(true)
     }
 
     override func setLayout() {
