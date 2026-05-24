@@ -27,8 +27,8 @@ final class CTAButton: UIButton {
     
     override var isEnabled: Bool {
         didSet {
-            if autoBackground {
-                updateBackgroundColor()
+            if autoBackground, oldValue != isEnabled {
+                updateBackgroundColor(animated: window != nil)
             }
         }
     }
@@ -43,7 +43,7 @@ final class CTAButton: UIButton {
         self.isEnabled = autoBackground ? false : true
         
         if autoBackground {
-            updateBackgroundColor()
+            updateBackgroundColor(animated: false)
         } else {
             backgroundColor = .hilingualBlack
         }
@@ -95,8 +95,20 @@ final class CTAButton: UIButton {
     
     // MARK: - Private Methods
     
-    private func updateBackgroundColor() {
-        backgroundColor = isEnabled ? .hilingualBlack : .gray300
+    private func updateBackgroundColor(animated: Bool = false) {
+        let nextColor: UIColor = isEnabled ? .hilingualBlack : .gray300
+        guard animated else {
+            backgroundColor = nextColor
+            return
+        }
+
+        UIView.animate(
+            withDuration: 0.25,
+            delay: 0,
+            options: [.allowUserInteraction, .beginFromCurrentState]
+        ) {
+            self.backgroundColor = nextColor
+        }
     }
     
     // MARK: - Public Methods

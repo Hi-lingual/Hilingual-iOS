@@ -72,7 +72,7 @@ final class MypageView: BaseUIView {
 
     let editButton: UIButton = {
         let button = UIButton()
-        button.setImage(UIImage(named: "ic_pen_24_ios", in: .module, compatibleWith: nil), for: .normal)
+        button.setImage(UIImage(resource: .icPen24Ios), for: .normal)
         button.tintColor = .gray400
         return button
     }()

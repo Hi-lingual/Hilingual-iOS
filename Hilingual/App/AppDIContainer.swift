@@ -177,6 +177,14 @@ final class AppDIContainer: ViewControllerFactory {
         return EditProfileViewController(viewModel: makeEditProfileViewModel(), diContainer: self)
     }
 
+    public func makeNicknameEditViewController(currentNickname: String) -> NicknameEditViewController {
+        return NicknameEditViewController(
+            viewModel: makeNicknameEditViewModel(currentNickname: currentNickname),
+            diContainer: self,
+            currentNickname: currentNickname
+        )
+    }
+
     public func makeBlockUserViewController() -> BlockUserViewController {
         return BlockUserViewController(viewModel: makeBlockUserViewModel(), diContainer: self)
     }
@@ -817,5 +825,13 @@ extension AppDIContainer {
 
     private func makeEditProfileViewModel() -> EditProfileViewModel {
         return EditProfileViewModel(fetchUserProfileUseCase: makefetchUserProfileUseCase(), uploadImageUseCase: makeUploadImageUseCase(), mypageUseCase: makeMypageUseCase())
+    }
+
+    private func makeNicknameEditViewModel(currentNickname: String) -> NicknameEditViewModel {
+        return NicknameEditViewModel(
+            currentNickname: currentNickname,
+            onBoardingUseCase: makeOnBoardingUseCase(),
+            userProfileUseCase: makefetchUserProfileUseCase()
+        )
     }
 }

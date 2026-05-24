@@ -41,6 +41,7 @@ public protocol ViewControllerFactory {
         userId: Int64
     ) -> FeedProfileViewController
     func makeEditProfileViewController() -> EditProfileViewController
+    func makeNicknameEditViewController(currentNickname: String) -> NicknameEditViewController
     func makeBlockUserViewController() -> BlockUserViewController
     func makeNotificationSettingViewController() -> NotificationSettingViewController
 }
