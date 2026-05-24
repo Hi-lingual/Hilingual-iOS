@@ -39,6 +39,9 @@ public enum AnalyticsEvent {
     case toastAction(action: ToastAction, toastId: ToastId, entryId: String)
     case clickBackFeedback(entryId: String, backSource: BackSource)
     case submittedPostDiary(entryId: String)
+    case clickVocabReviewBtn
+    case clickVocabPronunciationBtn(isFirstPlay: Bool)
+    case clickDiaryPronunciationBtn(isFirstPlay: Bool)
 }
 
 extension AnalyticsEvent {
@@ -167,6 +170,22 @@ extension AnalyticsEvent {
             return [
                 "entry_id": entryId
             ]
+        case .clickVocabReviewBtn:
+            return [
+                "page": Page.vocabulary.analyticsPropertyName,
+                "section": Section.vocabCard.analyticsPropertyName
+            ]
+        case let .clickVocabPronunciationBtn(isFirstPlay):
+            return [
+                "page": Page.vocabulary.analyticsPropertyName,
+                "section": Section.vocabCard.analyticsPropertyName,
+                "is_first_play": isFirstPlay
+            ]
+        case let .clickDiaryPronunciationBtn(isFirstPlay):
+            return [
+                "page": Page.feedback.analyticsPropertyName,
+                "is_first_play": isFirstPlay
+            ]
         }
     }
 
@@ -231,6 +250,7 @@ extension AnalyticsEvent {
         case userProfile
         case notification
         case feedback
+        case vocabulary
         case custom(String)
 
         var analyticsPropertyName: String {
@@ -239,9 +259,16 @@ extension AnalyticsEvent {
             case .userProfile: return "user_profile"
             case .notification: return "notification"
             case .feedback: return "feedback"
+            case .vocabulary: return "vocabulary"
             case .custom(let value): return value
             }
         }
+    }
+
+    public enum Section: String, Sendable {
+        case vocabCard = "vocab_card"
+
+        var analyticsPropertyName: String { rawValue }
     }
 
     public enum BackSource: Sendable {

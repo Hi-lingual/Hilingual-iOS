@@ -23,6 +23,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             print("[Amplitude] API Key not found in Info.plist")
         }
 
+        Task { @MainActor in
+            EnglishPronunciationPlayer.shared.prepare()
+        }
+
         guard let windowScene = scene as? UIWindowScene else { return }
 
         let window = UIWindow(windowScene: windowScene)

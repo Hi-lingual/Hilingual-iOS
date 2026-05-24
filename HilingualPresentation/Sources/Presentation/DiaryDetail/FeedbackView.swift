@@ -13,6 +13,7 @@ final class FeedbackView: BaseUIView {
     // MARK: - Properties
 
     var onToggleChanged: ((Bool) -> Void)?
+    var onDiaryPronunciationTapped: ((Bool) -> Void)?
 
     // MARK: - UI Components
 
@@ -174,6 +175,10 @@ final class FeedbackView: BaseUIView {
         contentView.setCustomSpacing(40, after: diaryTextView)
     }
 
+    func stopSpeech() {
+        diaryTextView.stopSpeech()
+    }
+
     func scrollToTop() {
         scrollView.setContentOffset(.zero, animated: true)
     }
@@ -217,6 +222,9 @@ final class FeedbackView: BaseUIView {
             diffRanges: data.diffRanges,
             isHighlightingEnabled: data.isHighlightingEnabled,
         )
+        diaryTextView.onSpeechButtonTapped = { [weak self] isFirstPlay in
+            self?.onDiaryPronunciationTapped?(isFirstPlay)
+        }
     }
 
     func configureFeedbacks(data: [FeedbackItem]) {
