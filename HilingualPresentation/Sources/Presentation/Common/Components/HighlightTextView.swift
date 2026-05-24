@@ -27,6 +27,8 @@ final class HighlightTextView: BaseUIView {
     private var currentHighlightPosition: Int = 0
     private var targetHighlightPosition: Int = 0
     private var highlightTimer: Timer?
+    private var hasPlayedSpeech: Bool = false
+    var onSpeechButtonTapped: ((Bool) -> Void)?
     
     
     // MARK: - UI Components
@@ -109,6 +111,7 @@ final class HighlightTextView: BaseUIView {
             EnglishPronunciationPlayer.shared.stop()
         }
         speechButton.updateState(isListening: false)
+        hasPlayedSpeech = false
 
         if let image = image, !image.isEmpty, let url = URL(string: image) {
             diaryImageView.kf.setImage(with: url)
@@ -243,6 +246,10 @@ private extension HighlightTextView {
 
     @objc func didTapSpeechButton() {
         UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        let isFirstPlay = !hasPlayedSpeech
+        hasPlayedSpeech = true
+        onSpeechButtonTapped?(isFirstPlay)
+
         let player = EnglishPronunciationPlayer.shared
 
         if player.isPaused {

@@ -9,6 +9,7 @@ import Foundation
 import Combine
 import UIKit
 import GoogleMobileAds
+import HilingualCore
 
 // MARK: - Model
 
@@ -63,6 +64,9 @@ public final class FeedbackViewController: BaseUIViewController<FeedbackViewMode
 
         feedbackView.onToggleChanged = { [weak self] isEnabled in
             self?.onToggleChanged?(isEnabled)
+        }
+        feedbackView.onDiaryPronunciationTapped = { isFirstPlay in
+            AmplitudeManager.shared.send(.clickDiaryPronunciationBtn(isFirstPlay: isFirstPlay))
         }
         
         if showsAdBanner {

@@ -33,7 +33,9 @@ final class WordCard: UIView {
     private var phrase: String = ""
     private var showsPronunciationButton: Bool = false
     private var isPronouncing: Bool = false
+    private var hasPlayedPronunciation: Bool = false
     var onBookmarkToggled: ((Bool) -> Void)?
+    var onPronunciationTapped: ((Bool) -> Void)?
 
     // MARK: - Init
 
@@ -55,6 +57,7 @@ final class WordCard: UIView {
         phrase = data.phrase
         self.showsPronunciationButton = showsPronunciationButton
         isPronouncing = false
+        hasPlayedPronunciation = false
         
         updateBookmarkImage()
         setPronouncing(false)
@@ -225,6 +228,10 @@ final class WordCard: UIView {
     }
 
     @objc private func didTapPronunciation() {
+        let isFirstPlay = !hasPlayedPronunciation
+        hasPlayedPronunciation = true
+        onPronunciationTapped?(isFirstPlay)
+
         if isPronouncing {
             EnglishPronunciationPlayer.shared.stop()
         } else {

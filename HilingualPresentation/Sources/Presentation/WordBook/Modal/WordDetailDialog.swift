@@ -13,6 +13,7 @@ final class WordDetailDialog: UIView {
     // MARK: - Callback
 
     var onBookmarkToggled: ((Int, Bool) -> Void)?
+    var onPronunciationTapped: ((Bool) -> Void)?
 
     // MARK: - UI Components
 
@@ -73,6 +74,9 @@ final class WordDetailDialog: UIView {
 
         wordCard.onBookmarkToggled = { [weak self] isMarked in
             self?.onBookmarkToggled?(Int(data.phraseId), isMarked)
+        }
+        wordCard.onPronunciationTapped = { [weak self] isFirstPlay in
+            self?.onPronunciationTapped?(isFirstPlay)
         }
     }
 
