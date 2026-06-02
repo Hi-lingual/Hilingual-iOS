@@ -23,7 +23,6 @@ final class DetailImageView: UIView {
         let button = UIButton(type: .system)
         button.setImage(UIImage(named: "ic_close_24_w_ios", in: .module, with: nil), for: .normal)
         button.tintColor = .white
-        button.addTarget(self, action: #selector(close), for: .touchUpInside)
         return button
     }()
     
@@ -43,11 +42,13 @@ final class DetailImageView: UIView {
     
     private func setUI() {
         backgroundColor = .black
+        button.addTarget(self, action: #selector(close), for: .touchUpInside)
         addSubviews(imageView, button)
         
         button.snp.makeConstraints {
             $0.top.equalTo(safeAreaLayoutGuide).inset(12)
             $0.leading.equalToSuperview().inset(12)
+            $0.size.equalTo(44)
         }
     }
     

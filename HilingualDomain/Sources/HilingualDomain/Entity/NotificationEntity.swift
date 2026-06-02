@@ -10,6 +10,7 @@ public struct NotificationEntity: Equatable {
     public let title: String
     public let isRead: Bool
     public let publishedAt: String
+    public let publishedAtUtc: String?
     public let targetId: Int?
     public let type: NotificationType
 
@@ -18,6 +19,7 @@ public struct NotificationEntity: Equatable {
         title: String,
         isRead: Bool,
         publishedAt: String,
+        publishedAtUtc: String? = nil,
         targetId: Int? = nil,
         type: NotificationType
     ) {
@@ -25,6 +27,7 @@ public struct NotificationEntity: Equatable {
         self.title = title
         self.isRead = isRead
         self.publishedAt = publishedAt
+        self.publishedAtUtc = publishedAtUtc
         self.targetId = targetId
         self.type = type
     }

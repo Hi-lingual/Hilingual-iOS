@@ -5,8 +5,6 @@
 //  Created by 성현주 on 8/26/25.
 //
 
-import Foundation
-
 import HilingualDomain
 import HilingualNetwork
 
@@ -17,6 +15,7 @@ extension GeneralNotificationDTO {
             title: title,
             isRead: isRead,
             publishedAt: publishedAt,
+            publishedAtUtc: publishedAtUtc,
             targetId: targetId,
             type: .general(type)
         )
@@ -30,6 +29,7 @@ extension NoticeNotificationDTO {
             title: title,
             isRead: isRead,
             publishedAt: publishedAt,
+            publishedAtUtc: publishedAtUtc,
             targetId: nil,
             type: .notice(category)
         )

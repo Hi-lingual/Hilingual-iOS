@@ -11,6 +11,7 @@ import Moya
 public enum MypageAPI {
     case fetchMyProfile
     case updateProfileImage(request: ProfileImageRequestDTO)
+    case updateNickname(request: NicknameRequestDTO)
 }
 
 extension MypageAPI: BaseTargetType {
@@ -21,6 +22,8 @@ extension MypageAPI: BaseTargetType {
             return "/users/mypage/info"
         case .updateProfileImage:
             return "/users/mypage/profileImg"
+        case .updateNickname:
+            return "/users/profile/nickname"
         }
     }
 
@@ -28,7 +31,7 @@ extension MypageAPI: BaseTargetType {
         switch self {
         case .fetchMyProfile:
             return .get
-        case .updateProfileImage:
+        case .updateProfileImage, .updateNickname:
             return .patch
         }
     }
@@ -38,6 +41,8 @@ extension MypageAPI: BaseTargetType {
         case .fetchMyProfile:
             return .requestPlain
         case .updateProfileImage(let request):
+            return .requestJSONEncodable(request)
+        case .updateNickname(let request):
             return .requestJSONEncodable(request)
         }
     }

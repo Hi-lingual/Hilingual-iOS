@@ -11,11 +11,13 @@ import Foundation
 public struct NotificationDetailDTO: Decodable {
     public let title: String
     public let createdAt: String
+    public let createdAtUtc: String?
     public let content: String
 
-    public init(title: String, createdAt: String, content: String) {
+    public init(title: String, createdAt: String, createdAtUtc: String?, content: String) {
         self.title = title
         self.createdAt = createdAt
+        self.createdAtUtc = createdAtUtc
         self.content = content
     }
 }

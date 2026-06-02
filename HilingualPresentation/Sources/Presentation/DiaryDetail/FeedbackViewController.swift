@@ -9,6 +9,7 @@ import Foundation
 import Combine
 import UIKit
 import GoogleMobileAds
+import HilingualCore
 
 // MARK: - Model
 
@@ -64,6 +65,9 @@ public final class FeedbackViewController: BaseUIViewController<FeedbackViewMode
         feedbackView.onToggleChanged = { [weak self] isEnabled in
             self?.onToggleChanged?(isEnabled)
         }
+        feedbackView.onDiaryPronunciationTapped = { isFirstPlay in
+            AmplitudeManager.shared.send(.clickDiaryPronunciationBtn(isFirstPlay: isFirstPlay))
+        }
         
         if showsAdBanner {
             setupAdBanner()
@@ -72,6 +76,11 @@ public final class FeedbackViewController: BaseUIViewController<FeedbackViewMode
 
     public override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+    }
+
+    public override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        feedbackView.stopSpeech()
     }
 
     // MARK: - Custom Method
@@ -182,17 +191,19 @@ public final class FeedbackViewController: BaseUIViewController<FeedbackViewMode
                         )
                     }
 
+                    let displayDate = DisplayDateFormatter.diaryDetailDate(apiDate: entity.date)
+
                     let diaryViewData = DiaryViewData(
                         imageURL: entity.image,
-                        date: entity.date,
+                        date: displayDate,
                         originalText: entity.originalText,
                         rewriteText: entity.rewriteText,
                         diffRanges: diffRanges,
                         isHighlightingEnabled: true,
                         isPublished: entity.isPublished
                     )
-                    self?.date = entity.date
-                    self?.onDateLoaded?(entity.date)
+                    self?.date = displayDate
+                    self?.onDateLoaded?(displayDate)
                     self?.publishedInfoLoaded?(entity.isPublished)
 
                     self?.feedbackView.configureDiary(data: diaryViewData)

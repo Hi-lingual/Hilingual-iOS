@@ -12,8 +12,9 @@ final class EditProfileView: BaseUIView {
 
     // MARK: - Public Callback
 
-     var onSelectDefaultImage: (() -> Void)?
-     var onSelectGallery: (() -> Void)?
+    var onSelectDefaultImage: (() -> Void)?
+    var onSelectGallery: (() -> Void)?
+    var onNicknameTapped: (() -> Void)?
 
     // MARK: - UI Components
 
@@ -31,7 +32,7 @@ final class EditProfileView: BaseUIView {
 
     let profileImageView = EditableProfileImageView()
 
-    let nicknameRow = ProfileRow(title: "닉네임", value: "sereal")
+    let nicknameRow = ProfileRow(title: "닉네임", value: "sereal", type: .editable)
     let socialRow = ProfileRow(title: "연결된 소셜 계정", value: "애플 로그인")
 
     let withdrawButton: UIButton = {
@@ -54,6 +55,7 @@ final class EditProfileView: BaseUIView {
         backgroundColor = .white
         addSubviews(backButton, profileImageView, nicknameRow, socialRow, withdrawButton, modal)
         configureModal()
+        configureNicknameRow()
     }
 
     override func setLayout() {
@@ -106,6 +108,16 @@ final class EditProfileView: BaseUIView {
                 ]
             )
         }
+
+    private func configureNicknameRow() {
+        nicknameRow.isUserInteractionEnabled = true
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(nicknameRowTapped))
+        nicknameRow.addGestureRecognizer(tapGesture)
+    }
+
+    @objc private func nicknameRowTapped() {
+        onNicknameTapped?()
+    }
 }
 
 extension EditProfileView {

@@ -8,6 +8,7 @@
 import UIKit
 import Combine
 import HilingualDomain
+import HilingualCore
 
 public final class WordBookViewController: BaseUIViewController<WordBookViewModel> {
 
@@ -47,7 +48,6 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
         wordBookView.showHeaderView(true)
         selectedSortIndex = 0
         wordBookView.tableView.contentInset.top = 0
-        applyFeatureFlags()
         sortSubject.send(.latest)
         wordBookView.updateHeaderView(totalCount: fullWordList.reduce(0) { $0 + $1.1.count }, sortIndex: selectedSortIndex)
         refreshSubject.send(())
@@ -125,6 +125,9 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
                 self?.wordDetailDialog.onBookmarkToggled = { [weak self] phraseId, isMarked in
                     self?.bookmarkToggledSubject.send((phraseId, isMarked))
                 }
+                self?.wordDetailDialog.onPronunciationTapped = { isFirstPlay in
+                    AmplitudeManager.shared.send(.clickVocabPronunciationBtn(isFirstPlay: isFirstPlay))
+                }
                 self?.wordDetailDialog.showAnimation()
             }
             .store(in: &cancellables)
@@ -200,15 +203,6 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
         updateViewState()
     }
 
-    private func applyFeatureFlags() {
-        let nickname = UserDefaults.standard.string(forKey: "currentUser.nickname")
-        let isEnabled = FeatureFlagService.shared.isEnabled(
-            .wordStudyAllowedNicknames,
-            nickname: nickname
-        )
-        wordBookView.setStudyButtonVisible(isEnabled)
-    }
-
     // MARK: - Action Method
 
     @objc
@@ -243,6 +237,8 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
 
     @objc
     private func didTapStudy() {
+        AmplitudeManager.shared.send(.clickVocabReviewBtn)
+
         let bookmarkedWords = fullWordList.flatMap { $0.1 }.filter { $0.isMarked }
         guard !bookmarkedWords.isEmpty else {
             showToast(message: "북마크된 단어가 없어요.")
