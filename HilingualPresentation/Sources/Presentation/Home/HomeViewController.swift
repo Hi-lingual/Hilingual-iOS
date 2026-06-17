@@ -14,6 +14,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     // MARK: - Properties
     
     private var hasShownOnboardingBottomSheet = false
+    private var isShowingOnboardingBottomSheet = false
     private var onboardingBottomSheet: OnboardingBottomSheet?
     private var overlayView: UIControl?
     private let homeView = HomeView()
@@ -263,12 +264,15 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         guard !hasShownOnboardingBottomSheet else { return false }
         
         hasShownOnboardingBottomSheet = true
+        isShowingOnboardingBottomSheet = true
 
         let bottomSheet = OnboardingBottomSheet()
         onboardingBottomSheet = bottomSheet
         bottomSheet.onDismiss = { [weak self] in
-            self?.onboardingBottomSheet = nil
-            self?.showNextHomeModal()
+            guard let self else { return }
+            self.onboardingBottomSheet = nil
+            self.isShowingOnboardingBottomSheet = false
+            self.showNextHomeModal()
         }
 
         view.window?.addSubview(bottomSheet)
@@ -281,16 +285,22 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     }
     
     private func showNextHomeModal() {
+        guard !isHomeModalVisible else { return }
+        
         if !showUpdateNoticeModalIfNeeded() {
             showRecoveryModalIfNeeded()
         }
     }
     
     private func showUpdateNoticeModalIfNeeded() -> Bool {
-        guard let window = view.window,
-              !UserDefaults.standard.bool(forKey: didShowUpdateNoticeModalStorageKey) else { return false }
+        guard !isShowingOnboardingBottomSheet,
+              let window = view.window,
+              shouldShowUpdateNoticeModal() else { return false }
         
-        UserDefaults.standard.set(true, forKey: didShowUpdateNoticeModalStorageKey)
+        markUpdateNoticeModalAsShown()
+        updateNoticeModal.onDismiss = { [weak self] in
+            self?.showRecoveryModalIfNeeded()
+        }
         window.addSubview(updateNoticeModal)
         updateNoticeModal.snp.makeConstraints {
             $0.edges.equalToSuperview()
@@ -305,11 +315,18 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
             buttonText: nil,
             buttonAction: { [weak self] in
                 self?.updateNoticeModal.dismissModal()
-                self?.showRecoveryModalIfNeeded()
             }
         )
         updateNoticeModal.showAnimation()
         return true
+    }
+    
+    private func shouldShowUpdateNoticeModal() -> Bool {
+        !UserDefaults.standard.bool(forKey: didShowUpdateNoticeModalStorageKey)
+    }
+    
+    private func markUpdateNoticeModalAsShown() {
+        UserDefaults.standard.set(true, forKey: didShowUpdateNoticeModalStorageKey)
     }
     
     private func dateKey(_ date: Date) -> String {
@@ -359,21 +376,31 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         UserDefaults.standard.set(monthKey(Date()), forKey: dismissedRecoveryModalMonthStorageKey)
     }
     
-    private func showRecoveryModalIfNeeded() {
+    @discardableResult
+    private func showRecoveryModalIfNeeded() -> Bool {
         let today = Date()
         let selectedDate = homeView.calendarView.selectedDate ?? today
         
-        guard !isHomeModalVisible else { return }
-        guard canShowRecoveryModal(today: today, selectedDate: selectedDate) else { return }
-        guard let recoveryDate = mostRecentRecoveryViewDateInCurrentMonth() else { return }
+        guard !isShowingOnboardingBottomSheet else { return false }
+        guard !UserDefaults.standard.bool(forKey: "showHomeOnboarding") else { return false }
+        guard canShowRecoveryModal(today: today, selectedDate: selectedDate) else { return false }
+        guard let recoveryDate = mostRecentRecoveryViewDateInCurrentMonth() else { return false }
         
+        guard !isUpdateNoticeModalVisible else { return false }
+        guard !shouldShowUpdateNoticeModal() else { return false }
+        guard !isHomeModalVisible else { return false }
         showRecoveryModal(for: recoveryDate)
+        return true
     }
     
     private var isHomeModalVisible: Bool {
-        onboardingBottomSheet?.superview != nil
+        isShowingOnboardingBottomSheet
         || (homeModal.superview != nil && !homeModal.isHidden)
-        || (updateNoticeModal.superview != nil && !updateNoticeModal.isHidden)
+        || isUpdateNoticeModalVisible
+    }
+    
+    private var isUpdateNoticeModalVisible: Bool {
+        updateNoticeModal.superview != nil && !updateNoticeModal.isHidden
     }
     
     private func canShowRecoveryModal(today: Date, selectedDate: Date) -> Bool {
