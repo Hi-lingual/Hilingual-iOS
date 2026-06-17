@@ -115,6 +115,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                     profileImageURL: entity.profileImg,
                     totalDiaries: entity.totalDiaries,
                     streak: entity.streak,
+                    recoveryTickets: entity.recoveryTickets,
                     newAlarm: entity.newAlarm
                 )
             })
@@ -522,6 +523,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                                         profileImageURL: entity.profileImg,
                                         totalDiaries: entity.totalDiaries,
                                         streak: entity.streak,
+                                        recoveryTickets: entity.recoveryTickets,
                                         newAlarm: entity.newAlarm
                                     )
                                 })
@@ -639,6 +641,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                     profileImageURL: entity.profileImg,
                     totalDiaries: entity.totalDiaries,
                     streak: entity.streak,
+                    recoveryTickets: entity.recoveryTickets,
                     newAlarm: entity.newAlarm
                 )
             })
