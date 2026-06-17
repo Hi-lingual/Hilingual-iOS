@@ -17,7 +17,7 @@ extension DiaryWritingAPI: BaseTargetType {
     public var path: String {
         switch self {
         case .postDiaryWriting:
-            return "/diaries"
+            return "/v1/diaries"
         }
     }
 
