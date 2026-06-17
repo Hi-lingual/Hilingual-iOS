@@ -25,9 +25,9 @@ extension HomeAPI: BaseTargetType {
         case .getUserInfo:
             return "/v2/users/home/info"
         case .getMonthInfo:
-            return "/v1/home/calendar/month"
+            return "/v2/home/calendar/month"
         case let .getDiaryInfo(date):
-            return "/v2/home/calendar/\(date)"
+            return "/v1/home/calendar/\(date)"
         case let .getTopic(date):
             return "/v1/home/calendar/\(date)/topic"
         case let .publishDiary(diaryId):

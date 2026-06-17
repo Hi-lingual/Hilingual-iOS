@@ -17,9 +17,9 @@ extension SharedDiaryAPI: BaseTargetType {
     public var path: String {
         switch self {
         case .fetchSharedDiaryProfile(let diaryId):
-            return "/v1feed/\(diaryId)/users/profiles"
+            return "/v1/feed/\(diaryId)/users/profiles"
         case .toggleLike(let diaryId, _):
-            return "/v1feed/likes/\(diaryId)"
+            return "/v1/feed/likes/\(diaryId)"
         }
     }
     

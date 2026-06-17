@@ -18,11 +18,11 @@ extension DiaryDetailAPI: BaseTargetType {
     public var path: String {
         switch self {
         case .fetchDiaryDetail(let diaryId):
-            return "diaries/\(diaryId)"
+            return "/v1/diaries/\(diaryId)"
         case .fetchFeedback(let diaryId):
-            return "/diaries/\(diaryId)/feedbacks"
+            return "/v1/diaries/\(diaryId)/feedbacks"
         case .fetchRecommendedExpression(let diaryId):
-            return "diaries/\(diaryId)/recommended"
+            return "/v1/diaries/\(diaryId)/recommended"
         }
         
     }
