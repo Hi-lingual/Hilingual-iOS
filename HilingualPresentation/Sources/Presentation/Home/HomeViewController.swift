@@ -7,6 +7,7 @@
 
 import UIKit
 import Combine
+import HilingualDomain
 @preconcurrency import GoogleMobileAds
 
 public final class HomeViewController: BaseUIViewController<HomeViewModel> {
@@ -68,8 +69,8 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     public override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
-        if !showOnboardingBottomSheet(), !showUpdateNoticeModalIfNeeded() {
-            showRecoveryModalIfNeeded()
+        if !showOnboardingBottomSheet() {
+            showNextHomeModal()
         }
     }
     
@@ -131,16 +132,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                     forKey: "currentUser.nickname"
                 )
                 
-                self.recoveryTickets = entity.recoveryTickets
-                self.homeView.profileView.updateView(
-                    nickname: entity.nickname,
-                    profileImageURL: entity.profileImg,
-                    totalDiaries: entity.totalDiaries,
-                    streak: entity.streak,
-                    recoveryTickets: entity.recoveryTickets,
-                    newAlarm: entity.newAlarm
-                )
-                self.showRecoveryModalIfNeeded()
+                self.updateUserInfo(entity)
             })
             .store(in: &viewModel.cancellables)
         
@@ -268,7 +260,6 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     
     // MARK: - Private Methods
 
-    @discardableResult
     private func showOnboardingBottomSheet() -> Bool {
         guard UserDefaults.standard.bool(forKey: "showHomeOnboarding") else { return false }
         guard !hasShownOnboardingBottomSheet else { return false }
@@ -280,9 +271,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         bottomSheet.onDismiss = { [weak self] in
             guard let self else { return }
             self.onboardingBottomSheet = nil
-            if !self.showUpdateNoticeModalIfNeeded() {
-                self.showRecoveryModalIfNeeded()
-            }
+            self.showNextHomeModal()
         }
 
         view.window?.addSubview(bottomSheet)
@@ -294,7 +283,12 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         return true
     }
     
-    @discardableResult
+    private func showNextHomeModal() {
+        if !showUpdateNoticeModalIfNeeded() {
+            showRecoveryModalIfNeeded()
+        }
+    }
+    
     private func showUpdateNoticeModalIfNeeded() -> Bool {
         guard let window = view.window,
               !UserDefaults.standard.bool(forKey: didShowUpdateNoticeModalStorageKey) else { return false }
@@ -349,22 +343,32 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     }
     
     private func showRecoveryModalIfNeeded() {
-        let calendar = Calendar.current
         let today = Date()
         let selectedDate = homeView.calendarView.selectedDate ?? today
-        let lastDay = calendar.range(of: .day, in: .month, for: today)?.count ?? 31
         
-        guard onboardingBottomSheet?.superview == nil else { return }
-        guard homeModal.superview == nil || homeModal.isHidden else { return }
-        guard updateNoticeModal.superview == nil || updateNoticeModal.isHidden else { return }
-        guard didLoadFilledDates else { return }
-        guard recoveryTickets > 0 else { return }
-        guard calendar.isDate(selectedDate, equalTo: today, toGranularity: .month) else { return }
-        guard UserDefaults.standard.string(forKey: dismissedRecoveryModalMonthStorageKey) != monthKey(today) else { return }
-        guard calendar.component(.day, from: today) >= lastDay - 7 else { return }
+        guard !isHomeModalVisible else { return }
+        guard canShowRecoveryModal(today: today, selectedDate: selectedDate) else { return }
         guard let recoveryDate = mostRecentRecoveryViewDateInCurrentMonth() else { return }
         
         showRecoveryModal(for: recoveryDate)
+    }
+    
+    private var isHomeModalVisible: Bool {
+        onboardingBottomSheet?.superview != nil
+        || (homeModal.superview != nil && !homeModal.isHidden)
+        || (updateNoticeModal.superview != nil && !updateNoticeModal.isHidden)
+    }
+    
+    private func canShowRecoveryModal(today: Date, selectedDate: Date) -> Bool {
+        let calendar = Calendar.current
+        let lastDay = calendar.range(of: .day, in: .month, for: today)?.count ?? 31
+        let alreadyDismissed = UserDefaults.standard.string(forKey: dismissedRecoveryModalMonthStorageKey) == monthKey(today)
+        
+        return didLoadFilledDates
+        && recoveryTickets > 0
+        && calendar.isDate(selectedDate, equalTo: today, toGranularity: .month)
+        && !alreadyDismissed
+        && calendar.component(.day, from: today) >= lastDay - 7
     }
     
     private func mostRecentRecoveryViewDateInCurrentMonth() -> Date? {
@@ -984,22 +988,26 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
 
     // MARK: - Recall
     
+    private func updateUserInfo(_ entity: UserInfoEntity) {
+        recoveryTickets = entity.recoveryTickets
+        homeView.profileView.updateView(
+            nickname: entity.nickname,
+            profileImageURL: entity.profileImg,
+            totalDiaries: entity.totalDiaries,
+            streak: entity.streak,
+            recoveryTickets: entity.recoveryTickets,
+            newAlarm: entity.newAlarm
+        )
+        showRecoveryModalIfNeeded()
+    }
+    
     private func refreshUserInfo() {
         viewModel?.fetchUserInfo()
             .receive(on: RunLoop.main)
             .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] entity in
                 guard let self else { return }
                 
-                self.recoveryTickets = entity.recoveryTickets
-                self.homeView.profileView.updateView(
-                    nickname: entity.nickname,
-                    profileImageURL: entity.profileImg,
-                    totalDiaries: entity.totalDiaries,
-                    streak: entity.streak,
-                    recoveryTickets: entity.recoveryTickets,
-                    newAlarm: entity.newAlarm
-                )
-                self.showRecoveryModalIfNeeded()
+                self.updateUserInfo(entity)
             })
             .store(in: &viewModel!.cancellables)
     }
