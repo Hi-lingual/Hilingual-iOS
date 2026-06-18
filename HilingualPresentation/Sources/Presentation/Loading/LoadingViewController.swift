@@ -140,16 +140,25 @@ public final class LoadingViewController: BaseUIViewController<LoadingViewModel>
                 return
             }
             
+            guard let ad = ad else {
+                print("🚨 예외 상황: 에러는 없으나 광고 객체가 nil입니다.")
+                self.retryLoadingAdIfNeeded()
+                return
+            }
+            
             self.adLoadRetryCount = 0
             self.interstitial = ad
             self.interstitial?.fullScreenContentDelegate = self
             self.adLoadTimestamp = Date()
             print("✅ 광고 로드 완료")
             
-            if let pendingDiaryId = self.pendingDiaryId, let ad = ad {
+            if let pendingDiaryId = self.pendingDiaryId {
                 self.pendingDiaryId = nil
                 self.currentDiaryId = pendingDiaryId
-                ad.present(from: self)
+                
+                DispatchQueue.main.async {
+                    ad.present(from: self)
+                }
             }
         }
     }
@@ -189,7 +198,9 @@ public final class LoadingViewController: BaseUIViewController<LoadingViewModel>
                 
                 if let ad = self.interstitial, self.isAdValid() {
                     self.currentDiaryId = diaryId
-                    ad.present(from: self)
+                    DispatchQueue.main.async {
+                        ad.present(from: self)
+                    }
                 }
                 else if self.adLoadRetryCount < Self.maxAdRetryCount {
                     self.pendingDiaryId = diaryId
