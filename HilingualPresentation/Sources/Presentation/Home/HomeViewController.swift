@@ -22,6 +22,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     private var currentDateRequestCancellable: AnyCancellable?
     private var pendingDraftDate: Date?
     private var pendingDraftTopic: (String, String)?
+    private var pendingDraftIsRecovery = false
     private var pendingRecoveryDate: Date?
     private var recoveredTopicByDate: [String: (String, String)] = [:]
     private let localPushPermissionService = LocalPushPermissionService()
@@ -145,14 +146,20 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                 
                 let date = self.pendingDraftDate ?? self.homeView.calendarView.selectedDate ?? Date()
                 let topic = self.pendingDraftTopic
+                let isRecoveryWriting = self.pendingDraftIsRecovery
                 
                 if hasDraft {
-                    self.showDraftDialog(selectedDate: date, topicData: topic)
+                    self.showDraftDialog(
+                        selectedDate: date,
+                        topicData: topic,
+                        isRecoveryWriting: isRecoveryWriting
+                    )
                 } else {
                     self.goToDiaryWritingView(
                         topicData: topic,
                         selectedDate: date,
-                        shouldLoadDraft: false
+                        shouldLoadDraft: false,
+                        isRecoveryWriting: isRecoveryWriting
                     )
                 }
             }
@@ -172,6 +179,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
 
             self.pendingDraftDate = selectedDate
             self.pendingDraftTopic = topic
+            self.pendingDraftIsRecovery = false
 
             self.input.checkDraft.send(selectedDate)
         }
@@ -344,7 +352,11 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         toast.configure(type: .basic, message: message)
     }
     
-    private func showDraftDialog(selectedDate: Date, topicData: (String, String)?) {
+    private func showDraftDialog(
+        selectedDate: Date,
+        topicData: (String, String)?,
+        isRecoveryWriting: Bool
+    ) {
         guard let window = view.window else { return }
 
         window.addSubview(dialog)
@@ -366,7 +378,8 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                 self.goToDiaryWritingView(
                     topicData: topicData,
                     selectedDate: selectedDate,
-                    shouldLoadDraft: false
+                    shouldLoadDraft: false,
+                    isRecoveryWriting: isRecoveryWriting
                 )
             },
             rightAction: { [weak self] in
@@ -377,7 +390,8 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                 self.goToDiaryWritingView(
                     topicData: topicData,
                     selectedDate: selectedDate,
-                    shouldLoadDraft: true
+                    shouldLoadDraft: true,
+                    isRecoveryWriting: isRecoveryWriting
                 )
             }
         )
@@ -679,12 +693,14 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     private func goToDiaryWritingView(
         topicData: (String, String)? = nil,
         selectedDate: Date? = nil,
-        shouldLoadDraft: Bool = false
+        shouldLoadDraft: Bool = false,
+        isRecoveryWriting: Bool = false
     ) {
         let diaryWritingVC = diContainer.makeDiaryWritingViewController(
             topicData: topicData,
             selectedDate: selectedDate ?? Date(),
-            shouldLoadDraft: shouldLoadDraft
+            shouldLoadDraft: shouldLoadDraft,
+            isRecoveryWriting: isRecoveryWriting
         )
         
         diaryWritingVC.hidesBottomBarWhenPushed = true
@@ -741,6 +757,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
 
                 self.pendingDraftDate = date
                 self.pendingDraftTopic = topicData
+                self.pendingDraftIsRecovery = true
                 self.input.checkDraft.send(date)
             })
             .store(in: &viewModel!.cancellables)
@@ -757,7 +774,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                 guard let self else { return }
 
                 if let errorDescription {
-                    print("Interstitial load failed: \(errorDescription)")
+                    print("🚨 전면 광고 로드 실패: \(errorDescription)")
                     self.pendingRecoveryDate = nil
                     return
                 }
@@ -802,14 +819,23 @@ extension HomeViewController: FullScreenContentDelegate {
         pendingRecoveryDate = nil
         interstitial = nil
 
-        fetchRecoveredTopicAndWrite(for: recoveryDate)
+        viewModel?.postHomeAdWatch(for: recoveryDate)
+            .receive(on: RunLoop.main)
+            .sink(receiveCompletion: { completion in
+                if case let .failure(error) = completion {
+                    print("🚨 전면 광고 호출 실패: \(error)")
+                }
+            }, receiveValue: { [weak self] in
+                self?.fetchRecoveredTopicAndWrite(for: recoveryDate)
+            })
+            .store(in: &viewModel!.cancellables)
     }
 
     public func ad(
         _ ad: FullScreenPresentingAd,
         didFailToPresentFullScreenContentWithError error: Error
     ) {
-        print("Interstitial present failed: \(error)")
+        print("🚨 전면 광고 표시 실패: \(error)")
         
         pendingRecoveryDate = nil
         interstitial = nil

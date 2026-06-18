@@ -83,7 +83,8 @@ final class AppDIContainer: ViewControllerFactory {
     func makeDiaryWritingViewController(
         topicData: (String, String)?,
         selectedDate: Date,
-        shouldLoadDraft: Bool
+        shouldLoadDraft: Bool,
+        isRecoveryWriting: Bool
     ) -> DiaryWritingViewController {
         
         let viewModel = makeDiaryWritingViewModel()
@@ -92,7 +93,8 @@ final class AppDIContainer: ViewControllerFactory {
             diContainer: self,
             topicData: topicData,
             selectedDate: selectedDate,
-            shouldLoadDraft: shouldLoadDraft
+            shouldLoadDraft: shouldLoadDraft,
+            isRecoveryWriting: isRecoveryWriting
         )
     }
 
@@ -487,9 +489,26 @@ extension AppDIContainer {
     private func makeHomeUseCase() -> HomeUseCase {
         return DefaultHomeUseCase(repository: makeHomeRepository())
     }
+
+    private func makeHomeAdWatchService() -> HomeAdWatchService {
+        return DefaultHomeAdWatchService()
+    }
+
+    private func makeHomeAdWatchRepository() -> HomeAdWatchRepository {
+        return DefaultHomeAdWatchRepository(service: makeHomeAdWatchService())
+    }
+
+    private func makeHomeAdWatchUseCase() -> HomeAdWatchUseCase {
+        return DefaultHomeAdWatchUseCase(repository: makeHomeAdWatchRepository())
+    }
     
     private func makeHomeViewModel() -> HomeViewModel {
-        return HomeViewModel(useCase: makeHomeUseCase(), fetchTemporaryDiaryUseCase: makeFetchTemporaryDiaryUseCase(), localPushUseCase: makeLocalPushUseCase())
+        return HomeViewModel(
+            useCase: makeHomeUseCase(),
+            fetchTemporaryDiaryUseCase: makeFetchTemporaryDiaryUseCase(),
+            localPushUseCase: makeLocalPushUseCase(),
+            homeAdWatchUseCase: makeHomeAdWatchUseCase()
+        )
     }
 }
 

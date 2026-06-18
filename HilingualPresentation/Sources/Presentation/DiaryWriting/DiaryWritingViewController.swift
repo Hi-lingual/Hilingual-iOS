@@ -27,6 +27,7 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
     let saveModal = Modal()
     private let textCountSubject = PassthroughSubject<Int, Never>()
     private let topicData: (String, String)?
+    private let isRecoveryWriting: Bool
     public let selectedDate: Date
     var currentPickerMode: PickerMode?
     var shouldLoadDraft: Bool
@@ -77,9 +78,11 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
         topicData: (String, String)?,
         selectedDate: Date,
         backSource: String = "ui_button",
-        shouldLoadDraft: Bool = true
+        shouldLoadDraft: Bool = true,
+        isRecoveryWriting: Bool = false
     ) {
         self.topicData = topicData
+        self.isRecoveryWriting = isRecoveryWriting
         self.selectedDate = selectedDate
         self.shouldLoadDraft = shouldLoadDraft
         self.backSource = backSource
