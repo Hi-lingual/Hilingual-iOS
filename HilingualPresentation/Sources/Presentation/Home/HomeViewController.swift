@@ -125,14 +125,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                     print("🚨 [UserInfo] API 호출 실패: \(error.localizedDescription)")
                 }
             }, receiveValue: { [weak self] entity in
-                guard let self else { return }
-                
-                UserDefaults.standard.set(
-                    entity.nickname.trimmingCharacters(in: .whitespacesAndNewlines),
-                    forKey: "currentUser.nickname"
-                )
-                
-                self.updateUserInfo(entity)
+                self?.updateUserInfo(entity)
             })
             .store(in: &viewModel.cancellables)
         
@@ -269,9 +262,8 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         let bottomSheet = OnboardingBottomSheet()
         onboardingBottomSheet = bottomSheet
         bottomSheet.onDismiss = { [weak self] in
-            guard let self else { return }
-            self.onboardingBottomSheet = nil
-            self.showNextHomeModal()
+            self?.onboardingBottomSheet = nil
+            self?.showNextHomeModal()
         }
 
         view.window?.addSubview(bottomSheet)
@@ -307,10 +299,8 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
             buttonTitle: "확인했습니다",
             buttonText: nil,
             buttonAction: { [weak self] in
-                guard let self else { return }
-                
-                self.updateNoticeModal.dismissModal()
-                self.showRecoveryModalIfNeeded()
+                self?.updateNoticeModal.dismissModal()
+                self?.showRecoveryModalIfNeeded()
             }
         )
         updateNoticeModal.showAnimation()
@@ -989,6 +979,10 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     // MARK: - Recall
     
     private func updateUserInfo(_ entity: UserInfoEntity) {
+        UserDefaults.standard.set(
+            entity.nickname.trimmingCharacters(in: .whitespacesAndNewlines),
+            forKey: "currentUser.nickname"
+        )
         recoveryTickets = entity.recoveryTickets
         homeView.profileView.updateView(
             nickname: entity.nickname,
@@ -1005,9 +999,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         viewModel?.fetchUserInfo()
             .receive(on: RunLoop.main)
             .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] entity in
-                guard let self else { return }
-                
-                self.updateUserInfo(entity)
+                self?.updateUserInfo(entity)
             })
             .store(in: &viewModel!.cancellables)
     }
