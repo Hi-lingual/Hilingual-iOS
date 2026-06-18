@@ -63,7 +63,7 @@ final class RecoveryView: UIView {
         recoveryCardView.snp.makeConstraints {
             $0.top.equalToSuperview()
             $0.horizontalEdges.equalToSuperview().inset(16)
-            $0.height.equalTo(77)
+            $0.height.equalTo(78)
         }
         
         recoveryLabel.snp.makeConstraints {
