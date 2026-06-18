@@ -9,6 +9,11 @@ import UIKit
 import SnapKit
 
 final class HomeModal: UIView, UIGestureRecognizerDelegate {
+
+    enum ButtonLabelStyle {
+        case visible
+        case hidden
+    }
         
     // MARK: - UI Components
     
@@ -61,7 +66,7 @@ final class HomeModal: UIView, UIGestureRecognizerDelegate {
         return button
     }()
     
-    private let buttonLabel: UILabel = {
+    private lazy var buttonLabel: UILabel = {
         let label = UILabel()
         label.font = .pretendard(.body_m_14)
         label.textColor = .gray400
@@ -72,11 +77,16 @@ final class HomeModal: UIView, UIGestureRecognizerDelegate {
     
     // MARK: - Properties
     
+    private let buttonLabelStyle: ButtonLabelStyle
     private var buttonAction: (() -> Void)?
     
     // MARK: - LifeCycle
     
-    override init(frame: CGRect) {
+    init(
+        frame: CGRect = .zero,
+        buttonLabelStyle: ButtonLabelStyle = .visible
+    ) {
+        self.buttonLabelStyle = buttonLabelStyle
         super.init(frame: frame)
         setStyle()
         setUI()
@@ -99,7 +109,11 @@ final class HomeModal: UIView, UIGestureRecognizerDelegate {
     
     private func setUI() {
         addSubview(modalSheetView)
-        modalSheetView.addSubviews(titleLabel, subtitleLabel, imageView, modalButton, buttonLabel)
+        modalSheetView.addSubviews(titleLabel, subtitleLabel, imageView, modalButton)
+
+        if buttonLabelStyle == .visible {
+            modalSheetView.addSubview(buttonLabel)
+        }
     }
     
     private func setLayout() {
@@ -126,11 +140,17 @@ final class HomeModal: UIView, UIGestureRecognizerDelegate {
             $0.top.equalTo(imageView.snp.bottom).offset(30)
             $0.height.equalTo(48)
             $0.horizontalEdges.equalTo(modalSheetView).inset(24)
+
+            if buttonLabelStyle == .hidden {
+                $0.bottom.equalTo(modalSheetView).inset(24)
+            }
         }
         
-        buttonLabel.snp.makeConstraints {
-            $0.top.equalTo(modalButton.snp.bottom).offset(10)
-            $0.bottom.horizontalEdges.equalTo(modalSheetView).inset(24)
+        if buttonLabelStyle == .visible {
+            buttonLabel.snp.makeConstraints {
+                $0.top.equalTo(modalButton.snp.bottom).offset(10)
+                $0.bottom.horizontalEdges.equalTo(modalSheetView).inset(24)
+            }
         }
     }
     
@@ -180,7 +200,9 @@ final class HomeModal: UIView, UIGestureRecognizerDelegate {
         subtitleLabel.text = subtitle
         imageView.image = image
         modalButton.setTitle(buttonTitle, for: .normal)
-        buttonLabel.text = buttonText
+        if buttonLabelStyle == .visible {
+            buttonLabel.text = buttonText
+        }
         self.buttonAction = buttonAction
     }
 }
