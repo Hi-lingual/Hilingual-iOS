@@ -7,6 +7,7 @@
 
 import UIKit
 import Combine
+import GoogleMobileAds
 
 public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     
@@ -22,6 +23,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     private var pendingDraftDate: Date?
     private var pendingDraftTopic: (String, String)?
     private let localPushPermissionService = LocalPushPermissionService()
+    private var interstitial: InterstitialAd?
     
     // MARK: - Life Cycle
     
@@ -203,6 +205,10 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         let profileTapGesture = UITapGestureRecognizer(target: self, action: #selector(profileImageTapped))
         homeView.profileView.profileImageView.isUserInteractionEnabled = true
         homeView.profileView.profileImageView.addGestureRecognizer(profileTapGesture)
+        
+        homeView.selectedInfo.onTapRecovery = { [weak self] in
+            self?.loadInterstitialAdAndPresent()
+        }
     }
     
     // MARK: - Private Methods
@@ -337,9 +343,6 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
 
         dialog.showAnimation()
     }
-
-
-
 
     // MARK: - Topic 조회 로직 분리
     
@@ -629,6 +632,28 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
             self.viewModel?.registerInitialLocalPushes()
         }
     }
+    
+    private func loadInterstitialAdAndPresent() {
+        let adUnitID = Bundle.main.infoDictionary?["AD_INTERSTITIAL_UNIT_ID"] as? String ?? ""
+
+        InterstitialAd.load(with: adUnitID, request: Request()) { [weak self] ad, error in
+            if let error {
+                print("Interstitial load failed: \(error)")
+                return
+            }
+
+            guard let self = self, let ad = ad else { return }
+
+            // Assign on the current thread, then hop to main to interact with UI/presentation
+            self.interstitial = ad
+
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.interstitial?.fullScreenContentDelegate = self
+                self.interstitial?.present(from: self)
+            }
+        }
+    }
 
     // MARK: - Recall
     
@@ -646,5 +671,15 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                 )
             })
             .store(in: &viewModel!.cancellables)
+    }
+}
+
+extension HomeViewController: FullScreenContentDelegate {
+    public func adDidDismissFullScreenContent(_ ad: FullScreenPresentingAd) {
+        // TODO: 광고 종료 후 처리 필요 시 여기에 구현 (예: 회복 처리 API 호출)
+    }
+
+    public func ad(_ ad: FullScreenPresentingAd, didFailToPresentFullScreenContentWithError error: Error) {
+        print("Interstitial present failed: \(error)")
     }
 }

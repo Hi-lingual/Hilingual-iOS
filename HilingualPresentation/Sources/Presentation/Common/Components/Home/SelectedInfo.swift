@@ -23,11 +23,13 @@ final class SelectedInfo: UIView {
     var onDiaryPreviewTapped: (() -> Void)?
     var onMoreButtonTapped: ((Bool?) -> Void)?
     var onMenuAction: ((MenuAction, Int) -> Void)?
+    var onTapRecovery: (() -> Void)?
     
     // MARK: - UI Components
 
     internal let cardTopicView = CardTopicView()
     internal let cardPreview = CardPreview()
+    private let recoveryView = RecoveryView()
     
     private let emptyDiaryView: EmptyView = {
         let view = EmptyView()
@@ -147,6 +149,7 @@ final class SelectedInfo: UIView {
             cardPreview,
             emptyDiaryView,
             diaryLockView,
+            recoveryView,
             menu
         )
 
@@ -168,6 +171,10 @@ final class SelectedInfo: UIView {
         let moreTapGesture = UITapGestureRecognizer(target: self, action: #selector(moreButtonTapped))
         moreImageView.addGestureRecognizer(moreTapGesture)
         moreImageView.isUserInteractionEnabled = true
+        
+        recoveryView.onTapRecovery = { [weak self] in
+            self?.onTapRecovery?()
+        }
     }
 
     private func setupLayout() {
@@ -178,7 +185,7 @@ final class SelectedInfo: UIView {
             $0.horizontalEdges.equalToSuperview().inset(16)
         }
 
-        [cardTopicView, emptyDiaryView, diaryLockView].forEach {
+        [cardTopicView, emptyDiaryView, diaryLockView, recoveryView].forEach {
             $0.snp.makeConstraints {
                 $0.top.equalTo(headerStack.snp.bottom).offset(16)
                 $0.horizontalEdges.equalToSuperview()
@@ -218,7 +225,7 @@ final class SelectedInfo: UIView {
     }
     
     public func reset() {
-        [cardPreview, cardTopicView, emptyDiaryView, diaryLockView, moreImageView, dot, notWrittenLabel, iconView, timeLeftStack].forEach {
+        [cardPreview, cardTopicView, emptyDiaryView, diaryLockView, recoveryView, moreImageView, dot, notWrittenLabel, iconView, timeLeftStack].forEach {
             $0.isHidden = true
         }
     }
@@ -282,7 +289,30 @@ final class SelectedInfo: UIView {
         // 4. 그 외의 모든 경우
         else {
             setNotWrittenState("미작성")
-            emptyDiaryView.isHidden = false
+
+            // 이번 달 여부 판단
+            let cal = Calendar.current
+            let now = Date()
+            let isSameMonth = cal.component(.year, from: date) == cal.component(.year, from: now) && cal.component(.month, from: date) == cal.component(.month, from: now)
+
+            if isSameMonth {
+                // 이번 달의 empty 상태 → RecoveryView 노출
+                recoveryView.isHidden = false
+                emptyDiaryView.isHidden = true
+                cardTopicView.isHidden = true
+                iconView.isHidden = true
+                timeLeftStack.isHidden = true
+            } else {
+                // 이번 달이 아니면 기존 empty 메시지 유지
+                emptyDiaryView.configure(
+                    message: "작성된 일기가 없어요.\n좋은 하루 보내셨기를 바라요!",
+                    imageName: "img_diary_empty_ios",
+                    font: .pretendard(.body_m_14)
+                )
+                emptyDiaryView.isHidden = false
+                recoveryView.isHidden = true
+                cardTopicView.isHidden = true
+            }
         }
     }
 
@@ -385,3 +415,4 @@ extension SelectedInfo: ActionMenuDelegate {
         }
     }
 }
+
