@@ -34,6 +34,7 @@ public final class HomeViewModel: BaseViewModel {
     private let useCase: HomeUseCase
     private let fetchTemporaryDiaryUseCase: FetchTemporaryDiaryUseCase
     private let localPushUseCase: LocalPushUseCase
+    private let homeAdWatchUseCase: HomeAdWatchUseCase
 
     public let hasDraft = PassthroughSubject<Bool, Never>()
 
@@ -42,11 +43,13 @@ public final class HomeViewModel: BaseViewModel {
     public init(
         useCase: HomeUseCase,
         fetchTemporaryDiaryUseCase: FetchTemporaryDiaryUseCase,
-        localPushUseCase: LocalPushUseCase
+        localPushUseCase: LocalPushUseCase,
+        homeAdWatchUseCase: HomeAdWatchUseCase
     ) {
         self.useCase = useCase
         self.fetchTemporaryDiaryUseCase = fetchTemporaryDiaryUseCase
         self.localPushUseCase = localPushUseCase
+        self.homeAdWatchUseCase = homeAdWatchUseCase
     }
 
     // MARK: - Transform
@@ -104,6 +107,11 @@ public final class HomeViewModel: BaseViewModel {
     
     public func fetchUserInfo() -> AnyPublisher<UserInfoEntity, Error> {
         return useCase.fetchUserInfo()
+    }
+
+    public func postHomeAdWatch(for date: Date) -> AnyPublisher<Void, Error> {
+        let targetDate = date.toFormattedString("yyyy-MM-dd")
+        return homeAdWatchUseCase.execute(targetDate: targetDate)
     }
     
     public func publishDiary(diaryId: Int) -> AnyPublisher<Void, Error> {
