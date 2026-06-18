@@ -25,6 +25,9 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     private var pendingDraftIsRecovery = false
     private var pendingRecoveryDate: Date?
     private var recoveredTopicByDate: [String: (String, String)] = [:]
+    private var recoveredDateKeys: Set<String> = []
+    private let recoveredTopicStorageKey = "home.recoveredTopicByDate"
+    private let recoveredDateStorageKey = "home.recoveredDateKeys"
     private let localPushPermissionService = LocalPushPermissionService()
     private var interstitial: InterstitialAd?
     
@@ -45,6 +48,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: false)
         
+        loadRecoveredTopicsFromStorage()
         refreshUserInfo()
         homeView.selectedInfo.reset()
         
@@ -179,7 +183,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
 
             self.pendingDraftDate = selectedDate
             self.pendingDraftTopic = topic
-            self.pendingDraftIsRecovery = false
+            self.pendingDraftIsRecovery = self.isRecoveredDate(selectedDate)
 
             self.input.checkDraft.send(selectedDate)
         }
@@ -272,6 +276,40 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         date.toFormattedString("yyyy-MM-dd")
     }
 
+    private func loadRecoveredTopicsFromStorage() {
+        if let storedKeys = UserDefaults.standard.stringArray(forKey: recoveredDateStorageKey) {
+            recoveredDateKeys = Set(storedKeys)
+        }
+
+        guard let storedTopics = UserDefaults.standard.dictionary(forKey: recoveredTopicStorageKey) as? [String: [String]] else {
+            return
+        }
+
+        storedTopics.forEach { key, topics in
+            guard topics.count == 2 else { return }
+            recoveredTopicByDate[key] = (topics[0], topics[1])
+        }
+    }
+
+    private func isRecoveredDate(_ date: Date) -> Bool {
+        recoveredDateKeys.contains(dateKey(date))
+    }
+
+    private func saveRecoveredDate(_ date: Date) {
+        recoveredDateKeys.insert(dateKey(date))
+        UserDefaults.standard.set(Array(recoveredDateKeys), forKey: recoveredDateStorageKey)
+    }
+
+    private func saveRecoveredTopic(_ topicData: (String, String), for date: Date) {
+        let key = dateKey(date)
+        saveRecoveredDate(date)
+        recoveredTopicByDate[key] = topicData
+
+        var storedTopics = UserDefaults.standard.dictionary(forKey: recoveredTopicStorageKey) as? [String: [String]] ?? [:]
+        storedTopics[key] = [topicData.0, topicData.1]
+        UserDefaults.standard.set(storedTopics, forKey: recoveredTopicStorageKey)
+    }
+
     private func fetchAndShowDateInfo(for date: Date) {
         currentDateRequestCancellable?.cancel()
         
@@ -283,6 +321,11 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         homeView.selectedInfo.setSelectedDate(date)
         homeView.selectedInfo.currentDiaryId = nil
         
+        if isRecoveredDate(date) {
+            fetchRecoveredTopicIfAvailable(for: date)
+            return
+        }
+
         let isDiaryDate = homeView.calendarView.filledDates.contains {
             calendar.isDate($0, inSameDayAs: date)
         }
@@ -290,7 +333,11 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         if isDiaryDate {
             currentDateRequestCancellable = viewModel?.fetchDiary(for: date)
                 .receive(on: RunLoop.main)
-                .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] diary in
+                .sink(receiveCompletion: { [weak self] completion in
+                    if case .failure = completion {
+                        self?.fetchRecoveredTopicIfAvailable(for: date)
+                    }
+                }, receiveValue: { [weak self] diary in
                     guard let self else { return }
                     
                     if let diary {
@@ -400,23 +447,59 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     }
 
     // MARK: - Topic 조회 로직 분리
+
+    private func fetchRecoveredTopicIfAvailable(for date: Date) {
+        currentDateRequestCancellable = viewModel?.fetchTopic(for: date)
+            .receive(on: RunLoop.main)
+            .sink(receiveCompletion: { [weak self] completion in
+                if case .failure = completion {
+                    self?.homeView.selectedInfo.updateView(
+                        for: date,
+                        diaryId: nil,
+                        isPublished: nil,
+                        remainingTime: 0,
+                        topicData: nil,
+                        diaryData: nil,
+                        imageURL: nil
+                    )
+                }
+            }, receiveValue: { [weak self] topic in
+                guard let self else { return }
+                guard let topic else {
+                    self.homeView.selectedInfo.updateView(
+                        for: date,
+                        diaryId: nil,
+                        isPublished: nil,
+                        remainingTime: 0,
+                        topicData: nil,
+                        diaryData: nil,
+                        imageURL: nil
+                    )
+                    return
+                }
+
+                let topicData = (topic.topicKor, topic.topicEn)
+                self.saveRecoveredTopic(topicData, for: date)
+                self.homeView.selectedInfo.updateView(
+                    for: date,
+                    diaryId: nil,
+                    isPublished: nil,
+                    remainingTime: 0,
+                    topicData: topicData,
+                    diaryData: nil,
+                    imageURL: nil,
+                    isRecovered: true
+                )
+            })
+
+        currentDateRequestCancellable?.store(in: &viewModel!.cancellables)
+    }
     
     private func fetchTopicIfNeeded(for date: Date, today: Date, yesterday: Date) {
         let calendar = Calendar.current
         let selectedDay = calendar.startOfDay(for: date)
-        let key = dateKey(date)
-
-        if let recoveredTopic = recoveredTopicByDate[key] {
-            homeView.selectedInfo.updateView(
-                for: date,
-                diaryId: nil,
-                isPublished: nil,
-                remainingTime: 0,
-                topicData: recoveredTopic,
-                diaryData: nil,
-                imageURL: nil,
-                isRecovered: true
-            )
+        if isRecoveredDate(date) {
+            fetchRecoveredTopicIfAvailable(for: date)
             return
         }
 
@@ -740,9 +823,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                 guard let topic else { return }
 
                 let topicData = (topic.topicKor, topic.topicEn)
-                let key = self.dateKey(date)
-
-                self.recoveredTopicByDate[key] = topicData
+                self.saveRecoveredTopic(topicData, for: date)
 
                 self.homeView.selectedInfo.updateView(
                     for: date,
@@ -826,6 +907,7 @@ extension HomeViewController: FullScreenContentDelegate {
                     print("🚨 전면 광고 호출 실패: \(error)")
                 }
             }, receiveValue: { [weak self] in
+                self?.saveRecoveredDate(recoveryDate)
                 self?.fetchRecoveredTopicAndWrite(for: recoveryDate)
             })
             .store(in: &viewModel!.cancellables)

@@ -212,9 +212,25 @@ public final class LoadingViewModel: BaseViewModel {
         return diaryWritingUseCase.postDiaryWriting(entity)
     }
 
+    private func clearRecoveryDateIfNeeded() {
+        guard isRecoveryWriting, let date else { return }
+
+        let dateStorageKey = "home.recoveredDateKeys"
+        let topicStorageKey = "home.recoveredTopicByDate"
+
+        var recoveredDateKeys = Set(UserDefaults.standard.stringArray(forKey: dateStorageKey) ?? [])
+        recoveredDateKeys.remove(date)
+        UserDefaults.standard.set(Array(recoveredDateKeys), forKey: dateStorageKey)
+
+        var storedTopics = UserDefaults.standard.dictionary(forKey: topicStorageKey) as? [String: [String]] ?? [:]
+        storedTopics.removeValue(forKey: date)
+        UserDefaults.standard.set(storedTopics, forKey: topicStorageKey)
+    }
+
     @MainActor
     private func handleFeedbackCompleted(success: Bool) async {
         if success {
+            clearRecoveryDateIfNeeded()
             errorCount = 0
             stateSubject.send(.success)
         } else {
