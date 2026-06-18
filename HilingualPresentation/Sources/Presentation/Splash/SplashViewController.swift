@@ -66,6 +66,9 @@ public final class SplashViewController: BaseUIViewController<SplashViewModel> {
     private func initializeMobileAdsAndProceed() {
         guard !didInitializeMobileAds else { return }
         didInitializeMobileAds = true
+        MobileAds.shared.isApplicationMuted = true
+        MobileAds.shared.applicationVolume = 0
+        MobileAds.shared.audioVideoManager.isAudioSessionApplicationManaged = true
         MobileAds.shared.start()
         checkRemoteConfigVersion()
     }
