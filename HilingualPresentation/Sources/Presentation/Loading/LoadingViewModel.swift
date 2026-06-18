@@ -110,10 +110,10 @@ public final class LoadingViewModel: BaseViewModel {
             .receive(on: DispatchQueue.main)
             .sink { completion in
                 if case .failure(let error) = completion {
-                    print("AdWatch patch failed: \(error)")
+                    print("🚨 광고 시청 반영 실패: \(error)")
                 }
             } receiveValue: { _ in
-                print("AdWatch patch success")
+                print("광고 시청 반영 성공")
             }
             .store(in: &cancellables)
     }
@@ -216,15 +216,9 @@ public final class LoadingViewModel: BaseViewModel {
         guard isRecoveryWriting, let date else { return }
 
         let dateStorageKey = "home.recoveredDateKeys"
-        let topicStorageKey = "home.recoveredTopicByDate"
-
         var recoveredDateKeys = Set(UserDefaults.standard.stringArray(forKey: dateStorageKey) ?? [])
         recoveredDateKeys.remove(date)
         UserDefaults.standard.set(Array(recoveredDateKeys), forKey: dateStorageKey)
-
-        var storedTopics = UserDefaults.standard.dictionary(forKey: topicStorageKey) as? [String: [String]] ?? [:]
-        storedTopics.removeValue(forKey: date)
-        UserDefaults.standard.set(storedTopics, forKey: topicStorageKey)
     }
 
     @MainActor

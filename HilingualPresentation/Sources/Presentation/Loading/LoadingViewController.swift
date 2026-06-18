@@ -240,6 +240,7 @@ extension LoadingViewController: FullScreenContentDelegate {
         interstitial = nil
         adLoadTimestamp = nil
         
+        print("🚨 전면 광고 표시 실패: \(error)")
         guard let diaryId = currentDiaryId else { return }
         pushDiaryDetail(diaryId: diaryId)
     }

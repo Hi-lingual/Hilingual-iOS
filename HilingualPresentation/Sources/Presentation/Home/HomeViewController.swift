@@ -24,9 +24,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     private var pendingDraftTopic: (String, String)?
     private var pendingDraftIsRecovery = false
     private var pendingRecoveryDate: Date?
-    private var recoveredTopicByDate: [String: (String, String)] = [:]
     private var recoveredDateKeys: Set<String> = []
-    private let recoveredTopicStorageKey = "home.recoveredTopicByDate"
     private let recoveredDateStorageKey = "home.recoveredDateKeys"
     private let localPushPermissionService = LocalPushPermissionService()
     private var interstitial: InterstitialAd?
@@ -48,7 +46,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: false)
         
-        loadRecoveredTopicsFromStorage()
+        loadRecoveredDatesFromStorage()
         refreshUserInfo()
         homeView.selectedInfo.reset()
         
@@ -276,19 +274,8 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         date.toFormattedString("yyyy-MM-dd")
     }
 
-    private func loadRecoveredTopicsFromStorage() {
-        if let storedKeys = UserDefaults.standard.stringArray(forKey: recoveredDateStorageKey) {
-            recoveredDateKeys = Set(storedKeys)
-        }
-
-        guard let storedTopics = UserDefaults.standard.dictionary(forKey: recoveredTopicStorageKey) as? [String: [String]] else {
-            return
-        }
-
-        storedTopics.forEach { key, topics in
-            guard topics.count == 2 else { return }
-            recoveredTopicByDate[key] = (topics[0], topics[1])
-        }
+    private func loadRecoveredDatesFromStorage() {
+        recoveredDateKeys = Set(UserDefaults.standard.stringArray(forKey: recoveredDateStorageKey) ?? [])
     }
 
     private func isRecoveredDate(_ date: Date) -> Bool {
@@ -298,16 +285,6 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     private func saveRecoveredDate(_ date: Date) {
         recoveredDateKeys.insert(dateKey(date))
         UserDefaults.standard.set(Array(recoveredDateKeys), forKey: recoveredDateStorageKey)
-    }
-
-    private func saveRecoveredTopic(_ topicData: (String, String), for date: Date) {
-        let key = dateKey(date)
-        saveRecoveredDate(date)
-        recoveredTopicByDate[key] = topicData
-
-        var storedTopics = UserDefaults.standard.dictionary(forKey: recoveredTopicStorageKey) as? [String: [String]] ?? [:]
-        storedTopics[key] = [topicData.0, topicData.1]
-        UserDefaults.standard.set(storedTopics, forKey: recoveredTopicStorageKey)
     }
 
     private func fetchAndShowDateInfo(for date: Date) {
@@ -479,7 +456,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                 }
 
                 let topicData = (topic.topicKor, topic.topicEn)
-                self.saveRecoveredTopic(topicData, for: date)
+                self.saveRecoveredDate(date)
                 self.homeView.selectedInfo.updateView(
                     for: date,
                     diaryId: nil,
@@ -823,7 +800,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                 guard let topic else { return }
 
                 let topicData = (topic.topicKor, topic.topicEn)
-                self.saveRecoveredTopic(topicData, for: date)
+                self.saveRecoveredDate(date)
 
                 self.homeView.selectedInfo.updateView(
                     for: date,
