@@ -66,6 +66,12 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         _ center: UNUserNotificationCenter,
         willPresent notification: UNNotification
     ) async -> UNNotificationPresentationOptions {
+        let userInfo = notification.request.content.userInfo
+        print("🔔 [앱 포그라운드] 푸시 수신!")
+        print("📱 제목: \(notification.request.content.title)")
+        print("📱 본문: \(notification.request.content.body)")
+        print("📱 데이터: \(userInfo)")
+        
         return [.banner, .sound, .badge]
     }
 
@@ -74,9 +80,15 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         didReceive response: UNNotificationResponse
     ) async {
         let userInfo = response.notification.request.content.userInfo
+        print("🔔 [푸시 탭됨!]")
+        print("📱 전체 데이터: \(userInfo)")
+        
         guard let link = userInfo["link"] as? String,
               let url = URL(string: link),
-              let destination = DeeplinkParser.parse(url: url) else { return }
+              let destination = DeeplinkParser.parse(url: url) else {
+            print("⚠️ link 파싱 실패")
+            return
+        }
 
         print("[Deeplink] 푸시 탭 → \(destination)")
 
