@@ -25,6 +25,8 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     private var pendingDraftTopic: (String, String)?
     private var pendingDraftIsRecovery = false
     private var pendingRecoveryDate: Date?
+    private var recoveryTickets = 0
+    private var didLoadFilledDates = false
     private var recoveredDateKeys: Set<String> = []
     private let recoveredDateStorageKey = "home.recoveredDateKeys"
     private let dismissedRecoveryModalMonthStorageKey = "home.dismissedRecoveryModalMonth"
@@ -117,12 +119,15 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                     print("🚨 [UserInfo] API 호출 실패: \(error.localizedDescription)")
                 }
             }, receiveValue: { [weak self] entity in
+                guard let self else { return }
+                
                 UserDefaults.standard.set(
                     entity.nickname.trimmingCharacters(in: .whitespacesAndNewlines),
                     forKey: "currentUser.nickname"
                 )
                 
-                self?.homeView.profileView.updateView(
+                self.recoveryTickets = entity.recoveryTickets
+                self.homeView.profileView.updateView(
                     nickname: entity.nickname,
                     profileImageURL: entity.profileImg,
                     totalDiaries: entity.totalDiaries,
@@ -130,6 +135,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                     recoveryTickets: entity.recoveryTickets,
                     newAlarm: entity.newAlarm
                 )
+                self.showRecoveryModalIfNeeded()
             })
             .store(in: &viewModel.cancellables)
         
@@ -138,6 +144,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
             .sink { [weak self] dates in
                 guard let self else { return }
                 
+                self.didLoadFilledDates = true
                 self.homeView.calendarView.filledDates = dates
                 self.fetchAndShowDateInfo(for: self.homeView.calendarView.selectedDate ?? Date())
                 self.showRecoveryModalIfNeeded()
@@ -304,6 +311,9 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         let selectedDate = homeView.calendarView.selectedDate ?? today
         let lastDay = calendar.range(of: .day, in: .month, for: today)?.count ?? 31
         
+        guard homeModal.superview == nil || homeModal.isHidden else { return }
+        guard didLoadFilledDates else { return }
+        guard recoveryTickets > 0 else { return }
         guard calendar.isDate(selectedDate, equalTo: today, toGranularity: .month) else { return }
         guard UserDefaults.standard.string(forKey: dismissedRecoveryModalMonthStorageKey) != monthKey(today) else { return }
         guard calendar.component(.day, from: today) >= lastDay - 7 else { return }
@@ -315,19 +325,20 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     private func mostRecentRecoveryViewDateInCurrentMonth() -> Date? {
         let calendar = Calendar.current
         let today = Date()
-        let currentDay = calendar.component(.day, from: today)
         let filledDateKeys = Set(homeView.calendarView.filledDates.map { dateKey($0) })
+        var date = calendar.date(byAdding: .day, value: -2, to: today)
         
-        return (1..<max(currentDay - 1, 1)).reversed().compactMap { day -> Date? in
-            guard let date = calendar.date(from: DateComponents(
-                year: calendar.component(.year, from: today),
-                month: calendar.component(.month, from: today),
-                day: day
-            )) else { return nil }
+        while let candidate = date,
+              calendar.isDate(candidate, equalTo: today, toGranularity: .month) {
+            let key = dateKey(candidate)
+            if !filledDateKeys.contains(key), !recoveredDateKeys.contains(key) {
+                return candidate
+            }
             
-            let key = dateKey(date)
-            return filledDateKeys.contains(key) || recoveredDateKeys.contains(key) ? nil : date
-        }.first
+            date = calendar.date(byAdding: .day, value: -1, to: candidate)
+        }
+        
+        return nil
     }
     
     private func showRecoveryModal(for missedDate: Date) {
@@ -932,7 +943,10 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         viewModel?.fetchUserInfo()
             .receive(on: RunLoop.main)
             .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] entity in
-                self?.homeView.profileView.updateView(
+                guard let self else { return }
+                
+                self.recoveryTickets = entity.recoveryTickets
+                self.homeView.profileView.updateView(
                     nickname: entity.nickname,
                     profileImageURL: entity.profileImg,
                     totalDiaries: entity.totalDiaries,
@@ -940,6 +954,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                     recoveryTickets: entity.recoveryTickets,
                     newAlarm: entity.newAlarm
                 )
+                self.showRecoveryModalIfNeeded()
             })
             .store(in: &viewModel!.cancellables)
     }
