@@ -7,7 +7,7 @@
 
 import UIKit
 import Combine
-import GoogleMobileAds
+@preconcurrency import GoogleMobileAds
 
 public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     
@@ -22,6 +22,8 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     private var currentDateRequestCancellable: AnyCancellable?
     private var pendingDraftDate: Date?
     private var pendingDraftTopic: (String, String)?
+    private var pendingRecoveryDate: Date?
+    private var recoveredTopicByDate: [String: (String, String)] = [:]
     private let localPushPermissionService = LocalPushPermissionService()
     private var interstitial: InterstitialAd?
     
@@ -44,13 +46,14 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         
         refreshUserInfo()
         homeView.selectedInfo.reset()
+        
         let selectedDate = homeView.calendarView.selectedDate ?? Date()
         let calendar = Calendar.current
         let year = calendar.component(.year, from: selectedDate)
         let month = calendar.component(.month, from: selectedDate)
+        
         input.monthChange.send((year, month))
         checkAndRequestLocalPushPermission()
-
     }
     
     public override func viewDidAppear(_ animated: Bool) {
@@ -71,13 +74,14 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         }
         
         homeView.onMonthChanged = { [weak self] year, month in
-            guard let self = self else { return }
+            guard let self else { return }
             
             let calendar = Calendar.current
             let today = Date()
             let selectedDate: Date
-            if year == calendar.component(.year, from: today) &&
-               month == calendar.component(.month, from: today) {
+            
+            if year == calendar.component(.year, from: today)
+                && month == calendar.component(.month, from: today) {
                 selectedDate = today
             } else {
                 selectedDate = calendar.date(from: DateComponents(year: year, month: month, day: 1))!
@@ -92,12 +96,12 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                 diaryData: nil,
                 imageURL: nil
             )
+            
             self.homeView.selectedInfo.reset()
             self.homeView.calendarView.select(date: selectedDate)
             self.fetchAndShowDateInfo(for: selectedDate)
             self.input.monthChange.send((year, month))
         }
-
         
         let output = viewModel.transform(input: input)
         
@@ -112,6 +116,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                     entity.nickname.trimmingCharacters(in: .whitespacesAndNewlines),
                     forKey: "currentUser.nickname"
                 )
+                
                 self?.homeView.profileView.updateView(
                     nickname: entity.nickname,
                     profileImageURL: entity.profileImg,
@@ -127,20 +132,28 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
             .receive(on: RunLoop.main)
             .sink { [weak self] dates in
                 guard let self else { return }
+                
                 self.homeView.calendarView.filledDates = dates
                 self.fetchAndShowDateInfo(for: self.homeView.calendarView.selectedDate ?? Date())
             }
             .store(in: &viewModel.cancellables)
+        
         viewModel.hasDraft
             .receive(on: RunLoop.main)
             .sink { [weak self] hasDraft in
                 guard let self else { return }
+                
                 let date = self.pendingDraftDate ?? self.homeView.calendarView.selectedDate ?? Date()
                 let topic = self.pendingDraftTopic
+                
                 if hasDraft {
                     self.showDraftDialog(selectedDate: date, topicData: topic)
                 } else {
-                    self.goToDiaryWritingView(topicData: topic, selectedDate: date, shouldLoadDraft: false)
+                    self.goToDiaryWritingView(
+                        topicData: topic,
+                        selectedDate: date,
+                        shouldLoadDraft: false
+                    )
                 }
             }
             .store(in: &viewModel.cancellables)
@@ -154,6 +167,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         homeView.selectedInfo.cardTopicView.onTapWriteDiary = { [weak self] in
             guard let self else { return }
             guard let selectedDate = self.homeView.calendarView.selectedDate else { return }
+            
             let topic = self.homeView.selectedInfo.topicData
 
             self.pendingDraftDate = selectedDate
@@ -179,6 +193,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         // 일기 더보기 버튼 눌렀을 때, 메뉴 토글
         homeView.selectedInfo.onMoreButtonTapped = { [weak self] _ in
             guard let self else { return }
+            
             if self.homeView.selectedInfo.menu.isHidden {
                 self.showOverlay()
             } else {
@@ -188,11 +203,14 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         
         homeView.selectedInfo.onMenuAction = { [weak self] action, diaryId in
             guard let self else { return }
+            
             switch action {
             case .publish:
                 self.showDialog(for: .publish, diaryId: diaryId)
+                
             case .unpublish:
                 self.showDialog(for: .unpublish, diaryId: diaryId)
+                
             case .delete:
                 // TODO: 일기 삭제 기능 재오픈 시 삭제 다이얼로그 연결 복구
                 // self.showDialog(for: .delete, diaryId: diaryId)
@@ -200,14 +218,26 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
             }
         }
         
-        homeView.profileView.alarmButton.addTarget(self, action: #selector(alarmButtonTapped), for: .touchUpInside)
+        homeView.profileView.alarmButton.addTarget(
+            self,
+            action: #selector(alarmButtonTapped),
+            for: .touchUpInside
+        )
         
-        let profileTapGesture = UITapGestureRecognizer(target: self, action: #selector(profileImageTapped))
+        let profileTapGesture = UITapGestureRecognizer(
+            target: self,
+            action: #selector(profileImageTapped)
+        )
+        
         homeView.profileView.profileImageView.isUserInteractionEnabled = true
         homeView.profileView.profileImageView.addGestureRecognizer(profileTapGesture)
         
         homeView.selectedInfo.onTapRecovery = { [weak self] in
-            self?.loadInterstitialAdAndPresent()
+            guard let self else { return }
+            guard let selectedDate = self.homeView.calendarView.selectedDate else { return }
+
+            self.pendingRecoveryDate = selectedDate
+            self.loadInterstitialAdAndPresent()
         }
     }
     
@@ -215,8 +245,8 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
 
     private func showOnboardingBottomSheet() {
         guard UserDefaults.standard.bool(forKey: "showHomeOnboarding") else { return }
-
         guard !hasShownOnboardingBottomSheet else { return }
+        
         hasShownOnboardingBottomSheet = true
 
         let bottomSheet = OnboardingBottomSheet()
@@ -229,25 +259,28 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
 
         UserDefaults.standard.set(false, forKey: "showHomeOnboarding")
     }
+    
+    private func dateKey(_ date: Date) -> String {
+        date.toFormattedString("yyyy-MM-dd")
+    }
 
     private func fetchAndShowDateInfo(for date: Date) {
-        self.currentDateRequestCancellable?.cancel()
+        currentDateRequestCancellable?.cancel()
         
         let calendar = Calendar.current
         let today = calendar.startOfDay(for: Date())
         let yesterday = calendar.date(byAdding: .day, value: -1, to: today)!
         let selectedDay = calendar.startOfDay(for: date)
         
-        // 선택 날짜 초기화
-        self.homeView.selectedInfo.setSelectedDate(date)
-        self.homeView.selectedInfo.currentDiaryId = nil
+        homeView.selectedInfo.setSelectedDate(date)
+        homeView.selectedInfo.currentDiaryId = nil
         
-        let isDiaryDate = self.homeView.calendarView.filledDates.contains {
+        let isDiaryDate = homeView.calendarView.filledDates.contains {
             calendar.isDate($0, inSameDayAs: date)
         }
         
         if isDiaryDate {
-            self.currentDateRequestCancellable = self.viewModel?.fetchDiary(for: date)
+            currentDateRequestCancellable = viewModel?.fetchDiary(for: date)
                 .receive(on: RunLoop.main)
                 .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] diary in
                     guard let self else { return }
@@ -274,13 +307,17 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                                 imageURL: nil
                             )
                         } else {
-                            self.fetchTopicIfNeeded(for: date, today: today, yesterday: yesterday)
+                            self.fetchTopicIfNeeded(
+                                for: date,
+                                today: today,
+                                yesterday: yesterday
+                            )
                         }
                     }
                 })
         } else {
             if selectedDay > today {
-                self.homeView.selectedInfo.updateView(
+                homeView.selectedInfo.updateView(
                     for: date,
                     diaryId: nil,
                     isPublished: nil,
@@ -290,18 +327,20 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                     imageURL: nil
                 )
             } else {
-                self.fetchTopicIfNeeded(for: date, today: today, yesterday: yesterday)
+                fetchTopicIfNeeded(
+                    for: date,
+                    today: today,
+                    yesterday: yesterday
+                )
             }
         }
         
-        self.currentDateRequestCancellable?.store(in: &self.viewModel!.cancellables)
+        currentDateRequestCancellable?.store(in: &viewModel!.cancellables)
     }
     
     func showToast(message: String) {
         let toast = ToastMessage()
-        
         view.addSubview(toast)
-        
         toast.configure(type: .basic, message: message)
     }
     
@@ -309,7 +348,9 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         guard let window = view.window else { return }
 
         window.addSubview(dialog)
-        dialog.snp.remakeConstraints { $0.edges.equalToSuperview() }
+        dialog.snp.remakeConstraints {
+            $0.edges.equalToSuperview()
+        }
 
         dialog.configure(
             style: .normal,
@@ -319,9 +360,9 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
             rightButtonTitle: "이어 쓰기",
             leftAction: { [weak self] in
                 guard let self else { return }
+                
                 self.dialog.dismiss()
 
-                // 새로쓰기 → 그냥 작성 화면으로 이동
                 self.goToDiaryWritingView(
                     topicData: topicData,
                     selectedDate: selectedDate,
@@ -330,9 +371,9 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
             },
             rightAction: { [weak self] in
                 guard let self else { return }
+                
                 self.dialog.dismiss()
 
-                // 이어쓰기 → 작성 화면으로 이동 → 작성 화면이 알아서 draft load
                 self.goToDiaryWritingView(
                     topicData: topicData,
                     selectedDate: selectedDate,
@@ -349,9 +390,25 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     private func fetchTopicIfNeeded(for date: Date, today: Date, yesterday: Date) {
         let calendar = Calendar.current
         let selectedDay = calendar.startOfDay(for: date)
-        
-        guard calendar.isDate(selectedDay, inSameDayAs: today) || calendar.isDate(selectedDay, inSameDayAs: yesterday) else {
-            self.homeView.selectedInfo.updateView(
+        let key = dateKey(date)
+
+        if let recoveredTopic = recoveredTopicByDate[key] {
+            homeView.selectedInfo.updateView(
+                for: date,
+                diaryId: nil,
+                isPublished: nil,
+                remainingTime: 0,
+                topicData: recoveredTopic,
+                diaryData: nil,
+                imageURL: nil,
+                isRecovered: true
+            )
+            return
+        }
+
+        guard calendar.isDate(selectedDay, inSameDayAs: today)
+                || calendar.isDate(selectedDay, inSameDayAs: yesterday) else {
+            homeView.selectedInfo.updateView(
                 for: date,
                 diaryId: nil,
                 isPublished: nil,
@@ -363,7 +420,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
             return
         }
         
-        self.currentDateRequestCancellable = self.viewModel?.fetchTopic(for: date)
+        currentDateRequestCancellable = viewModel?.fetchTopic(for: date)
             .receive(on: RunLoop.main)
             .sink(receiveCompletion: { [weak self] completion in
                 if case .failure = completion {
@@ -379,6 +436,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                 }
             }, receiveValue: { [weak self] topic in
                 guard let self else { return }
+                
                 let remaining = max(0, topic?.remainingTime ?? 0)
                 let topicData = remaining > 0 ? topic.map { ($0.topicKor, $0.topicEn) } : nil
                 
@@ -393,20 +451,25 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                 )
             })
         
-        self.currentDateRequestCancellable?.store(in: &self.viewModel!.cancellables)
+        currentDateRequestCancellable?.store(in: &viewModel!.cancellables)
     }
     
     private func showOverlay() {
         let overlay = UIControl()
         overlay.backgroundColor = .clear
         overlay.addTarget(self, action: #selector(dismissMenu), for: .touchUpInside)
+        
         view.addSubview(overlay)
-        overlay.snp.makeConstraints { $0.edges.equalToSuperview() }
+        overlay.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
+        
         overlayView = overlay
 
         if homeView.selectedInfo.menu.superview != nil {
             homeView.selectedInfo.menu.removeFromSuperview()
         }
+        
         view.addSubview(homeView.selectedInfo.menu)
 
         homeView.selectedInfo.menu.snp.remakeConstraints {
@@ -425,7 +488,9 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         guard let window = view.window else { return }
 
         window.addSubview(dialog)
-        dialog.snp.remakeConstraints { $0.edges.equalToSuperview() }
+        dialog.snp.remakeConstraints {
+            $0.edges.equalToSuperview()
+        }
         
         switch action {
         case .publish:
@@ -435,7 +500,9 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                 content: "공유된 일기는 모든 유저에게 게시되며,\n피드에서 확인하실 수 있어요.",
                 leftButtonTitle: "아니요",
                 rightButtonTitle: "게시하기",
-                leftAction: { [weak dialog] in dialog?.dismiss() },
+                leftAction: { [weak dialog] in
+                    dialog?.dismiss()
+                },
                 rightAction: { [weak self] in
                     guard let self else { return }
                     
@@ -447,6 +514,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                             }
                         }, receiveValue: { [weak self] _ in
                             guard let self else { return }
+                            
                             self.homeView.selectedInfo.updateDiaryState(isPublished: true)
                             self.homeView.selectedInfo.updateMenuState(isPublished: true)
                             self.dialog.dismiss()
@@ -467,6 +535,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                         .store(in: &self.viewModel!.cancellables)
                 }
             )
+            
         case .unpublish:
             dialog.configure(
                 style: .normal,
@@ -474,7 +543,9 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                 content: "비공개로 전환 시, 해당 일기의\n피드 활동 내역은 모두 사라져요.",
                 leftButtonTitle: "아니요",
                 rightButtonTitle: "비공개하기",
-                leftAction: { [weak dialog] in dialog?.dismiss() },
+                leftAction: { [weak dialog] in
+                    dialog?.dismiss()
+                },
                 rightAction: { [weak self] in
                     guard let self else { return }
                     
@@ -486,6 +557,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                             }
                         }, receiveValue: { [weak self] _ in
                             guard let self else { return }
+                            
                             self.homeView.selectedInfo.updateDiaryState(isPublished: false)
                             self.homeView.selectedInfo.updateMenuState(isPublished: false)
                             self.dialog.dismiss()
@@ -497,6 +569,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                         .store(in: &self.viewModel!.cancellables)
                 }
             )
+            
         case .delete:
             dialog.configure(
                 style: .normal,
@@ -504,7 +577,9 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                 content: "작성한 일기를 삭제한 날짜에는\n다시 일기를 작성할 수 없어요.",
                 leftButtonTitle: "아니요",
                 rightButtonTitle: "삭제하기",
-                leftAction: { [weak dialog] in dialog?.dismiss() },
+                leftAction: { [weak dialog] in
+                    dialog?.dismiss()
+                },
                 rightAction: { [weak self] in
                     guard let self else { return }
                     
@@ -517,7 +592,6 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                         }, receiveValue: { [weak self] _ in
                             guard let self else { return }
                             
-                            // 1. 사용자 정보 다시 요청
                             self.viewModel?.fetchUserInfo()
                                 .receive(on: RunLoop.main)
                                 .sink(receiveCompletion: { _ in }, receiveValue: { entity in
@@ -532,14 +606,13 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                                 })
                                 .store(in: &self.viewModel!.cancellables)
                             
-                            // 2. 캘린더 및 선택 정보 업데이트
                             let selectedDate = self.homeView.calendarView.selectedDate ?? Date()
                             let calendar = Calendar.current
                             let year = calendar.component(.year, from: selectedDate)
                             let month = calendar.component(.month, from: selectedDate)
+                            
                             self.input.monthChange.send((year, month))
                             
-                            // 3. SelectedInfo 뷰를 '미작성' 상태로 명시적 업데이트
                             self.homeView.selectedInfo.updateView(
                                 for: selectedDate,
                                 diaryId: nil,
@@ -560,6 +633,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                 }
             )
         }
+        
         dialog.showAnimation()
     }
     
@@ -602,12 +676,17 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     
     // MARK: - Navigation
     
-    private func goToDiaryWritingView(topicData: (String, String)? = nil, selectedDate: Date? = nil, shouldLoadDraft: Bool = false) {
+    private func goToDiaryWritingView(
+        topicData: (String, String)? = nil,
+        selectedDate: Date? = nil,
+        shouldLoadDraft: Bool = false
+    ) {
         let diaryWritingVC = diContainer.makeDiaryWritingViewController(
             topicData: topicData,
             selectedDate: selectedDate ?? Date(),
             shouldLoadDraft: shouldLoadDraft
         )
+        
         diaryWritingVC.hidesBottomBarWhenPushed = true
         navigationController?.pushViewController(diaryWritingVC, animated: true)
     }
@@ -615,40 +694,80 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     private func goToDiaryDetailView(diaryId: Int) {
         let detailVC = diContainer.makeDiaryDetailViewController(diaryId: diaryId)
         detailVC.hidesBottomBarWhenPushed = true
+        
         navigationController?.pushViewController(detailVC, animated: true)
     }
     
     private func goToMyFeedProefileView() {
         let myFeedProfileVC = diContainer.makeMyFeedProfileViewController()
         myFeedProfileVC.hidesBottomBarWhenPushed = true
+        
         navigationController?.pushViewController(myFeedProfileVC, animated: true)
     }
 
     private func checkAndRequestLocalPushPermission() {
         Task { @MainActor [weak self] in
             guard let self else { return }
+            
             let shouldRegister = await localPushPermissionService.checkAndRequestPermission()
             guard shouldRegister else { return }
+            
             self.viewModel?.registerInitialLocalPushes()
         }
+    }
+    
+    private func fetchRecoveredTopicAndWrite(for date: Date) {
+        viewModel?.fetchTopic(for: date)
+            .receive(on: RunLoop.main)
+            .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] topic in
+                guard let self else { return }
+                guard let topic else { return }
+
+                let topicData = (topic.topicKor, topic.topicEn)
+                let key = self.dateKey(date)
+
+                self.recoveredTopicByDate[key] = topicData
+
+                self.homeView.selectedInfo.updateView(
+                    for: date,
+                    diaryId: nil,
+                    isPublished: nil,
+                    remainingTime: 0,
+                    topicData: topicData,
+                    diaryData: nil,
+                    imageURL: nil,
+                    isRecovered: true
+                )
+
+                self.pendingDraftDate = date
+                self.pendingDraftTopic = topicData
+                self.input.checkDraft.send(date)
+            })
+            .store(in: &viewModel!.cancellables)
     }
     
     private func loadInterstitialAdAndPresent() {
         let adUnitID = Bundle.main.infoDictionary?["AD_INTERSTITIAL_UNIT_ID"] as? String ?? ""
 
         InterstitialAd.load(with: adUnitID, request: Request()) { [weak self] ad, error in
-            if let error {
-                print("Interstitial load failed: \(error)")
-                return
-            }
+            nonisolated(unsafe) let loadedAd = ad
+            let errorDescription = error.map { String(describing: $0) }
 
-            guard let self = self, let ad = ad else { return }
+            Task { @MainActor [weak self] in
+                guard let self else { return }
 
-            // Assign on the current thread, then hop to main to interact with UI/presentation
-            self.interstitial = ad
+                if let errorDescription {
+                    print("Interstitial load failed: \(errorDescription)")
+                    self.pendingRecoveryDate = nil
+                    return
+                }
 
-            DispatchQueue.main.async { [weak self] in
-                guard let self = self else { return }
+                guard let loadedAd else {
+                    self.pendingRecoveryDate = nil
+                    return
+                }
+
+                self.interstitial = loadedAd
                 self.interstitial?.fullScreenContentDelegate = self
                 self.interstitial?.present(from: self)
             }
@@ -674,12 +793,25 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     }
 }
 
+// MARK: - FullScreenContentDelegate
+
 extension HomeViewController: FullScreenContentDelegate {
     public func adDidDismissFullScreenContent(_ ad: FullScreenPresentingAd) {
-        // TODO: 광고 종료 후 처리 필요 시 여기에 구현 (예: 회복 처리 API 호출)
+        guard let recoveryDate = pendingRecoveryDate else { return }
+
+        pendingRecoveryDate = nil
+        interstitial = nil
+
+        fetchRecoveredTopicAndWrite(for: recoveryDate)
     }
 
-    public func ad(_ ad: FullScreenPresentingAd, didFailToPresentFullScreenContentWithError error: Error) {
+    public func ad(
+        _ ad: FullScreenPresentingAd,
+        didFailToPresentFullScreenContentWithError error: Error
+    ) {
         print("Interstitial present failed: \(error)")
+        
+        pendingRecoveryDate = nil
+        interstitial = nil
     }
 }

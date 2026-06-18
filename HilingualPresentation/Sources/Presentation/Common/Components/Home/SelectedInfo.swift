@@ -239,7 +239,8 @@ final class SelectedInfo: UIView {
         remainingTime: Int,
         topicData: (kor: String, en: String)? = nil,
         diaryData: String? = nil,
-        imageURL: String? = nil
+        imageURL: String? = nil,
+        isRecovered: Bool = false
     ) {
         reset()
         
@@ -275,7 +276,17 @@ final class SelectedInfo: UIView {
             diaryLockView.isHidden = false
         }
         
-        // 3. 남은 시간이 있고 주제가 있는 경우
+        // 3. Recovery로 해금된 경우
+        else if isRecovered, let topic = topicData {
+            setNotWrittenState("미작성")
+            cardTopicView.isHidden = false
+            cardTopicView.configure(kor: topic.kor, en: topic.en)
+
+            iconView.isHidden = true
+            timeLeftStack.isHidden = true
+        }
+        
+        // 4. 남은 시간이 있고 주제가 있는 경우
         else if remainingTime > 0, let topic = topicData {
             setNotWrittenState("미작성")
             cardTopicView.isHidden = false
