@@ -13,6 +13,24 @@ enum MenuAction {
     case publish, unpublish, delete
 }
 
+struct HomeUserInfoViewData {
+    let nickname: String
+    let profileImageURL: String?
+    let totalDiaries: Int
+    let streak: Int
+    let recoveryTickets: Int
+    let newAlarm: Bool
+    
+    init(entity: UserInfoEntity) {
+        self.nickname = entity.nickname
+        self.profileImageURL = entity.profileImg
+        self.totalDiaries = entity.totalDiaries
+        self.streak = entity.streak
+        self.recoveryTickets = entity.recoveryTickets
+        self.newAlarm = entity.newAlarm
+    }
+}
+
 public final class HomeViewModel: BaseViewModel {
 
     // MARK: - Input
@@ -25,7 +43,7 @@ public final class HomeViewModel: BaseViewModel {
     // MARK: - Output
 
     public struct Output {
-        let userInfo: AnyPublisher<UserInfoEntity, Error>
+        let userInfo: AnyPublisher<HomeUserInfoViewData, Error>
         let filledDates: AnyPublisher<[Date], Never>
     }
 
@@ -55,8 +73,7 @@ public final class HomeViewModel: BaseViewModel {
     // MARK: - Transform
 
     public func transform(input: Input) -> Output {
-        let userInfoPublisher = useCase.fetchUserInfo()
-            .eraseToAnyPublisher()
+        let userInfoPublisher = fetchUserInfo()
 
         let filledDatesPublisher = input.monthChange
             .flatMap { year, month in
@@ -105,8 +122,10 @@ public final class HomeViewModel: BaseViewModel {
         return useCase.fetchMonthInfo(year: year, month: month)
     }
     
-    public func fetchUserInfo() -> AnyPublisher<UserInfoEntity, Error> {
+    func fetchUserInfo() -> AnyPublisher<HomeUserInfoViewData, Error> {
         return useCase.fetchUserInfo()
+            .map { HomeUserInfoViewData(entity: $0) }
+            .eraseToAnyPublisher()
     }
 
     public func postHomeAdWatch(for date: Date) -> AnyPublisher<Void, Error> {

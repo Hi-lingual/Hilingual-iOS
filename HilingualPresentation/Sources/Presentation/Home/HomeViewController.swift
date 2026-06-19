@@ -7,7 +7,6 @@
 
 import UIKit
 import Combine
-import HilingualDomain
 @preconcurrency import GoogleMobileAds
 
 public final class HomeViewController: BaseUIViewController<HomeViewModel> {
@@ -125,8 +124,8 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                 if case let .failure(error) = completion {
                     print("🚨 [UserInfo] API 호출 실패: \(error.localizedDescription)")
                 }
-            }, receiveValue: { [weak self] entity in
-                self?.updateUserInfo(entity)
+            }, receiveValue: { [weak self] userInfo in
+                self?.updateUserInfo(userInfo)
             })
             .store(in: &viewModel.cancellables)
         
@@ -794,19 +793,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                         }, receiveValue: { [weak self] _ in
                             guard let self else { return }
                             
-                            self.viewModel?.fetchUserInfo()
-                                .receive(on: RunLoop.main)
-                                .sink(receiveCompletion: { _ in }, receiveValue: { entity in
-                                    self.homeView.profileView.updateView(
-                                        nickname: entity.nickname,
-                                        profileImageURL: entity.profileImg,
-                                        totalDiaries: entity.totalDiaries,
-                                        streak: entity.streak,
-                                        recoveryTickets: entity.recoveryTickets,
-                                        newAlarm: entity.newAlarm
-                                    )
-                                })
-                                .store(in: &self.viewModel!.cancellables)
+                            self.refreshUserInfo(shouldShowRecoveryModal: false)
                             
                             let selectedDate = self.homeView.calendarView.selectedDate ?? Date()
                             let calendar = Calendar.current
@@ -982,28 +969,33 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
 
     // MARK: - Recall
     
-    private func updateUserInfo(_ entity: UserInfoEntity) {
+    private func updateUserInfo(
+        _ userInfo: HomeUserInfoViewData,
+        shouldShowRecoveryModal: Bool = true
+    ) {
         UserDefaults.standard.set(
-            entity.nickname.trimmingCharacters(in: .whitespacesAndNewlines),
+            userInfo.nickname.trimmingCharacters(in: .whitespacesAndNewlines),
             forKey: "currentUser.nickname"
         )
-        recoveryTickets = entity.recoveryTickets
+        recoveryTickets = userInfo.recoveryTickets
         homeView.profileView.updateView(
-            nickname: entity.nickname,
-            profileImageURL: entity.profileImg,
-            totalDiaries: entity.totalDiaries,
-            streak: entity.streak,
-            recoveryTickets: entity.recoveryTickets,
-            newAlarm: entity.newAlarm
+            nickname: userInfo.nickname,
+            profileImageURL: userInfo.profileImageURL,
+            totalDiaries: userInfo.totalDiaries,
+            streak: userInfo.streak,
+            recoveryTickets: userInfo.recoveryTickets,
+            newAlarm: userInfo.newAlarm
         )
-        showRecoveryModalIfNeeded()
+        if shouldShowRecoveryModal {
+            showRecoveryModalIfNeeded()
+        }
     }
     
-    private func refreshUserInfo() {
+    private func refreshUserInfo(shouldShowRecoveryModal: Bool = true) {
         viewModel?.fetchUserInfo()
             .receive(on: RunLoop.main)
-            .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] entity in
-                self?.updateUserInfo(entity)
+            .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] userInfo in
+                self?.updateUserInfo(userInfo, shouldShowRecoveryModal: shouldShowRecoveryModal)
             })
             .store(in: &viewModel!.cancellables)
     }
