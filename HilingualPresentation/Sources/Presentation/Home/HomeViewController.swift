@@ -34,7 +34,8 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     private let dismissedRecoveryModalMonthStorageKey = "home.dismissedRecoveryModalMonth"
     private let didShowUpdateNoticeModalStorageKey = "home.didShowRecoveryUpdateNoticeModal"
     private let localPushPermissionService = LocalPushPermissionService()
-    private var interstitial: InterstitialAd?
+    private var rewardedInterstitial: RewardedInterstitialAd?
+    private var didEarnRecoveryReward = false
     
     // MARK: - Life Cycle
     
@@ -949,9 +950,9 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     }
     
     private func loadInterstitialAdAndPresent() {
-        let adUnitID = Bundle.main.infoDictionary?["AD_INTERSTITIAL_UNIT_ID"] as? String ?? ""
+        let adUnitID = Bundle.main.infoDictionary?["AD_RECOVERY_UNIT_ID"] as? String ?? ""
 
-        InterstitialAd.load(with: adUnitID, request: Request()) { [weak self] ad, error in
+        RewardedInterstitialAd.load(with: adUnitID, request: Request()) { [weak self] ad, error in
             nonisolated(unsafe) let loadedAd = ad
             let errorDescription = error.map { String(describing: $0) }
 
@@ -959,7 +960,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                 guard let self else { return }
 
                 if let errorDescription {
-                    print("🚨 전면 광고 로드 실패: \(errorDescription)")
+                    print("🚨 보상형 전면 광고 로드 실패: \(errorDescription)")
                     self.pendingRecoveryDate = nil
                     return
                 }
@@ -969,9 +970,12 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                     return
                 }
 
-                self.interstitial = loadedAd
-                self.interstitial?.fullScreenContentDelegate = self
-                self.interstitial?.present(from: self)
+                self.didEarnRecoveryReward = false
+                self.rewardedInterstitial = loadedAd
+                self.rewardedInterstitial?.fullScreenContentDelegate = self
+                self.rewardedInterstitial?.present(from: self) { [weak self] in
+                    self?.didEarnRecoveryReward = true
+                }
             }
         }
     }
@@ -1012,7 +1016,10 @@ extension HomeViewController: FullScreenContentDelegate {
         guard let recoveryDate = pendingRecoveryDate else { return }
 
         pendingRecoveryDate = nil
-        interstitial = nil
+        rewardedInterstitial = nil
+
+        guard didEarnRecoveryReward else { return }
+        didEarnRecoveryReward = false
 
         viewModel?.postHomeAdWatch(for: recoveryDate)
             .receive(on: RunLoop.main)
@@ -1034,6 +1041,7 @@ extension HomeViewController: FullScreenContentDelegate {
         print("🚨 전면 광고 표시 실패: \(error)")
         
         pendingRecoveryDate = nil
-        interstitial = nil
+        rewardedInterstitial = nil
+        didEarnRecoveryReward = false
     }
 }
