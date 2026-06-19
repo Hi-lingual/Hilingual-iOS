@@ -11,6 +11,13 @@ import Kingfisher
 
 final class ProfileView: UIView {
     
+    private static func makeDotView() -> UIView {
+        let view = UIView()
+        view.backgroundColor = .white
+        view.layer.cornerRadius = 1
+        return view
+    }
+    
     private let nameLabel: UILabel = {
         let label = UILabel()
         label.font = .pretendard(.head_sb_18)
@@ -40,17 +47,12 @@ final class ProfileView: UIView {
         return label
     }()
     
-    private let dot1: UIView = {
-        let view = UIView()
-        view.backgroundColor = .white
-        view.layer.cornerRadius = 1
-        return view
-    }()
+    private let dot1 = makeDotView()
     
     private let streakImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFit
-        imageView.image = UIImage(named: "ic_fire_16_ios", in: .module, compatibleWith: nil)
+        imageView.image = (resource: .ic_fire_16_ios)
         return imageView
     }()
     
@@ -61,12 +63,7 @@ final class ProfileView: UIView {
         return label
     }()
     
-    private let dot2: UIView = {
-        let view = UIView()
-        view.backgroundColor = .white
-        view.layer.cornerRadius = 1
-        return view
-    }()
+    private let dot2 = makeDotView()
     
     private let returnImageView: UIImageView = {
         let imageView = UIImageView()
