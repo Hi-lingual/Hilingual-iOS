@@ -439,7 +439,15 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                 .receive(on: RunLoop.main)
                 .sink(receiveCompletion: { [weak self] completion in
                     if case .failure = completion {
-                        self?.fetchRecoveredTopicIfAvailable(for: date)
+                        self?.homeView.selectedInfo.updateView(
+                            for: date,
+                            diaryId: nil,
+                            isPublished: nil,
+                            remainingTime: 0,
+                            topicData: nil,
+                            diaryData: nil,
+                            imageURL: nil
+                        )
                     }
                 }, receiveValue: { [weak self] diary in
                     guard let self else { return }
@@ -583,7 +591,6 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                 }
 
                 let topicData = (topic.topicKor, topic.topicEn)
-                self.saveRecoveredDate(date)
                 self.homeView.selectedInfo.updateView(
                     for: date,
                     diaryId: nil,
@@ -915,8 +922,6 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                 guard let topic else { return }
 
                 let topicData = (topic.topicKor, topic.topicEn)
-                self.saveRecoveredDate(date)
-
                 self.homeView.selectedInfo.updateView(
                     for: date,
                     diaryId: nil,
