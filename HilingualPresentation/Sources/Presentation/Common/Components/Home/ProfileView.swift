@@ -36,7 +36,7 @@ final class ProfileView: UIView {
     private let totalImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFit
-        imageView.image = UIImage(named: "ic_bubble_16_ios", in: .module, compatibleWith: nil)
+        imageView.image = UIImage(resource: .icBubble16Ios)
         return imageView
     }()
     
@@ -52,7 +52,7 @@ final class ProfileView: UIView {
     private let streakImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFit
-        imageView.image = (resource: .ic_fire_16_ios)
+        imageView.image = UIImage(resource: .icFire16Ios)
         return imageView
     }()
     
@@ -68,7 +68,7 @@ final class ProfileView: UIView {
     private let returnImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFit
-        imageView.image = UIImage(named: "ic_return_16_ios", in: .module, compatibleWith: nil)
+        imageView.image = UIImage(resource: .icReturn16Ios)
         return imageView
     }()
     
@@ -98,7 +98,7 @@ final class ProfileView: UIView {
     private(set) var alarmButton: UIButton = {
         let button = UIButton()
         button.setImage(
-            UIImage(named: "ic_alarm_28_ios", in: .module, compatibleWith: nil),
+            UIImage(resource: .icAlarm28Ios),
             for: .normal
         )
         return button
@@ -177,11 +177,7 @@ final class ProfileView: UIView {
         streakLabel.text = "\(streak)일 연속"
         returnLabel.text = "\(recoveryTickets)개"
         
-        let defaultImage = UIImage(
-            named: "img_profile_normal_ios",
-            in: .module,
-            compatibleWith: nil
-        )
+        let defaultImage = UIImage(resource: .imgProfileNormalIos)
         
         if let urlString = profileImageURL,
            let url = URL(string: urlString),
@@ -202,12 +198,12 @@ final class ProfileView: UIView {
         }
         if newAlarm {
             alarmButton.setImage(
-                UIImage(named: "ic_newAlarm_28_ios", in: .module, compatibleWith: nil),
+                UIImage(resource: .icNewAlarm28Ios),
                 for: .normal
             )
         } else {
             alarmButton.setImage(
-                UIImage(named: "ic_alarm_28_ios", in: .module, compatibleWith: nil),
+                UIImage(resource: .icAlarm28Ios),
                 for: .normal
             )
         }

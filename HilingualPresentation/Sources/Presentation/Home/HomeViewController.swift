@@ -296,7 +296,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         updateNoticeModal.configure(
             title: "이제 끊긴 기록을 되살릴 수 있어요!",
             subtitle: "미처 작성하지 못한 날짜를 누르고,\n광고 한 편 보고 끊긴 기록을 살려보세요.",
-            image: UIImage(named: "img_modal_update_ios", in: .module, compatibleWith: nil),
+            image: UIImage(resource: .imgModalUpdateIos),
             buttonTitle: "확인했습니다",
             buttonText: nil,
             buttonAction: { [weak self] in
@@ -395,7 +395,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         homeModal.configure(
             title: "연속 기록이 끊겼나요?",
             subtitle: "광고 한 번 보면 놓쳤던 날짜의 일기를\n다시 작성할 수 있어요.",
-            image: UIImage(named: "img_modal_return_record_ios", in: .module, compatibleWith: nil),
+            image: UIImage(resource: .imgModalReturnRecordIos),
             buttonTitle: "기록 살리기",
             buttonText: "나중에 살리기",
             buttonAction: { [weak self] in
