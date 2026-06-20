@@ -414,6 +414,12 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         homeModal.showAnimation()
     }
 
+    private func removeFilledDate(_ date: Date) {
+        homeView.calendarView.filledDates.removeAll {
+            Calendar.current.isDate($0, inSameDayAs: date)
+        }
+    }
+
     private func fetchAndShowDateInfo(for date: Date) {
         currentDateRequestCancellable?.cancel()
         
@@ -424,6 +430,12 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         
         homeView.selectedInfo.setSelectedDate(date)
         homeView.selectedInfo.currentDiaryId = nil
+
+        if isRecoveredDate(date) {
+            fetchRecoveredTopicIfAvailable(for: date)
+            currentDateRequestCancellable?.store(in: &viewModel!.cancellables)
+            return
+        }
         
         let isDiaryDate = homeView.calendarView.filledDates.contains {
             calendar.isDate($0, inSameDayAs: date)
@@ -433,17 +445,8 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
             currentDateRequestCancellable = viewModel?.fetchDiary(for: date)
                 .receive(on: RunLoop.main)
                 .sink(receiveCompletion: { [weak self] completion in
-                    if case .failure = completion {
-                        self?.homeView.selectedInfo.updateView(
-                            for: date,
-                            diaryId: nil,
-                            isPublished: nil,
-                            remainingTime: 0,
-                            topicData: nil,
-                            diaryData: nil,
-                            imageURL: nil
-                        )
-                    }
+                    guard let self else { return }
+                    if case .failure = completion { }
                 }, receiveValue: { [weak self] diary in
                     guard let self else { return }
                     
