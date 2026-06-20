@@ -29,6 +29,8 @@ Add these environment variables in your Xcode Cloud workflow:
 - `AD_FEEDBACK_UNIT_ID_RELEASE`
 - `AD_INTERSTITIAL_UNIT_ID_DEBUG`
 - `AD_INTERSTITIAL_UNIT_ID_RELEASE`
+- `AD_RECOVERY_UNIT_ID_DEBUG`
+- `AD_RECOVERY_UNIT_ID_RELEASE`
 
 Mark secret values as secrets in Xcode Cloud where appropriate.
 

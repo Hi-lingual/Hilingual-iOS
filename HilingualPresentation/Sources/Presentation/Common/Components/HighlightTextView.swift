@@ -220,11 +220,13 @@ private extension HighlightTextView {
     func animateHighlight(to target: Int) {
         targetHighlightPosition = target
         guard highlightTimer == nil else { return }
-        highlightTimer = Timer.scheduledTimer(withTimeInterval: 0.055, repeats: true) { [weak self] _ in
+        let timer = Timer(timeInterval: 0.055, repeats: true) { [weak self] _ in
             guard let self, self.currentHighlightPosition < self.targetHighlightPosition else { return }
             self.currentHighlightPosition += 1
             self.renderReadingHighlight(upTo: self.currentHighlightPosition)
         }
+        highlightTimer = timer
+        RunLoop.main.add(timer, forMode: .common)
     }
 
     func stopHighlightTimer() {
