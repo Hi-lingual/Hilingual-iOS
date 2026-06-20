@@ -16,7 +16,7 @@ public enum PresignedURLAPI {
 extension PresignedURLAPI: BaseTargetType {
 
     public var path: String {
-        return "/presigned-urls"
+        return "/v1/presigned-urls"
     }
 
     public var method: Moya.Method {

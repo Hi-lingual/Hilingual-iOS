@@ -24,7 +24,8 @@ public protocol ViewControllerFactory {
     func makeDiaryWritingViewController(
         topicData: (String, String)?,
         selectedDate: Date,
-        shouldLoadDraft: Bool
+        shouldLoadDraft: Bool,
+        isRecoveryWriting: Bool
     ) -> DiaryWritingViewController
     func makeVerificationCodeViewController() -> VerificationCodeViewController
     func makeFollowListViewController(targetUserId:Int) -> FollowListViewController

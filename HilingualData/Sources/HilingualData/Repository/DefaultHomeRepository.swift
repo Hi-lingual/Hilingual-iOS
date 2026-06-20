@@ -31,6 +31,7 @@ public final class DefaultHomeRepository: HomeRepository {
                     profileImg: data.profileImg,
                     totalDiaries: data.totalDiaries,
                     streak: data.streak,
+                    recoveryTickets: data.recoveryTickets,
                     newAlarm: data.newAlarm
                 )
             }
