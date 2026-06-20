@@ -425,11 +425,6 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         homeView.selectedInfo.setSelectedDate(date)
         homeView.selectedInfo.currentDiaryId = nil
         
-        if isRecoveredDate(date) {
-            fetchRecoveredTopicIfAvailable(for: date)
-            return
-        }
-
         let isDiaryDate = homeView.calendarView.filledDates.contains {
             calendar.isDate($0, inSameDayAs: date)
         }
@@ -483,7 +478,9 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                     }
                 })
         } else {
-            if selectedDay > today {
+            if isRecoveredDate(date) {
+                fetchRecoveredTopicIfAvailable(for: date)
+            } else if selectedDay > today {
                 homeView.selectedInfo.updateView(
                     for: date,
                     diaryId: nil,

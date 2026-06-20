@@ -215,10 +215,7 @@ public final class LoadingViewModel: BaseViewModel {
     private func clearRecoveryDateIfNeeded() {
         guard isRecoveryWriting, let date else { return }
 
-        let dateStorageKey = "home.recoveredDateKeys"
-        var recoveredDateKeys = Set(UserDefaults.standard.stringArray(forKey: dateStorageKey) ?? [])
-        recoveredDateKeys.remove(date)
-        UserDefaults.standard.set(Array(recoveredDateKeys), forKey: dateStorageKey)
+        HomeRecoveryStorage.removeRecoveredDateKey(date)
     }
 
     @MainActor

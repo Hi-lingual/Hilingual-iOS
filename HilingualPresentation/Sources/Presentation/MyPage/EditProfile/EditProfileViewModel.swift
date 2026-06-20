@@ -60,6 +60,7 @@ public final class EditProfileViewModel: BaseViewModel {
                 return self.mypageUseCase.withdraw()
                     .handleEvents(
                         receiveOutput: { [weak self] in
+                            HomeRecoveryStorage.clearSessionCache()
                             self?.withdrawSuccessSubject.send(())
                         }, receiveCompletion: { [weak self] completion in
                             if case let .failure(error) = completion {

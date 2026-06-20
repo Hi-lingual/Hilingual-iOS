@@ -56,6 +56,7 @@ public final class MypageViewModel: BaseViewModel {
                     .handleEvents(receiveCompletion: { completion in
                         switch completion {
                         case .finished:
+                            HomeRecoveryStorage.clearSessionCache()
                             self.logoutCompletedSubject.send(())
                         case .failure(let error):
                             self.logoutErrorSubject.send(error)
