@@ -297,7 +297,7 @@ final class SelectedInfo: UIView {
             timeLeftStack.isHidden = false
         }
         
-        // 4. 그 외의 모든 경우
+        // 5. 그 외의 모든 경우
         else {
             setNotWrittenState("미작성")
 
