@@ -15,6 +15,7 @@ final class SelectedInfo: UIView {
     }
 
     public var currentDiaryId: Int?
+    public var canShowRecoveryView = true
     private var currentIsPublished: Bool?
     private var overlayView: UIControl?
     
@@ -306,7 +307,7 @@ final class SelectedInfo: UIView {
             let now = Date()
             let isSameMonth = cal.component(.year, from: date) == cal.component(.year, from: now) && cal.component(.month, from: date) == cal.component(.month, from: now)
 
-            if isSameMonth {
+            if isSameMonth, canShowRecoveryView {
                 // 이번 달의 empty 상태 → RecoveryView 노출
                 recoveryView.isHidden = false
                 emptyDiaryView.isHidden = true
@@ -314,7 +315,7 @@ final class SelectedInfo: UIView {
                 iconView.isHidden = true
                 timeLeftStack.isHidden = true
             } else {
-                // 이번 달이 아니면 기존 empty 메시지 유지
+                // 이번 달이 아니거나 복구 기회를 모두 사용한 경우 empty 메시지 유지
                 emptyDiaryView.configure(
                     message: "작성된 일기가 없어요.\n좋은 하루 보내셨기를 바라요!",
                     imageName: "img_diary_empty_ios",

@@ -35,6 +35,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     private let localPushPermissionService = LocalPushPermissionService()
     private var rewardedInterstitial: RewardedInterstitialAd?
     private var didEarnRecoveryReward = false
+    private var recoveryTransitionOverlay: UIView?
     
     // MARK: - Life Cycle
     
@@ -90,12 +91,12 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
             guard let self else { return }
             
             let calendar = Calendar.current
-            let today = Date()
+            let existingSelected = self.homeView.calendarView.selectedDate
             let selectedDate: Date
-            
-            if year == calendar.component(.year, from: today)
-                && month == calendar.component(.month, from: today) {
-                selectedDate = today
+            if let existingSelected,
+               calendar.component(.year, from: existingSelected) == year,
+               calendar.component(.month, from: existingSelected) == month {
+                selectedDate = existingSelected
             } else {
                 selectedDate = calendar.date(from: DateComponents(year: year, month: month, day: 1))!
             }
@@ -129,13 +130,16 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
             })
             .store(in: &viewModel.cancellables)
         
-        output.filledDates
+        output.monthInfo
             .receive(on: RunLoop.main)
-            .sink { [weak self] dates in
+            .sink { [weak self] monthInfo in
                 guard let self else { return }
                 
                 self.didLoadFilledDates = true
-                self.homeView.calendarView.filledDates = dates
+                self.homeView.calendarView.filledDates = monthInfo.writtenDates
+                self.homeView.calendarView.recoveredDates = self.mergedRecoveredDates(
+                    with: monthInfo.recoveredDates
+                )
                 self.fetchAndShowDateInfo(for: self.homeView.calendarView.selectedDate ?? Date())
                 self.showRecoveryModalIfNeeded()
             }
@@ -151,6 +155,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                 let isRecoveryWriting = self.pendingDraftIsRecovery
                 
                 if hasDraft {
+                    self.hideRecoveryTransitionOverlay()
                     self.showDraftDialog(
                         selectedDate: date,
                         topicData: topic,
@@ -310,18 +315,40 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     private func dateKey(_ date: Date) -> String {
         date.toFormattedString("yyyy-MM-dd")
     }
+    
+    private func recoveredDatesFromKeys() -> [Date] {
+        let formatter = DateFormatter()
+        formatter.calendar = Calendar(identifier: .gregorian)
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = .current
+        formatter.dateFormat = "yyyy-MM-dd"
+        return recoveredDateKeys.compactMap { formatter.date(from: $0) }
+    }
+
+    private func mergedRecoveredDates(with serverDates: [Date]) -> [Date] {
+        let datesByKey = (serverDates + recoveredDatesFromKeys()).reduce(into: [String: Date]()) { result, date in
+            result[dateKey(date)] = date
+        }
+        return Array(datesByKey.values)
+    }
 
     private func loadRecoveredDatesFromStorage() {
         recoveredDateKeys = Set(UserDefaults.standard.stringArray(forKey: recoveredDateStorageKey) ?? [])
+        homeView.calendarView.recoveredDates = recoveredDatesFromKeys()
     }
 
     private func isRecoveredDate(_ date: Date) -> Bool {
-        recoveredDateKeys.contains(dateKey(date))
+        recoveredDateKeys.contains(dateKey(date)) || homeView.calendarView.recoveredDates.contains {
+            Calendar.current.isDate($0, inSameDayAs: date)
+        }
     }
 
     private func saveRecoveredDate(_ date: Date) {
         recoveredDateKeys.insert(dateKey(date))
         UserDefaults.standard.set(Array(recoveredDateKeys), forKey: recoveredDateStorageKey)
+        homeView.calendarView.recoveredDates = mergedRecoveredDates(
+            with: homeView.calendarView.recoveredDates
+        )
     }
     
     private func monthKey(_ date: Date) -> String {
@@ -365,12 +392,13 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         let calendar = Calendar.current
         let today = Date()
         let filledDateKeys = Set(homeView.calendarView.filledDates.map { dateKey($0) })
+        let recoveredKeys = Set(homeView.calendarView.recoveredDates.map { dateKey($0) })
         var date = calendar.date(byAdding: .day, value: -2, to: today)
         
         while let candidate = date,
               calendar.isDate(candidate, equalTo: today, toGranularity: .month) {
             let key = dateKey(candidate)
-            if !filledDateKeys.contains(key), !recoveredDateKeys.contains(key) {
+            if !filledDateKeys.contains(key), !recoveredKeys.contains(key) {
                 return candidate
             }
             
@@ -414,6 +442,12 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         homeModal.showAnimation()
     }
 
+    private func removeFilledDate(_ date: Date) {
+        homeView.calendarView.filledDates.removeAll {
+            Calendar.current.isDate($0, inSameDayAs: date)
+        }
+    }
+
     private func fetchAndShowDateInfo(for date: Date) {
         currentDateRequestCancellable?.cancel()
         
@@ -424,6 +458,12 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         
         homeView.selectedInfo.setSelectedDate(date)
         homeView.selectedInfo.currentDiaryId = nil
+
+        if isRecoveredDate(date) {
+            fetchRecoveredTopicIfAvailable(for: date)
+            currentDateRequestCancellable?.store(in: &viewModel!.cancellables)
+            return
+        }
         
         let isDiaryDate = homeView.calendarView.filledDates.contains {
             calendar.isDate($0, inSameDayAs: date)
@@ -434,15 +474,20 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                 .receive(on: RunLoop.main)
                 .sink(receiveCompletion: { [weak self] completion in
                     if case .failure = completion {
-                        self?.homeView.selectedInfo.updateView(
-                            for: date,
-                            diaryId: nil,
-                            isPublished: nil,
-                            remainingTime: 0,
-                            topicData: nil,
-                            diaryData: nil,
-                            imageURL: nil
-                        )
+                        self?.removeFilledDate(date)
+                        if self?.isRecoveredDate(date) == true {
+                            self?.fetchRecoveredTopicIfAvailable(for: date)
+                        } else {
+                            self?.homeView.selectedInfo.updateView(
+                                for: date,
+                                diaryId: nil,
+                                isPublished: nil,
+                                remainingTime: 0,
+                                topicData: nil,
+                                diaryData: nil,
+                                imageURL: nil
+                            )
+                        }
                     }
                 }, receiveValue: { [weak self] diary in
                     guard let self else { return }
@@ -885,6 +930,15 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         
         diaryWritingVC.hidesBottomBarWhenPushed = true
         navigationController?.pushViewController(diaryWritingVC, animated: true)
+
+        guard recoveryTransitionOverlay != nil else { return }
+        guard let transitionCoordinator = navigationController?.transitionCoordinator else {
+            hideRecoveryTransitionOverlay()
+            return
+        }
+        transitionCoordinator.animate(alongsideTransition: nil) { [weak self] _ in
+            self?.hideRecoveryTransitionOverlay()
+        }
     }
     
     private func goToDiaryDetailView(diaryId: Int) {
@@ -915,9 +969,16 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     private func fetchRecoveredTopicAndWrite(for date: Date) {
         viewModel?.fetchTopic(for: date)
             .receive(on: RunLoop.main)
-            .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] topic in
+            .sink(receiveCompletion: { [weak self] completion in
+                if case .failure = completion {
+                    self?.hideRecoveryTransitionOverlay()
+                }
+            }, receiveValue: { [weak self] topic in
                 guard let self else { return }
-                guard let topic else { return }
+                guard let topic else {
+                    self.hideRecoveryTransitionOverlay()
+                    return
+                }
 
                 let topicData = (topic.topicKor, topic.topicEn)
                 self.homeView.selectedInfo.updateView(
@@ -937,6 +998,35 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                 self.input.checkDraft.send(date)
             })
             .store(in: &viewModel!.cancellables)
+    }
+
+    private func showRecoveryTransitionOverlay() {
+        guard recoveryTransitionOverlay == nil else { return }
+
+        let overlay = UIView()
+        overlay.backgroundColor = .white
+
+        let indicator = UIActivityIndicatorView(style: .medium)
+        indicator.color = .gray500
+        indicator.startAnimating()
+
+        overlay.addSubview(indicator)
+        view.addSubview(overlay)
+
+        overlay.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
+        indicator.snp.makeConstraints {
+            $0.center.equalToSuperview()
+        }
+
+        recoveryTransitionOverlay = overlay
+        view.layoutIfNeeded()
+    }
+
+    private func hideRecoveryTransitionOverlay() {
+        recoveryTransitionOverlay?.removeFromSuperview()
+        recoveryTransitionOverlay = nil
     }
     
     private func loadInterstitialAdAndPresent() {
@@ -965,6 +1055,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                 self.rewardedInterstitial?.fullScreenContentDelegate = self
                 self.rewardedInterstitial?.present(from: self) { [weak self] in
                     self?.didEarnRecoveryReward = true
+                    self?.showRecoveryTransitionOverlay()
                 }
             }
         }
@@ -975,12 +1066,13 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     private func updateUserInfo(
         _ userInfo: HomeUserInfoViewData,
         shouldShowRecoveryModal: Bool = true
-    ) {
+        ) {
         UserDefaults.standard.set(
             userInfo.nickname.trimmingCharacters(in: .whitespacesAndNewlines),
             forKey: "currentUser.nickname"
         )
         recoveryTickets = userInfo.recoveryTickets
+        homeView.selectedInfo.canShowRecoveryView = userInfo.recoveryTickets > 0
         homeView.profileView.updateView(
             nickname: userInfo.nickname,
             profileImageURL: userInfo.profileImageURL,
@@ -989,6 +1081,9 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
             recoveryTickets: userInfo.recoveryTickets,
             newAlarm: userInfo.newAlarm
         )
+        if let selectedDate = homeView.calendarView.selectedDate {
+            fetchAndShowDateInfo(for: selectedDate)
+        }
         if shouldShowRecoveryModal {
             showRecoveryModalIfNeeded()
         }
@@ -1013,7 +1108,10 @@ extension HomeViewController: FullScreenContentDelegate {
         pendingRecoveryDate = nil
         rewardedInterstitial = nil
 
-        guard didEarnRecoveryReward else { return }
+        guard didEarnRecoveryReward else {
+            hideRecoveryTransitionOverlay()
+            return
+        }
         didEarnRecoveryReward = false
 
         viewModel?.postHomeAdWatch(for: recoveryDate)
@@ -1021,6 +1119,7 @@ extension HomeViewController: FullScreenContentDelegate {
             .sink(receiveCompletion: { completion in
                 if case let .failure(error) = completion {
                     print("🚨 전면 광고 호출 실패: \(error)")
+                    self.hideRecoveryTransitionOverlay()
                 }
             }, receiveValue: { [weak self] in
                 self?.saveRecoveredDate(recoveryDate)
@@ -1038,5 +1137,6 @@ extension HomeViewController: FullScreenContentDelegate {
         pendingRecoveryDate = nil
         rewardedInterstitial = nil
         didEarnRecoveryReward = false
+        hideRecoveryTransitionOverlay()
     }
 }
