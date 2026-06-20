@@ -7,6 +7,7 @@
 
 import AppTrackingTransparency
 import Combine
+import FBAudienceNetwork
 import GoogleMobileAds
 import UIKit
 import FirebaseCore
@@ -69,8 +70,28 @@ public final class SplashViewController: BaseUIViewController<SplashViewModel> {
         MobileAds.shared.isApplicationMuted = true
         MobileAds.shared.applicationVolume = 0
         MobileAds.shared.audioVideoManager.isAudioSessionApplicationManaged = true
+        configureMetaAdvertiserTrackingFlag()
         MobileAds.shared.start()
         checkRemoteConfigVersion()
+    }
+
+    private func configureMetaAdvertiserTrackingFlag() {
+        if #available(iOS 17, *) { return }
+
+        guard #available(iOS 14, *) else {
+            setMetaAdvertiserTrackingEnabled(true)
+            return
+        }
+
+        let isTrackingAuthorized = ATTrackingManager.trackingAuthorizationStatus == .authorized
+        setMetaAdvertiserTrackingEnabled(isTrackingAuthorized)
+    }
+
+    private func setMetaAdvertiserTrackingEnabled(_ isEnabled: Bool) {
+        let selector = NSSelectorFromString("setAdvertiserTrackingEnabled:")
+        guard FBAdSettings.responds(to: selector) else { return }
+
+        FBAdSettings.perform(selector, with: NSNumber(value: isEnabled))
     }
 
     // MARK: - Remote Config Check
