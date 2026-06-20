@@ -44,7 +44,7 @@ public final class HomeViewModel: BaseViewModel {
 
     public struct Output {
         let userInfo: AnyPublisher<HomeUserInfoViewData, Error>
-        let filledDates: AnyPublisher<[Date], Never>
+        let monthInfo: AnyPublisher<MonthInfoEntity, Never>
     }
 
     // MARK: - Properties
@@ -75,11 +75,10 @@ public final class HomeViewModel: BaseViewModel {
     public func transform(input: Input) -> Output {
         let userInfoPublisher = fetchUserInfo()
 
-        let filledDatesPublisher = input.monthChange
+        let monthInfoPublisher = input.monthChange
             .flatMap { year, month in
                 self.useCase.fetchMonthInfo(year: year, month: month)
-                    .map { $0.dates }
-                    .catch { _ in Just([]) }
+                    .catch { _ in Just(MonthInfoEntity(writtenDates: [])) }
             }
             .eraseToAnyPublisher()
         
@@ -95,7 +94,7 @@ public final class HomeViewModel: BaseViewModel {
 
         return Output(
             userInfo: userInfoPublisher,
-            filledDates: filledDatesPublisher
+            monthInfo: monthInfoPublisher
         )
     }
 
