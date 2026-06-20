@@ -590,7 +590,8 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                     return
                 }
 
-                let topicData = (topic.topicKor, topic.topicEn)
+                let isRecovered = self.isRecoveredDate(date)
+                let topicData = isRecovered ? (topic.topicKor, topic.topicEn) : nil
                 self.homeView.selectedInfo.updateView(
                     for: date,
                     diaryId: nil,
@@ -599,7 +600,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                     topicData: topicData,
                     diaryData: nil,
                     imageURL: nil,
-                    isRecovered: true
+                    isRecovered: isRecovered
                 )
             })
 
