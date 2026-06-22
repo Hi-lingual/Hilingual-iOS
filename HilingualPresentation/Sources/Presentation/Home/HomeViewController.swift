@@ -1039,6 +1039,11 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     private func canPresentRecoveryAd() -> Bool {
         view.window != nil && presentedViewController == nil && UIApplication.shared.topViewController() == self
     }
+
+    @MainActor
+    private func showRecoveryAdFailureDialog() {
+        DialogManager.shared.show(message: "광고를 불러오지 못했어요.\n잠시 후 다시 시도해주세요.")
+    }
     
     private func loadInterstitialAdAndPresent() {
         let adUnitID = Bundle.main.infoDictionary?["AD_RECOVERY_UNIT_ID"] as? String ?? ""
@@ -1053,16 +1058,19 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                 if let errorDescription {
                     print("🚨 보상형 전면 광고 로드 실패: \(errorDescription)")
                     self.resetRecoveryAdState()
+                    self.showRecoveryAdFailureDialog()
                     return
                 }
 
                 guard let loadedAd else {
                     self.resetRecoveryAdState()
+                    self.showRecoveryAdFailureDialog()
                     return
                 }
 
                 guard self.canPresentRecoveryAd() else {
                     self.resetRecoveryAdState()
+                    self.showRecoveryAdFailureDialog()
                     return
                 }
 
@@ -1154,5 +1162,6 @@ extension HomeViewController: FullScreenContentDelegate {
     ) {
         print("🚨 전면 광고 표시 실패: \(error)")
         resetRecoveryAdState()
+        showRecoveryAdFailureDialog()
     }
 }
