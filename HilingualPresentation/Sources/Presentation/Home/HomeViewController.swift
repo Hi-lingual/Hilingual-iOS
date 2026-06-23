@@ -377,21 +377,19 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         UserDefaults.standard.set(monthKey(Date()), forKey: dismissedRecoveryModalMonthStorageKey)
     }
     
-    @discardableResult
-    private func showRecoveryModalIfNeeded() -> Bool {
+    private func showRecoveryModalIfNeeded() {
         let today = Date()
         let selectedDate = homeView.calendarView.selectedDate ?? today
         
-        guard !isShowingOnboardingBottomSheet else { return false }
-        guard !UserDefaults.standard.bool(forKey: "showHomeOnboarding") else { return false }
-        guard canShowRecoveryModal(today: today, selectedDate: selectedDate) else { return false }
-        guard let recoveryDate = mostRecentRecoveryViewDateInCurrentMonth() else { return false }
+        guard !isShowingOnboardingBottomSheet else { return }
+        guard !UserDefaults.standard.bool(forKey: "showHomeOnboarding") else { return }
+        guard canShowRecoveryModal(today: today, selectedDate: selectedDate) else { return }
+        guard let recoveryDate = mostRecentRecoveryViewDateInCurrentMonth() else { return }
         
-        guard !isUpdateNoticeModalVisible else { return false }
-        guard !shouldShowUpdateNoticeModal() else { return false }
-        guard !isHomeModalVisible else { return false }
+        guard !isUpdateNoticeModalVisible else { return }
+        guard !shouldShowUpdateNoticeModal() else { return }
+        guard !isHomeModalVisible else { return }
         showRecoveryModal(for: recoveryDate)
-        return true
     }
     
     private var isHomeModalVisible: Bool {
