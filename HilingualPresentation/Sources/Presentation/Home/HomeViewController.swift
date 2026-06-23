@@ -18,6 +18,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     private var overlayView: UIControl?
     private let homeView = HomeView()
     private let homeModal = HomeModal()
+    private let updateNoticeModal = HomeModal(buttonLabelStyle: .hidden)
     let dialog = Dialog()
     private let input = HomeViewModel.Input()
     private var currentDateRequestCancellable: AnyCancellable?
@@ -30,6 +31,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     private var recoveredDateKeys: Set<String> = []
     private let recoveredDateStorageKey = "home.recoveredDateKeys"
     private let dismissedRecoveryModalMonthStorageKey = "home.dismissedRecoveryModalMonth"
+    private let didShowUpdateNoticeModalStorageKey = "home.didShowRecoveryUpdateNoticeModal"
     private let localPushPermissionService = LocalPushPermissionService()
     private var interstitial: InterstitialAd?
     
@@ -65,7 +67,10 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     
     public override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        showOnboardingBottomSheet()
+        
+        if !showOnboardingBottomSheet(), !showUpdateNoticeModalIfNeeded() {
+            showRecoveryModalIfNeeded()
+        }
     }
     
     // MARK: - Bind
@@ -263,14 +268,22 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     
     // MARK: - Private Methods
 
-    private func showOnboardingBottomSheet() {
-        guard UserDefaults.standard.bool(forKey: "showHomeOnboarding") else { return }
-        guard !hasShownOnboardingBottomSheet else { return }
+    @discardableResult
+    private func showOnboardingBottomSheet() -> Bool {
+        guard UserDefaults.standard.bool(forKey: "showHomeOnboarding") else { return false }
+        guard !hasShownOnboardingBottomSheet else { return false }
         
         hasShownOnboardingBottomSheet = true
 
         let bottomSheet = OnboardingBottomSheet()
         onboardingBottomSheet = bottomSheet
+        bottomSheet.onDismiss = { [weak self] in
+            guard let self else { return }
+            self.onboardingBottomSheet = nil
+            if !self.showUpdateNoticeModalIfNeeded() {
+                self.showRecoveryModalIfNeeded()
+            }
+        }
 
         view.window?.addSubview(bottomSheet)
         bottomSheet.snp.makeConstraints {
@@ -278,6 +291,36 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         }
 
         UserDefaults.standard.set(false, forKey: "showHomeOnboarding")
+        return true
+    }
+    
+    @discardableResult
+    private func showUpdateNoticeModalIfNeeded() -> Bool {
+        guard let window = view.window,
+              !UserDefaults.standard.bool(forKey: didShowUpdateNoticeModalStorageKey) else { return false }
+        
+        UserDefaults.standard.set(true, forKey: didShowUpdateNoticeModalStorageKey)
+        window.addSubview(updateNoticeModal)
+        updateNoticeModal.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
+        
+        updateNoticeModal.isHidden = false
+        updateNoticeModal.configure(
+            title: "이제 끊긴 기록을 되살릴 수 있어요!",
+            subtitle: "미처 작성하지 못한 날짜를 누르고,\n광고 한 편 보고 끊긴 기록을 살려보세요.",
+            image: UIImage(named: "img_modal_update_ios", in: .module, compatibleWith: nil),
+            buttonTitle: "확인했습니다",
+            buttonText: nil,
+            buttonAction: { [weak self] in
+                guard let self else { return }
+                
+                self.updateNoticeModal.dismissModal()
+                self.showRecoveryModalIfNeeded()
+            }
+        )
+        updateNoticeModal.showAnimation()
+        return true
     }
     
     private func dateKey(_ date: Date) -> String {
@@ -311,7 +354,9 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         let selectedDate = homeView.calendarView.selectedDate ?? today
         let lastDay = calendar.range(of: .day, in: .month, for: today)?.count ?? 31
         
+        guard onboardingBottomSheet?.superview == nil else { return }
         guard homeModal.superview == nil || homeModal.isHidden else { return }
+        guard updateNoticeModal.superview == nil || updateNoticeModal.isHidden else { return }
         guard didLoadFilledDates else { return }
         guard recoveryTickets > 0 else { return }
         guard calendar.isDate(selectedDate, equalTo: today, toGranularity: .month) else { return }
