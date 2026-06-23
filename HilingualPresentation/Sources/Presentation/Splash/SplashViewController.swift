@@ -76,15 +76,7 @@ public final class SplashViewController: BaseUIViewController<SplashViewModel> {
     }
 
     private func configureMetaAdvertiserTrackingFlag() {
-        if #available(iOS 17, *) { return }
-
-        guard #available(iOS 14, *) else {
-            setMetaAdvertiserTrackingEnabled(true)
-            return
-        }
-
-        let isTrackingAuthorized = ATTrackingManager.trackingAuthorizationStatus == .authorized
-        setMetaAdvertiserTrackingEnabled(isTrackingAuthorized)
+        setMetaAdvertiserTrackingEnabled(true)
     }
 
     private func setMetaAdvertiserTrackingEnabled(_ isEnabled: Bool) {
