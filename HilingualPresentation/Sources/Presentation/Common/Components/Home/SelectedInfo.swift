@@ -265,6 +265,7 @@ final class SelectedInfo: UIView {
         let calendar = Calendar.current
         let today = calendar.startOfDay(for: Date())
         let selectedDay = calendar.startOfDay(for: date)
+        let topicTitleType: CardTopicView.TopicTitleType = isRecovered ? .selectedDate : .today
         
         // 1. 일기가 있는 경우
         if let _ = diaryId {
@@ -292,7 +293,7 @@ final class SelectedInfo: UIView {
         else if isRecovered, let topic = topicData {
             setNotWrittenState("미작성")
             cardTopicView.isHidden = false
-            cardTopicView.configure(kor: topic.kor, en: topic.en)
+            cardTopicView.configure(kor: topic.kor, en: topic.en, titleType: topicTitleType)
 
             iconView.isHidden = true
             timeLeftStack.isHidden = true
@@ -302,7 +303,7 @@ final class SelectedInfo: UIView {
         else if remainingTime > 0, let topic = topicData {
             setNotWrittenState("미작성")
             cardTopicView.isHidden = false
-            cardTopicView.configure(kor: topic.kor, en: topic.en)
+            cardTopicView.configure(kor: topic.kor, en: topic.en, titleType: topicTitleType)
             timeLeftLabel.attributedText = formatRemainingTime(remainingTime)
 
             iconView.isHidden = false
