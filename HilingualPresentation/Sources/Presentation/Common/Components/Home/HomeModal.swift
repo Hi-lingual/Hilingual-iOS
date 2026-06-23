@@ -79,6 +79,7 @@ final class HomeModal: UIView, UIGestureRecognizerDelegate {
     
     private let buttonLabelStyle: ButtonLabelStyle
     private var buttonAction: (() -> Void)?
+    private var buttonTextAction: (() -> Void)?
     
     // MARK: - LifeCycle
     
@@ -103,6 +104,10 @@ final class HomeModal: UIView, UIGestureRecognizerDelegate {
         let tap = UITapGestureRecognizer(target: self, action: #selector(dismissModal))
         tap.delegate = self
         self.addGestureRecognizer(tap)
+        
+        let buttonLabelTap = UITapGestureRecognizer(target: self, action: #selector(didTapButtonText))
+        buttonLabel.isUserInteractionEnabled = true
+        buttonLabel.addGestureRecognizer(buttonLabelTap)
         
         modalButton.addTarget(self, action: #selector(didTapModalButton), for: .touchUpInside)
     }
@@ -168,14 +173,14 @@ final class HomeModal: UIView, UIGestureRecognizerDelegate {
         self.backgroundColor = .clear
         UIView.animate(withDuration: 0.3, delay: 0, options: [.curveEaseOut]) {
             self.modalSheetView.transform = .identity
-            self.backgroundColor = UIColor.dim
+            self.backgroundColor = .dim2
         }
     }
     
     @objc public func dismissModal() {
         UIView.animate(withDuration: 0.2, animations: {
             self.modalSheetView.transform = CGAffineTransform(translationX: 0, y: self.modalSheetView.frame.height)
-            self.backgroundColor = UIColor.dim.withAlphaComponent(0)
+            self.backgroundColor = .dim2
         }, completion: { _ in
             self.isHidden = true
         })
@@ -186,6 +191,11 @@ final class HomeModal: UIView, UIGestureRecognizerDelegate {
         buttonAction?()
     }
     
+    @objc
+    private func didTapButtonText() {
+        buttonTextAction?()
+    }
+    
     // MARK: - Public Methods
     
     public func configure(
@@ -194,7 +204,8 @@ final class HomeModal: UIView, UIGestureRecognizerDelegate {
         image: UIImage?,
         buttonTitle: String?,
         buttonText: String?,
-        buttonAction: (() -> Void)?
+        buttonAction: (() -> Void)?,
+        buttonTextAction: (() -> Void)? = nil
     ) {
         titleLabel.text = title
         subtitleLabel.text = subtitle
@@ -204,5 +215,6 @@ final class HomeModal: UIView, UIGestureRecognizerDelegate {
             buttonLabel.text = buttonText
         }
         self.buttonAction = buttonAction
+        self.buttonTextAction = buttonTextAction
     }
 }

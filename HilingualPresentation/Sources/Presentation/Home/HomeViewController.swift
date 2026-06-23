@@ -17,6 +17,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     private var onboardingBottomSheet: OnboardingBottomSheet?
     private var overlayView: UIControl?
     private let homeView = HomeView()
+    private let homeModal = HomeModal()
     let dialog = Dialog()
     private let input = HomeViewModel.Input()
     private var currentDateRequestCancellable: AnyCancellable?
@@ -26,6 +27,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     private var pendingRecoveryDate: Date?
     private var recoveredDateKeys: Set<String> = []
     private let recoveredDateStorageKey = "home.recoveredDateKeys"
+    private let dismissedRecoveryModalMonthStorageKey = "home.dismissedRecoveryModalMonth"
     private let localPushPermissionService = LocalPushPermissionService()
     private var interstitial: InterstitialAd?
     
@@ -138,6 +140,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                 
                 self.homeView.calendarView.filledDates = dates
                 self.fetchAndShowDateInfo(for: self.homeView.calendarView.selectedDate ?? Date())
+                self.showRecoveryModalIfNeeded()
             }
             .store(in: &viewModel.cancellables)
         
@@ -285,6 +288,80 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     private func saveRecoveredDate(_ date: Date) {
         recoveredDateKeys.insert(dateKey(date))
         UserDefaults.standard.set(Array(recoveredDateKeys), forKey: recoveredDateStorageKey)
+    }
+    
+    private func monthKey(_ date: Date) -> String {
+        date.toFormattedString("yyyy-MM")
+    }
+    
+    private func saveDismissedRecoveryModalMonth() {
+        UserDefaults.standard.set(monthKey(Date()), forKey: dismissedRecoveryModalMonthStorageKey)
+    }
+    
+    private func showRecoveryModalIfNeeded() {
+        let calendar = Calendar.current
+        let today = Date()
+        let selectedDate = homeView.calendarView.selectedDate ?? today
+        let lastDay = calendar.range(of: .day, in: .month, for: today)?.count ?? 31
+        
+        guard calendar.isDate(selectedDate, equalTo: today, toGranularity: .month) else { return }
+        guard UserDefaults.standard.string(forKey: dismissedRecoveryModalMonthStorageKey) != monthKey(today) else { return }
+        guard calendar.component(.day, from: today) >= lastDay - 7 else { return }
+        guard let recoveryDate = mostRecentRecoveryViewDateInCurrentMonth() else { return }
+        
+        showRecoveryModal(for: recoveryDate)
+    }
+    
+    private func mostRecentRecoveryViewDateInCurrentMonth() -> Date? {
+        let calendar = Calendar.current
+        let today = Date()
+        let currentDay = calendar.component(.day, from: today)
+        let filledDateKeys = Set(homeView.calendarView.filledDates.map { dateKey($0) })
+        
+        return (1..<max(currentDay - 1, 1)).reversed().compactMap { day -> Date? in
+            guard let date = calendar.date(from: DateComponents(
+                year: calendar.component(.year, from: today),
+                month: calendar.component(.month, from: today),
+                day: day
+            )) else { return nil }
+            
+            let key = dateKey(date)
+            return filledDateKeys.contains(key) || recoveredDateKeys.contains(key) ? nil : date
+        }.first
+    }
+    
+    private func showRecoveryModal(for missedDate: Date) {
+        guard let window = view.window else { return }
+        
+        if homeModal.superview == nil {
+            window.addSubview(homeModal)
+            homeModal.snp.makeConstraints {
+                $0.edges.equalToSuperview()
+            }
+        }
+        
+        homeModal.isHidden = false
+        homeModal.configure(
+            title: "연속 기록이 끊겼나요?",
+            subtitle: "광고 한 번 보면 놓쳤던 날짜의 일기를\n다시 작성할 수 있어요.",
+            image: UIImage(named: "img_modal_return_record_ios", in: .module, compatibleWith: nil),
+            buttonTitle: "기록 살리기",
+            buttonText: "나중에 살리기",
+            buttonAction: { [weak self] in
+                guard let self else { return }
+                
+                self.saveDismissedRecoveryModalMonth()
+                self.homeView.calendarView.select(date: missedDate)
+                self.homeModal.dismissModal()
+            },
+            buttonTextAction: { [weak self] in
+                guard let self else { return }
+                
+                self.saveDismissedRecoveryModalMonth()
+                self.homeModal.dismissModal()
+            }
+        )
+        homeModal.showAnimation()
     }
 
     private func fetchAndShowDateInfo(for date: Date) {

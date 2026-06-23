@@ -426,4 +426,3 @@ extension SelectedInfo: ActionMenuDelegate {
         }
     }
 }
-
