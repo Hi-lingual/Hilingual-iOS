@@ -29,6 +29,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     private var pendingRecoveryDate: Date?
     private var recoveryTickets = 0
     private var didLoadFilledDates = false
+    private var dismissedRecoveryModalMonthInCurrentAppearance: String?
     private var recoveredDateKeys: Set<String> = []
     private let recoveredDateStorageKey = "home.recoveredDateKeys"
     private let dismissedRecoveryModalMonthStorageKey = "home.dismissedRecoveryModalMonth"
@@ -406,12 +407,15 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     private func canShowRecoveryModal(today: Date, selectedDate: Date) -> Bool {
         let calendar = Calendar.current
         let lastDay = calendar.range(of: .day, in: .month, for: today)?.count ?? 31
-        let alreadyDismissed = UserDefaults.standard.string(forKey: dismissedRecoveryModalMonthStorageKey) == monthKey(today)
+        let currentMonthKey = monthKey(today)
+        let alreadyDismissed = UserDefaults.standard.string(forKey: dismissedRecoveryModalMonthStorageKey) == currentMonthKey
+        let alreadyDismissedInCurrentAppearance = dismissedRecoveryModalMonthInCurrentAppearance == currentMonthKey
         
         return didLoadFilledDates
         && recoveryTickets > 0
         && calendar.isDate(selectedDate, equalTo: today, toGranularity: .month)
         && !alreadyDismissed
+        && !alreadyDismissedInCurrentAppearance
         && calendar.component(.day, from: today) >= lastDay - 7
     }
     
@@ -445,6 +449,9 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
             }
         }
         
+        homeModal.onDismiss = { [weak self] in
+            self?.dismissedRecoveryModalMonthInCurrentAppearance = self?.monthKey(Date())
+        }
         homeModal.isHidden = false
         homeModal.configure(
             title: "연속 기록이 끊겼나요?",
