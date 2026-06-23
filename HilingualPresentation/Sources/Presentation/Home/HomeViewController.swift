@@ -102,12 +102,11 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
             guard let self else { return }
             
             let calendar = Calendar.current
-            let existingSelected = self.homeView.calendarView.selectedDate
+            let today = Date()
             let selectedDate: Date
-            if let existingSelected,
-               calendar.component(.year, from: existingSelected) == year,
-               calendar.component(.month, from: existingSelected) == month {
-                selectedDate = existingSelected
+            if calendar.component(.year, from: today) == year,
+               calendar.component(.month, from: today) == month {
+                selectedDate = today
             } else {
                 selectedDate = calendar.date(from: DateComponents(year: year, month: month, day: 1))!
             }
