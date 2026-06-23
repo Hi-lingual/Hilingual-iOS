@@ -96,7 +96,8 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
         diaryWritingView.updateView(for: selectedDate)
 
         if let topic = topicData {
-            diaryWritingView.setTopic(kor: topic.0, en: topic.1)
+            let dropdownStyle: DropdownStyle = isRecoveryWriting ? .recoveryDate : .today
+            diaryWritingView.setTopic(kor: topic.0, en: topic.1, style: dropdownStyle)
         }
     }
 

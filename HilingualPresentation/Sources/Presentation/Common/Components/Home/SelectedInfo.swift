@@ -51,6 +51,16 @@ final class SelectedInfo: UIView {
         )
         return view
     }()
+    
+    private let noRecoveryTicketView: EmptyView = {
+        let view = EmptyView()
+        view.configure(
+            message: "이번 달 기록 살리기를 다 사용했어요.\n다음 달에 또 만나요!",
+            imageName: "img_diary_empty_ios",
+            font: .pretendard(.body_m_14)
+        )
+        return view
+    }()
 
     private let selectedDayLabel: UILabel = {
         let label = UILabel()
@@ -149,6 +159,7 @@ final class SelectedInfo: UIView {
             cardTopicView,
             cardPreview,
             emptyDiaryView,
+            noRecoveryTicketView,
             diaryLockView,
             recoveryView,
             menu
@@ -161,7 +172,7 @@ final class SelectedInfo: UIView {
         spacer.setContentHuggingPriority(.defaultLow, for: .horizontal)
         spacer.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
 
-        [cardTopicView, cardPreview, emptyDiaryView, diaryLockView].forEach { $0.isHidden = true }
+        [cardTopicView, cardPreview, emptyDiaryView, noRecoveryTicketView, diaryLockView].forEach { $0.isHidden = true }
         iconView.isHidden = true
         timeLeftStack.isHidden = true
 
@@ -186,7 +197,7 @@ final class SelectedInfo: UIView {
             $0.horizontalEdges.equalToSuperview().inset(16)
         }
 
-        [cardTopicView, emptyDiaryView, diaryLockView, recoveryView].forEach {
+        [cardTopicView, emptyDiaryView, noRecoveryTicketView, diaryLockView, recoveryView].forEach {
             $0.snp.makeConstraints {
                 $0.top.equalTo(headerStack.snp.bottom).offset(16)
                 $0.horizontalEdges.equalToSuperview()
@@ -226,7 +237,7 @@ final class SelectedInfo: UIView {
     }
     
     public func reset() {
-        [cardPreview, cardTopicView, emptyDiaryView, diaryLockView, recoveryView, moreImageView, dot, notWrittenLabel, iconView, timeLeftStack].forEach {
+        [cardPreview, cardTopicView, emptyDiaryView, noRecoveryTicketView, diaryLockView, recoveryView, moreImageView, dot, notWrittenLabel, iconView, timeLeftStack].forEach {
             $0.isHidden = true
         }
     }
@@ -254,6 +265,7 @@ final class SelectedInfo: UIView {
         let calendar = Calendar.current
         let today = calendar.startOfDay(for: Date())
         let selectedDay = calendar.startOfDay(for: date)
+        let topicTitleType: CardTopicView.TopicTitleType = isRecovered ? .selectedDate : .today
         
         // 1. 일기가 있는 경우
         if let _ = diaryId {
@@ -281,7 +293,7 @@ final class SelectedInfo: UIView {
         else if isRecovered, let topic = topicData {
             setNotWrittenState("미작성")
             cardTopicView.isHidden = false
-            cardTopicView.configure(kor: topic.kor, en: topic.en)
+            cardTopicView.configure(kor: topic.kor, en: topic.en, titleType: topicTitleType)
 
             iconView.isHidden = true
             timeLeftStack.isHidden = true
@@ -291,7 +303,7 @@ final class SelectedInfo: UIView {
         else if remainingTime > 0, let topic = topicData {
             setNotWrittenState("미작성")
             cardTopicView.isHidden = false
-            cardTopicView.configure(kor: topic.kor, en: topic.en)
+            cardTopicView.configure(kor: topic.kor, en: topic.en, titleType: topicTitleType)
             timeLeftLabel.attributedText = formatRemainingTime(remainingTime)
 
             iconView.isHidden = false
@@ -311,17 +323,20 @@ final class SelectedInfo: UIView {
                 // 이번 달의 empty 상태 → RecoveryView 노출
                 recoveryView.isHidden = false
                 emptyDiaryView.isHidden = true
+                noRecoveryTicketView.isHidden = true
                 cardTopicView.isHidden = true
                 iconView.isHidden = true
                 timeLeftStack.isHidden = true
+            } else if isSameMonth {
+                // 이번 달에서 복구 기회를 모두 사용한 경우
+                noRecoveryTicketView.isHidden = false
+                emptyDiaryView.isHidden = true
+                recoveryView.isHidden = true
+                cardTopicView.isHidden = true
             } else {
-                // 이번 달이 아니거나 복구 기회를 모두 사용한 경우 empty 메시지 유지
-                emptyDiaryView.configure(
-                    message: "작성된 일기가 없어요.\n좋은 하루 보내셨기를 바라요!",
-                    imageName: "img_diary_empty_ios",
-                    font: .pretendard(.body_m_14)
-                )
+                // 이번 달이 아니면 empty 메시지 유지
                 emptyDiaryView.isHidden = false
+                noRecoveryTicketView.isHidden = true
                 recoveryView.isHidden = true
                 cardTopicView.isHidden = true
             }

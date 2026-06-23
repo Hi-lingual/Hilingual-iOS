@@ -1028,6 +1028,22 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         recoveryTransitionOverlay?.removeFromSuperview()
         recoveryTransitionOverlay = nil
     }
+
+    private func resetRecoveryAdState() {
+        pendingRecoveryDate = nil
+        rewardedInterstitial = nil
+        didEarnRecoveryReward = false
+        hideRecoveryTransitionOverlay()
+    }
+
+    private func canPresentRecoveryAd() -> Bool {
+        view.window != nil && presentedViewController == nil && UIApplication.shared.topViewController() == self
+    }
+
+    @MainActor
+    private func showRecoveryAdFailureDialog() {
+        DialogManager.shared.show(message: "광고를 불러오지 못했어요.\n잠시 후 다시 시도해주세요.")
+    }
     
     private func loadInterstitialAdAndPresent() {
         let adUnitID = Bundle.main.infoDictionary?["AD_RECOVERY_UNIT_ID"] as? String ?? ""
@@ -1041,12 +1057,20 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
 
                 if let errorDescription {
                     print("🚨 보상형 전면 광고 로드 실패: \(errorDescription)")
-                    self.pendingRecoveryDate = nil
+                    self.resetRecoveryAdState()
+                    self.showRecoveryAdFailureDialog()
                     return
                 }
 
                 guard let loadedAd else {
-                    self.pendingRecoveryDate = nil
+                    self.resetRecoveryAdState()
+                    self.showRecoveryAdFailureDialog()
+                    return
+                }
+
+                guard self.canPresentRecoveryAd() else {
+                    self.resetRecoveryAdState()
+                    self.showRecoveryAdFailureDialog()
                     return
                 }
 
@@ -1054,6 +1078,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                 self.rewardedInterstitial = loadedAd
                 self.rewardedInterstitial?.fullScreenContentDelegate = self
                 self.rewardedInterstitial?.present(from: self) { [weak self] in
+                    print("✅ 전면 광고 시청 완료")
                     self?.didEarnRecoveryReward = true
                     self?.showRecoveryTransitionOverlay()
                 }
@@ -1103,13 +1128,16 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
 
 extension HomeViewController: FullScreenContentDelegate {
     public func adDidDismissFullScreenContent(_ ad: FullScreenPresentingAd) {
-        guard let recoveryDate = pendingRecoveryDate else { return }
+        guard let recoveryDate = pendingRecoveryDate else {
+            resetRecoveryAdState()
+            return
+        }
 
         pendingRecoveryDate = nil
         rewardedInterstitial = nil
 
         guard didEarnRecoveryReward else {
-            hideRecoveryTransitionOverlay()
+            resetRecoveryAdState()
             return
         }
         didEarnRecoveryReward = false
@@ -1133,10 +1161,7 @@ extension HomeViewController: FullScreenContentDelegate {
         didFailToPresentFullScreenContentWithError error: Error
     ) {
         print("🚨 전면 광고 표시 실패: \(error)")
-        
-        pendingRecoveryDate = nil
-        rewardedInterstitial = nil
-        didEarnRecoveryReward = false
-        hideRecoveryTransitionOverlay()
+        resetRecoveryAdState()
+        showRecoveryAdFailureDialog()
     }
 }
