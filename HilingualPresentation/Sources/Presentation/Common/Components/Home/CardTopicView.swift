@@ -19,7 +19,7 @@ final class CardTopicView: UIView {
             case .today:
                 return "오늘의 추천 주제"
             case .selectedDate:
-                return "이 날의 추천 주제"
+                return "이날의 추천 주제"
             }
         }
     }
