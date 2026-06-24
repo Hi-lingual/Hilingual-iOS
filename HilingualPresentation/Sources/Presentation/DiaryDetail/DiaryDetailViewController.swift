@@ -75,10 +75,8 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
         
         super.init(viewModel: viewModel, diContainer: diContainer)
         
-        self.feedbackViewController = diContainer.makeFeedbackViewController(
-            diaryId: diaryId,
-            page: self.feedbackPage.analyticsPropertyName
-        )
+        self.feedbackViewController = diContainer.makeFeedbackViewController(diaryId: diaryId)
+        self.feedbackViewController.page = self.feedbackPage
     }
 
     required init?(coder: NSCoder) {

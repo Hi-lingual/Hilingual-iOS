@@ -56,14 +56,7 @@ final class AppDIContainer: ViewControllerFactory {
         )
     }
     
-    public func makeFeedbackViewController(diaryId: Int, page: String? = nil) -> FeedbackViewController {
-        let pageEnum: AnalyticsEvent.Page = {
-            switch page {
-            case "posted_diary": return .postedDiary
-            default: return .feedback
-            }
-        }()
-        
+    public func makeFeedbackViewController(diaryId: Int) -> FeedbackViewController {
         let viewModel = FeedbackViewModel(
             diaryId: diaryId,
             diaryDetailUseCase: makeDiaryDetailUseCase(),
@@ -73,8 +66,7 @@ final class AppDIContainer: ViewControllerFactory {
         return FeedbackViewController(
             viewModel: viewModel,
             diContainer: self,
-            diaryId: diaryId,
-            page: pageEnum
+            diaryId: diaryId
         )
     }
     
