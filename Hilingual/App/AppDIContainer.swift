@@ -11,7 +11,6 @@ import HilingualDomain
 import HilingualData
 import HilingualNetwork
 import HilingualPresentation
-import HilingualCore
 
 // MARK: - DIContainer Entry Point
 
