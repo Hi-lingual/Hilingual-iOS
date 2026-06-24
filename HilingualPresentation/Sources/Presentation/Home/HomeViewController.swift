@@ -14,6 +14,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     // MARK: - Properties
     
     private var hasShownOnboardingBottomSheet = false
+    private var isShowingOnboardingBottomSheet = false
     private var onboardingBottomSheet: OnboardingBottomSheet?
     private var overlayView: UIControl?
     private let homeView = HomeView()
@@ -28,6 +29,8 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     private var pendingRecoveryDate: Date?
     private var recoveryTickets = 0
     private var didLoadFilledDates = false
+    private var temporarilyDismissedRecoveryMonth: String?
+    private var isRecoveryWritingFlowActive = false
     private var recoveredDateKeys: Set<String> = []
     private let recoveredDateStorageKey = "home.recoveredDateKeys"
     private let dismissedRecoveryModalMonthStorageKey = "home.dismissedRecoveryModalMonth"
@@ -73,6 +76,14 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         if !showOnboardingBottomSheet() {
             showNextHomeModal()
         }
+        finishRecoveryWritingFlowIfNeeded()
+    }
+    
+    public override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        
+        if isRecoveryWritingFlowActive { return }
+        temporarilyDismissedRecoveryMonth = nil
     }
     
     // MARK: - Bind
@@ -91,12 +102,11 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
             guard let self else { return }
             
             let calendar = Calendar.current
-            let existingSelected = self.homeView.calendarView.selectedDate
+            let today = Date()
             let selectedDate: Date
-            if let existingSelected,
-               calendar.component(.year, from: existingSelected) == year,
-               calendar.component(.month, from: existingSelected) == month {
-                selectedDate = existingSelected
+            if calendar.component(.year, from: today) == year,
+               calendar.component(.month, from: today) == month {
+                selectedDate = today
             } else {
                 selectedDate = calendar.date(from: DateComponents(year: year, month: month, day: 1))!
             }
@@ -252,6 +262,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
             guard let selectedDate = self.homeView.calendarView.selectedDate else { return }
 
             self.pendingRecoveryDate = selectedDate
+            self.isRecoveryWritingFlowActive = true
             self.loadInterstitialAdAndPresent()
         }
     }
@@ -263,12 +274,15 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         guard !hasShownOnboardingBottomSheet else { return false }
         
         hasShownOnboardingBottomSheet = true
+        isShowingOnboardingBottomSheet = true
 
         let bottomSheet = OnboardingBottomSheet()
         onboardingBottomSheet = bottomSheet
         bottomSheet.onDismiss = { [weak self] in
-            self?.onboardingBottomSheet = nil
-            self?.showNextHomeModal()
+            guard let self else { return }
+            self.onboardingBottomSheet = nil
+            self.isShowingOnboardingBottomSheet = false
+            self.showNextHomeModal()
         }
 
         view.window?.addSubview(bottomSheet)
@@ -281,16 +295,31 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     }
     
     private func showNextHomeModal() {
+        guard !isHomeModalVisible else { return }
+        
         if !showUpdateNoticeModalIfNeeded() {
             showRecoveryModalIfNeeded()
         }
     }
     
-    private func showUpdateNoticeModalIfNeeded() -> Bool {
-        guard let window = view.window,
-              !UserDefaults.standard.bool(forKey: didShowUpdateNoticeModalStorageKey) else { return false }
+    private func finishRecoveryWritingFlowIfNeeded() {
+        guard isRecoveryWritingFlowActive else { return }
+        guard pendingRecoveryDate == nil,
+              rewardedInterstitial == nil,
+              recoveryTransitionOverlay == nil else { return }
         
-        UserDefaults.standard.set(true, forKey: didShowUpdateNoticeModalStorageKey)
+        isRecoveryWritingFlowActive = false
+    }
+    
+    private func showUpdateNoticeModalIfNeeded() -> Bool {
+        guard !isShowingOnboardingBottomSheet,
+              let window = view.window,
+              shouldShowUpdateNoticeModal() else { return false }
+        
+        markUpdateNoticeModalAsShown()
+        updateNoticeModal.onDismiss = { [weak self] in
+            self?.showRecoveryModalIfNeeded()
+        }
         window.addSubview(updateNoticeModal)
         updateNoticeModal.snp.makeConstraints {
             $0.edges.equalToSuperview()
@@ -305,11 +334,18 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
             buttonText: nil,
             buttonAction: { [weak self] in
                 self?.updateNoticeModal.dismissModal()
-                self?.showRecoveryModalIfNeeded()
             }
         )
         updateNoticeModal.showAnimation()
         return true
+    }
+    
+    private func shouldShowUpdateNoticeModal() -> Bool {
+        !UserDefaults.standard.bool(forKey: didShowUpdateNoticeModalStorageKey)
+    }
+    
+    private func markUpdateNoticeModalAsShown() {
+        UserDefaults.standard.set(true, forKey: didShowUpdateNoticeModalStorageKey)
     }
     
     private func dateKey(_ date: Date) -> String {
@@ -363,29 +399,40 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         let today = Date()
         let selectedDate = homeView.calendarView.selectedDate ?? today
         
-        guard !isHomeModalVisible else { return }
+        guard !isShowingOnboardingBottomSheet else { return }
+        guard !UserDefaults.standard.bool(forKey: "showHomeOnboarding") else { return }
         guard canShowRecoveryModal(today: today, selectedDate: selectedDate) else { return }
         guard let recoveryDate = mostRecentRecoveryViewDateInCurrentMonth() else { return }
         
+        guard !isUpdateNoticeModalVisible else { return }
+        guard !shouldShowUpdateNoticeModal() else { return }
+        guard !isHomeModalVisible else { return }
         showRecoveryModal(for: recoveryDate)
     }
     
     private var isHomeModalVisible: Bool {
-        onboardingBottomSheet?.superview != nil
+        isShowingOnboardingBottomSheet
         || (homeModal.superview != nil && !homeModal.isHidden)
-        || (updateNoticeModal.superview != nil && !updateNoticeModal.isHidden)
+        || isUpdateNoticeModalVisible
+    }
+    
+    private var isUpdateNoticeModalVisible: Bool {
+        updateNoticeModal.superview != nil && !updateNoticeModal.isHidden
     }
     
     private func canShowRecoveryModal(today: Date, selectedDate: Date) -> Bool {
         let calendar = Calendar.current
         let lastDay = calendar.range(of: .day, in: .month, for: today)?.count ?? 31
-        let alreadyDismissed = UserDefaults.standard.string(forKey: dismissedRecoveryModalMonthStorageKey) == monthKey(today)
+        let currentMonthKey = monthKey(today)
+        let alreadyDismissed = UserDefaults.standard.string(forKey: dismissedRecoveryModalMonthStorageKey) == currentMonthKey
+        let temporarilyDismissed = temporarilyDismissedRecoveryMonth == currentMonthKey
         
         return didLoadFilledDates
         && recoveryTickets > 0
         && calendar.isDate(selectedDate, equalTo: today, toGranularity: .month)
         && !alreadyDismissed
-        && calendar.component(.day, from: today) >= lastDay - 7
+        && !temporarilyDismissed
+        && calendar.component(.day, from: today) == lastDay - 7
     }
     
     private func mostRecentRecoveryViewDateInCurrentMonth() -> Date? {
@@ -418,6 +465,9 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
             }
         }
         
+        homeModal.onDismiss = { [weak self] in
+            self?.temporarilyDismissedRecoveryMonth = self?.monthKey(Date())
+        }
         homeModal.isHidden = false
         homeModal.configure(
             title: "연속 기록이 끊겼나요?",
@@ -921,6 +971,10 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         shouldLoadDraft: Bool = false,
         isRecoveryWriting: Bool = false
     ) {
+        if isRecoveryWriting {
+            isRecoveryWritingFlowActive = true
+        }
+        
         let diaryWritingVC = diContainer.makeDiaryWritingViewController(
             topicData: topicData,
             selectedDate: selectedDate ?? Date(),
@@ -1033,6 +1087,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         pendingRecoveryDate = nil
         rewardedInterstitial = nil
         didEarnRecoveryReward = false
+        isRecoveryWritingFlowActive = false
         hideRecoveryTransitionOverlay()
     }
 
