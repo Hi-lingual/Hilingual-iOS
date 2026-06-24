@@ -56,14 +56,17 @@ final class AppDIContainer: ViewControllerFactory {
     }
     
     public func makeFeedbackViewController(diaryId: Int) -> FeedbackViewController {
-//        return FeedbackViewController(viewModel: makeFeedbackViewModel(diaryId: diaryId), diContainer: self)
         let viewModel = FeedbackViewModel(
-                diaryId: diaryId,
-                diaryDetailUseCase: makeDiaryDetailUseCase(),
-                feedbackUseCase: makeFeedbackUseCase(),
-                homeUseCase: makeHomeUseCase()
-            )
-            return FeedbackViewController(viewModel: viewModel, diContainer:  self)
+            diaryId: diaryId,
+            diaryDetailUseCase: makeDiaryDetailUseCase(),
+            feedbackUseCase: makeFeedbackUseCase(),
+            homeUseCase: makeHomeUseCase()
+        )
+        return FeedbackViewController(
+            viewModel: viewModel,
+            diContainer: self,
+            diaryId: diaryId
+        )
     }
     
     public func makeRecommendedExpressionViewController(diaryId: Int) -> RecommendedExpressionViewController {

@@ -17,6 +17,12 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
 
     let diaryId: Int
     var date: String = ""
+    private var toggleClickCount: Int = 0
+    public var feedbackPage: AnalyticsEvent.Page = .feedback {
+        didSet {
+            feedbackViewController?.page = feedbackPage
+        }
+    }
     private var isPublished: Bool = true
     private let deleteTappedSubject = PassthroughSubject<Void, Never>()
     private let publishTappedSubject = PassthroughSubject<Void, Never>()
@@ -42,7 +48,8 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
         return button
     }()
 
-    private lazy var feedbackViewController = diContainer.makeFeedbackViewController(diaryId: diaryId)
+    private var feedbackViewController: FeedbackViewController!
+    
     private lazy var recommendedExpressionViewController = diContainer.makeRecommendedExpressionViewController(diaryId: diaryId)
 
     private var segmentedControl: SegmentedControl!
@@ -53,7 +60,6 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
     private var entryId: String = ""
     private var entrySource: String = "unknown"
     private var backSource: String = "ui_button"
-    private var toggleClickCount: Int = 0
 
     // MARK: - Init
 
@@ -66,7 +72,11 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
         self.diaryId = diaryId
         self.entryId = String(diaryId)
         self.entrySource = entrySource
+        
         super.init(viewModel: viewModel, diContainer: diContainer)
+        
+        self.feedbackViewController = diContainer.makeFeedbackViewController(diaryId: diaryId)
+        self.feedbackViewController.page = self.feedbackPage
     }
 
     required init?(coder: NSCoder) {
@@ -80,8 +90,6 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
         
         feedbackViewController.showsAdBanner = !showsActionButton
         recommendedExpressionViewController.showsAdBanner = !showsActionButton
-
-        AmplitudeManager.shared.send(.pageviewFeedback)
 
         hideKeyboardWhenTappedAround()
         updateButtonTitle()
@@ -107,19 +115,20 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
             self?.isPublished = isPublished
             self?.updateButtonTitle()
         }
-
+        
         feedbackViewController.onToggleChanged = { [weak self] isEnabled in
-            guard let self = self else { return }
+            guard let self else { return }
             self.toggleClickCount += 1
-
+            
             AmplitudeManager.shared.send(
                 .clickFeedbackToggle(
-                    clickCount: self.toggleClickCount,
-                    isEnabled: isEnabled
+                    page: self.feedbackPage,
+                    toggleClickCount: self.toggleClickCount,
+                    toggleState: isEnabled
                 )
             )
         }
-
+        
         recommendedExpressionViewController.onBookmarkToggle = { [weak self] phraseId, isBookmarked in
             guard let self = self else { return }
 
