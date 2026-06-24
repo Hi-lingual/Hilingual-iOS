@@ -48,9 +48,7 @@ public final class MypageViewController: BaseUIViewController<MypageViewModel> {
         super.setUI()
         
         view.addSubview(mypageView)
-        
-        configureAdInspectorGesture()
-        
+                
         if let value = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String {
             mypageView.versionValueLabel.text = "\(value)"
         }
@@ -131,22 +129,6 @@ public final class MypageViewController: BaseUIViewController<MypageViewModel> {
     }
     
     // MARK: - Private Methods
-    
-    private func configureAdInspectorGesture() {
-        let gesture = UILongPressGestureRecognizer(target: self, action: #selector(presentAdInspector(_:)))
-        gesture.minimumPressDuration = 2
-        view.addGestureRecognizer(gesture)
-    }
-    
-    @objc
-    private func presentAdInspector(_ gesture: UILongPressGestureRecognizer) {
-        guard gesture.state == .began else { return }
-        MobileAds.shared.presentAdInspector(from: self) { error in
-            if let error {
-                print("Ad Inspector error: \(error.localizedDescription)")
-            }
-        }
-    }
     
     @objc
     private func presentLogoutDialog() {
