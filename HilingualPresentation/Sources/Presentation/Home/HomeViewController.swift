@@ -432,7 +432,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         && calendar.isDate(selectedDate, equalTo: today, toGranularity: .month)
         && !alreadyDismissed
         && !temporarilyDismissed
-        && calendar.component(.day, from: today) == lastDay - 7
+        && calendar.component(.day, from: today) >= lastDay - 7
     }
     
     private func mostRecentRecoveryViewDateInCurrentMonth() -> Date? {
