@@ -19,7 +19,7 @@ public protocol ViewControllerFactory {
     func makeLoadingViewController() -> LoadingViewController
     func makeWordBookViewController() -> WordBookViewController
     func makeDiaryDetailViewController(diaryId: Int) -> DiaryDetailViewController
-    func makeFeedbackViewController(diaryId: Int) -> FeedbackViewController
+    func makeFeedbackViewController(diaryId: Int, page: String?) -> FeedbackViewController
     func makeRecommendedExpressionViewController(diaryId: Int) -> RecommendedExpressionViewController
     func makeDiaryWritingViewController(
         topicData: (String, String)?,

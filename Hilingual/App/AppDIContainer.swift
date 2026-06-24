@@ -11,6 +11,7 @@ import HilingualDomain
 import HilingualData
 import HilingualNetwork
 import HilingualPresentation
+import HilingualCore
 
 // MARK: - DIContainer Entry Point
 
@@ -55,15 +56,26 @@ final class AppDIContainer: ViewControllerFactory {
         )
     }
     
-    public func makeFeedbackViewController(diaryId: Int) -> FeedbackViewController {
-//        return FeedbackViewController(viewModel: makeFeedbackViewModel(diaryId: diaryId), diContainer: self)
+    public func makeFeedbackViewController(diaryId: Int, page: String? = nil) -> FeedbackViewController {
+        let pageEnum: AnalyticsEvent.Page = {
+            switch page {
+            case "posted_diary": return .postedDiary
+            default: return .feedback
+            }
+        }()
+        
         let viewModel = FeedbackViewModel(
-                diaryId: diaryId,
-                diaryDetailUseCase: makeDiaryDetailUseCase(),
-                feedbackUseCase: makeFeedbackUseCase(),
-                homeUseCase: makeHomeUseCase()
-            )
-            return FeedbackViewController(viewModel: viewModel, diContainer:  self)
+            diaryId: diaryId,
+            diaryDetailUseCase: makeDiaryDetailUseCase(),
+            feedbackUseCase: makeFeedbackUseCase(),
+            homeUseCase: makeHomeUseCase()
+        )
+        return FeedbackViewController(
+            viewModel: viewModel,
+            diContainer: self,
+            diaryId: diaryId,
+            page: pageEnum
+        )
     }
     
     public func makeRecommendedExpressionViewController(diaryId: Int) -> RecommendedExpressionViewController {

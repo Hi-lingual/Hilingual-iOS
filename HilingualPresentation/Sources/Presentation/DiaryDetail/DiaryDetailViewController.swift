@@ -17,6 +17,12 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
 
     let diaryId: Int
     var date: String = ""
+    private var toggleClickCount: Int = 0
+    public var feedbackPage: AnalyticsEvent.Page = .feedback {
+        didSet {
+            feedbackViewController?.page = feedbackPage
+        }
+    }
     private var isPublished: Bool = true
     private let deleteTappedSubject = PassthroughSubject<Void, Never>()
     private let publishTappedSubject = PassthroughSubject<Void, Never>()
@@ -42,7 +48,8 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
         return button
     }()
 
-    private lazy var feedbackViewController = diContainer.makeFeedbackViewController(diaryId: diaryId)
+    private var feedbackViewController: FeedbackViewController!
+    
     private lazy var recommendedExpressionViewController = diContainer.makeRecommendedExpressionViewController(diaryId: diaryId)
 
     private var segmentedControl: SegmentedControl!
@@ -65,7 +72,13 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
         self.diaryId = diaryId
         self.entryId = String(diaryId)
         self.entrySource = entrySource
+        
         super.init(viewModel: viewModel, diContainer: diContainer)
+        
+        self.feedbackViewController = diContainer.makeFeedbackViewController(
+            diaryId: diaryId,
+            page: self.feedbackPage.analyticsPropertyName
+        )
     }
 
     required init?(coder: NSCoder) {
@@ -79,8 +92,6 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
         
         feedbackViewController.showsAdBanner = !showsActionButton
         recommendedExpressionViewController.showsAdBanner = !showsActionButton
-
-        AmplitudeManager.shared.send(.pageviewFeedback)
 
         hideKeyboardWhenTappedAround()
         updateButtonTitle()
@@ -105,6 +116,19 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
         feedbackViewController.publishedInfoLoaded = { [weak self] isPublished in
             self?.isPublished = isPublished
             self?.updateButtonTitle()
+        }
+        
+        feedbackViewController.onToggleChanged = { [weak self] isEnabled in
+            guard let self else { return }
+            self.toggleClickCount += 1
+            
+            AmplitudeManager.shared.send(
+                .clickFeedbackToggle(
+                    page: self.feedbackPage,
+                    toggleClickCount: self.toggleClickCount,
+                    toggleState: isEnabled
+                )
+            )
         }
         
         recommendedExpressionViewController.onBookmarkToggle = { [weak self] phraseId, isBookmarked in
