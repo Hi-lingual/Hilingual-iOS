@@ -53,7 +53,6 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
     private var entryId: String = ""
     private var entrySource: String = "unknown"
     private var backSource: String = "ui_button"
-    private var toggleClickCount: Int = 0
 
     // MARK: - Init
 
@@ -107,19 +106,7 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
             self?.isPublished = isPublished
             self?.updateButtonTitle()
         }
-
-        feedbackViewController.onToggleChanged = { [weak self] isEnabled in
-            guard let self = self else { return }
-            self.toggleClickCount += 1
-
-            AmplitudeManager.shared.send(
-                .clickFeedbackToggle(
-                    clickCount: self.toggleClickCount,
-                    isEnabled: isEnabled
-                )
-            )
-        }
-
+        
         recommendedExpressionViewController.onBookmarkToggle = { [weak self] phraseId, isBookmarked in
             guard let self = self else { return }
 

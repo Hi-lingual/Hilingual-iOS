@@ -34,7 +34,7 @@ public enum AnalyticsEvent {
     )
     case clickBackDiary(entryId: String, backSource: BackSource)
     case clickTextfield(entryId: String, inputType: TextInputType, timeToFirstInput: Int)
-    case clickFeedbackToggle(clickCount: Int, isEnabled: Bool)
+    case clickFeedbackToggle(page: String, toggleState: Bool)
     case bookmarkAction(entryId: String, entrySource: EntrySource, action: BookmarkAction)
     case toastAction(action: ToastAction, toastId: ToastId, entryId: String)
     case clickBackFeedback(entryId: String, backSource: BackSource)
@@ -144,10 +144,10 @@ extension AnalyticsEvent {
                 "text_input_type": inputType.analyticsPropertyName,
                 "time_to_first_input": timeToFirstInput
             ]
-        case let .clickFeedbackToggle(clickCount, isEnabled):
+        case let .clickFeedbackToggle(page, toggleState):
             return [
-                "toggle_click_count": clickCount,
-                "toggle_state": isEnabled
+                "page": page,
+                "toggle_state": toggleState
             ]
         case let .bookmarkAction(entryId, entrySource, action):
             return [

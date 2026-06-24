@@ -63,8 +63,12 @@ public final class FeedbackViewController: BaseUIViewController<FeedbackViewMode
         viewDidLoadSubject.send(())
 
         feedbackView.onToggleChanged = { [weak self] isEnabled in
+            AmplitudeManager.shared.send(
+                .clickFeedbackToggle(page: "feedback", toggleState: isEnabled)
+            )
             self?.onToggleChanged?(isEnabled)
         }
+        
         feedbackView.onDiaryPronunciationTapped = { isFirstPlay in
             AmplitudeManager.shared.send(.clickDiaryPronunciationBtn(isFirstPlay: isFirstPlay))
         }
