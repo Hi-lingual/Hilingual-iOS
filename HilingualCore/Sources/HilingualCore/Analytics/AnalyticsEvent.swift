@@ -255,7 +255,7 @@ extension AnalyticsEvent {
         case vocabulary
         case custom(String)
 
-        public var analyticsPropertyName: String {
+        var analyticsPropertyName: String {
             switch self {
             case .feed: return "feed"
             case .userProfile: return "user_profile"
