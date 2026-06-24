@@ -77,6 +77,7 @@ final class HomeModal: UIView, UIGestureRecognizerDelegate {
     
     // MARK: - Properties
     
+    var onDismiss: (() -> Void)?
     private let buttonLabelStyle: ButtonLabelStyle
     private var buttonAction: (() -> Void)?
     private var buttonTextAction: (() -> Void)?
@@ -178,12 +179,18 @@ final class HomeModal: UIView, UIGestureRecognizerDelegate {
     }
     
     @objc public func dismissModal() {
-        UIView.animate(withDuration: 0.2, animations: {
-            self.modalSheetView.transform = CGAffineTransform(translationX: 0, y: self.modalSheetView.frame.height)
-            self.backgroundColor = .dim2
-        }, completion: { _ in
+        dismissModalAfterAnimation(completion: nil)
+    }
+    
+    public func dismissModalAfterAnimation(completion: (() -> Void)?) {
+        UIView.animate(withDuration: 0.2) {
+            self.alpha = 0
+        } completion: { _ in
+            self.alpha = 1
             self.isHidden = true
-        })
+            self.onDismiss?()
+            completion?()
+        }
     }
     
     @objc
