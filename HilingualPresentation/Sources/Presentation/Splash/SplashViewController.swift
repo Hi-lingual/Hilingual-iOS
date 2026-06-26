@@ -76,14 +76,17 @@ public final class SplashViewController: BaseUIViewController<SplashViewModel> {
     }
 
     private func configureMetaAdvertiserTrackingFlag() {
-        setMetaAdvertiserTrackingEnabled(true)
-    }
+        let isTrackingEnabled: Bool
+        if #available(iOS 14, *) {
+            isTrackingEnabled = ATTrackingManager.trackingAuthorizationStatus == .authorized
+        } else {
+            isTrackingEnabled = true
+        }
 
-    private func setMetaAdvertiserTrackingEnabled(_ isEnabled: Bool) {
         let selector = NSSelectorFromString("setAdvertiserTrackingEnabled:")
         guard FBAdSettings.responds(to: selector) else { return }
 
-        FBAdSettings.perform(selector, with: NSNumber(value: isEnabled))
+        FBAdSettings.perform(selector, with: NSNumber(value: isTrackingEnabled))
     }
 
     // MARK: - Remote Config Check
