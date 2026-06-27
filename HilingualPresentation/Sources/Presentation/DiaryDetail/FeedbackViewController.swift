@@ -38,13 +38,10 @@ public final class FeedbackViewController: BaseUIViewController<FeedbackViewMode
     var onToggleChanged: ((Bool) -> Void)?
     private let viewDidLoadSubject = PassthroughSubject<Void, Never>()
     private var date: String = ""
-    
-    // Amplitude Tracking Properties
 
     private var toggleClickCount: Int = 0
     public var page: AnalyticsEvent.Page
 
-    // Ad
     public var showsAdBanner: Bool = false
     private var bannerView: BannerView?
     
@@ -198,12 +195,23 @@ public final class FeedbackViewController: BaseUIViewController<FeedbackViewMode
                     }
                 },
                 receiveValue: { [weak self] feedbackList in
+                    self?.errorPresenter.dismiss()
                     let feedbackItems: [FeedbackItem] = feedbackList.map {
                         FeedbackItem(original: $0.original, rewrite: $0.rewrite, explanation: $0.explain)
                     }
                     self?.feedbackView.configureFeedbacks(data: feedbackItems)
                 }
             )
+            .store(in: &cancellables)
+
+        output.feedbackError
+            .receive(on: RunLoop.main)
+            .sink { [weak self] error in
+                guard let self else { return }
+                self.errorPresenter.show(error, form: .fullPage) { [weak self] in
+                    self?.viewModel?.fetchFeedback()
+                }
+            }
             .store(in: &cancellables)
 
         output.fetchDiaryResult
@@ -215,6 +223,7 @@ public final class FeedbackViewController: BaseUIViewController<FeedbackViewMode
                     }
                 },
                 receiveValue: { [weak self] entity in
+                    self?.errorPresenter.dismiss()
                     let diffRanges = entity.diffRanges.map {
                         HighlightTextView.DiffRange(
                             start: $0.start,
@@ -240,6 +249,15 @@ public final class FeedbackViewController: BaseUIViewController<FeedbackViewMode
                     self?.feedbackView.configureDiary(data: diaryViewData)
                 }
             )
+            .store(in: &cancellables)
+
+        output.diaryDetailError
+            .receive(on: RunLoop.main)
+            .sink { [weak self] error in
+                self?.errorPresenter.show(error, form: .fullPage) { [weak self] in
+                    self?.viewModel?.fetchDiaryDetail()
+                }
+            }
             .store(in: &cancellables)
     }
 
