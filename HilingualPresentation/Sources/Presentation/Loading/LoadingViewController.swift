@@ -8,6 +8,7 @@
 import Foundation
 import Combine
 import GoogleMobileAds
+import HilingualCore
 
 public final class LoadingViewController: BaseUIViewController<LoadingViewModel> {
     
@@ -79,6 +80,7 @@ public final class LoadingViewController: BaseUIViewController<LoadingViewModel>
         case .success:
             goToNextView()
         case .error:
+            AmplitudeManager.shared.send(.clickErrorCTA(page: .aiFeedback, action: .feedbackRetry))
             retryButtonTapped()
         }
     }

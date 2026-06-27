@@ -120,7 +120,7 @@ public final class MypageViewController: BaseUIViewController<MypageViewModel> {
         output.logoutError
             .receive(on: RunLoop.main)
             .sink { [weak self] error in
-                self?.errorPresenter.show(error, form: .modal)
+                self?.errorPresenter.show(error, form: .modal, page: .myPage)
             }
             .store(in: &cancellables)
 
@@ -139,7 +139,7 @@ public final class MypageViewController: BaseUIViewController<MypageViewModel> {
         output.loadError
             .receive(on: RunLoop.main)
             .sink { [weak self] error in
-                self?.errorPresenter.show(error, form: .fullPage) {
+                self?.errorPresenter.show(error, form: .fullPage, page: .myPage) {
                     self?.viewModel?.fetchUserProfile()
                 }
             }

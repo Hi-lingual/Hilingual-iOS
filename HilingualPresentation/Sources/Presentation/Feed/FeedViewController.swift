@@ -104,7 +104,7 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
         output.actionError
             .receive(on: RunLoop.main)
             .sink { [weak self] error in
-                self?.errorPresenter.show(error, form: .modal)
+                self?.errorPresenter.show(error, form: .modal, page: .feed)
             }
             .store(in: &viewModel.cancellables)
     }

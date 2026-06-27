@@ -51,7 +51,7 @@ public final class FollowListViewController: BaseUIViewController<FollowListView
         viewModel?.loadErrorPublisher
             .receive(on: RunLoop.main)
             .sink { [weak self] error in
-                self?.errorPresenter.show(error, form: .fullPage) {
+                self?.errorPresenter.show(error, form: .fullPage, page: .followList) {
                     self?.viewModel?.fetchFollowers()
                     self?.viewModel?.fetchFollowing()
                 }
@@ -65,7 +65,7 @@ public final class FollowListViewController: BaseUIViewController<FollowListView
 
         viewModel?.actionErrorPublisher
             .receive(on: RunLoop.main)
-            .sink { [weak self] error in self?.errorPresenter.show(error, form: .modal) }
+            .sink { [weak self] error in self?.errorPresenter.show(error, form: .modal, page: .followList) }
             .store(in: &cancellables)
 
         segmentedControl.onIndexChange = { [weak self] (index: Int) in

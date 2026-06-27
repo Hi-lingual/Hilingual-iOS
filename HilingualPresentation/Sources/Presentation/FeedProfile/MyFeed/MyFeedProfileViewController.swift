@@ -145,7 +145,7 @@ public final class MyFeedProfileViewController: BaseUIViewController<FeedProfile
         output.loadError
             .receive(on: RunLoop.main)
             .sink { [weak self] error in
-                self?.errorPresenter.show(error, form: .fullPage) {
+                self?.errorPresenter.show(error, form: .fullPage, page: .myFeed) {
                     input.reloadProfile.send(())
                     input.reloadFeeds.send(())
                 }
@@ -155,7 +155,7 @@ public final class MyFeedProfileViewController: BaseUIViewController<FeedProfile
         output.actionError
             .receive(on: RunLoop.main)
             .sink { [weak self] error in
-                self?.errorPresenter.show(error, form: .modal)
+                self?.errorPresenter.show(error, form: .modal, page: .myFeed)
             }
             .store(in: &viewModel.cancellables)
     }

@@ -151,7 +151,7 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
             .sink { [weak self] error in
                 guard let self else { return }
                 let form: ErrorDisplayForm = (HilingualError.from(error) == .dataNotFound) ? .modal : .fullPage
-                self.errorPresenter.show(error, form: form) {
+                self.errorPresenter.show(error, form: form, page: .vocabulary) {
                     self.refreshSubject.send(())
                 }
             }
@@ -160,7 +160,7 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
         output.actionError
             .receive(on: RunLoop.main)
             .sink { [weak self] error in
-                self?.errorPresenter.show(error, form: .modal)
+                self?.errorPresenter.show(error, form: .modal, page: .vocabulary)
             }
             .store(in: &cancellables)
     }

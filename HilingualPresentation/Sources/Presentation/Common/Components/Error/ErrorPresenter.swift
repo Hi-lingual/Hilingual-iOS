@@ -43,7 +43,7 @@ final class ErrorPresenter {
 
     // MARK: - Public
 
-    func show(_ error: Error, form: ErrorDisplayForm, retry: (() -> Void)? = nil) {
+    func show(_ error: Error, form: ErrorDisplayForm, page: AnalyticsEvent.Page? = nil, retry: (() -> Void)? = nil) {
         let error = HilingualError.from(error)
 
         guard error != .unauthorized else { return }
@@ -52,11 +52,11 @@ final class ErrorPresenter {
 
         switch resolvedForm {
         case .fullPage:
-            presentFullPage(spec: ErrorContentPolicy.fullPage(for: error), retry: retry)
+            presentFullPage(spec: ErrorContentPolicy.fullPage(for: error), error: error, page: page, retry: retry)
         case .fullPageFeedback:
-            presentFullPage(spec: ErrorContentPolicy.feedbackFullPage(), retry: retry)
+            presentFullPage(spec: ErrorContentPolicy.feedbackFullPage(), error: error, page: page, retry: retry)
         case .modal:
-            presentModal(error: error, retry: retry)
+            presentModal(error: error, page: page, retry: retry)
         case .toast:
             presentToast(error: error)
         }
@@ -72,7 +72,7 @@ final class ErrorPresenter {
 
     // MARK: - Full Page
 
-    private func presentFullPage(spec: FullPageErrorSpec, retry: (() -> Void)?) {
+    private func presentFullPage(spec: FullPageErrorSpec, error: HilingualError, page: AnalyticsEvent.Page?, retry: (() -> Void)?) {
         guard let host else { return }
         dismiss()
 
@@ -87,6 +87,7 @@ final class ErrorPresenter {
 
         let errorView = FullPageErrorView(frame: container.bounds)
         errorView.configure(with: spec.content, hasTabBar: hasTabBar) { [weak self] in
+            self?.track(Self.mainCTAAction(for: error), page: page)
             switch spec.role {
             case .retry:
                 retry?()
@@ -95,7 +96,10 @@ final class ErrorPresenter {
             }
         }
 
-        errorView.configureBackButton(onTap: navStackCount > 1 ? { [weak self] in self?.goBack() } : nil)
+        errorView.configureBackButton(onTap: navStackCount > 1 ? { [weak self] in
+            self?.track(Self.backCTAAction(for: error), page: page)
+            self?.goBack()
+        } : nil)
 
         container.addSubview(errorView)
         errorView.snp.makeConstraints { $0.edges.equalToSuperview() }
@@ -104,15 +108,42 @@ final class ErrorPresenter {
 
     // MARK: - Modal
 
-    private func presentModal(error: HilingualError, retry: (() -> Void)?) {
-        let confirmAction: (() -> Void)? = (error == .dataNotFound) ? retry : nil
+    private func presentModal(error: HilingualError, page: AnalyticsEvent.Page?, retry: (() -> Void)?) {
+        let businessAction: (() -> Void)? = (error == .dataNotFound) ? retry : nil
+        let ctaAction: AnalyticsEvent.ErrorCTAAction = (error == .dataNotFound) ? .dataNotFoundGoBack : .serverErrorConfirm
 
         DialogManager.shared.show(
             message: ErrorContentPolicy.modalTitle(for: error),
             style: .error,
             confirmTitle: "확인",
-            confirmAction: confirmAction
+            confirmAction: { [weak self] in
+                self?.track(ctaAction, page: page)
+                businessAction?()
+            }
         )
+    }
+
+    // MARK: - Analytics
+
+    private func track(_ action: AnalyticsEvent.ErrorCTAAction?, page: AnalyticsEvent.Page?) {
+        guard let action, let page else { return }
+        AmplitudeManager.shared.send(.clickErrorCTA(page: page, action: action))
+    }
+
+    private static func mainCTAAction(for error: HilingualError) -> AnalyticsEvent.ErrorCTAAction {
+        switch error {
+        case .dataNotFound: return .dataNotFoundGoBack
+        case .network: return .networkErrorRetry
+        default: return .serverErrorRetry
+        }
+    }
+
+    private static func backCTAAction(for error: HilingualError) -> AnalyticsEvent.ErrorCTAAction? {
+        switch error {
+        case .dataNotFound: return .dataNotFoundGoBack
+        case .network: return nil
+        default: return .serverErrorGoBack
+        }
     }
 
     // MARK: - Toast

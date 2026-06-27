@@ -129,7 +129,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
             .receive(on: RunLoop.main)
             .sink(receiveCompletion: { [weak self] completion in
                 if case let .failure(error) = completion {
-                    self?.errorPresenter.show(error, form: .fullPage) {
+                    self?.errorPresenter.show(error, form: .fullPage, page: .home) {
                         self?.retryHomeInitialLoad()
                     }
                 }
@@ -848,7 +848,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                         .sink(receiveCompletion: { [weak self] completion in
                             if case let .failure(error) = completion {
                                 self?.dialog.dismiss()
-                                self?.errorPresenter.show(error, form: .modal)
+                                self?.errorPresenter.show(error, form: .modal, page: .home)
                             }
                         }, receiveValue: { [weak self] _ in
                             guard let self else { return }
@@ -892,7 +892,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                         .sink(receiveCompletion: { [weak self] completion in
                             if case let .failure(error) = completion {
                                 self?.dialog.dismiss()
-                                self?.errorPresenter.show(error, form: .modal)
+                                self?.errorPresenter.show(error, form: .modal, page: .home)
                             }
                         }, receiveValue: { [weak self] _ in
                             guard let self else { return }
@@ -927,7 +927,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                         .sink(receiveCompletion: { [weak self] completion in
                             if case let .failure(error) = completion {
                                 self?.dialog.dismiss()
-                                self?.errorPresenter.show(error, form: .modal)
+                                self?.errorPresenter.show(error, form: .modal, page: .home)
                             }
                         }, receiveValue: { [weak self] _ in
                             guard let self else { return }
@@ -1213,7 +1213,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
             .receive(on: RunLoop.main)
             .sink(receiveCompletion: { [weak self] completion in
                 if case let .failure(error) = completion {
-                    self?.errorPresenter.show(error, form: .fullPage) {
+                    self?.errorPresenter.show(error, form: .fullPage, page: .home) {
                         self?.retryHomeInitialLoad()
                     }
                 }
@@ -1234,7 +1234,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
             .receive(on: RunLoop.main)
             .sink(receiveCompletion: { [weak self] completion in
                 if case let .failure(error) = completion {
-                    self?.errorPresenter.show(error, form: .fullPage) {
+                    self?.errorPresenter.show(error, form: .fullPage, page: .home) {
                         self?.retryHomeInitialLoad()
                     }
                 }
