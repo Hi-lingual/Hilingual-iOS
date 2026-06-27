@@ -226,7 +226,7 @@ final class LoadingView: BaseUIView {
             feedbackButton.isHidden = false
 
             errorImageView.snp.remakeConstraints {
-                $0.top.equalToSuperview().offset(340)
+                $0.top.equalToSuperview().offset(220)
                 $0.centerX.equalToSuperview()
                 $0.width.equalTo(200)
                 $0.height.equalTo(175)
