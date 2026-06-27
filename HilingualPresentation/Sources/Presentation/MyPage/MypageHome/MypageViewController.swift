@@ -48,7 +48,7 @@ public final class MypageViewController: BaseUIViewController<MypageViewModel> {
         super.setUI()
         
         view.addSubview(mypageView)
-        
+                
         if let value = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String {
             mypageView.versionValueLabel.text = "\(value)"
         }
