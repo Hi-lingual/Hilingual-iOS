@@ -11,8 +11,6 @@ import HilingualDomain
 
 public final class MypageViewModel: BaseViewModel {
 
-    //TODO: - Default 이미지 처리 로직 추가
-
     // MARK: - Input
 
     public struct Input {
@@ -25,6 +23,7 @@ public final class MypageViewModel: BaseViewModel {
         let logoutCompleted: AnyPublisher<Void, Never>
         let logoutError: AnyPublisher<Error, Never>
         let userProfile: AnyPublisher<UserProfileEntity?, Never>
+        let loadError: AnyPublisher<Error, Never>
     }
 
     // MARK: - Properties
@@ -35,6 +34,7 @@ public final class MypageViewModel: BaseViewModel {
     private let logoutCompletedSubject = PassthroughSubject<Void, Never>()
     private let logoutErrorSubject = PassthroughSubject<Error, Never>()
     private let userProfileSubject = PassthroughSubject<UserProfileEntity?, Never>()
+    private let loadErrorSubject = PassthroughSubject<Error, Never>()
 
     // MARK: - Init
 
@@ -71,15 +71,17 @@ public final class MypageViewModel: BaseViewModel {
         return Output(
             logoutCompleted: logoutCompletedSubject.eraseToAnyPublisher(),
             logoutError: logoutErrorSubject.eraseToAnyPublisher(),
-            userProfile: userProfileSubject.eraseToAnyPublisher()
+            userProfile: userProfileSubject.eraseToAnyPublisher(),
+            loadError: loadErrorSubject.eraseToAnyPublisher()
         )
     }
 
     func fetchUserProfile() {
         fetchUserProfileUseCase.fetchMyProfile()
             .sink(
-                receiveCompletion: { completion in
+                receiveCompletion: { [weak self] completion in
                     if case .failure(let error) = completion {
+                        self?.loadErrorSubject.send(error)
                     }
                 },
                 receiveValue: { [weak self] profile in
