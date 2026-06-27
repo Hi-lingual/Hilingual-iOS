@@ -62,7 +62,7 @@ public final class MypageViewController: BaseUIViewController<MypageViewModel> {
         mypageView.logoutButton.addTarget(self, action: #selector(presentLogoutDialog), for: .touchUpInside)
         mypageView.editButton.addTarget(self, action: #selector(editButtonTapped), for: .touchUpInside)
         mypageView.feedButton.addTarget(self, action: #selector(myFeedProfileButtonTapped), for: .touchUpInside)
-        
+
         mypageView.onEditProfileTap = { [weak self] in
             self?.editButtonTapped()
         }
@@ -147,7 +147,7 @@ public final class MypageViewController: BaseUIViewController<MypageViewModel> {
     }
     
     // MARK: - Private Methods
-    
+
     @objc
     private func presentLogoutDialog() {
         guard let window = UIApplication.shared.windows.first else { return }

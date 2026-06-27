@@ -15,14 +15,23 @@ public final class DebugViewController: UIViewController {
     private struct Item {
         let title: String
         let subtitle: String
-        let make: () -> UIViewController
+        let handler: (DebugViewController) -> Void
     }
 
     private let items: [Item] = [
         Item(
             title: "강제 에러",
             subtitle: "화면별 서버/네트워크/데이터없음 에러 강제",
-            make: { DebugForceErrorViewController() }
+            handler: { vc in
+                vc.navigationController?.pushViewController(DebugForceErrorViewController(), animated: true)
+            }
+        ),
+        Item(
+            title: "💥 강제 크래시 (Crashlytics 테스트)",
+            subtitle: "탭 시 즉시 크래시 → 디버거 없이 재실행하면 Crashlytics로 전송",
+            handler: { _ in
+                fatalError("Crashlytics 테스트용 강제 크래시")
+            }
         )
     ]
 
@@ -74,7 +83,7 @@ extension DebugViewController: UITableViewDataSource, UITableViewDelegate {
 
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        navigationController?.pushViewController(items[indexPath.row].make(), animated: true)
+        items[indexPath.row].handler(self)
     }
 }
 #endif
