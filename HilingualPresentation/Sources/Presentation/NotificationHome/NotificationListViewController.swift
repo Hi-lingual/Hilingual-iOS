@@ -79,6 +79,7 @@ public final class NotificationListViewController: BaseUIViewController<Notifica
             output.generalNotifications
                 .receive(on: DispatchQueue.main)
                 .sink { [weak self] list in
+                    self?.errorPresenter.dismiss()
                     self?.notificationView.notificationListModel = NotificationListModel(
                         type: .feed(raw),
                         items: list
@@ -91,6 +92,7 @@ public final class NotificationListViewController: BaseUIViewController<Notifica
             output.noticeNotifications
                 .receive(on: DispatchQueue.main)
                 .sink { [weak self] list in
+                    self?.errorPresenter.dismiss()
                     self?.notificationView.notificationListModel = NotificationListModel(
                         type: .notice(raw),
                         items: list
@@ -99,6 +101,16 @@ public final class NotificationListViewController: BaseUIViewController<Notifica
                 }
                 .store(in: &cancellables)
         }
+
+        output.loadError
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] error in
+                self?.notificationView.refreshControl.endRefreshing()
+                self?.errorPresenter.show(error, form: .fullPage) {
+                    self?.fetchTrigger.send(())
+                }
+            }
+            .store(in: &cancellables)
     }
 
     //MARK: - Private Method

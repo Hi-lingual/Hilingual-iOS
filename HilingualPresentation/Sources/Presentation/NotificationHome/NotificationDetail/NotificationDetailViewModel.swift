@@ -19,6 +19,7 @@ public final class NotificationDetailViewModel: BaseViewModel {
 
     public struct Output {
         let detail: AnyPublisher<NotificationDetailModel, Never>
+        let loadError: AnyPublisher<Error, Never>
     }
 
     // MARK: - Private
@@ -26,6 +27,7 @@ public final class NotificationDetailViewModel: BaseViewModel {
     private let useCase: NotificationUseCase
     private let notiId: Int
     private let detailSubject = PassthroughSubject<NotificationDetailModel, Never>()
+    private let loadErrorSubject = PassthroughSubject<Error, Never>()
 
     // MARK: - Init
 
@@ -41,10 +43,13 @@ public final class NotificationDetailViewModel: BaseViewModel {
             .sink { [weak self] in self?.fetchDetail() }
             .store(in: &cancellables)
 
-        return Output(detail: detailSubject.eraseToAnyPublisher())
+        return Output(
+            detail: detailSubject.eraseToAnyPublisher(),
+            loadError: loadErrorSubject.eraseToAnyPublisher()
+        )
     }
 
-    private func fetchDetail() {
+    func fetchDetail() {
         useCase.fetchNotificationDetail(notiId: notiId)
             .map {
                 NotificationDetailModel(
@@ -56,7 +61,11 @@ public final class NotificationDetailViewModel: BaseViewModel {
                     content: $0.content
                 )
             }
-            .sink(receiveCompletion: { _ in },
+            .sink(receiveCompletion: { [weak self] completion in
+                      if case let .failure(error) = completion {
+                          self?.loadErrorSubject.send(error)
+                      }
+                  },
                   receiveValue: { [weak self] model in
                       self?.detailSubject.send(model)
                   })

@@ -22,12 +22,14 @@ public final class NotificationViewModel: BaseViewModel {
     public struct Output {
         let generalNotifications: AnyPublisher<[NotificationModel], Never>
         let noticeNotifications: AnyPublisher<[NotificationModel], Never>
+        let loadError: AnyPublisher<Error, Never>
     }
 
     // MARK: - Private Subjects
 
     private let generalSubject = CurrentValueSubject<[NotificationModel], Never>([])
     private let noticeSubject = CurrentValueSubject<[NotificationModel], Never>([])
+    private let loadErrorSubject = PassthroughSubject<Error, Never>()
 
     private let useCase: NotificationUseCase
 
@@ -65,7 +67,10 @@ public final class NotificationViewModel: BaseViewModel {
                     .map { entities in
                         entities.compactMap { self.toModel(from: $0) }
                     }
-                    .catch { _ in Just([]) }
+                    .catch { [weak self] error -> Just<[NotificationModel]> in
+                        self?.loadErrorSubject.send(error)
+                        return Just([])
+                    }
                     .handleEvents(receiveOutput: { [weak self] models in
                         self?.generalSubject.send(models)
                     })
@@ -82,7 +87,10 @@ public final class NotificationViewModel: BaseViewModel {
                     .map { entities in
                         entities.compactMap { self.toModel(from: $0) }
                     }
-                    .catch { _ in Just([]) }
+                    .catch { [weak self] error -> Just<[NotificationModel]> in
+                        self?.loadErrorSubject.send(error)
+                        return Just([])
+                    }
                     .handleEvents(receiveOutput: { [weak self] models in
                         self?.noticeSubject.send(models)
                     })
@@ -93,7 +101,8 @@ public final class NotificationViewModel: BaseViewModel {
 
         return Output(
             generalNotifications: generalSubject.eraseToAnyPublisher(),
-            noticeNotifications: noticeSubject.eraseToAnyPublisher()
+            noticeNotifications: noticeSubject.eraseToAnyPublisher(),
+            loadError: loadErrorSubject.eraseToAnyPublisher()
         )
     }
 

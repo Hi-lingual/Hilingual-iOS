@@ -18,6 +18,7 @@ public final class NotificationSettingViewController: BaseUIViewController<Notif
 
     private let marketingToggledSubject = PassthroughSubject<Void, Never>()
     private let feedToggledSubject = PassthroughSubject<Void, Never>()
+    private let reloadSubject = PassthroughSubject<Void, Never>()
 
     // MARK: - Life Cycle
 
@@ -38,7 +39,7 @@ public final class NotificationSettingViewController: BaseUIViewController<Notif
 
     public override func bind(viewModel: NotificationSettingViewModel) {
         let input = NotificationSettingViewModel.Input(
-            viewDidLoad: Just(()).eraseToAnyPublisher(),
+            viewDidLoad: Just(()).merge(with: reloadSubject).eraseToAnyPublisher(),
             marketingToggled: marketingToggledSubject.eraseToAnyPublisher(),
             feedToggled: feedToggledSubject.eraseToAnyPublisher()
         )
@@ -48,6 +49,7 @@ public final class NotificationSettingViewController: BaseUIViewController<Notif
         output.isMarketingOn
             .receive(on: RunLoop.main)
             .sink { [weak self] isOn in
+                self?.errorPresenter.dismiss()
                 self?.alarmSettingView.marketingToggle.setOn(isOn, animated: true)
             }
             .store(in: &cancellables)
@@ -56,6 +58,22 @@ public final class NotificationSettingViewController: BaseUIViewController<Notif
             .receive(on: RunLoop.main)
             .sink { [weak self] isOn in
                 self?.alarmSettingView.feedToggle.setOn(isOn, animated: true)
+            }
+            .store(in: &cancellables)
+
+        output.settingUpdateError
+            .receive(on: RunLoop.main)
+            .sink { [weak self] error in
+                self?.errorPresenter.show(error, form: .modal)
+            }
+            .store(in: &cancellables)
+
+        output.loadError
+            .receive(on: RunLoop.main)
+            .sink { [weak self] error in
+                self?.errorPresenter.show(error, form: .fullPage) {
+                    self?.reloadSubject.send(())
+                }
             }
             .store(in: &cancellables)
     }
