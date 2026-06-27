@@ -25,6 +25,8 @@ public final class FeedbackViewModel: BaseViewModel{
         let fetchFeedbackResult: AnyPublisher<[DiaryFeedbackEntity], Never>
         let fetchTopicResult: AnyPublisher<TopicEntity, Never>
         let errorMessage: AnyPublisher<String, Never>
+        let feedbackError: AnyPublisher<Error, Never>
+        let diaryDetailError: AnyPublisher<Error, Never>
     }
     
     // MARK: - Properties
@@ -37,6 +39,8 @@ public final class FeedbackViewModel: BaseViewModel{
     private let feedbackSubject = PassthroughSubject<[DiaryFeedbackEntity], Never>()
     private let topicSubject = PassthroughSubject<TopicEntity, Never>()
     private let errorSubject = PassthroughSubject<String, Never>()
+    private let feedbackErrorSubject = PassthroughSubject<Error, Never>()
+    private let diaryDetailErrorSubject = PassthroughSubject<Error, Never>()
     
     public init(
         diaryId: Int,
@@ -54,50 +58,9 @@ public final class FeedbackViewModel: BaseViewModel{
         input.viewDidLoad
             .sink { [weak self] in
                 guard let self = self else { return }
-                
-                self.feedbackUseCase.fetchFeedback(diaryId: diaryId)
-                    .sink(receiveCompletion: { [weak self] completion in
-                        switch completion {
-                        case .failure(let error):
-                            self?.errorSubject.send("조회 실패: \(error.localizedDescription)")
-                        case .finished:
-                            break
-                        }
-                    }, receiveValue: { [weak self] entity in
-                        let feedbackData = entity
-                        self?.feedbackSubject.send(feedbackData)
-                    })
-                    .store(in: &self.cancellables)
-                
-                self.diaryDetailUseCase.fetchDiaryDetail(diaryId: diaryId)
-                    .sink(
-                        receiveCompletion: { [weak self] completion in
-                            if case let .failure(error) = completion {
-                                self?.errorSubject.send("일기 상세 조회 실패: \(error.localizedDescription)")
-                            }
-                        },
-                        receiveValue: { [weak self] detail in
-                            guard let self else { return }
-                            
-                            self.diaryDetailSubject.send(detail)
-                            let topicDate = DisplayDateFormatter.normalizedAPIDate(detail.date)
 
-                            self.homeUseCase.fetchTopic(for: topicDate)
-                                .sink(
-                                    receiveCompletion: { completion in
-                                        if case let .failure(error) = completion {
-                                            print("일기 상세화면 - 주제 조회 실패:", error)
-                                        }
-                                    },
-                                    receiveValue: { [weak self] topic in
-                                        guard let topic else { return }
-                                        self?.topicSubject.send(topic)
-                                    }
-                                )
-                                .store(in: &self.cancellables)
-                        }
-                    )
-                    .store(in: &self.cancellables)
+                self.fetchFeedback()
+                self.fetchDiaryDetail()
             }
             .store(in: &cancellables)
         
@@ -106,7 +69,53 @@ public final class FeedbackViewModel: BaseViewModel{
             fetchDiaryResult: diaryDetailSubject.eraseToAnyPublisher(),
             fetchFeedbackResult: feedbackSubject.eraseToAnyPublisher(),
             fetchTopicResult: topicSubject.eraseToAnyPublisher(),
-            errorMessage: errorSubject.eraseToAnyPublisher()
+            errorMessage: errorSubject.eraseToAnyPublisher(),
+            feedbackError: feedbackErrorSubject.eraseToAnyPublisher(),
+            diaryDetailError: diaryDetailErrorSubject.eraseToAnyPublisher()
         )
+    }
+
+    func fetchFeedback() {
+        feedbackUseCase.fetchFeedback(diaryId: diaryId)
+            .sink(receiveCompletion: { [weak self] completion in
+                if case let .failure(error) = completion {
+                    self?.feedbackErrorSubject.send(error)
+                }
+            }, receiveValue: { [weak self] entity in
+                self?.feedbackSubject.send(entity)
+            })
+            .store(in: &cancellables)
+    }
+
+    func fetchDiaryDetail() {
+        diaryDetailUseCase.fetchDiaryDetail(diaryId: diaryId)
+            .sink(
+                receiveCompletion: { [weak self] completion in
+                    if case let .failure(error) = completion {
+                        self?.diaryDetailErrorSubject.send(error)
+                    }
+                },
+                receiveValue: { [weak self] detail in
+                    guard let self else { return }
+
+                    self.diaryDetailSubject.send(detail)
+                    let topicDate = DisplayDateFormatter.normalizedAPIDate(detail.date)
+
+                    self.homeUseCase.fetchTopic(for: topicDate)
+                        .sink(
+                            receiveCompletion: { completion in
+                                if case let .failure(error) = completion {
+                                    print("일기 상세화면 - 주제 조회 실패:", error)
+                                }
+                            },
+                            receiveValue: { [weak self] topic in
+                                guard let topic else { return }
+                                self?.topicSubject.send(topic)
+                            }
+                        )
+                        .store(in: &self.cancellables)
+                }
+            )
+            .store(in: &cancellables)
     }
 }
