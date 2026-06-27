@@ -56,7 +56,6 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
 
     public var showsActionButton: Bool = true
 
-    // Amplitude Tracking Properties
     private var entryId: String = ""
     private var entrySource: String = "unknown"
     private var backSource: String = "ui_button"
@@ -271,10 +270,10 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
             }
             .store(in: &cancellables)
 
-        output.errorMessage
+        output.actionError
             .receive(on: RunLoop.main)
-            .sink { [weak self] message in
-                self?.showErrorDialog(message: message)
+            .sink { [weak self] error in
+                self?.errorPresenter.show(error, form: .modal)
             }
             .store(in: &cancellables)
     }
@@ -317,11 +316,6 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
         modal.configure(
             title: nil,
             items: [
-                // TODO: 일기 삭제 기능 재오픈 시 상세 화면 삭제 메뉴 복구
-//                ("삭제하기", UIImage(resource: .icDelete24Ios), { [weak self] in
-//                    self?.modal.isHidden = true
-//                    self?.showDeleteDialog()
-//                }),
                 ("AI 피드백 신고하기", UIImage(resource: .icReport24Ios), { [weak self] in
                     self?.modal.isHidden = true
                     self?.showReportDialog()
@@ -329,8 +323,6 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
             ]
         )
 
-        // TODO: 일기 삭제 기능 재오픈 시 삭제 메뉴 스타일 복구
-//        modal.applyStyle(to: 0, titleColor: .alertRed)
         modal.isHidden = false
 
         DispatchQueue.main.async { [weak self] in
