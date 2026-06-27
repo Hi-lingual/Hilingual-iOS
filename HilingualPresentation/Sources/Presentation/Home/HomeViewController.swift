@@ -131,11 +131,14 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         
         output.userInfo
             .receive(on: RunLoop.main)
-            .sink(receiveCompletion: { completion in
+            .sink(receiveCompletion: { [weak self] completion in
                 if case let .failure(error) = completion {
-                    print("🚨 [UserInfo] API 호출 실패: \(error.localizedDescription)")
+                    self?.errorPresenter.show(error, form: .fullPage) {
+                        self?.retryHomeInitialLoad()
+                    }
                 }
             }, receiveValue: { [weak self] userInfo in
+                self?.errorPresenter.dismiss()
                 self?.updateUserInfo(userInfo)
             })
             .store(in: &viewModel.cancellables)
@@ -186,8 +189,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     // MARK: - Action
 
     public override func addTarget() {
-        
-        // 주제 카드 눌렀을 때, 일기 작성화면으로 이동
+
         homeView.selectedInfo.cardTopicView.onTapWriteDiary = { [weak self] in
             guard let self else { return }
             guard let selectedDate = self.homeView.calendarView.selectedDate else { return }
@@ -200,8 +202,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
 
             self.input.checkDraft.send(selectedDate)
         }
-        
-        // 일기 프리뷰 눌렀을 때, 상세화면으로 이동
+
         homeView.selectedInfo.onDiaryPreviewTapped = { [weak self] in
             guard let self,
                   let date = self.homeView.calendarView.selectedDate else { return }
@@ -214,8 +215,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                 })
                 .store(in: &self.viewModel!.cancellables)
         }
-        
-        // 일기 더보기 버튼 눌렀을 때, 메뉴 토글
+
         homeView.selectedInfo.onMoreButtonTapped = { [weak self] _ in
             guard let self else { return }
             
@@ -237,8 +237,6 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                 self.showDialog(for: .unpublish, diaryId: diaryId)
                 
             case .delete:
-                // TODO: 일기 삭제 기능 재오픈 시 삭제 다이얼로그 연결 복구
-                // self.showDialog(for: .delete, diaryId: diaryId)
                 break
             }
         }
@@ -776,7 +774,6 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         homeView.selectedInfo.menu.snp.remakeConstraints {
             $0.top.equalTo(homeView.selectedInfo.moreImageView.snp.bottom).offset(4)
             $0.trailing.equalTo(homeView.selectedInfo.moreImageView.snp.trailing)
-            // TODO: 일기 삭제 기능 재오픈 시 오버레이 메뉴 높이 원복 검토
             $0.height.equalTo(48)
             $0.width.equalTo(182)
         }
@@ -809,9 +806,10 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                     
                     self.viewModel?.publishDiary(diaryId: diaryId)
                         .receive(on: RunLoop.main)
-                        .sink(receiveCompletion: { completion in
-                            if case .failure = completion {
-                                print("🚨 게시하기 API 호출 실패")
+                        .sink(receiveCompletion: { [weak self] completion in
+                            if case let .failure(error) = completion {
+                                self?.dialog.dismiss()
+                                self?.errorPresenter.show(error, form: .modal)
                             }
                         }, receiveValue: { [weak self] _ in
                             guard let self else { return }
@@ -852,9 +850,10 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                     
                     self.viewModel?.unpublishDiary(diaryId: diaryId)
                         .receive(on: RunLoop.main)
-                        .sink(receiveCompletion: { completion in
-                            if case .failure = completion {
-                                print("🚨 비공개하기 API 호출 실패")
+                        .sink(receiveCompletion: { [weak self] completion in
+                            if case let .failure(error) = completion {
+                                self?.dialog.dismiss()
+                                self?.errorPresenter.show(error, form: .modal)
                             }
                         }, receiveValue: { [weak self] _ in
                             guard let self else { return }
@@ -886,9 +885,10 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                     
                     self.viewModel?.deleteDiary(diaryId: diaryId)
                         .receive(on: RunLoop.main)
-                        .sink(receiveCompletion: { completion in
-                            if case .failure = completion {
-                                print("🚨 삭제하기 API 호출 실패")
+                        .sink(receiveCompletion: { [weak self] completion in
+                            if case let .failure(error) = completion {
+                                self?.dialog.dismiss()
+                                self?.errorPresenter.show(error, form: .modal)
                             }
                         }, receiveValue: { [weak self] _ in
                             guard let self else { return }
@@ -1172,8 +1172,36 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     private func refreshUserInfo(shouldShowRecoveryModal: Bool = true) {
         viewModel?.fetchUserInfo()
             .receive(on: RunLoop.main)
-            .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] userInfo in
+            .sink(receiveCompletion: { [weak self] completion in
+                if case let .failure(error) = completion {
+                    self?.errorPresenter.show(error, form: .fullPage) {
+                        self?.retryHomeInitialLoad()
+                    }
+                }
+            }, receiveValue: { [weak self] userInfo in
+                self?.errorPresenter.dismiss()
                 self?.updateUserInfo(userInfo, shouldShowRecoveryModal: shouldShowRecoveryModal)
+            })
+            .store(in: &viewModel!.cancellables)
+    }
+
+    private func retryHomeInitialLoad() {
+        let date = homeView.calendarView.selectedDate ?? Date()
+        let calendar = Calendar.current
+        input.monthChange.send((calendar.component(.year, from: date),
+                                calendar.component(.month, from: date)))
+
+        viewModel?.fetchUserInfo()
+            .receive(on: RunLoop.main)
+            .sink(receiveCompletion: { [weak self] completion in
+                if case let .failure(error) = completion {
+                    self?.errorPresenter.show(error, form: .fullPage) {
+                        self?.retryHomeInitialLoad()
+                    }
+                }
+            }, receiveValue: { [weak self] userInfo in
+                self?.errorPresenter.dismiss()
+                self?.updateUserInfo(userInfo)
             })
             .store(in: &viewModel!.cancellables)
     }
