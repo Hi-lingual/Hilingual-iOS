@@ -89,6 +89,13 @@ public final class MypageViewController: BaseUIViewController<MypageViewModel> {
                 guard let url = URL(string: "https://hilingual.notion.site/230829677ebf8104b52ce74c65c27607") else { return }
                 let safariVC = SFSafariViewController(url: url)
                 self.present(safariVC, animated: true)
+
+            #if DEBUG
+            case .debug:
+                let vc = DebugViewController()
+                vc.hidesBottomBarWhenPushed = true
+                self.navigationController?.pushViewController(vc, animated: true)
+            #endif
             }
         }
     }
@@ -112,18 +119,28 @@ public final class MypageViewController: BaseUIViewController<MypageViewModel> {
         output.logoutError
             .receive(on: RunLoop.main)
             .sink { [weak self] error in
-                // TODO: - error 모달 추가하기
+                self?.errorPresenter.show(error, form: .modal)
             }
             .store(in: &cancellables)
-        
+
         output.userProfile
             .compactMap { $0 }
             .receive(on: RunLoop.main)
             .sink { [weak self] profile in
+                self?.errorPresenter.dismiss()
                 self?.mypageView.configure(
                     nickname: profile.nickname,
                     profileImageURL: profile.profileImg
                 )
+            }
+            .store(in: &cancellables)
+
+        output.loadError
+            .receive(on: RunLoop.main)
+            .sink { [weak self] error in
+                self?.errorPresenter.show(error, form: .fullPage) {
+                    self?.viewModel?.fetchUserProfile()
+                }
             }
             .store(in: &cancellables)
     }

@@ -66,6 +66,7 @@ public final class EditProfileViewController: BaseUIViewController<EditProfileVi
             .receive(on: RunLoop.main)
             .sink { [weak self] profile in
                 guard let profile else { return }
+                self?.errorPresenter.dismiss()
                 self?.currentNickname = profile.nickname
                 self?.editProfileView.configure(
                     profileImageURL: profile.profileImg,
@@ -84,9 +85,24 @@ public final class EditProfileViewController: BaseUIViewController<EditProfileVi
 
         output.profileImageUploadError
             .receive(on: RunLoop.main)
-            .sink { error in
-                // TODO: 실패 시 Alert 처리 등
-                print("프로필 이미지 업로드 실패: \(error)")
+            .sink { [weak self] error in
+                self?.errorPresenter.show(error, form: .modal)
+            }
+            .store(in: &cancellables)
+
+        output.withdrawError
+            .receive(on: RunLoop.main)
+            .sink { [weak self] error in
+                self?.errorPresenter.show(error, form: .modal)
+            }
+            .store(in: &cancellables)
+
+        output.loadError
+            .receive(on: RunLoop.main)
+            .sink { [weak self] error in
+                self?.errorPresenter.show(error, form: .fullPage) {
+                    self?.viewModel?.fetchUserProfile()
+                }
             }
             .store(in: &cancellables)
     }

@@ -59,12 +59,30 @@ public final class BlockUserViewController: BaseUIViewController<BlockUserViewMo
             .receive(on: RunLoop.main)
             .sink { [weak self] users in
                 guard let self else { return }
+                self.errorPresenter.dismiss()
                 self.blockUserView.tableView.reloadData()
                 self.blockUserView.refreshControl.endRefreshing()
 
                 let isEmpty = users.isEmpty
                 self.blockUserView.updateEmptyView(isHidden: !isEmpty)
                 self.blockUserView.tableView.isHidden = isEmpty
+            }
+            .store(in: &cancellables)
+
+        output.loadError
+            .receive(on: RunLoop.main)
+            .sink { [weak self] error in
+                self?.blockUserView.refreshControl.endRefreshing()
+                self?.errorPresenter.show(error, form: .fullPage) {
+                    self?.refreshTriggeredSubject.send(())
+                }
+            }
+            .store(in: &cancellables)
+
+        output.actionError
+            .receive(on: RunLoop.main)
+            .sink { [weak self] error in
+                self?.errorPresenter.show(error, form: .modal)
             }
             .store(in: &cancellables)
     }

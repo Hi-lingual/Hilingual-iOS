@@ -100,8 +100,8 @@ public final class NicknameEditViewController: BaseUIViewController<NicknameEdit
 
         output.updateError
             .receive(on: RunLoop.main)
-            .sink { error in
-                print("닉네임 변경 실패: \(error)")
+            .sink { [weak self] error in
+                self?.errorPresenter.show(error, form: .modal)
             }
             .store(in: &cancellables)
     }
