@@ -39,6 +39,7 @@ final class LoadingView: BaseUIView {
         label.font = .pretendard(.head_sb_20)
         label.textColor = .gray850
         label.textAlignment = .center
+        label.numberOfLines = 0
         return label
     }()
 
@@ -155,12 +156,6 @@ final class LoadingView: BaseUIView {
             $0.horizontalEdges.equalToSuperview().inset(16)
         }
 
-        errorImageView.snp.makeConstraints {
-            $0.top.equalTo(titleLabel.snp.bottom).offset(20)
-            $0.centerX.equalToSuperview()
-            $0.width.equalTo(200)
-            $0.height.equalTo(175)
-        }
     }
 
     private func addTarget() {
@@ -185,12 +180,21 @@ final class LoadingView: BaseUIView {
 
         switch state {
         case .loading:
+            titleLabel.snp.remakeConstraints {
+                $0.top.equalToSuperview().offset(260)
+                $0.centerX.equalToSuperview()
+            }
             startRotation()
             errorIcon.isHidden = false
             footerLabel.isHidden = false
 
         case .success:
+            titleLabel.snp.remakeConstraints {
+                $0.top.equalToSuperview().offset(260)
+                $0.centerX.equalToSuperview()
+            }
             stopRotation()
+            closeIcon.setImage(UIImage(resource: .icClose24BIos), for: .normal)
             titleLabel.text = "일기 저장 완료!"
             subtitleLabel.text = "틀린 부분을 고치고,\n더 나은 표현으로 수정했어요!"
             animationView.animation = LottieAnimation.named("feedback2", bundle: .module)
@@ -204,16 +208,34 @@ final class LoadingView: BaseUIView {
 
         case .error:
             stopRotation()
-            titleLabel.text = "앗! 일시적인 오류가 발생했어요."
-            subtitleLabel.isHidden = true
+            titleLabel.text = "피드백을 받는 중에\n일시적인 오류가 발생했어요!"
+            subtitleLabel.text = "잠시 후 다시 시도해주세요."
+            subtitleLabel.isHidden = false
             animationView.isHidden = true
 
+            errorImageView.image = UIImage(resource: .imgErrorDiaryIos)
             errorImageView.isHidden = false
             errorIcon.isHidden = true
             footerLabel.isHidden = true
             closeIcon.isHidden = false
-            feedbackButton.setTitle("다시 요청하기", for: .normal)
+            closeIcon.setImage(
+                UIImage(named: "ic_arrow_left_b_24_ios", in: .module, compatibleWith: nil),
+                for: .normal
+            )
+            feedbackButton.setTitle("피드백 다시 요청하기", for: .normal)
             feedbackButton.isHidden = false
+
+            errorImageView.snp.remakeConstraints {
+                $0.top.equalToSuperview().offset(340)
+                $0.centerX.equalToSuperview()
+                $0.width.equalTo(200)
+                $0.height.equalTo(175)
+            }
+            titleLabel.snp.remakeConstraints {
+                $0.top.equalTo(errorImageView.snp.bottom).offset(20)
+                $0.centerX.equalToSuperview()
+                $0.horizontalEdges.equalToSuperview().inset(24)
+            }
         }
 
         addSubview(animationView)
