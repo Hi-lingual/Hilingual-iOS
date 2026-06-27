@@ -37,6 +37,30 @@ public class BaseService<API: TargetType> {
         return nil
     }
 
+    // MARK: - Crash Reporting
+
+    private static func report(_ error: NetworkError, path: String) {
+        let code: Int
+        switch error {
+        case .serverError(let serverError): code = serverError.code
+        case .decoding: code = -1001
+        case .networkFail: code = -1002
+        case .timeout: code = -1003
+        case .forbidden: code = 403
+        case .unauthorized: code = 401
+        case .notFound: code = 404
+        case .refreshFailed: code = -1004
+        case .unknown: code = -1000
+        }
+
+        let nsError = NSError(
+            domain: "API.\(API.self)",
+            code: code,
+            userInfo: [NSLocalizedDescriptionKey: "\(error)"]
+        )
+        CrashReporter.record(nsError, userInfo: ["path": path, "error": "\(error)"])
+    }
+
     // MARK: - Properties
 
     private let provider: MoyaProvider<API>
@@ -76,8 +100,12 @@ public class BaseService<API: TargetType> {
                             }
 
                         case 500..<600:
-                            promise(.failure(.serverError(ServerError(code: response.statusCode,
-                                                                      message: "Server Error"))))
+                            if let serverError = try? JSONDecoder().decode(ServerError.self, from: response.data) {
+                                promise(.failure(.serverError(serverError)))
+                            } else {
+                                promise(.failure(.serverError(ServerError(code: response.statusCode,
+                                                                          message: "Server Error"))))
+                            }
 
                         default:
                             promise(.failure(.unknown))
@@ -99,6 +127,7 @@ public class BaseService<API: TargetType> {
         .handleEvents(receiveCompletion: { completion in
             if case .failure(let error) = completion {
                 print("❌ [네트워크에러] \(API.self) - \(target.path): \(error)에러 발생 ㅠ")
+                Self.report(error, path: target.path)
             }
         })
         .mapError { $0.toHilingualError() }
@@ -130,8 +159,12 @@ public class BaseService<API: TargetType> {
                         }
 
                     case 500..<600:
-                        promise(.failure(.serverError(ServerError(code: response.statusCode,
-                                                                  message: "Server Error"))))
+                        if let serverError = try? JSONDecoder().decode(ServerError.self, from: response.data) {
+                            promise(.failure(.serverError(serverError)))
+                        } else {
+                            promise(.failure(.serverError(ServerError(code: response.statusCode,
+                                                                      message: "Server Error"))))
+                        }
 
                     default:
                         promise(.failure(.unknown))
@@ -146,6 +179,11 @@ public class BaseService<API: TargetType> {
                 }
             }
         }
+        .handleEvents(receiveCompletion: { completion in
+            if case .failure(let error) = completion {
+                Self.report(error, path: target.path)
+            }
+        })
         .mapError { $0.toHilingualError() }
         .eraseToAnyPublisher()
     }
