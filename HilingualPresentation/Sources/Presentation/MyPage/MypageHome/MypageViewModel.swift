@@ -7,6 +7,7 @@
 
 import Combine
 import Foundation
+import HilingualCore
 import HilingualDomain
 
 public final class MypageViewModel: BaseViewModel {
@@ -86,6 +87,11 @@ public final class MypageViewModel: BaseViewModel {
                 },
                 receiveValue: { [weak self] profile in
                     self?.userProfileSubject.send(profile)
+                    if let userId = profile.userId {
+                        Task { @MainActor in
+                            AmplitudeManager.shared.updateUserId(userId)
+                        }
+                    }
                 }
             )
             .store(in: &cancellables)
