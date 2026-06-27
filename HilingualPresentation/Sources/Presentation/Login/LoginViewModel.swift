@@ -7,6 +7,7 @@
 
 import Foundation
 import Combine
+import HilingualCore
 import HilingualDomain
 
 public final class LoginViewModel: BaseViewModel {
@@ -102,6 +103,11 @@ public final class LoginViewModel: BaseViewModel {
 
         HomeRecoveryStorage.clearSessionCache()
         saveLoginState(result)
+        if let userId = result.userId {
+            Task { @MainActor in
+                AmplitudeManager.shared.updateUserId(userId)
+            }
+        }
         navigateAfterLogin(result)
     }
 

@@ -13,6 +13,7 @@ import HilingualDomain
 extension UserProfileResponseDTO {
     public func toEntity() -> UserProfileEntity {
         return UserProfileEntity(
+            userId: self.userId,
             profileImg: self.profileImg,
             nickname: self.nickname,
             provider: self.provider

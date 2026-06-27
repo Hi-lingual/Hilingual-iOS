@@ -27,7 +27,7 @@ public final class DefaultOnBoardingRepository: OnBoardingRepository {
             .eraseToAnyPublisher()
     }
 
-    public func registerProfile(profile: ProfileEntity) -> AnyPublisher<Void, Error> {
+    public func registerProfile(profile: ProfileEntity) -> AnyPublisher<Int64, Error> {
         return service.registerProfile(
             nickname: profile.nickname,
             adAlarmAgree: profile.adAlarmAgree,
