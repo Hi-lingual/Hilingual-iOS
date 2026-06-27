@@ -47,7 +47,27 @@ public final class FollowListViewController: BaseUIViewController<FollowListView
         viewModel?.bind()
         viewModel?.fetchFollowers()
         viewModel?.fetchFollowing()
-        
+
+        viewModel?.loadErrorPublisher
+            .receive(on: RunLoop.main)
+            .sink { [weak self] error in
+                self?.errorPresenter.show(error, form: .fullPage) {
+                    self?.viewModel?.fetchFollowers()
+                    self?.viewModel?.fetchFollowing()
+                }
+            }
+            .store(in: &cancellables)
+
+        viewModel?.followListPublisher
+            .receive(on: RunLoop.main)
+            .sink { [weak self] _ in self?.errorPresenter.dismiss() }
+            .store(in: &cancellables)
+
+        viewModel?.actionErrorPublisher
+            .receive(on: RunLoop.main)
+            .sink { [weak self] error in self?.errorPresenter.show(error, form: .modal) }
+            .store(in: &cancellables)
+
         segmentedControl.onIndexChange = { [weak self] (index: Int) in
             switch index {
             case 0:
