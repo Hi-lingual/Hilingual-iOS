@@ -208,7 +208,7 @@ public final class FeedbackViewController: BaseUIViewController<FeedbackViewMode
             .receive(on: RunLoop.main)
             .sink { [weak self] error in
                 guard let self else { return }
-                self.errorPresenter.show(error, form: .fullPage) { [weak self] in
+                self.errorPresenter.show(error, form: .fullPage, page: .feedback) { [weak self] in
                     self?.viewModel?.fetchFeedback()
                 }
             }
@@ -254,7 +254,7 @@ public final class FeedbackViewController: BaseUIViewController<FeedbackViewMode
         output.diaryDetailError
             .receive(on: RunLoop.main)
             .sink { [weak self] error in
-                self?.errorPresenter.show(error, form: .fullPage) { [weak self] in
+                self?.errorPresenter.show(error, form: .fullPage, page: .feedback) { [weak self] in
                     self?.viewModel?.fetchDiaryDetail()
                 }
             }

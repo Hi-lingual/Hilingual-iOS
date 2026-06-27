@@ -73,7 +73,7 @@ public final class BlockUserViewController: BaseUIViewController<BlockUserViewMo
             .receive(on: RunLoop.main)
             .sink { [weak self] error in
                 self?.blockUserView.refreshControl.endRefreshing()
-                self?.errorPresenter.show(error, form: .fullPage) {
+                self?.errorPresenter.show(error, form: .fullPage, page: .blockUser) {
                     self?.refreshTriggeredSubject.send(())
                 }
             }
@@ -82,7 +82,7 @@ public final class BlockUserViewController: BaseUIViewController<BlockUserViewMo
         output.actionError
             .receive(on: RunLoop.main)
             .sink { [weak self] error in
-                self?.errorPresenter.show(error, form: .modal)
+                self?.errorPresenter.show(error, form: .modal, page: .blockUser)
             }
             .store(in: &cancellables)
     }

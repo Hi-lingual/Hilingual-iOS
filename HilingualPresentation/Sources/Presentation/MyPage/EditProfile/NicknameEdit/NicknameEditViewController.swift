@@ -101,7 +101,7 @@ public final class NicknameEditViewController: BaseUIViewController<NicknameEdit
         output.updateError
             .receive(on: RunLoop.main)
             .sink { [weak self] error in
-                self?.errorPresenter.show(error, form: .modal)
+                self?.errorPresenter.show(error, form: .modal, page: .nicknameEdit)
             }
             .store(in: &cancellables)
     }

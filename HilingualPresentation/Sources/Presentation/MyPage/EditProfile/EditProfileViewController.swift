@@ -86,21 +86,21 @@ public final class EditProfileViewController: BaseUIViewController<EditProfileVi
         output.profileImageUploadError
             .receive(on: RunLoop.main)
             .sink { [weak self] error in
-                self?.errorPresenter.show(error, form: .modal)
+                self?.errorPresenter.show(error, form: .modal, page: .editProfile)
             }
             .store(in: &cancellables)
 
         output.withdrawError
             .receive(on: RunLoop.main)
             .sink { [weak self] error in
-                self?.errorPresenter.show(error, form: .modal)
+                self?.errorPresenter.show(error, form: .modal, page: .editProfile)
             }
             .store(in: &cancellables)
 
         output.loadError
             .receive(on: RunLoop.main)
             .sink { [weak self] error in
-                self?.errorPresenter.show(error, form: .fullPage) {
+                self?.errorPresenter.show(error, form: .fullPage, page: .editProfile) {
                     self?.viewModel?.fetchUserProfile()
                 }
             }

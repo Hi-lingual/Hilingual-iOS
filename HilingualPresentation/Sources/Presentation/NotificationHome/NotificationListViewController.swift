@@ -106,7 +106,7 @@ public final class NotificationListViewController: BaseUIViewController<Notifica
             .receive(on: DispatchQueue.main)
             .sink { [weak self] error in
                 self?.notificationView.refreshControl.endRefreshing()
-                self?.errorPresenter.show(error, form: .fullPage) {
+                self?.errorPresenter.show(error, form: .fullPage, page: .notification) {
                     self?.fetchTrigger.send(())
                 }
             }

@@ -273,7 +273,7 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
         output.actionError
             .receive(on: RunLoop.main)
             .sink { [weak self] error in
-                self?.errorPresenter.show(error, form: .modal)
+                self?.errorPresenter.show(error, form: .modal, page: .postedDiary)
             }
             .store(in: &cancellables)
     }

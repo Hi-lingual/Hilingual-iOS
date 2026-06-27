@@ -86,7 +86,7 @@ public final class OnBoardingViewController: BaseUIViewController<OnBoardingView
         output.signUpError
             .receive(on: RunLoop.main)
             .sink { [weak self] error in
-                self?.errorPresenter.show(error, form: .modal)
+                self?.errorPresenter.show(error, form: .modal, page: .onboarding)
             }
             .store(in: &cancellables)
     }

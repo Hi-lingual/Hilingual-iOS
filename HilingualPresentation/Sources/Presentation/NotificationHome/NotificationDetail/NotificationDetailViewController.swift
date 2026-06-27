@@ -60,7 +60,7 @@ public final class NotificationDetailViewController: BaseUIViewController<Notifi
         output.loadError
             .receive(on: DispatchQueue.main)
             .sink { [weak self] error in
-                self?.errorPresenter.show(error, form: .fullPage) {
+                self?.errorPresenter.show(error, form: .fullPage, page: .notificationDetail) {
                     self?.viewModel?.fetchDetail()
                 }
             }

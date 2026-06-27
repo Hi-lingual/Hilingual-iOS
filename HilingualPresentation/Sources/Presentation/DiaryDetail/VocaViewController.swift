@@ -141,7 +141,7 @@ public final class RecommendedExpressionViewController: BaseUIViewController<Rec
         output.loadError
             .receive(on: RunLoop.main)
             .sink { [weak self] error in
-                self?.errorPresenter.show(error, form: .fullPage) {
+                self?.errorPresenter.show(error, form: .fullPage, page: .feedback) {
                     self?.viewModel?.fetchRecommendedExpression()
                 }
             }
@@ -153,7 +153,7 @@ public final class RecommendedExpressionViewController: BaseUIViewController<Rec
                 guard let self else { return }
 
                 if HilingualError.from(error) == .network {
-                    self.errorPresenter.show(error, form: .toast)
+                    self.errorPresenter.show(error, form: .toast, page: .feedback)
                     return
                 }
 

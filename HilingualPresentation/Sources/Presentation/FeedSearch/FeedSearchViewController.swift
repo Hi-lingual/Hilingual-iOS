@@ -107,7 +107,7 @@ public final class FeedSearchViewController: BaseUIViewController<FeedSearchView
         output?.loadError
             .receive(on: RunLoop.main)
             .sink { [weak self] error in
-                self?.errorPresenter.show(error, form: .toast)
+                self?.errorPresenter.show(error, form: .toast, page: .feed)
             }
             .store(in: &cancellables)
     }

@@ -156,7 +156,7 @@ public final class FeedListViewController: BaseUIViewController<FeedViewModel> {
         output.loadError
             .receive(on: RunLoop.main)
             .sink { [weak self] error in
-                self?.errorPresenter.show(error, form: .fullPage) {
+                self?.errorPresenter.show(error, form: .fullPage, page: .feed) {
                     self?.input.reload.send(())
                 }
             }
@@ -165,7 +165,7 @@ public final class FeedListViewController: BaseUIViewController<FeedViewModel> {
         output.actionError
             .receive(on: RunLoop.main)
             .sink { [weak self] error in
-                self?.errorPresenter.show(error, form: .modal)
+                self?.errorPresenter.show(error, form: .modal, page: .feed)
             }
             .store(in: &cancellables)
     }

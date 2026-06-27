@@ -195,7 +195,7 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
             .receive(on: RunLoop.main)
             .sink { [weak self] error in
                 guard let self else { return }
-                self.errorPresenter.show(error, form: .fullPage) {
+                self.errorPresenter.show(error, form: .fullPage, page: .userProfile) {
                     self.input.reloadProfile.send(())
                     self.input.reloadFeeds.send(())
                 }
@@ -205,7 +205,7 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
         output.actionError
             .receive(on: RunLoop.main)
             .sink { [weak self] error in
-                self?.errorPresenter.show(error, form: .modal)
+                self?.errorPresenter.show(error, form: .modal, page: .userProfile)
             }
             .store(in: &cancellables)
     }

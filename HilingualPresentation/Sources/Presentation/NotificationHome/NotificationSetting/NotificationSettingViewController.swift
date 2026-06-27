@@ -64,14 +64,14 @@ public final class NotificationSettingViewController: BaseUIViewController<Notif
         output.settingUpdateError
             .receive(on: RunLoop.main)
             .sink { [weak self] error in
-                self?.errorPresenter.show(error, form: .modal)
+                self?.errorPresenter.show(error, form: .modal, page: .notificationSetting)
             }
             .store(in: &cancellables)
 
         output.loadError
             .receive(on: RunLoop.main)
             .sink { [weak self] error in
-                self?.errorPresenter.show(error, form: .fullPage) {
+                self?.errorPresenter.show(error, form: .fullPage, page: .notificationSetting) {
                     self?.reloadSubject.send(())
                 }
             }

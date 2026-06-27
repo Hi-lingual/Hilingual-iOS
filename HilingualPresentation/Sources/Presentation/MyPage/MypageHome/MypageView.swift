@@ -135,7 +135,7 @@ final class MypageView: BaseUIView {
             (.policy, "개인정보 처리방침 및 이용약관", "ic_document_24_ios")
         ]
         #if DEBUG
-        items.append((.debug, "🛠 디버그 (에러 강제)", "ic_setting_24_ios"))
+        items.append((.debug, "DEBUG", "ic_setting_24_ios"))
         #endif
         return items
     }()
