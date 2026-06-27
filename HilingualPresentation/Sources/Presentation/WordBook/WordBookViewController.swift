@@ -50,7 +50,6 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
         wordBookView.tableView.contentInset.top = 0
         sortSubject.send(.latest)
         wordBookView.updateHeaderView(totalCount: fullWordList.reduce(0) { $0 + $1.1.count }, sortIndex: selectedSortIndex)
-        refreshSubject.send(())
     }
 
     public override func viewWillDisappear(_ animated: Bool) {
@@ -93,7 +92,7 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
 
     public override func bind(viewModel: WordBookViewModel) {
         let input = WordBookViewModel.Input(
-            viewDidLoad: Just(()).eraseToAnyPublisher(),
+            viewDidLoad: Empty().eraseToAnyPublisher(),
             sortChanged: sortSubject.eraseToAnyPublisher(),
             selectedWordId: selectedWordIdSubject.eraseToAnyPublisher(),
             bookmarkToggled: bookmarkToggledSubject.eraseToAnyPublisher(),
@@ -107,6 +106,7 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
             .receive(on: RunLoop.main)
             .sink { [weak self] wordList in
                 guard let self = self else { return }
+                self.errorPresenter.dismiss()
                 self.fullWordList = wordList
                 self.filteredWordList = wordList
                 self.updateViewState()
@@ -143,6 +143,24 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
                 let studyVC = WordBookStudyViewController(words: words)
                 studyVC.modalPresentationStyle = .fullScreen
                 self.present(studyVC, animated: true)
+            }
+            .store(in: &cancellables)
+
+        output.loadError
+            .receive(on: RunLoop.main)
+            .sink { [weak self] error in
+                guard let self else { return }
+                let form: ErrorDisplayForm = (HilingualError.from(error) == .dataNotFound) ? .modal : .fullPage
+                self.errorPresenter.show(error, form: form) {
+                    self.refreshSubject.send(())
+                }
+            }
+            .store(in: &cancellables)
+
+        output.actionError
+            .receive(on: RunLoop.main)
+            .sink { [weak self] error in
+                self?.errorPresenter.show(error, form: .modal)
             }
             .store(in: &cancellables)
     }
