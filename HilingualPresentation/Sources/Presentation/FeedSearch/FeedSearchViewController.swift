@@ -85,14 +85,12 @@ public final class FeedSearchViewController: BaseUIViewController<FeedSearchView
     private func bind() {
         let output = viewModel?.transform()
         
-        // 검색 결과
         output?.searchState
             .sink { [weak self] state in
                 self?.updateUI(for: state)
             }
             .store(in: &cancellables)
         
-        // 팔로우 액션 결과
         output?.followAction
             .sink { [weak self] result in
                 guard let self = self else { return }
@@ -103,6 +101,13 @@ public final class FeedSearchViewController: BaseUIViewController<FeedSearchView
                         cell.configure(with: self.userList[index])
                     }
                 }
+            }
+            .store(in: &cancellables)
+
+        output?.loadError
+            .receive(on: RunLoop.main)
+            .sink { [weak self] error in
+                self?.errorPresenter.show(error, form: .toast)
             }
             .store(in: &cancellables)
     }
