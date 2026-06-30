@@ -5,23 +5,6 @@
 //  Created by 성현주 on 6/27/26.
 //
 
-// 화면(UIViewController)에 붙어 에러를 정책에 따라 표현하는 경량 헬퍼.
-// 화면은 "이 에러를 어떤 형태로 보여줄지(form)"와 "다시 시도 동작(retry)"만 넘기면 된다.
-// 실제 문구/이미지/버튼/내비게이션은 ErrorContentPolicy 가 결정한다.
-//
-// 사용 예 (ViewController):
-//     output.loadError
-//         .sink { [weak self] error in
-//             self?.errorPresenter.show(error, form: .fullPage) {
-//                 self?.reloadSubject.send(())   // 다시 시도
-//             }
-//         }
-//     output.data
-//         .sink { [weak self] data in
-//             self?.errorPresenter.dismiss()     // 성공 시 에러 뷰 제거
-//             ...
-//         }
-
 import UIKit
 import SnapKit
 import HilingualCore

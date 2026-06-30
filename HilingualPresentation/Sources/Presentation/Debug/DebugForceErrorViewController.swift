@@ -5,8 +5,6 @@
 //  Created by 성현주 on 6/27/26.
 //
 
-// DEBUG 전용. 화면별로 강제 에러(끔/서버/데이터없음/네트워크)를 런타임 토글하는 화면.
-
 #if DEBUG
 import UIKit
 import SnapKit

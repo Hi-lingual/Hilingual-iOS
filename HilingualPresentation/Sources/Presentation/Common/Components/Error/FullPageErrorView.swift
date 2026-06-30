@@ -5,9 +5,6 @@
 //  Created by 성현주 on 6/27/26.
 //
 
-// 화면 전체 데이터를 불러오지 못했을 때 콘텐츠 영역을 덮는 풀페이지 에러 뷰.
-// 표시 문구/이미지/버튼은 정책(ErrorContentPolicy)이 결정하고,
-// 이 뷰는 전달받은 Content 를 그리기만 한다. (탭바 노출/숨김은 네비 스택에 의해 자동 결정)
 
 import UIKit
 import SnapKit

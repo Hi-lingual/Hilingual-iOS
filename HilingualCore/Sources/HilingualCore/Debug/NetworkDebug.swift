@@ -5,10 +5,6 @@
 //  Created by 성현주 on 6/27/26.
 //
 
-// ⚠️ 테스트 전용 강제 에러 스위치. RELEASE 빌드에는 포함되지 않는다.
-// 디버그 화면(DebugViewController)에서 런타임으로 토글하거나, forcedErrors 를 직접 채워도 된다.
-// path 가 키 문자열을 '포함'하면 그 요청을 해당 에러로 강제 실패시킨다.
-
 import Foundation
 
 #if DEBUG
