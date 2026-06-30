@@ -5,8 +5,6 @@
 //  Created by 성현주 on 6/27/26.
 //
 
-// DEBUG 전용 디버그 홈. 디버그 기능들을 목록으로 보여주고 각 화면으로 진입한다.
-// 새 디버그 기능은 items 에 행을 추가하면 된다.
 
 #if DEBUG
 import UIKit

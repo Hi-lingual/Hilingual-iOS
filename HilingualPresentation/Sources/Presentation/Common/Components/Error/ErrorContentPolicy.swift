@@ -5,18 +5,9 @@
 //  Created by 성현주 on 6/27/26.
 //
 
-// 에러 정책의 단일 출처(Single Source of Truth).
-// "어떤 에러를, 어떤 표현 형태로, 어떤 문구/이미지/버튼으로 보여줄지"가 모두 이 파일에 모인다.
-// 정책을 바꾸려면 이 파일만 수정하면 전 화면에 반영된다.
-
 import UIKit
 import HilingualCore
 
-/// 에러를 보여주는 표현 형태. 화면(호출부)이 상황에 맞게 선택한다.
-/// - `fullPage`: 화면 전체 데이터를 불러오지 못한 경우 (탭O/탭X는 네비 스택에 의해 자동)
-/// - `fullPageFeedback`: AI 피드백 생성 실패 전용 풀페이지
-/// - `modal`: 기존 화면 콘텐츠를 유지해야 하는 부분 실패 (저장 실패, 단어장 데이터 없음 등)
-/// - `toast`: 네트워크 끊김을 화면 이동 전에 감지한 경우 등 가벼운 안내
 enum ErrorDisplayForm {
     case fullPage
     case fullPageFeedback
@@ -24,13 +15,11 @@ enum ErrorDisplayForm {
     case toast
 }
 
-/// 풀페이지 에러 버튼이 수행할 동작.
 enum ErrorButtonRole {
     case retry
     case goBack
 }
 
-/// 풀페이지 에러 1건의 표현 명세(그릴 내용 + 버튼 동작).
 struct FullPageErrorSpec {
     let content: FullPageErrorView.Content
     let role: ErrorButtonRole
