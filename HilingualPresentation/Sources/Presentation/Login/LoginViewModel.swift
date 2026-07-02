@@ -100,6 +100,7 @@ public final class LoginViewModel: BaseViewModel {
         print("[LoginVM] ♻️ refreshToken: \(result.refreshToken.prefix(10))...")
         print("[LoginVM] 🔍 isProfileCompleted: \(result.isProfileCompleted)")
 
+        HomeRecoveryStorage.clearSessionCache()
         saveLoginState(result)
         navigateAfterLogin(result)
     }

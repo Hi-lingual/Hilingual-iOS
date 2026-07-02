@@ -34,6 +34,7 @@ public final class SharedDiaryViewController: BaseUIViewController<SharedDiaryVi
     private lazy var diaryDetailViewController: DiaryDetailViewController = {
         let vc = diContainer.makeDiaryDetailViewController(diaryId: diaryId)
         vc.showsActionButton = false
+        vc.feedbackPage = .postedDiary
         return vc
     }()
     private let bottomSafeAreaBackgroundView = UIView()

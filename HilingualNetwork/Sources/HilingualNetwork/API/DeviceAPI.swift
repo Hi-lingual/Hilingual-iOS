@@ -16,7 +16,7 @@ extension DeviceAPI: BaseTargetType {
     public var path: String {
         switch self {
         case .updateDevice:
-            return "/users/device"
+            return "/v1/users/device"
         }
     }
 

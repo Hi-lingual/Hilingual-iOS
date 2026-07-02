@@ -56,14 +56,17 @@ final class AppDIContainer: ViewControllerFactory {
     }
     
     public func makeFeedbackViewController(diaryId: Int) -> FeedbackViewController {
-//        return FeedbackViewController(viewModel: makeFeedbackViewModel(diaryId: diaryId), diContainer: self)
         let viewModel = FeedbackViewModel(
-                diaryId: diaryId,
-                diaryDetailUseCase: makeDiaryDetailUseCase(),
-                feedbackUseCase: makeFeedbackUseCase(),
-                homeUseCase: makeHomeUseCase()
-            )
-            return FeedbackViewController(viewModel: viewModel, diContainer:  self)
+            diaryId: diaryId,
+            diaryDetailUseCase: makeDiaryDetailUseCase(),
+            feedbackUseCase: makeFeedbackUseCase(),
+            homeUseCase: makeHomeUseCase()
+        )
+        return FeedbackViewController(
+            viewModel: viewModel,
+            diContainer: self,
+            diaryId: diaryId
+        )
     }
     
     public func makeRecommendedExpressionViewController(diaryId: Int) -> RecommendedExpressionViewController {
@@ -83,7 +86,8 @@ final class AppDIContainer: ViewControllerFactory {
     func makeDiaryWritingViewController(
         topicData: (String, String)?,
         selectedDate: Date,
-        shouldLoadDraft: Bool
+        shouldLoadDraft: Bool,
+        isRecoveryWriting: Bool
     ) -> DiaryWritingViewController {
         
         let viewModel = makeDiaryWritingViewModel()
@@ -92,7 +96,8 @@ final class AppDIContainer: ViewControllerFactory {
             diContainer: self,
             topicData: topicData,
             selectedDate: selectedDate,
-            shouldLoadDraft: shouldLoadDraft
+            shouldLoadDraft: shouldLoadDraft,
+            isRecoveryWriting: isRecoveryWriting
         )
     }
 
@@ -487,9 +492,26 @@ extension AppDIContainer {
     private func makeHomeUseCase() -> HomeUseCase {
         return DefaultHomeUseCase(repository: makeHomeRepository())
     }
+
+    private func makeHomeAdWatchService() -> HomeAdWatchService {
+        return DefaultHomeAdWatchService()
+    }
+
+    private func makeHomeAdWatchRepository() -> HomeAdWatchRepository {
+        return DefaultHomeAdWatchRepository(service: makeHomeAdWatchService())
+    }
+
+    private func makeHomeAdWatchUseCase() -> HomeAdWatchUseCase {
+        return DefaultHomeAdWatchUseCase(repository: makeHomeAdWatchRepository())
+    }
     
     private func makeHomeViewModel() -> HomeViewModel {
-        return HomeViewModel(useCase: makeHomeUseCase(), fetchTemporaryDiaryUseCase: makeFetchTemporaryDiaryUseCase(), localPushUseCase: makeLocalPushUseCase())
+        return HomeViewModel(
+            useCase: makeHomeUseCase(),
+            fetchTemporaryDiaryUseCase: makeFetchTemporaryDiaryUseCase(),
+            localPushUseCase: makeLocalPushUseCase(),
+            homeAdWatchUseCase: makeHomeAdWatchUseCase()
+        )
     }
 }
 

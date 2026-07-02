@@ -19,11 +19,11 @@ extension MypageAPI: BaseTargetType {
     public var path: String {
         switch self {
         case .fetchMyProfile:
-            return "/users/mypage/info"
+            return "/v1/users/mypage/info"
         case .updateProfileImage:
-            return "/users/mypage/profileImg"
+            return "/v1/users/mypage/profileImg"
         case .updateNickname:
-            return "/users/profile/nickname"
+            return "/v1/users/profile/nickname"
         }
     }
 

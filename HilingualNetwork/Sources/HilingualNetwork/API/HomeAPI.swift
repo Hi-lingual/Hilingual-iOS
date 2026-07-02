@@ -23,19 +23,19 @@ extension HomeAPI: BaseTargetType {
     public var path: String {
         switch self {
         case .getUserInfo:
-            return "/users/home/info"
+            return "/v2/users/home/info"
         case .getMonthInfo:
-            return "/home/calendar/month"
+            return "/v2/home/calendar/month"
         case let .getDiaryInfo(date):
-            return "/home/calendar/\(date)"
+            return "/v1/home/calendar/\(date)"
         case let .getTopic(date):
-            return "/home/calendar/\(date)/topic"
+            return "/v1/home/calendar/\(date)/topic"
         case let .publishDiary(diaryId):
-            return "/diaries/\(diaryId)/publish"
+            return "/v1/diaries/\(diaryId)/publish"
         case let .unpublishDiary(diaryId):
-            return "/diaries/\(diaryId)/unpublish"
+            return "/v1/diaries/\(diaryId)/unpublish"
         case let .deleteDiary(diaryId):
-            return "/diaries/\(diaryId)"
+            return "/v1/diaries/\(diaryId)"
         }
     }
 

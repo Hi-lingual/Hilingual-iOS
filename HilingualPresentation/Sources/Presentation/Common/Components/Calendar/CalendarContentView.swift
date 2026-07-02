@@ -29,6 +29,10 @@ final class CalendarContentView: UICollectionView {
 
     private var days: [Date] = []
 
+    var recoveredDates: [Date] = [] {
+        didSet { reloadData() }
+    }
+
     var filledDates: [Date] = [] {
         didSet { reloadData() }
     }
@@ -179,9 +183,8 @@ extension CalendarContentView: UICollectionViewDataSource, UICollectionViewDeleg
             isSelected = false
         }
 
-        let isFilled = filledDates.contains {
-            calendar.isDate($0, inSameDayAs: date)
-        }
+        let isRecovered = recoveredDates.contains { calendar.isDate($0, inSameDayAs: date) }
+        let isFilled = filledDates.contains { calendar.isDate($0, inSameDayAs: date) } && !isRecovered
 
         cell.configure(
             day: calendar.component(.day, from: date),
@@ -242,3 +245,4 @@ extension CalendarContentView {
         )
     }
 }
+

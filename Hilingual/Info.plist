@@ -10,6 +10,8 @@
 	<string>$(AD_FEEDBACK_UNIT_ID)</string>
 	<key>AD_INTERSTITIAL_UNIT_ID</key>
 	<string>$(AD_INTERSTITIAL_UNIT_ID)</string>
+	<key>AD_RECOVERY_UNIT_ID</key>
+	<string>$(AD_RECOVERY_UNIT_ID)</string>
 	<key>AD_NATIVE_UNIT_ID</key>
 	<string>$(AD_NATIVE_UNIT_ID)</string>
 	<key>AMPLITUDE_API_KEY</key>

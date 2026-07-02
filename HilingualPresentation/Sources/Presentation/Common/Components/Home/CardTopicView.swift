@@ -9,6 +9,20 @@ import UIKit
 import SnapKit
 
 final class CardTopicView: UIView {
+
+    enum TopicTitleType {
+        case today
+        case selectedDate
+
+        var title: String {
+            switch self {
+            case .today:
+                return "오늘의 추천 주제"
+            case .selectedDate:
+                return "이날의 추천 주제"
+            }
+        }
+    }
     
     private(set) var topicData: (String, String)?
     
@@ -128,6 +142,7 @@ final class CardTopicView: UIView {
 
         cardStack.snp.makeConstraints {
             $0.top.equalToSuperview().offset(0)
+            $0.height.equalTo(78)
             $0.horizontalEdges.equalToSuperview().inset(16)
         }
         
@@ -166,10 +181,15 @@ final class CardTopicView: UIView {
     
     // MARK: - Configuration
     
-    func configure(kor: String? = nil, en: String? = nil) {
+    func configure(
+        kor: String? = nil,
+        en: String? = nil,
+        titleType: TopicTitleType = .today
+    ) {
         let korText = kor ?? "한글 주제 아직 없지롱"
         let enText  = en  ?? "Bringing up the English topic"
-        
+
+        titleLabel.text = titleType.title
         topicKorLabel.attributedText = .pretendard(.body_m_15, text: korText)
         topicEnLabel.attributedText  = .pretendard(.body_m_15, text: enText)
         

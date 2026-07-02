@@ -8,7 +8,7 @@ import Foundation
 public enum AnalyticsEvent {
     case pageviewFeed(entryId: String)
     case pageviewPostedDiary(entryId: String)
-    case pageviewFeedback
+    case pageviewFeedback(page: Page)
     case pageviewDiaryWriting(
         entryId: String,
         backSource: BackSource,
@@ -34,7 +34,7 @@ public enum AnalyticsEvent {
     )
     case clickBackDiary(entryId: String, backSource: BackSource)
     case clickTextfield(entryId: String, inputType: TextInputType, timeToFirstInput: Int)
-    case clickFeedbackToggle(clickCount: Int, isEnabled: Bool)
+    case clickFeedbackToggle(page: Page, toggleClickCount: Int, toggleState: Bool)
     case bookmarkAction(entryId: String, entrySource: EntrySource, action: BookmarkAction)
     case toastAction(action: ToastAction, toastId: ToastId, entryId: String)
     case clickBackFeedback(entryId: String, backSource: BackSource)
@@ -57,7 +57,7 @@ extension AnalyticsEvent {
              .pageviewDiaryWriting:
             return "pageview"
         case .viewProfileUser:
-            return "viewe_profile_user"
+            return "view_profile_user"
         default:
             return snakeCaseName
         }
@@ -83,9 +83,9 @@ extension AnalyticsEvent {
                 "entry_id": entryId,
                 "tab_name": TabName.postedDiary.analyticsPropertyName
             ]
-        case .pageviewFeedback:
+        case let .pageviewFeedback(page):
             return [
-                "page": Page.feedback.analyticsPropertyName
+                "page": page.analyticsPropertyName
             ]
         case let .pageviewDiaryWriting(entryId, backSource, selectedDate, recommendedTopic):
             return [
@@ -144,10 +144,11 @@ extension AnalyticsEvent {
                 "text_input_type": inputType.analyticsPropertyName,
                 "time_to_first_input": timeToFirstInput
             ]
-        case let .clickFeedbackToggle(clickCount, isEnabled):
+        case let .clickFeedbackToggle(page, toggleClickCount, toggleState):
             return [
-                "toggle_click_count": clickCount,
-                "toggle_state": isEnabled
+                "page": page.analyticsPropertyName,
+                "toggle_click_count": toggleClickCount,
+                "toggle_state": toggleState
             ]
         case let .bookmarkAction(entryId, entrySource, action):
             return [
@@ -250,6 +251,7 @@ extension AnalyticsEvent {
         case userProfile
         case notification
         case feedback
+        case postedDiary
         case vocabulary
         case custom(String)
 
@@ -259,6 +261,7 @@ extension AnalyticsEvent {
             case .userProfile: return "user_profile"
             case .notification: return "notification"
             case .feedback: return "feedback"
+            case .postedDiary: return "posted_diary"
             case .vocabulary: return "vocabulary"
             case .custom(let value): return value
             }

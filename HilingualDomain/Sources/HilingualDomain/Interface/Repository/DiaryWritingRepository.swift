@@ -9,4 +9,5 @@ import Combine
 
 public protocol DiaryWritingRepository {
     func postDiaryWriting(_ entity: DiaryWritingEntity) -> AnyPublisher<DiaryWritingResponseEntity, Error>
+    func postDiaryRecovery(_ entity: DiaryWritingEntity) -> AnyPublisher<DiaryWritingResponseEntity, Error>
 }

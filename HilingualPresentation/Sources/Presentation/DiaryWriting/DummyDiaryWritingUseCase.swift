@@ -13,6 +13,14 @@ public class DummyDiaryWritingUseCase: DiaryWritingUseCase {
     public init() {}
     
     public func postDiaryWriting(_ entity: DiaryWritingEntity) -> AnyPublisher<DiaryWritingResponseEntity, Error> {
+        makeMockResponse()
+    }
+
+    public func postDiaryRecovery(_ entity: DiaryWritingEntity) -> AnyPublisher<DiaryWritingResponseEntity, Error> {
+        makeMockResponse()
+    }
+
+    private func makeMockResponse() -> AnyPublisher<DiaryWritingResponseEntity, Error> {
         let mockResponse = DiaryWritingResponseEntity(diaryId: 123, isAdWatched: false)
 
         return Just(mockResponse)
