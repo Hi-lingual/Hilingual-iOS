@@ -68,6 +68,9 @@ public class BaseService<API: TargetType> {
                         case 401:
                             promise(.failure(.unauthorized))
 
+                        case 404:
+                            promise(.failure(.notFound))
+
                         case 400..<500:
                             if let serverError = try? JSONDecoder().decode(ServerError.self, from: response.data) {
                                 promise(.failure(.serverError(serverError)))
@@ -121,6 +124,9 @@ public class BaseService<API: TargetType> {
 
                     case 401:
                         promise(.failure(.unauthorized))
+
+                    case 404:
+                        promise(.failure(.notFound))
 
                     case 400..<500:
                         if let serverError = try? JSONDecoder().decode(ServerError.self, from: response.data) {
