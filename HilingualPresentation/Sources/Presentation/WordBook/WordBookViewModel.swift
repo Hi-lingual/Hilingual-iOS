@@ -27,6 +27,8 @@ public final class WordBookViewModel: BaseViewModel {
         let wordList: AnyPublisher<[(date: String, items: [PhraseData])], Never>
         let wordDetail: AnyPublisher<PhraseData, Never>
         let studyWords: AnyPublisher<[PhraseData], Never>
+        let loadError: AnyPublisher<Error, Never>
+        let actionError: AnyPublisher<Error, Never>
     }
 
     // MARK: - Dependencies
@@ -39,6 +41,8 @@ public final class WordBookViewModel: BaseViewModel {
     private let wordListSubject = CurrentValueSubject<[(date: String, items: [PhraseData])], Never>([])
     private let wordDetailSubject = PassthroughSubject<PhraseData, Never>()
     private let studyWordsSubject = PassthroughSubject<[PhraseData], Never>()
+    private let loadErrorSubject = PassthroughSubject<Error, Never>()
+    private let actionErrorSubject = PassthroughSubject<Error, Never>()
     private var currentSortOption: SortOption = .latest
 
     // MARK: - Init
@@ -94,7 +98,9 @@ public final class WordBookViewModel: BaseViewModel {
         return Output(
             wordList: wordListSubject.eraseToAnyPublisher(),
             wordDetail: wordDetailSubject.eraseToAnyPublisher(),
-            studyWords: studyWordsSubject.eraseToAnyPublisher()
+            studyWords: studyWordsSubject.eraseToAnyPublisher(),
+            loadError: loadErrorSubject.eraseToAnyPublisher(),
+            actionError: actionErrorSubject.eraseToAnyPublisher()
         )
     }
 
@@ -122,10 +128,13 @@ public final class WordBookViewModel: BaseViewModel {
                     return (date: date, items: phraseDataList)
                 }
             }
-            .replaceError(with: [])
-            .sink { [weak self] result in
+            .sink(receiveCompletion: { [weak self] completion in
+                if case .failure(let error) = completion {
+                    self?.loadErrorSubject.send(error)
+                }
+            }, receiveValue: { [weak self] result in
                 self?.wordListSubject.send(result)
-            }
+            })
             .store(in: &cancellables)
     }
 
@@ -147,8 +156,11 @@ public final class WordBookViewModel: BaseViewModel {
                     isMarked: $0.isMarked
                 )
             }
-            .sink(receiveCompletion: { _ in },
-                  receiveValue: { [weak self] in self?.wordDetailSubject.send($0) })
+            .sink(receiveCompletion: { [weak self] completion in
+                if case let .failure(error) = completion {
+                    self?.actionErrorSubject.send(error)
+                }
+            }, receiveValue: { [weak self] in self?.wordDetailSubject.send($0) })
             .store(in: &cancellables)
     }
 
@@ -160,7 +172,7 @@ public final class WordBookViewModel: BaseViewModel {
                 case .finished:
                     self?.updateBookmarkState(phraseId: phraseId, isBookmarked: isBookmarked)
                 case .failure(let error):
-                    print("북마크 토글 실패: \(error.localizedDescription)")
+                    self?.actionErrorSubject.send(error)
                 }
             }, receiveValue: { _ in
             })
@@ -210,15 +222,18 @@ public final class WordBookViewModel: BaseViewModel {
                         isMarked: entity.isMarked
                     )
                 }
-                .catch { _ in Empty<PhraseData, Never>() }
                 .eraseToAnyPublisher()
         }
 
         Publishers.MergeMany(publishers)
             .collect()
-            .sink { [weak self] words in
+            .sink(receiveCompletion: { [weak self] completion in
+                if case let .failure(error) = completion {
+                    self?.actionErrorSubject.send(error)
+                }
+            }, receiveValue: { [weak self] words in
                 self?.studyWordsSubject.send(words)
-            }
+            })
             .store(in: &cancellables)
     }
 }

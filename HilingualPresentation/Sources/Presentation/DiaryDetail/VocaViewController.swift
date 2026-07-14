@@ -9,6 +9,7 @@ import Foundation
 import UIKit
 import Combine
 import GoogleMobileAds
+import HilingualCore
 
 public final class RecommendedExpressionViewController: BaseUIViewController<RecommendedExpressionViewModel>, ScrollControllable {
 
@@ -131,15 +132,31 @@ public final class RecommendedExpressionViewController: BaseUIViewController<Rec
                     }
                 },
                 receiveValue: { [weak self] viewDataList in
+                    self?.errorPresenter.dismiss()
                     self?.recommendedExpressionView.configure(dataList: viewDataList)
                 }
             )
             .store(in: &cancellables)
 
-        output.errorMessage
+        output.loadError
             .receive(on: RunLoop.main)
-            .sink { [weak self] message in
+            .sink { [weak self] error in
+                self?.errorPresenter.show(error, form: .fullPage, page: .feedback) {
+                    self?.viewModel?.fetchRecommendedExpression()
+                }
+            }
+            .store(in: &cancellables)
+
+        output.bookmarkError
+            .receive(on: RunLoop.main)
+            .sink { [weak self] error in
                 guard let self else { return }
+
+                if HilingualError.from(error) == .network {
+                    self.errorPresenter.show(error, form: .toast, page: .feedback)
+                    return
+                }
+
                 let toast = ToastMessage()
                 self.view.addSubview(toast)
                 toast.configure(type: .withButton, message: "단어장이 모두 찼어요!", actionTitle: "비우러가기")

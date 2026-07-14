@@ -7,7 +7,7 @@
 
 import UIKit
 import Combine
-import Network
+import HilingualCore
 
 public class BaseUIViewController<VM: BaseViewBindable>: UIViewController, UIGestureRecognizerDelegate {
 
@@ -16,8 +16,7 @@ public class BaseUIViewController<VM: BaseViewBindable>: UIViewController, UIGes
     public var viewModel: VM?
     public let diContainer: any ViewControllerFactory
 
-    private let networkMonitor = NWPathMonitor()
-    private let networkQueue = DispatchQueue(label: "NetworkMonitor")
+    lazy var errorPresenter = ErrorPresenter(host: self)
 
     // MARK: - Init
     public init(viewModel: VM, diContainer: any ViewControllerFactory) {
@@ -27,8 +26,6 @@ public class BaseUIViewController<VM: BaseViewBindable>: UIViewController, UIGes
         bind(viewModel: viewModel)
         setupNavigationBar()
         observeSessionExpired()
-        observeServerError()
-        observeNetworkStatus()
         HilingualLog.debug("[VC LifeCycle] \(Self.self) init")
     }
 
@@ -89,46 +86,8 @@ public class BaseUIViewController<VM: BaseViewBindable>: UIViewController, UIGes
         }
     }
 
-    // MARK: - Server Error
-    
-    private func observeServerError() {
-        NotificationCenter.default.publisher(for: Notification.Name("ServerErrorOccurred"))
-            .compactMap { $0.userInfo?["message"] as? String }
-            .debounce(for: .milliseconds(300), scheduler: RunLoop.main)
-            .receive(on: RunLoop.main)
-            .sink { message in
-                DialogManager.shared.show(
-                    message: message,
-                    style: .error,
-                    popOnConfirm: true
-                )
-            }
-            .store(in: &cancellables)
-    }
-
-    // MARK: - Network Error
-
-    private func observeNetworkStatus() {
-        networkMonitor.pathUpdateHandler = { [weak self] path in
-            guard let self else { return }
-            if path.status == .unsatisfied {
-                DispatchQueue.main.async {
-                    self.handleNetworkDisconnected()
-                }
-            }
-        }
-        networkMonitor.start(queue: networkQueue)
-    }
-
-    @MainActor
-    private func handleNetworkDisconnected() {
-        DialogManager.shared.showNetworkError(
-            using: networkMonitor)
-    }
-
     // MARK: - Deinit
     deinit {
         HilingualLog.debug("[VC LifeCycle] \(Self.self) deinit")
-        networkMonitor.cancel()
     }
 }

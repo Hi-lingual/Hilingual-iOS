@@ -52,7 +52,17 @@ public final class NotificationDetailViewController: BaseUIViewController<Notifi
         output.detail
             .receive(on: DispatchQueue.main)
             .sink { [weak self] detail in
+                self?.errorPresenter.dismiss()
                 self?.detailView.configure(with: detail)
+            }
+            .store(in: &cancellables)
+
+        output.loadError
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] error in
+                self?.errorPresenter.show(error, form: .fullPage, page: .notificationDetail) {
+                    self?.viewModel?.fetchDetail()
+                }
             }
             .store(in: &cancellables)
     }

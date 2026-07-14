@@ -144,11 +144,28 @@ public final class FeedListViewController: BaseUIViewController<FeedViewModel> {
             .receive(on: RunLoop.main)
             .sink { [weak self] (feeds, haveFollowing) in
                 guard let self else { return }
+                self.errorPresenter.dismiss()
                 self.currentFeeds = feeds
                 self.feedCellView.apply(
                     items: feeds,
                     followingState: haveFollowing
                 )
+            }
+            .store(in: &cancellables)
+
+        output.loadError
+            .receive(on: RunLoop.main)
+            .sink { [weak self] error in
+                self?.errorPresenter.show(error, form: .fullPage, page: .feed) {
+                    self?.input.reload.send(())
+                }
+            }
+            .store(in: &cancellables)
+
+        output.actionError
+            .receive(on: RunLoop.main)
+            .sink { [weak self] error in
+                self?.errorPresenter.show(error, form: .modal, page: .feed)
             }
             .store(in: &cancellables)
     }

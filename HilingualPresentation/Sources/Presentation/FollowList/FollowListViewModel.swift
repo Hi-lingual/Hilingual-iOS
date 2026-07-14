@@ -40,9 +40,21 @@ public final class FollowListViewModel: BaseViewModel {
     }
     
     private let userUpdateSubject = PassthroughSubject<FollowUserModel, Never>()
-    
+
     public var userUpdatePublisher: AnyPublisher<FollowUserModel, Never> {
         return userUpdateSubject.eraseToAnyPublisher()
+    }
+
+    private let loadErrorSubject = PassthroughSubject<Error, Never>()
+
+    public var loadErrorPublisher: AnyPublisher<Error, Never> {
+        return loadErrorSubject.eraseToAnyPublisher()
+    }
+
+    private let actionErrorSubject = PassthroughSubject<Error, Never>()
+
+    public var actionErrorPublisher: AnyPublisher<Error, Never> {
+        return actionErrorSubject.eraseToAnyPublisher()
     }
     
     // MARK: - Private Properties
@@ -71,10 +83,11 @@ public final class FollowListViewModel: BaseViewModel {
     
     public struct Output {
         let followList: AnyPublisher<FollowListModel, Never>
+        let loadError: AnyPublisher<Error, Never>
     }
-    
+
     public lazy var input = Input()
-    public lazy var output = Output(followList: followListPublisher)
+    public lazy var output = Output(followList: followListPublisher, loadError: loadErrorPublisher)
     
     // MARK: - Bind Inputs
     
@@ -96,7 +109,9 @@ public final class FollowListViewModel: BaseViewModel {
     
     func fetchFollowers() {
         followListUseCase.fetchFollowers(targetUserId: targetUserId)
-            .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] followers in
+            .sink(receiveCompletion: { [weak self] completion in
+                if case let .failure(error) = completion { self?.loadErrorSubject.send(error) }
+            }, receiveValue: { [weak self] followers in
                 guard let self = self else { return }
                 self.originalFollowers = followers
                 let userModels = followers.map { self.mapToUserModel(from: $0, type: .follower) }
@@ -104,10 +119,12 @@ public final class FollowListViewModel: BaseViewModel {
             })
             .store(in: &cancellables)
     }
-    
+
     func fetchFollowing() {
         followListUseCase.fetchFollowings(targetUserId: targetUserId)
-            .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] following in
+            .sink(receiveCompletion: { [weak self] completion in
+                if case let .failure(error) = completion { self?.loadErrorSubject.send(error) }
+            }, receiveValue: { [weak self] following in
                 guard let self = self else { return }
                 self.originalFollowing = following
                 let userModels = following.map { self.mapToUserModel(from: $0, type: .following) }
@@ -132,7 +149,9 @@ public final class FollowListViewModel: BaseViewModel {
         actionPublisher
             .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { [weak self] completion in
-                guard self != nil else { return }
+                if case let .failure(error) = completion {
+                    self?.actionErrorSubject.send(error)
+                }
             }, receiveValue: { [weak self] success in
                 guard let self = self else { return }
                 user.isFollowing = shouldFollow

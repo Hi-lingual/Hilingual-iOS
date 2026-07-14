@@ -29,6 +29,9 @@ public final class SharedDiaryViewModel: BaseViewModel {
         let fetchDiaryResult: AnyPublisher<SharedDiaryEntity, Never>
         let errorMessage: AnyPublisher<String, Never>
         let blockSuccess: AnyPublisher<Void, Never>
+        let loadError: AnyPublisher<Error, Never>
+        let actionError: AnyPublisher<Error, Never>
+        let likeResult: AnyPublisher<(Int, Bool), Never>
     }
     
     // MARK: - Properties
@@ -41,6 +44,9 @@ public final class SharedDiaryViewModel: BaseViewModel {
     private let sharedDiarySubject = PassthroughSubject<SharedDiaryEntity, Never>()
     private let errorSubject = PassthroughSubject<String, Never>()
     private let blockSuccessSubject = PassthroughSubject<Void, Never>()
+    private let loadErrorSubject = PassthroughSubject<Error, Never>()
+    private let actionErrorSubject = PassthroughSubject<Error, Never>()
+    private let likeResultSubject = PassthroughSubject<(Int, Bool), Never>()
     
     public init(diaryId: Int,
                 sharedDiaryUseCase: SharedDiaryUseCase, toggleLikeUseCase: ToggleLikeUseCase, publishDiaryUseCase: PublishDiaryUseCase, blockUserUseCase: BlockUserUseCase) {
@@ -54,21 +60,7 @@ public final class SharedDiaryViewModel: BaseViewModel {
     func transform(input: Input) -> Output {
         input.viewDidLoad
             .sink { [weak self] in
-                guard let self = self else { return }
-                self.sharedDiaryUseCase.fetchSharedDiary(diaryId: diaryId)
-                    .sink(receiveCompletion: { [weak self] completion in
-                        switch completion {
-                        case .failure(let error):
-                            self?.errorSubject.send("\(error)")
-                        case .finished:
-                            break
-                        }
-                    }, receiveValue: { [weak self] entity in
-                        let sharedDiaryData = entity
-                        self?.sharedDiarySubject.send(sharedDiaryData)
-                    })
-                    .store(in: &self.cancellables)
-                
+                self?.fetchSharedDiary()
             }
             .store(in: &cancellables)
         
@@ -99,18 +91,33 @@ public final class SharedDiaryViewModel: BaseViewModel {
         return Output(
             fetchDiaryResult: sharedDiarySubject.eraseToAnyPublisher(),
             errorMessage: errorSubject.eraseToAnyPublisher(),
-            blockSuccess: blockSuccessSubject.eraseToAnyPublisher()
+            blockSuccess: blockSuccessSubject.eraseToAnyPublisher(),
+            loadError: loadErrorSubject.eraseToAnyPublisher(),
+            actionError: actionErrorSubject.eraseToAnyPublisher(),
+            likeResult: likeResultSubject.eraseToAnyPublisher()
         )
+    }
+
+    func fetchSharedDiary() {
+        sharedDiaryUseCase.fetchSharedDiary(diaryId: diaryId)
+            .sink(receiveCompletion: { [weak self] completion in
+                if case let .failure(error) = completion {
+                    self?.loadErrorSubject.send(error)
+                }
+            }, receiveValue: { [weak self] entity in
+                self?.sharedDiarySubject.send(entity)
+            })
+            .store(in: &cancellables)
     }
     
     private func toggleLike(diaryId: Int, isLiked: Bool) {
         toggleLikeUseCase.toggleLike(diaryId: diaryId, isLiked: isLiked)
             .sink(receiveCompletion: { [weak self] completion in
                 if case let .failure(error) = completion {
-                    self?.errorSubject.send("공감하기 실패: \(error.localizedDescription)")
+                    self?.actionErrorSubject.send(error)
                 }
-            }, receiveValue: { _ in
-
+            }, receiveValue: { [weak self] _ in
+                self?.likeResultSubject.send((diaryId, isLiked))
             })
             .store(in: &cancellables)
     }
@@ -119,7 +126,7 @@ public final class SharedDiaryViewModel: BaseViewModel {
         publishDiaryUseCase.publishDiary(diaryId: diaryId)
             .sink(receiveCompletion: { [weak self] completion in
                 if case let .failure(error) = completion {
-                    self?.errorSubject.send("공개 상태 변경 실패: \(error.localizedDescription)")
+                    self?.actionErrorSubject.send(error)
                 }
             }, receiveValue: { _ in
                 
@@ -131,7 +138,7 @@ public final class SharedDiaryViewModel: BaseViewModel {
         publishDiaryUseCase.unpublishDiary(diaryId: diaryId)
             .sink(receiveCompletion: { [weak self] completion in
                 if case let .failure(error) = completion {
-                    self?.errorSubject.send("비공개 전환 실패: \(error.localizedDescription)")
+                    self?.actionErrorSubject.send(error)
                 }
             }, receiveValue: { _ in
                 
@@ -143,7 +150,7 @@ public final class SharedDiaryViewModel: BaseViewModel {
         blockUserUseCase.blockUser(id: Int(userId))
             .sink(receiveCompletion: { [weak self] completion in
                 if case let .failure(error) = completion {
-                    self?.errorSubject.send("차단 실패: \(error.localizedDescription)")
+                    self?.actionErrorSubject.send(error)
                 }
             }, receiveValue: { [weak self] _ in
                 self?.blockSuccessSubject.send(())

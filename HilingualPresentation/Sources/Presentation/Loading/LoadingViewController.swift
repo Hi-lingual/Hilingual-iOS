@@ -8,6 +8,7 @@
 import Foundation
 import Combine
 import GoogleMobileAds
+import HilingualCore
 
 public final class LoadingViewController: BaseUIViewController<LoadingViewModel> {
     
@@ -79,6 +80,7 @@ public final class LoadingViewController: BaseUIViewController<LoadingViewModel>
         case .success:
             goToNextView()
         case .error:
+            AmplitudeManager.shared.send(.clickErrorCTA(page: .aiFeedback, action: .feedbackRetry))
             retryButtonTapped()
         }
     }
@@ -120,7 +122,14 @@ public final class LoadingViewController: BaseUIViewController<LoadingViewModel>
         
         output.goToHome
             .receive(on: RunLoop.main)
-            .sink { [weak self] in self?.goToHomeView() }
+            .sink { [weak self] in
+                guard let self else { return }
+                if self.loadingView.currentState == .error {
+                    self.navigationController?.popViewController(animated: true)
+                } else {
+                    self.goToHomeView()
+                }
+            }
             .store(in: &cancellables)
     }
     
@@ -223,6 +232,10 @@ public final class LoadingViewController: BaseUIViewController<LoadingViewModel>
         navigationController?.popToRootViewController(animated: true)
     }
 }
+
+// MARK: - OfflineNavigable
+
+extension LoadingViewController: OfflineNavigable {}
 
 // MARK: - FullScreenContentDelegate
 

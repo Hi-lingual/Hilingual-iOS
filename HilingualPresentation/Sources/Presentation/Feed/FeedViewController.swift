@@ -33,10 +33,6 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
         vc.onLikeTapped = { [weak self] diaryId, isLiked in
             guard let self else { return }
             self.input.likeTapped.send((diaryId, isLiked))
-
-            if isLiked {
-                self.showToastMessage(message: "공감한 일기에 추가되었어요.", diaryId: diaryId)
-            }
         }
         return vc
     }()
@@ -55,10 +51,6 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
         vc.onLikeTapped = { [weak self] diaryId, isLiked in
             guard let self else { return }
             self.input.likeTapped.send((diaryId, isLiked))
-
-            if isLiked {
-                self.showToastMessage(message: "공감한 일기에 추가되었어요.", diaryId: diaryId)
-            }
         }
         return vc
     }()
@@ -98,6 +90,21 @@ public final class FeedViewController: BaseUIViewController<FeedViewModel> {
             .receive(on: RunLoop.main)
             .sink { [weak self] url in
                 self?.feedView.updateProfileImage(url)
+            }
+            .store(in: &viewModel.cancellables)
+
+        output.likeResult
+            .receive(on: RunLoop.main)
+            .sink { [weak self] (diaryId, isLiked) in
+                guard let self, isLiked else { return }
+                self.showToastMessage(message: "공감한 일기에 추가되었어요.", diaryId: diaryId)
+            }
+            .store(in: &viewModel.cancellables)
+
+        output.actionError
+            .receive(on: RunLoop.main)
+            .sink { [weak self] error in
+                self?.errorPresenter.show(error, form: .modal, page: .feed)
             }
             .store(in: &viewModel.cancellables)
     }

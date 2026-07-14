@@ -82,6 +82,13 @@ public final class OnBoardingViewController: BaseUIViewController<OnBoardingView
                 changeRootVC(homeVC, animated: true)
             }
             .store(in: &cancellables)
+
+        output.signUpError
+            .receive(on: RunLoop.main)
+            .sink { [weak self] error in
+                self?.errorPresenter.show(error, form: .modal, page: .onboarding)
+            }
+            .store(in: &cancellables)
     }
 
     // MARK: - Private Methods

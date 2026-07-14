@@ -33,6 +33,8 @@ public final class FeedProfileViewModel: BaseViewModel, BaseViewModelType {
         let buttonState: AnyPublisher<FollowButtonState?, Never>
         let publishResult: AnyPublisher<Bool, Never>
         let likeResult: AnyPublisher<(Int, Bool), Never>
+        let loadError: AnyPublisher<Error, Never>
+        let actionError: AnyPublisher<Error, Never>
     }
     
     // MARK: - Dependencies
@@ -56,6 +58,8 @@ public final class FeedProfileViewModel: BaseViewModel, BaseViewModelType {
     private let buttonStateSubject = CurrentValueSubject<FollowButtonState?, Never>(nil)
     private let publishSubject = PassthroughSubject<Bool, Never>()
     private let likeSubject = PassthroughSubject<(Int, Bool), Never>()
+    private let loadErrorSubject = PassthroughSubject<Error, Never>()
+    private let actionErrorSubject = PassthroughSubject<Error, Never>()
     
     // MARK: - Init
     
@@ -83,14 +87,13 @@ public final class FeedProfileViewModel: BaseViewModel, BaseViewModelType {
     // MARK: - Transform
     
     public func transform(input: Input) -> Output {
-        /// 프로필
         input.reloadProfile
             .flatMap { [weak self] _ -> AnyPublisher<FeedProfileInfoEntity?, Never> in
                 guard let self else { return Just(nil).eraseToAnyPublisher() }
                 return self.profileInfoUseCase.execute(targetUserId: self.targetUserId)
                     .map { Optional($0) }
                     .catch { [weak self] error -> Just<FeedProfileInfoEntity?> in
-                        self?.errorSubject.send("프로필 정보 불러오기 실패: \(error.localizedDescription)")
+                        self?.loadErrorSubject.send(error)
                         return Just(nil)
                     }
                     .eraseToAnyPublisher()
@@ -104,7 +107,6 @@ public final class FeedProfileViewModel: BaseViewModel, BaseViewModelType {
             }
             .store(in: &cancellables)
         
-        /// 피드
         input.reloadFeeds
             .flatMap { [weak self] _ -> AnyPublisher<[FeedModel], Never> in
                 guard let self else { return Just([]).eraseToAnyPublisher() }
@@ -161,7 +163,7 @@ public final class FeedProfileViewModel: BaseViewModel, BaseViewModelType {
                 guard let self else { return Empty().eraseToAnyPublisher() }
                 return self.followUseCase.follow(userId: Int(self.targetUserId))
                     .catch { [weak self] error -> AnyPublisher<Void, Never> in
-                        self?.errorSubject.send("팔로우 실패: \(error.localizedDescription)")
+                        self?.actionErrorSubject.send(error)
                         return Empty<Void, Never>().eraseToAnyPublisher()
                     }
                     .eraseToAnyPublisher()
@@ -177,7 +179,7 @@ public final class FeedProfileViewModel: BaseViewModel, BaseViewModelType {
                 guard let self else { return Empty().eraseToAnyPublisher() }
                 return self.followUseCase.unfollow(userId: Int(self.targetUserId))
                     .catch { [weak self] error -> AnyPublisher<Bool, Never> in
-                        self?.errorSubject.send("언팔로우 실패: \(error.localizedDescription)")
+                        self?.actionErrorSubject.send(error)
                         return Empty<Bool, Never>().eraseToAnyPublisher()
                     }
                     .eraseToAnyPublisher()
@@ -192,7 +194,7 @@ public final class FeedProfileViewModel: BaseViewModel, BaseViewModelType {
                 guard let self else { return Empty().eraseToAnyPublisher() }
                 return self.blockUserUseCase.blockUser(id: Int(self.targetUserId))
                     .catch { [weak self] error -> AnyPublisher<Void, Never> in
-                        self?.errorSubject.send("차단 실패: \(error.localizedDescription)")
+                        self?.actionErrorSubject.send(error)
                         return Empty<Void, Never>().eraseToAnyPublisher()
                     }
                     .eraseToAnyPublisher()
@@ -207,7 +209,7 @@ public final class FeedProfileViewModel: BaseViewModel, BaseViewModelType {
                 guard let self else { return Empty().eraseToAnyPublisher() }
                 return self.blockUserUseCase.unblockUser(id: Int(self.targetUserId))
                     .catch { [weak self] error -> AnyPublisher<Void, Never> in
-                        self?.errorSubject.send("차단 해제 실패: \(error.localizedDescription)")
+                        self?.actionErrorSubject.send(error)
                         return Empty<Void, Never>().eraseToAnyPublisher()
                     }
                     .eraseToAnyPublisher()
@@ -225,7 +227,9 @@ public final class FeedProfileViewModel: BaseViewModel, BaseViewModelType {
             isEmpty: isEmptySubject.eraseToAnyPublisher(),
             buttonState: buttonStateSubject.eraseToAnyPublisher(),
             publishResult: publishSubject.eraseToAnyPublisher(),
-            likeResult: likeSubject.eraseToAnyPublisher()
+            likeResult: likeSubject.eraseToAnyPublisher(),
+            loadError: loadErrorSubject.eraseToAnyPublisher(),
+            actionError: actionErrorSubject.eraseToAnyPublisher()
         )
     }
     
@@ -264,7 +268,7 @@ public final class FeedProfileViewModel: BaseViewModel, BaseViewModelType {
         publishDiaryUseCase.unpublishDiary(diaryId: diaryId)
             .map { _ in diaryId }
             .catch { [weak self] error -> AnyPublisher<Int, Never> in
-                self?.errorSubject.send("공개 상태 변경 실패: \(error.localizedDescription)")
+                self?.actionErrorSubject.send(error)
                 return Empty().eraseToAnyPublisher()
             }
             .sink { [weak self] deletedId in
@@ -281,7 +285,7 @@ public final class FeedProfileViewModel: BaseViewModel, BaseViewModelType {
         toggleLikeUseCase.toggleLike(diaryId: diaryId, isLiked: isLiked)
             .map { _ in (diaryId, !isLiked) }
             .catch { [weak self] error -> AnyPublisher<(Int, Bool), Never> in
-                self?.errorSubject.send("공감하기 실패: \(error.localizedDescription)")
+                self?.actionErrorSubject.send(error)
                 return Empty<(Int, Bool), Never>().eraseToAnyPublisher()
             }
             .sink { [weak self] result in

@@ -23,6 +23,7 @@ public final class EditProfileViewModel: BaseViewModel {
         public let profileImageUploadError: AnyPublisher<Error, Never>
         public let withdrawSuccess: AnyPublisher<Void, Never>
         public let withdrawError: AnyPublisher<Error, Never>
+        public let loadError: AnyPublisher<Error, Never>
     }
 
     // MARK: - Properties
@@ -36,6 +37,7 @@ public final class EditProfileViewModel: BaseViewModel {
     private let profileImageUploadErrorSubject = PassthroughSubject<Error, Never>()
     private let withdrawSuccessSubject = PassthroughSubject<Void, Never>()
     private let withdrawErrorSubject = PassthroughSubject<Error, Never>()
+    private let loadErrorSubject = PassthroughSubject<Error, Never>()
 
     // MARK: - Init
 
@@ -79,7 +81,8 @@ public final class EditProfileViewModel: BaseViewModel {
             profileImageUploadSuccess: profileImageUploadSuccessSubject.eraseToAnyPublisher(),
             profileImageUploadError: profileImageUploadErrorSubject.eraseToAnyPublisher(),
             withdrawSuccess: withdrawSuccessSubject.eraseToAnyPublisher(),
-            withdrawError: withdrawErrorSubject.eraseToAnyPublisher()
+            withdrawError: withdrawErrorSubject.eraseToAnyPublisher(),
+            loadError: loadErrorSubject.eraseToAnyPublisher()
         )
     }
 
@@ -108,12 +111,12 @@ public final class EditProfileViewModel: BaseViewModel {
 
     // MARK: - Private
 
-    private func fetchUserProfile() {
+    func fetchUserProfile() {
         fetchUserProfileUseCase.fetchMyProfile()
             .sink(
-                receiveCompletion: { completion in
+                receiveCompletion: { [weak self] completion in
                     if case .failure(let error) = completion {
-                        print("❌ 유저 정보 불러오기 실패: \(error)")
+                        self?.loadErrorSubject.send(error)
                     }
                 },
                 receiveValue: { [weak self] profile in

@@ -22,6 +22,7 @@ public final class OnBoardingViewModel: BaseViewModel {
         let nicknameState: AnyPublisher<nickNameTextField.State, Never>
         let startButtonEnabled: AnyPublisher<Bool, Never>
         let signUpResult: AnyPublisher<Void, Never>
+        let signUpError: AnyPublisher<Error, Never>
     }
 
     // MARK: - Private
@@ -30,6 +31,7 @@ public final class OnBoardingViewModel: BaseViewModel {
     private let deviceUseCase: DeviceUseCase
     private let uploadImageUseCase: UploadImageUseCase
     private let navigateToHomeSubject = PassthroughSubject<Void, Never>()
+    private let signUpErrorSubject = PassthroughSubject<Error, Never>()
     private var latestValidNickname: String = ""
     public var selectedImageData: Data?
     private var latestFileKey: String = ""
@@ -114,7 +116,8 @@ public final class OnBoardingViewModel: BaseViewModel {
         return Output(
             nicknameState: nicknameState.eraseToAnyPublisher(),
             startButtonEnabled: isStartButtonEnabled.eraseToAnyPublisher(),
-            signUpResult: navigateToHomeSubject.eraseToAnyPublisher()
+            signUpResult: navigateToHomeSubject.eraseToAnyPublisher(),
+            signUpError: signUpErrorSubject.eraseToAnyPublisher()
         )
     }
 
@@ -151,7 +154,10 @@ public final class OnBoardingViewModel: BaseViewModel {
             .handleEvents(receiveOutput: { [weak self] in
                 self?.handleSignUpSuccess()
             })
-            .catch { _ in Empty<Void, Never>() }
+            .catch { [weak self] error -> Empty<Void, Never> in
+                self?.signUpErrorSubject.send(error)
+                return Empty<Void, Never>()
+            }
             .eraseToAnyPublisher()
     }
 
@@ -171,7 +177,10 @@ public final class OnBoardingViewModel: BaseViewModel {
         .handleEvents(receiveOutput: { [weak self] in
             self?.handleSignUpSuccess()
         })
-        .catch { _ in Empty<Void, Never>() }
+        .catch { [weak self] error -> Empty<Void, Never> in
+            self?.signUpErrorSubject.send(error)
+            return Empty<Void, Never>()
+        }
         .eraseToAnyPublisher()
     }
 

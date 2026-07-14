@@ -59,6 +59,7 @@ public final class TabBarViewController: UIViewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
+        NetworkMonitor.shared.start()
         setupChildViewControllers()
         setupUI()
         setupLayout()
@@ -84,7 +85,7 @@ public final class TabBarViewController: UIViewController {
     }
 
     private func makeNavigationController(root: UIViewController) -> UINavigationController {
-        let nav = UINavigationController(rootViewController: root)
+        let nav = NetworkAwareNavigationController(rootViewController: root)
         nav.delegate = self
         return nav
     }
