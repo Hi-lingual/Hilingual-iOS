@@ -21,26 +21,11 @@ extension NetworkError {
         case .networkFail:
             return .network
 
-        case .serverError(let serverError):
-            return DataNotFoundPolicy.contains(code: serverError.code) ? .dataNotFound : .server
+        case .serverError:
+            return .server
 
         case .timeout, .decoding, .unknown, .forbidden:
             return .server
         }
-    }
-}
-
-enum DataNotFoundPolicy {
-    private static let codes: Set<Int> = [
-        40403,
-        40404,
-        40409,
-        40410,
-        40411,
-        40412
-    ]
-
-    static func contains(code: Int) -> Bool {
-        codes.contains(code)
     }
 }
