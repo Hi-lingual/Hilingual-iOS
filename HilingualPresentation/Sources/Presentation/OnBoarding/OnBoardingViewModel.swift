@@ -7,6 +7,7 @@
 
 import Foundation
 import Combine
+import HilingualCore
 import HilingualDomain
 
 public final class OnBoardingViewModel: BaseViewModel {
@@ -133,7 +134,7 @@ public final class OnBoardingViewModel: BaseViewModel {
     private func signUpWithImage(data: Data, adAgree: Bool) -> AnyPublisher<Void, Never> {
         uploadImageUseCase
             .execute(data: data, contentType: "image/jpeg", purpose: "PROFILE_UPLOAD")
-            .flatMap { [weak self] fileKey -> AnyPublisher<Void, Error> in
+            .flatMap { [weak self] fileKey -> AnyPublisher<Int64, Error> in
                 guard let self else {
                     return Fail(error: NSError(domain: "OnBoardingViewModel", code: -1)).eraseToAnyPublisher()
                 }
@@ -144,16 +145,17 @@ public final class OnBoardingViewModel: BaseViewModel {
                     fileKey: fileKey
                 )
             }
-            .flatMap { [weak self] _ -> AnyPublisher<Void, Error> in
+            .flatMap { [weak self] userId -> AnyPublisher<Int64, Error> in
                 guard let self else {
                     return Fail(error: NSError(domain: "OnBoardingViewModel", code: -1)).eraseToAnyPublisher()
                 }
 
-                return self.syncDeviceAfterSignUp()
+                return self.syncDeviceAfterSignUp().map { userId }.eraseToAnyPublisher()
             }
-            .handleEvents(receiveOutput: { [weak self] in
-                self?.handleSignUpSuccess()
+            .handleEvents(receiveOutput: { [weak self] userId in
+                self?.handleSignUpSuccess(userId: userId)
             })
+            .map { _ in () }
             .catch { [weak self] error -> Empty<Void, Never> in
                 self?.signUpErrorSubject.send(error)
                 return Empty<Void, Never>()
@@ -167,16 +169,17 @@ public final class OnBoardingViewModel: BaseViewModel {
             adAlarmAgree: adAgree,
             fileKey: nil
         )
-        .flatMap { [weak self] _ -> AnyPublisher<Void, Error> in
+        .flatMap { [weak self] userId -> AnyPublisher<Int64, Error> in
             guard let self else {
                 return Fail(error: NSError(domain: "OnBoardingViewModel", code: -1)).eraseToAnyPublisher()
             }
 
-            return self.syncDeviceAfterSignUp()
+            return self.syncDeviceAfterSignUp().map { userId }.eraseToAnyPublisher()
         }
-        .handleEvents(receiveOutput: { [weak self] in
-            self?.handleSignUpSuccess()
+        .handleEvents(receiveOutput: { [weak self] userId in
+            self?.handleSignUpSuccess(userId: userId)
         })
+        .map { _ in () }
         .catch { [weak self] error -> Empty<Void, Never> in
             self?.signUpErrorSubject.send(error)
             return Empty<Void, Never>()
@@ -184,8 +187,11 @@ public final class OnBoardingViewModel: BaseViewModel {
         .eraseToAnyPublisher()
     }
 
-    private func handleSignUpSuccess() {
+    private func handleSignUpSuccess(userId: Int64) {
         UserDefaults.standard.set(true, forKey: "isProfileCompleted")
+        Task { @MainActor in
+            AmplitudeManager.shared.updateUserId(userId)
+        }
         navigateToHomeSubject.send()
     }
 
