@@ -48,6 +48,41 @@ public final class SplashViewModel: BaseViewModel {
         self.tokenStore = tokenStore
         self.socialLoginUseCase = socialLoginUseCase
         self.deviceUseCase = deviceUseCase
+        super.init()
+        setupFCMTokenSync()
+    }
+    
+    // MARK: - FCM Token Sync
+    
+    private func setupFCMTokenSync() {
+        FCMTokenManager.shared.onTokenUpdated = { [weak self] token in
+            self?.syncFCMTokenIfNeeded(token)
+        }
+        
+        if let existingToken = FCMTokenManager.shared.currentToken, !existingToken.isEmpty {
+            syncFCMTokenIfNeeded(existingToken)
+        }
+    }
+    
+    private func syncFCMTokenIfNeeded(_ token: String) {
+        let accessToken = tokenStore.loadAccessToken()
+        guard !accessToken.isEmpty else {
+            print("[LoginVM][FCM] 로그인 전 → sync 스킵")
+            return
+        }
+        
+        deviceUseCase.updateFcmToken(fcmToken: token)
+            .sink(
+                receiveCompletion: { completion in
+                    if case let .failure(error) = completion {
+                        print("[LoginVM][FCM] sync 실패: \(error.localizedDescription)")
+                    }
+                },
+                receiveValue: { _ in
+                    print("[LoginVM][FCM] sync 성공")
+                }
+            )
+            .store(in: &cancellables)
     }
 
     // MARK: - Transform

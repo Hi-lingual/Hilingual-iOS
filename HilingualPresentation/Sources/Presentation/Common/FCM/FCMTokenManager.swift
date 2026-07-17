@@ -8,6 +8,13 @@
 public final class FCMTokenManager: Sendable {
     public static let shared = FCMTokenManager()
     private init() {}
-    
-    public nonisolated(unsafe) var currentToken: String?
+
+    public nonisolated(unsafe) var onTokenUpdated: ((String) -> Void)?
+
+    public nonisolated(unsafe) var currentToken: String? {
+        didSet {
+            guard let token = currentToken, !token.isEmpty else { return }
+            onTokenUpdated?(token)
+        }
+    }
 }
