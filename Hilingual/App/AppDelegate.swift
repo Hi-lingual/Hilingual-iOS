@@ -66,23 +66,21 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
 
     nonisolated func userNotificationCenter(
         _ center: UNUserNotificationCenter,
-        willPresent notification: UNNotification,
-        withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
-    ) {
+        willPresent notification: UNNotification
+    ) async -> UNNotificationPresentationOptions {
         let userInfo = notification.request.content.userInfo
         print("🔔 [앱 포그라운드] 푸시 수신!")
         print("📱 제목: \(notification.request.content.title)")
         print("📱 본문: \(notification.request.content.body)")
         print("📱 데이터: \(userInfo)")
 
-        completionHandler([.banner, .sound, .badge])
+        return [.banner, .sound, .badge]
     }
 
     nonisolated func userNotificationCenter(
         _ center: UNUserNotificationCenter,
-        didReceive response: UNNotificationResponse,
-        withCompletionHandler completionHandler: @escaping () -> Void
-    ) {
+        didReceive response: UNNotificationResponse
+    ) async {
         let userInfo = response.notification.request.content.userInfo
         print("🔔 [푸시 탭됨!]")
         print("📱 전체 데이터: \(userInfo)")
@@ -91,16 +89,13 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
               let url = URL(string: link),
               let destination = DeeplinkParser.parse(url: url) else {
             print("⚠️ link 파싱 실패")
-            completionHandler()
             return
         }
 
         print("[Deeplink] 푸시 탭 → \(destination)")
 
-        Task { @MainActor in
+        await MainActor.run {
             DeeplinkManager.shared.pendingDestination = destination
         }
-
-        completionHandler()
     }
 }
