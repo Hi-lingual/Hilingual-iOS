@@ -23,7 +23,6 @@
 		E5C84AC92E1538C700CBD669 /* AppDIContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5C84AC82E1538C700CBD669 /* AppDIContainer.swift */; };
 		E5CBCFB42EC4B3E100475E81 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = E5CBCFB32EC4B3E100475E81 /* FirebaseCore */; };
 		E5CBCFB62EC4B3E100475E81 /* FirebaseRemoteConfig in Frameworks */ = {isa = PBXBuildFile; productRef = E5CBCFB52EC4B3E100475E81 /* FirebaseRemoteConfig */; };
-		E5CBCFB82EC4B4C900475E81 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = E5CBCFB72EC4B4C900475E81 /* GoogleService-Info.plist */; };
 		E5D5D0A92E171AC300DABE8D /* HilingualData in Frameworks */ = {isa = PBXBuildFile; productRef = E5D5D0A82E171AC300DABE8D /* HilingualData */; };
 		E5D5D0AC2E17289000DABE8D /* HilingualPresentation in Frameworks */ = {isa = PBXBuildFile; productRef = E5D5D0AB2E17289000DABE8D /* HilingualPresentation */; };
 /* End PBXBuildFile section */
@@ -57,7 +56,8 @@
 		E5C79B292E15282100E461C3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		E5C79B2D2E15282100E461C3 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		E5C84AC82E1538C700CBD669 /* AppDIContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDIContainer.swift; sourceTree = "<group>"; };
-		E5CBCFB72EC4B4C900475E81 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		E5CBCFB72EC4B4C900475E81 /* GoogleService-Info-Debug.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info-Debug.plist"; sourceTree = "<group>"; };
+		E5CBCFB82EC4B4C900475E81 /* GoogleService-Info-Release.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info-Release.plist"; sourceTree = "<group>"; };
 		E5D5D0A72E171AA900DABE8D /* HilingualData */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = HilingualData; sourceTree = "<group>"; };
 		E5D5D0AA2E1727BB00DABE8D /* HilingualPresentation */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = HilingualPresentation; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -130,7 +130,8 @@
 				E5C79B3B2E152AC800E461C3 /* App */,
 				E51DB2002E1CF7AD000C2BEA /* Hilingual.entitlements */,
 				E5C79B282E15282100E461C3 /* Info.plist */,
-				E5CBCFB72EC4B4C900475E81 /* GoogleService-Info.plist */,
+				E5CBCFB72EC4B4C900475E81 /* GoogleService-Info-Debug.plist */,
+				E5CBCFB82EC4B4C900475E81 /* GoogleService-Info-Release.plist */,
 			);
 			path = Hilingual;
 			sourceTree = "<group>";
@@ -157,6 +158,7 @@
 				E5C79B0A2E15281900E461C3 /* Sources */,
 				E5C79B0B2E15281900E461C3 /* Frameworks */,
 				E5C79B0C2E15281900E461C3 /* Resources */,
+				E5F1A0012FCB000100000001 /* Configure Firebase */,
 				E5151C022E15DEA700497996 /* Embed Frameworks */,
 			);
 			buildRules = (
@@ -228,7 +230,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				E51B4C542E28DC11000B16D0 /* AppIcon.xcassets in Resources */,
-				E5CBCFB82EC4B4C900475E81 /* GoogleService-Info.plist in Resources */,
 				E5C79B322E15282100E461C3 /* LaunchScreen.storyboard in Resources */,
 				3A091AEA2F8F923E004D27CF /* Debug.xcconfig in Resources */,
 				3A091AE82F8F922B004D27CF /* Release.xcconfig in Resources */,
@@ -236,6 +237,26 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		E5F1A0012FCB000100000001 /* Configure Firebase */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/Hilingual/GoogleService-Info-Debug.plist",
+				"$(SRCROOT)/Hilingual/GoogleService-Info-Release.plist",
+			);
+			name = "Configure Firebase";
+			outputPaths = (
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/GoogleService-Info.plist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -e\n\ncase \"${CONFIGURATION}\" in\n  Debug) FIREBASE_PLIST=\"${SRCROOT}/Hilingual/GoogleService-Info-Debug.plist\" ;;\n  Release) FIREBASE_PLIST=\"${SRCROOT}/Hilingual/GoogleService-Info-Release.plist\" ;;\n  *) echo \"error: Unsupported configuration ${CONFIGURATION}\" >&2; exit 1 ;;\nesac\n\nDESTINATION=\"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/GoogleService-Info.plist\"\nmkdir -p \"$(dirname \"${DESTINATION}\")\"\ncp \"${FIREBASE_PLIST}\" \"${DESTINATION}\"\n\necho \"Configured Firebase for ${CONFIGURATION}: ${FIREBASE_PLIST}\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		E5C79B0A2E15281900E461C3 /* Sources */ = {

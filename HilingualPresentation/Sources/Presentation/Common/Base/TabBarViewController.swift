@@ -91,19 +91,25 @@ public final class TabBarViewController: UIViewController {
 
             let homeNav = self.childNavigationControllers[0]
             DeeplinkManager.shared.handle(destination, from: homeNav, di: self.factory)
-            self.selectTab(at: 0)
+
+            if self.currentIndex != 0 {
+                self.selectTab(at: 0)
+            }
 
             return true
         }
     }
-    
+
     private func handlePendingDeeplink() {
         guard let destination = DeeplinkManager.shared.pendingDestination else { return }
         DeeplinkManager.shared.pendingDestination = nil
-        
+
         let homeNav = childNavigationControllers[0]
         DeeplinkManager.shared.handle(destination, from: homeNav, di: factory)
-        selectTab(at: 0)
+
+        if currentIndex != 0 {
+            selectTab(at: 0)
+        }
     }
 
     private func makeNavigationController(root: UIViewController) -> UINavigationController {
