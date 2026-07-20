@@ -109,14 +109,15 @@ final class WordBookView: BaseUIView {
         let button = UIButton(type: .system)
 
         var config = UIButton.Configuration.filled()
-        config.title = "단어 복습하기"
+        var title = AttributedString("단어 복습하기")
+        title.font = UIFont.pretendard(.body_sb_14)
+        config.attributedTitle = title
         config.baseForegroundColor = .white
         config.baseBackgroundColor = .hilingualBlack
         config.cornerStyle = .capsule
         config.contentInsets = NSDirectionalEdgeInsets(top: 14, leading: 24, bottom: 14, trailing: 24)
 
         button.configuration = config
-        button.titleLabel?.font = UIFont.pretendard(.body_sb_14)
         button.layer.shadowColor = UIColor.black.cgColor
         button.layer.shadowOpacity = 0.2
         button.layer.shadowRadius = 8
@@ -159,7 +160,7 @@ final class WordBookView: BaseUIView {
         )
         showHeaderView(true)
         tableView.refreshControl = refreshControl
-        setStudyButtonVisible(false)
+        setStudyButtonVisible(true)
     }
 
     override func setLayout() {

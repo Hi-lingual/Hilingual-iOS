@@ -9,6 +9,7 @@ import Foundation
 import Combine
 import UIKit
 import GoogleMobileAds
+import HilingualCore
 
 // MARK: - Model
 
@@ -35,18 +36,22 @@ public final class FeedbackViewController: BaseUIViewController<FeedbackViewMode
     var onDateLoaded: ((String) -> Void)?
     var publishedInfoLoaded: ((Bool) -> Void)?
     var onToggleChanged: ((Bool) -> Void)?
-
-    private var date: String = ""
-
-    private let feedbackView = FeedbackView()
-    private let dialog = Dialog()
-
     private let viewDidLoadSubject = PassthroughSubject<Void, Never>()
+    private var date: String = ""
+    
+    // Amplitude Tracking Properties
 
-    // MARK: - Ad
+    private var toggleClickCount: Int = 0
+    public var page: AnalyticsEvent.Page
 
+    // Ad
     public var showsAdBanner: Bool = false
     private var bannerView: BannerView?
+    
+    // MARK: - UI Components
+    
+    private let feedbackView = FeedbackView()
+    private let dialog = Dialog()
 
     private lazy var adPlaceholderImageView: UIImageView = {
         let imageView = UIImageView(image: UIImage(resource: .imgLoadingFeedIos))
@@ -56,13 +61,43 @@ public final class FeedbackViewController: BaseUIViewController<FeedbackViewMode
     }()
 
     // MARK: - LifeCycle
+    
+    public init(viewModel: FeedbackViewModel,
+                diContainer: any ViewControllerFactory,
+                diaryId: Int,
+                page: AnalyticsEvent.Page = .feedback) {
+        self.page = page
+        super.init(viewModel: viewModel, diContainer: diContainer)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 
     public override func viewDidLoad() {
         super.viewDidLoad()
         viewDidLoadSubject.send(())
+        AmplitudeManager.shared.send(.pageviewFeedback(page: self.page))
 
         feedbackView.onToggleChanged = { [weak self] isEnabled in
-            self?.onToggleChanged?(isEnabled)
+            guard let self = self else { return }
+
+            if let customToggleAction = self.onToggleChanged {
+                customToggleAction(isEnabled)
+            } else {
+                self.toggleClickCount += 1
+                AmplitudeManager.shared.send(
+                    .clickFeedbackToggle(
+                        page: self.page,
+                        toggleClickCount: self.toggleClickCount,
+                        toggleState: isEnabled
+                    )
+                )
+            }
+        }
+        
+        feedbackView.onDiaryPronunciationTapped = { isFirstPlay in
+            AmplitudeManager.shared.send(.clickDiaryPronunciationBtn(isFirstPlay: isFirstPlay))
         }
         
         if showsAdBanner {
@@ -72,6 +107,11 @@ public final class FeedbackViewController: BaseUIViewController<FeedbackViewMode
 
     public override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+    }
+
+    public override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        feedbackView.stopSpeech()
     }
 
     // MARK: - Custom Method

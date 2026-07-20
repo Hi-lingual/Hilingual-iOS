@@ -24,7 +24,8 @@ public protocol ViewControllerFactory {
     func makeDiaryWritingViewController(
         topicData: (String, String)?,
         selectedDate: Date,
-        shouldLoadDraft: Bool
+        shouldLoadDraft: Bool,
+        isRecoveryWriting: Bool
     ) -> DiaryWritingViewController
     func makeVerificationCodeViewController() -> VerificationCodeViewController
     func makeFollowListViewController(targetUserId:Int) -> FollowListViewController
@@ -41,6 +42,7 @@ public protocol ViewControllerFactory {
         userId: Int64
     ) -> FeedProfileViewController
     func makeEditProfileViewController() -> EditProfileViewController
+    func makeNicknameEditViewController(currentNickname: String) -> NicknameEditViewController
     func makeBlockUserViewController() -> BlockUserViewController
     func makeNotificationSettingViewController() -> NotificationSettingViewController
 }

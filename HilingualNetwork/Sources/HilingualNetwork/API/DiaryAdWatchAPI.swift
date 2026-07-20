@@ -16,7 +16,7 @@ extension DiaryAdWatchAPI: BaseTargetType {
     public var path: String {
         switch self {
         case .patchAdWatch(let diaryId):
-            return "/diaries/\(diaryId)/ad-watch"
+            return "/v1/diaries/\(diaryId)/ad-watch"
         }
     }
 

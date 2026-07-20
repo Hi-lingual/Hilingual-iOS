@@ -18,11 +18,11 @@ extension OnBoardingAPI: BaseTargetType {
     public var path: String {
         switch self {
         case .checkNickname:
-            return "/users/profile/check"
+            return "/v1/users/profile/check"
         case .registerProfile:
-            return "/users/profile"
+            return "/v1/users/profile"
         case .verifyCode:
-            return "/auth/verify"
+            return "/v1/auth/verify"
         }
     }
 

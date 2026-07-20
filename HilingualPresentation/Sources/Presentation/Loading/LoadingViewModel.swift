@@ -29,6 +29,7 @@ public final class LoadingViewModel: BaseViewModel {
     private var originalText: String?
     private var date: String?
     private var imageFile: Data?
+    private var isRecoveryWriting = false
     private var isAdWatched: Bool?
     
     private var startTime: Date?
@@ -90,11 +91,17 @@ public final class LoadingViewModel: BaseViewModel {
     // MARK: - External API
 
     @MainActor
-    public func postDiary(originalText: String, date: String, imageFile: Data?) {
+    public func postDiary(originalText: String, date: String, imageFile: Data?, isRecoveryWriting: Bool = false) {
         self.originalText = originalText
         self.date = date
         self.imageFile = imageFile
-        startDiaryRequest(originalText: originalText, date: date, imageFile: imageFile)
+        self.isRecoveryWriting = isRecoveryWriting
+        startDiaryRequest(
+            originalText: originalText,
+            date: date,
+            imageFile: imageFile,
+            isRecoveryWriting: isRecoveryWriting
+        )
     }
     
     @MainActor
@@ -103,10 +110,10 @@ public final class LoadingViewModel: BaseViewModel {
             .receive(on: DispatchQueue.main)
             .sink { completion in
                 if case .failure(let error) = completion {
-                    print("AdWatch patch failed: \(error)")
+                    print("🚨 광고 시청 반영 실패: \(error)")
                 }
             } receiveValue: { _ in
-                print("AdWatch patch success")
+                print("광고 시청 반영 성공")
             }
             .store(in: &cancellables)
     }
@@ -116,7 +123,12 @@ public final class LoadingViewModel: BaseViewModel {
     @MainActor
     private func retryFeedback() {
         guard let originalText, let date else { return }
-        startDiaryRequest(originalText: originalText, date: date, imageFile: imageFile)
+        startDiaryRequest(
+            originalText: originalText,
+            date: date,
+            imageFile: imageFile,
+            isRecoveryWriting: isRecoveryWriting
+        )
     }
 
     @MainActor
@@ -126,7 +138,7 @@ public final class LoadingViewModel: BaseViewModel {
     }
 
     @MainActor
-    private func startDiaryRequest(originalText: String, date: String, imageFile: Data?) {
+    private func startDiaryRequest(originalText: String, date: String, imageFile: Data?, isRecoveryWriting: Bool) {
         startLoadingState()
         let contentType = "image/jpeg"
 
@@ -143,7 +155,7 @@ public final class LoadingViewModel: BaseViewModel {
                             date: date,
                             fileKey: fileKey
                         )
-                        return self.diaryWritingUseCase.postDiaryWriting(entity)
+                        return self.postDiary(entity, isRecoveryWriting: isRecoveryWriting)
                     }
                 .receive(on: DispatchQueue.main)
                 .sink { [weak self] completion in
@@ -169,7 +181,7 @@ public final class LoadingViewModel: BaseViewModel {
                 fileKey: nil
             )
             
-            diaryWritingUseCase.postDiaryWriting(entity)
+            postDiary(entity, isRecoveryWriting: isRecoveryWriting)
                 .receive(on: DispatchQueue.main)
                 .sink { [weak self] completion in
                     guard let self else { return }
@@ -189,9 +201,27 @@ public final class LoadingViewModel: BaseViewModel {
         }
     }
 
+    private func postDiary(
+        _ entity: DiaryWritingEntity,
+        isRecoveryWriting: Bool
+    ) -> AnyPublisher<DiaryWritingResponseEntity, Error> {
+        if isRecoveryWriting {
+            return diaryWritingUseCase.postDiaryRecovery(entity)
+        }
+
+        return diaryWritingUseCase.postDiaryWriting(entity)
+    }
+
+    private func clearRecoveryDateIfNeeded() {
+        guard isRecoveryWriting, let date else { return }
+
+        HomeRecoveryStorage.removeRecoveredDateKey(date)
+    }
+
     @MainActor
     private func handleFeedbackCompleted(success: Bool) async {
         if success {
+            clearRecoveryDateIfNeeded()
             errorCount = 0
             stateSubject.send(.success)
         } else {

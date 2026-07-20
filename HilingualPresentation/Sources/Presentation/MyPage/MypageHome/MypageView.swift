@@ -72,7 +72,7 @@ final class MypageView: BaseUIView {
 
     let editButton: UIButton = {
         let button = UIButton()
-        button.setImage(UIImage(named: "ic_pen_24_ios", in: .module, compatibleWith: nil), for: .normal)
+        button.setImage(UIImage(resource: .icPen24Ios), for: .normal)
         button.tintColor = .gray400
         return button
     }()
@@ -327,9 +327,8 @@ final class MypageView: BaseUIView {
     // MARK: - Ad
 
     func updateBannerHeight(_ height: CGFloat) {
-        let clamped = min(height, 70)
-        bannerContainerView.isHidden = clamped <= 0
-        bannerHeightConstraint?.update(offset: max(clamped, 0))
+        bannerContainerView.isHidden = false
+        bannerHeightConstraint?.update(offset: 70)
     }
 }
 

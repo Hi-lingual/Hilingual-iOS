@@ -15,6 +15,7 @@ final class SelectedInfo: UIView {
     }
 
     public var currentDiaryId: Int?
+    public var canShowRecoveryView = true
     private var currentIsPublished: Bool?
     private var overlayView: UIControl?
     
@@ -23,27 +24,29 @@ final class SelectedInfo: UIView {
     var onDiaryPreviewTapped: (() -> Void)?
     var onMoreButtonTapped: ((Bool?) -> Void)?
     var onMenuAction: ((MenuAction, Int) -> Void)?
+    var onTapRecovery: (() -> Void)?
     
     // MARK: - UI Components
 
     internal let cardTopicView = CardTopicView()
     internal let cardPreview = CardPreview()
+    private let recoveryView = RecoveryView()
     
-    private let emptyDiaryView: EmptyView = {
-        let view = EmptyView()
-        view.configure(
-            message: "작성된 일기가 없어요.\n좋은 하루 보내셨기를 바라요!",
-            imageName: "img_diary_empty_ios",
-            font: .pretendard(.body_m_14)
-        )
-        return view
-    }()
-
     private let diaryLockView: EmptyView = {
         let view = EmptyView()
         view.configure(
             message: "아직 작성 가능한 시간이 아니에요.\n오늘의 일기를 작성해주세요!",
             imageName: "img_diary_lock_ios",
+            font: .pretendard(.body_m_14)
+        )
+        return view
+    }()
+    
+    private let noRecoveryTicketView: EmptyView = {
+        let view = EmptyView()
+        view.configure(
+            message: "이번 달 기록 살리기를 다 사용했어요.\n다음 달에 또 만나요!",
+            imageName: "img_diary_empty_ios",
             font: .pretendard(.body_m_14)
         )
         return view
@@ -145,8 +148,9 @@ final class SelectedInfo: UIView {
             headerStack,
             cardTopicView,
             cardPreview,
-            emptyDiaryView,
+            noRecoveryTicketView,
             diaryLockView,
+            recoveryView,
             menu
         )
 
@@ -157,7 +161,7 @@ final class SelectedInfo: UIView {
         spacer.setContentHuggingPriority(.defaultLow, for: .horizontal)
         spacer.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
 
-        [cardTopicView, cardPreview, emptyDiaryView, diaryLockView].forEach { $0.isHidden = true }
+        [cardTopicView, cardPreview, noRecoveryTicketView, diaryLockView, recoveryView].forEach { $0.isHidden = true }
         iconView.isHidden = true
         timeLeftStack.isHidden = true
 
@@ -168,6 +172,10 @@ final class SelectedInfo: UIView {
         let moreTapGesture = UITapGestureRecognizer(target: self, action: #selector(moreButtonTapped))
         moreImageView.addGestureRecognizer(moreTapGesture)
         moreImageView.isUserInteractionEnabled = true
+        
+        recoveryView.onTapRecovery = { [weak self] in
+            self?.onTapRecovery?()
+        }
     }
 
     private func setupLayout() {
@@ -178,7 +186,7 @@ final class SelectedInfo: UIView {
             $0.horizontalEdges.equalToSuperview().inset(16)
         }
 
-        [cardTopicView, emptyDiaryView, diaryLockView].forEach {
+        [cardTopicView, noRecoveryTicketView, diaryLockView, recoveryView].forEach {
             $0.snp.makeConstraints {
                 $0.top.equalTo(headerStack.snp.bottom).offset(16)
                 $0.horizontalEdges.equalToSuperview()
@@ -218,7 +226,7 @@ final class SelectedInfo: UIView {
     }
     
     public func reset() {
-        [cardPreview, cardTopicView, emptyDiaryView, diaryLockView, moreImageView, dot, notWrittenLabel, iconView, timeLeftStack].forEach {
+        [cardPreview, cardTopicView, noRecoveryTicketView, diaryLockView, recoveryView, moreImageView, dot, notWrittenLabel, iconView, timeLeftStack].forEach {
             $0.isHidden = true
         }
     }
@@ -232,7 +240,8 @@ final class SelectedInfo: UIView {
         remainingTime: Int,
         topicData: (kor: String, en: String)? = nil,
         diaryData: String? = nil,
-        imageURL: String? = nil
+        imageURL: String? = nil,
+        isRecovered: Bool = false
     ) {
         reset()
         
@@ -245,6 +254,7 @@ final class SelectedInfo: UIView {
         let calendar = Calendar.current
         let today = calendar.startOfDay(for: Date())
         let selectedDay = calendar.startOfDay(for: date)
+        let topicTitleType: CardTopicView.TopicTitleType = isRecovered ? .selectedDate : .today
         
         // 1. 일기가 있는 경우
         if let _ = diaryId {
@@ -268,21 +278,42 @@ final class SelectedInfo: UIView {
             diaryLockView.isHidden = false
         }
         
-        // 3. 남은 시간이 있고 주제가 있는 경우
+        // 3. Recovery로 해금된 경우
+        else if isRecovered, let topic = topicData {
+            setNotWrittenState("미작성")
+            cardTopicView.isHidden = false
+            cardTopicView.configure(kor: topic.kor, en: topic.en, titleType: topicTitleType)
+
+            iconView.isHidden = true
+            timeLeftStack.isHidden = true
+        }
+        
+        // 4. 남은 시간이 있고 주제가 있는 경우
         else if remainingTime > 0, let topic = topicData {
             setNotWrittenState("미작성")
             cardTopicView.isHidden = false
-            cardTopicView.configure(kor: topic.kor, en: topic.en)
+            cardTopicView.configure(kor: topic.kor, en: topic.en, titleType: topicTitleType)
             timeLeftLabel.attributedText = formatRemainingTime(remainingTime)
 
             iconView.isHidden = false
             timeLeftStack.isHidden = false
         }
         
-        // 4. 그 외의 모든 경우
+        // 5. 그 외의 모든 경우
         else {
             setNotWrittenState("미작성")
-            emptyDiaryView.isHidden = false
+
+            if canShowRecoveryView {
+                recoveryView.isHidden = false
+                noRecoveryTicketView.isHidden = true
+            } else {
+                noRecoveryTicketView.isHidden = false
+                recoveryView.isHidden = true
+            }
+
+            cardTopicView.isHidden = true
+            iconView.isHidden = true
+            timeLeftStack.isHidden = true
         }
     }
 
