@@ -341,7 +341,6 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         }
 
         UserDefaults.standard.set(false, forKey: "showHomeOnboarding")
-        return true
     }
     
     private func showNextHomeModal() {
