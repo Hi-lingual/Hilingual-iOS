@@ -17,9 +17,9 @@ extension DeviceAPI: BaseTargetType {
     public var path: String {
         switch self {
         case .updateDevice:
-            return "/users/device"
+            return "/v1/users/device"
         case .updateFcmToken:
-            return "/users/device/fcm-token"
+            return "/v1/users/device/fcm-token"
         }
     }
     

@@ -27,6 +27,10 @@ final class AppDIContainer: ViewControllerFactory {
         NetworkEnvironment.configure(AppBaseURLProvider())
     }
 
+    func configureFCMTokenSync() {
+        FCMTokenSyncService.shared.configure(deviceUseCase: makeDeviceUseCase())
+    }
+
     public func makeTabBarViewController() -> HilingualPresentation.TabBarViewController {
         return TabBarViewController(diContainer: self)
     }

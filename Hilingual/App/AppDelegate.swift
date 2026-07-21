@@ -26,7 +26,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 //            UserDefaults.standard.removeObject(forKey: key.description)
 //        }
         _ = CoreDataStorage.shared
-        
+
+        AppDIContainer.shared.configureFCMTokenSync()
+
         Messaging.messaging().delegate = self
         UNUserNotificationCenter.current().delegate = self
         UIApplication.shared.registerForRemoteNotifications()

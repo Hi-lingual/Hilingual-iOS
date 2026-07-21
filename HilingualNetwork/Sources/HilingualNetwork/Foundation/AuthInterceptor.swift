@@ -62,7 +62,6 @@ public final class AuthInterceptor: RequestInterceptor {
         let refreshToken = UserDefaultHandler.refreshToken
         if refreshToken.isEmpty {
             completeAllWithFailure(NetworkError.refreshFailed)
-            notifySessionExpired()
             return
         }
 
@@ -72,7 +71,7 @@ public final class AuthInterceptor: RequestInterceptor {
                 case .failure(let err):
                     print("[AuthInterceptor] ❌ 토큰 재발급 실패: \(err)")
                     self?.completeAllWithFailure(err)
-                    self?.notifySessionExpired()
+                    self?.expireSession()
                 case .finished:
                     break
                 }
@@ -104,10 +103,10 @@ public final class AuthInterceptor: RequestInterceptor {
 
     // MARK: - 세션 만료 이벤트 발행
 
-    private func notifySessionExpired() {
-        NotificationCenter.default.post(
-            name: Notification.Name("SessionExpired"),
-            object: nil
-        )
+    private func expireSession() {
+        UserDefaultHandler.accessToken = ""
+        UserDefaultHandler.refreshToken = ""
+
+        NotificationCenter.default.post(name: .sessionExpired, object: nil)
     }
 }

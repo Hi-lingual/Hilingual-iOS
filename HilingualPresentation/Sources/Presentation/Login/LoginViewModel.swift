@@ -81,18 +81,11 @@ public final class LoginViewModel: BaseViewModel {
     }
 
     private func syncDevice() {
-        let fcmToken = FCMTokenManager.shared.currentToken ?? ""
+        Task { @MainActor in
+            FCMTokenSyncService.shared.sessionDidAuthenticate()
+        }
+
         deviceUseCase.updateCurrentDevice()
-            .flatMap { [weak self] _ -> AnyPublisher<Void, Error> in
-                guard let self else {
-                    return Fail(error: NSError(domain: "LoginViewModel", code: -1)).eraseToAnyPublisher()
-                }
-                guard !fcmToken.isEmpty else {
-                    print("[LoginVM] ⚠️ FCM 토큰 없음 → 스킵")
-                    return Just(()).setFailureType(to: Error.self).eraseToAnyPublisher()
-                }
-                return self.deviceUseCase.updateFcmToken(fcmToken: fcmToken)
-            }
             .sink(
                 receiveCompletion: { completion in
                     if case let .failure(error) = completion {
@@ -100,7 +93,7 @@ public final class LoginViewModel: BaseViewModel {
                     }
                 },
                 receiveValue: { _ in
-                    print("[LoginVM] ✅ device + FCM API 성공")
+                    print("[LoginVM] ✅ device API 성공")
                 }
             )
             .store(in: &cancellables)
