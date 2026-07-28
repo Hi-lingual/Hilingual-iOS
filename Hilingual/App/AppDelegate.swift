@@ -13,46 +13,29 @@ import HilingualData
 import HilingualPresentation
 
 @main
-class AppDelegate: UIResponder, UIApplicationDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
     
     var pendingDeeplinkURL: String?
-
+    
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         FirebaseApp.configure()
         UIFont.registerPretendardFonts()
-
-//        for key in UserDefaults.standard.dictionaryRepresentation().keys {
-//            UserDefaults.standard.removeObject(forKey: key.description)
-//        }
+        
+        //        for key in UserDefaults.standard.dictionaryRepresentation().keys {
+        //            UserDefaults.standard.removeObject(forKey: key.description)
+        //        }
         _ = CoreDataStorage.shared
-
+        
         AppDIContainer.shared.configureFCMTokenSync()
-
+        
         Messaging.messaging().delegate = self
         UNUserNotificationCenter.current().delegate = self
         UIApplication.shared.registerForRemoteNotifications()
-
+        
         return true
     }
-
-    // MARK: UISceneSession Lifecycle
-
-    func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
-        // Called when a new scene session is being created.
-        // Use this method to select a configuration to create the new scene with.
-        return UISceneConfiguration(name: "Default Configuration", sessionRole: connectingSceneSession.role)
-    }
-
-    func application(_ application: UIApplication, didDiscardSceneSessions sceneSessions: Set<UISceneSession>) {
-        // Called when the user discards a scene session.
-        // If any sessions were discarded while the application was not running, this will be called shortly after application:didFinishLaunchingWithOptions.
-        // Use this method to release any resources that were specific to the discarded scenes, as they will not return.
-    }
-}
-
-// MARK: - MessagingDelegate
-extension AppDelegate: MessagingDelegate {
+    
     nonisolated func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
         guard let fcmToken else { return }
         
@@ -62,12 +45,25 @@ extension AppDelegate: MessagingDelegate {
             FCMTokenManager.shared.currentToken = fcmToken
         }
     }
+    
+    // MARK: UISceneSession Lifecycle
+    
+    func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
+        return UISceneConfiguration(name: "Default Configuration", sessionRole: connectingSceneSession.role)
+    }
+    
+    func application(_ application: UIApplication, didDiscardSceneSessions sceneSessions: Set<UISceneSession>) {
+    }
 }
-extension AppDelegate: UNUserNotificationCenterDelegate {
-    nonisolated func userNotificationCenter(
+
+@MainActor
+extension AppDelegate: @preconcurrency UNUserNotificationCenterDelegate {
+    
+    func userNotificationCenter(
         _ center: UNUserNotificationCenter,
         willPresent notification: UNNotification,
-        withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
+    ) {
         let userInfo = notification.request.content.userInfo
         print("🔔 [앱 포그라운드] 푸시 수신!")
         print("📱 제목: \(notification.request.content.title)")
@@ -77,7 +73,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         completionHandler([.banner, .sound, .badge])
     }
 
-    nonisolated func userNotificationCenter(
+    func userNotificationCenter(
         _ center: UNUserNotificationCenter,
         didReceive response: UNNotificationResponse,
         withCompletionHandler completionHandler: @escaping () -> Void
@@ -96,10 +92,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
 
         print("[Deeplink] 푸시 탭 → \(destination)")
 
-        Task { @MainActor in
-            DeeplinkManager.shared.pendingDestination = destination
-        }
-        
+        DeeplinkManager.shared.pendingDestination = destination
         completionHandler()
     }
 }

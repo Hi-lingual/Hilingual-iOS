@@ -31,6 +31,15 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             EnglishPronunciationPlayer.shared.prepare()
         }
 
+        if let response = connectionOptions.notificationResponse {
+            let userInfo = response.notification.request.content.userInfo
+            if let link = userInfo["link"] as? String,
+               let url = URL(string: link),
+               let destination = DeeplinkParser.parse(url: url) {
+                DeeplinkManager.shared.pendingDestination = destination
+            }
+        }
+
         guard let windowScene = scene as? UIWindowScene else { return }
 
         let window = UIWindow(windowScene: windowScene)
