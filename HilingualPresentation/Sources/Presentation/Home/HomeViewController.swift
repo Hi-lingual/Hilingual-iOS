@@ -73,9 +73,6 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     public override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         showOnboardingBottomSheet()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
-            self?.checkAndShowNotificationPermissionModal()
-        }
     }
     
     public override func viewDidDisappear(_ animated: Bool) {
@@ -345,10 +342,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     
     private func showNextHomeModal() {
         guard !isHomeModalVisible else { return }
-        
-        if !showUpdateNoticeModalIfNeeded() {
-            showRecoveryModalIfNeeded()
-        }
+        showRecoveryModalIfNeeded()
     }
     
     private func finishRecoveryWritingFlowIfNeeded() {
@@ -452,9 +446,6 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         guard !UserDefaults.standard.bool(forKey: "showHomeOnboarding") else { return }
         guard canShowRecoveryModal(today: today, selectedDate: selectedDate) else { return }
         guard let recoveryDate = mostRecentRecoveryViewDateInCurrentMonth() else { return }
-        
-        guard !isUpdateNoticeModalVisible else { return }
-        guard !shouldShowUpdateNoticeModal() else { return }
         guard !isHomeModalVisible else { return }
         showRecoveryModal(for: recoveryDate)
     }
@@ -462,7 +453,6 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     private var isHomeModalVisible: Bool {
         isShowingOnboardingBottomSheet
         || (homeModal.superview != nil && !homeModal.isHidden)
-        || isUpdateNoticeModalVisible
     }
     
     private var isUpdateNoticeModalVisible: Bool {
