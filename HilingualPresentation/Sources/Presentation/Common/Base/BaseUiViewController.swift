@@ -26,7 +26,6 @@ public class BaseUIViewController<VM: BaseViewBindable>: UIViewController, UIGes
         bind(viewModel: viewModel)
         setupNavigationBar()
         observeServerError()
-        observeNetworkStatus()
         observeSessionExpired()
         HilingualLog.debug("[VC LifeCycle] \(Self.self) init")
     }
@@ -82,26 +81,6 @@ public class BaseUIViewController<VM: BaseViewBindable>: UIViewController, UIGes
                 )
             }
             .store(in: &cancellables)
-    }
-
-    // MARK: - Network Error
-
-    private func observeNetworkStatus() {
-        networkMonitor.pathUpdateHandler = { [weak self] path in
-            guard let self else { return }
-            if path.status == .unsatisfied {
-                DispatchQueue.main.async {
-                    self.handleNetworkDisconnected()
-                }
-            }
-        }
-        networkMonitor.start(queue: networkQueue)
-    }
-
-    @MainActor
-    private func handleNetworkDisconnected() {
-        DialogManager.shared.showNetworkError(
-            using: networkMonitor)
     }
 
     // MARK: - Session Expired

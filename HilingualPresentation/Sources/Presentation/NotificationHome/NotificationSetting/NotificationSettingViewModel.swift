@@ -93,8 +93,7 @@ public final class NotificationSettingViewModel: BaseViewModel {
             isMarketingOn: marketingSubject.eraseToAnyPublisher(),
             isFeedOn: feedSubject.eraseToAnyPublisher(),
             settingUpdateError: errorSubject.eraseToAnyPublisher(),
-            loadError: loadErrorSubject.eraseToAnyPublisher()
-            settingUpdateError: errorSubject.eraseToAnyPublisher(),
+            loadError: loadErrorSubject.eraseToAnyPublisher(),
             shouldShowBanner: shouldShowBanner
         )
     }

@@ -49,8 +49,7 @@ public final class NotificationSettingViewController: BaseUIViewController<Notif
     
     public override func bind(viewModel: NotificationSettingViewModel) {
         let input = NotificationSettingViewModel.Input(
-            viewDidLoad: Just(()).merge(with: reloadSubject).eraseToAnyPublisher(),
-            viewDidLoad: viewWillAppearSubject.eraseToAnyPublisher(),
+            viewDidLoad: viewWillAppearSubject.merge(with: reloadSubject).eraseToAnyPublisher(),
             marketingToggled: marketingToggledSubject.eraseToAnyPublisher(),
             feedToggled: feedToggledSubject.eraseToAnyPublisher(),
             isSystemPermissionGranted: permissionSubject.eraseToAnyPublisher()
