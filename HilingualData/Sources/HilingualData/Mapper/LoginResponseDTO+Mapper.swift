@@ -13,6 +13,7 @@ import HilingualNetwork
 extension LoginResponseDTO {
     public func toEntity() -> LoginResponseEntity {
         return LoginResponseEntity(
+            userId: self.userId,
             accessToken: self.accessToken,
             refreshToken: self.refreshToken,
             isProfileCompleted: self.registerStatus

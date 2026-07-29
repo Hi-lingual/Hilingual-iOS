@@ -12,22 +12,16 @@ import Combine
 
 public protocol OnBoardingService {
     func checkNicknameDuplication(nickname: String) -> AnyPublisher<OnBoardingResponseDTO, Error>
-    func registerProfile(nickname: String, adAlarmAgree: Bool, fileKey: String?) -> AnyPublisher<Void, Error>
+    func registerProfile(nickname: String, adAlarmAgree: Bool, fileKey: String?) -> AnyPublisher<Int64, Error>
 }
 
 public final class DefaultOnBoardingService: BaseService<OnBoardingAPI>, OnBoardingService {
-    public func registerProfile(nickname: String, adAlarmAgree: Bool, fileKey: String?) -> AnyPublisher<Void, Error> {
-//        #if DEBUG
-//        return Just(())
-//            .setFailureType(to: Error.self)
-//            .eraseToAnyPublisher()
-//        #else
+    public func registerProfile(nickname: String, adAlarmAgree: Bool, fileKey: String?) -> AnyPublisher<Int64, Error> {
         let dto = RegisterProfileRequestDTO(nickname: nickname, adAlarmAgree: adAlarmAgree, fileKey: fileKey)
-        return requestPlain(.registerProfile(requestDTO: dto))
-            .map { _ in () }
+        return request(.registerProfile(requestDTO: dto), as: BaseAPIResponse<RegisterProfileResponseDTO>.self)
+            .map { $0.data.userId }
             .mapError { $0 as Error }
             .eraseToAnyPublisher()
-//        #endif
     }
 
     public func checkNicknameDuplication(nickname: String) -> AnyPublisher<OnBoardingResponseDTO, Error> {

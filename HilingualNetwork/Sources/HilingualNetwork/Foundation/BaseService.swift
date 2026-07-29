@@ -8,8 +8,58 @@
 import Foundation
 import Combine
 import Moya
+import Alamofire
+import HilingualCore
 
 public class BaseService<API: TargetType> {
+
+    // MARK: - Transport Error Mapping
+
+    static func transportError(from error: Error) -> NetworkError {
+        guard let code = urlErrorCode(in: error) else { return .unknown }
+        return code == NSURLErrorTimedOut ? .timeout : .networkFail
+    }
+
+    private static func urlErrorCode(in error: Error) -> Int? {
+        if let urlError = error as? URLError {
+            return urlError.code.rawValue
+        }
+        if let afError = error as? AFError, let underlying = afError.underlyingError {
+            return urlErrorCode(in: underlying)
+        }
+        let nsError = error as NSError
+        if nsError.domain == NSURLErrorDomain {
+            return nsError.code
+        }
+        if let underlying = nsError.userInfo[NSUnderlyingErrorKey] as? NSError {
+            return urlErrorCode(in: underlying)
+        }
+        return nil
+    }
+
+    // MARK: - Crash Reporting
+
+    private static func report(_ error: NetworkError, path: String) {
+        let code: Int
+        switch error {
+        case .serverError(let serverError): code = serverError.code
+        case .decoding: code = -1001
+        case .networkFail: code = -1002
+        case .timeout: code = -1003
+        case .forbidden: code = 403
+        case .unauthorized: code = 401
+        case .notFound: code = 404
+        case .refreshFailed: code = -1004
+        case .unknown: code = -1000
+        }
+
+        let nsError = NSError(
+            domain: "API.\(API.self)",
+            code: code,
+            userInfo: [NSLocalizedDescriptionKey: "\(error)"]
+        )
+        CrashReporter.record(nsError, userInfo: ["path": path, "error": "\(error)"])
+    }
 
     // MARK: - Properties
 
@@ -23,7 +73,12 @@ public class BaseService<API: TargetType> {
 
     // MARK: - Request (Decodable Response)
     
-    public func request<T: Decodable>(_ target: API, as type: T.Type) -> AnyPublisher<T, NetworkError> {
+    public func request<T: Decodable>(_ target: API, as type: T.Type) -> AnyPublisher<T, HilingualError> {
+        #if DEBUG
+        if let forced = NetworkDebug.forcedError(for: target.path) {
+            return Fail<T, HilingualError>(error: forced).eraseToAnyPublisher()
+        }
+        #endif
         return Future<T, NetworkError> { [weak self] promise in
             self?.provider.request(target) { result in
                 switch result {
@@ -37,26 +92,23 @@ public class BaseService<API: TargetType> {
                         case 401:
                             promise(.failure(.unauthorized))
 
+                        case 404:
+                            promise(.failure(.notFound))
+
                         case 400..<500:
                             if let serverError = try? JSONDecoder().decode(ServerError.self, from: response.data) {
-                                NotificationCenter.default.post(
-                                    name: Notification.Name("ServerErrorOccurred"),
-                                    object: nil,
-                                    userInfo: ["message": serverError.message]
-                                )
                                 promise(.failure(.serverError(serverError)))
                             } else {
                                 promise(.failure(.unknown))
                             }
 
                         case 500..<600:
-                            NotificationCenter.default.post(
-                                name: Notification.Name("ServerErrorOccurred"),
-                                object: nil,
-                                userInfo: ["message": "서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요."]
-                            )
-                            promise(.failure(.serverError(ServerError(code: response.statusCode,
-                                                                      message: "Server Error"))))
+                            if let serverError = try? JSONDecoder().decode(ServerError.self, from: response.data) {
+                                promise(.failure(.serverError(serverError)))
+                            } else {
+                                promise(.failure(.serverError(ServerError(code: response.statusCode,
+                                                                          message: "Server Error"))))
+                            }
 
                         default:
                             promise(.failure(.unknown))
@@ -68,19 +120,7 @@ public class BaseService<API: TargetType> {
                 case .failure(let error):
                     switch error {
                     case .underlying(let err, _):
-                        if let urlError = err as? URLError {
-                            switch urlError.code {
-                            case .timedOut:
-                                promise(.failure(.timeout))
-                            case .notConnectedToInternet, .cannotFindHost:
-                                promise(.failure(.networkFail))
-                            default:
-                                promise(.failure(.networkFail))
-                            }
-                        } else {
-                            promise(.failure(.unknown))
-                        }
-
+                        promise(.failure(Self.transportError(from: err)))
                     default:
                         promise(.failure(.unknown))
                     }
@@ -89,19 +129,20 @@ public class BaseService<API: TargetType> {
         }
         .handleEvents(receiveCompletion: { completion in
             if case .failure(let error) = completion {
-                NotificationCenter.default.post(
-                    name: Notification.Name("ServerErrorOccurred"),
-                    object: nil,
-                    userInfo: ["message": "앗 일시적인 오류가 발생했어요."]
-                )
                 print("❌ [네트워크에러] \(API.self) - \(target.path): \(error)에러 발생 ㅠ")
+                Self.report(error, path: target.path)
             }
         })
+        .mapError { $0.toHilingualError() }
         .eraseToAnyPublisher()
     }
 
-    ///삭제처럼 리스폰스 디코딩이  없는것들은 이함수로 호출하세요!! 
-    public func requestPlain(_ target: API) -> AnyPublisher<Void, NetworkError> {
+    public func requestPlain(_ target: API) -> AnyPublisher<Void, HilingualError> {
+        #if DEBUG
+        if let forced = NetworkDebug.forcedError(for: target.path) {
+            return Fail<Void, HilingualError>(error: forced).eraseToAnyPublisher()
+        }
+        #endif
         return Future<Void, NetworkError> { [weak self] promise in
             self?.provider.request(target) { result in
                 switch result {
@@ -113,36 +154,43 @@ public class BaseService<API: TargetType> {
                     case 401:
                         promise(.failure(.unauthorized))
 
+                    case 404:
+                        promise(.failure(.notFound))
+
                     case 400..<500:
                         if let serverError = try? JSONDecoder().decode(ServerError.self, from: response.data) {
-                            NotificationCenter.default.post(
-                                name: Notification.Name("ServerErrorOccurred"),
-                                object: nil,
-                                userInfo: ["message": serverError.message]
-                            )
                             promise(.failure(.serverError(serverError)))
                         } else {
                             promise(.failure(.unknown))
                         }
 
                     case 500..<600:
-                        NotificationCenter.default.post(
-                            name: Notification.Name("ServerErrorOccurred"),
-                            object: nil,
-                            userInfo: ["message": "서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요."]
-                        )
-                        promise(.failure(.serverError(ServerError(code: response.statusCode,
-                                                                  message: "Server Error"))))
+                        if let serverError = try? JSONDecoder().decode(ServerError.self, from: response.data) {
+                            promise(.failure(.serverError(serverError)))
+                        } else {
+                            promise(.failure(.serverError(ServerError(code: response.statusCode,
+                                                                      message: "Server Error"))))
+                        }
 
                     default:
                         promise(.failure(.unknown))
                     }
 
-                case .failure:
-                    promise(.failure(.networkFail))
+                case .failure(let error):
+                    if case let .underlying(err, _) = error {
+                        promise(.failure(Self.transportError(from: err)))
+                    } else {
+                        promise(.failure(.networkFail))
+                    }
                 }
             }
         }
+        .handleEvents(receiveCompletion: { completion in
+            if case .failure(let error) = completion {
+                Self.report(error, path: target.path)
+            }
+        })
+        .mapError { $0.toHilingualError() }
         .eraseToAnyPublisher()
     }
 }

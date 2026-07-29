@@ -42,6 +42,7 @@ public enum AnalyticsEvent {
     case clickVocabReviewBtn
     case clickVocabPronunciationBtn(isFirstPlay: Bool)
     case clickDiaryPronunciationBtn(isFirstPlay: Bool)
+    case clickErrorCTA(page: Page, action: ErrorCTAAction)
 }
 
 extension AnalyticsEvent {
@@ -58,6 +59,8 @@ extension AnalyticsEvent {
             return "pageview"
         case .viewProfileUser:
             return "view_profile_user"
+        case let .clickErrorCTA(page, action):
+            return "click_\(page.analyticsPropertyName).\(action.rawValue)"
         default:
             return snakeCaseName
         }
@@ -187,6 +190,10 @@ extension AnalyticsEvent {
                 "page": Page.feedback.analyticsPropertyName,
                 "is_first_play": isFirstPlay
             ]
+        case let .clickErrorCTA(page, _):
+            return [
+                "page": page.analyticsPropertyName
+            ]
         }
     }
 
@@ -247,25 +254,60 @@ extension AnalyticsEvent {
     }
 
     public enum Page: Sendable {
+        case home
         case feed
         case userProfile
+        case feedProfile
+        case myFeed
         case notification
+        case notificationSetting
+        case notificationDetail
         case feedback
         case postedDiary
         case vocabulary
+        case writeDiary
+        case aiFeedback
+        case myPage
+        case editProfile
+        case nicknameEdit
+        case blockUser
+        case followList
+        case onboarding
         case custom(String)
 
         var analyticsPropertyName: String {
             switch self {
+            case .home: return "home"
             case .feed: return "feed"
             case .userProfile: return "user_profile"
+            case .feedProfile: return "feed_profile"
+            case .myFeed: return "my_feed"
             case .notification: return "notification"
+            case .notificationSetting: return "notification_setting"
+            case .notificationDetail: return "notification_detail"
             case .feedback: return "feedback"
             case .postedDiary: return "posted_diary"
             case .vocabulary: return "vocabulary"
+            case .writeDiary: return "write_diary"
+            case .aiFeedback: return "ai_feedback"
+            case .myPage: return "mypage"
+            case .editProfile: return "edit_profile"
+            case .nicknameEdit: return "nickname_edit"
+            case .blockUser: return "block_user"
+            case .followList: return "follow_list"
+            case .onboarding: return "onboarding"
             case .custom(let value): return value
             }
         }
+    }
+
+    public enum ErrorCTAAction: String, Sendable {
+        case dataNotFoundGoBack = "data_not_found_go_back"
+        case serverErrorRetry = "server_error_retry"
+        case serverErrorGoBack = "server_error_go_back"
+        case serverErrorConfirm = "server_error_confirm"
+        case networkErrorRetry = "network_error_retry"
+        case feedbackRetry = "feedback_retry"
     }
 
     public enum Section: String, Sendable {

@@ -17,6 +17,7 @@ public final class DiaryDetailViewModel: BaseViewModel {
     private let deleteSubject = PassthroughSubject<Void, Never>()
     private let publishSubject = PassthroughSubject<Bool, Never>()
     private let errorSubject = PassthroughSubject<String, Never>()
+    private let actionErrorSubject = PassthroughSubject<Error, Never>()
     
     public init(
         diaryId: Int,
@@ -40,6 +41,7 @@ public final class DiaryDetailViewModel: BaseViewModel {
         let deleteResult: AnyPublisher<Void, Never>
         let publishResult: AnyPublisher<Bool, Never>
         let errorMessage: AnyPublisher<String, Never>
+        let actionError: AnyPublisher<Error, Never>
     }
     
     public func transform(input: Input) -> Output {
@@ -65,7 +67,8 @@ public final class DiaryDetailViewModel: BaseViewModel {
         return Output(
             deleteResult: deleteSubject.eraseToAnyPublisher(),
             publishResult: publishSubject.eraseToAnyPublisher(),
-            errorMessage: errorSubject.eraseToAnyPublisher()
+            errorMessage: errorSubject.eraseToAnyPublisher(),
+            actionError: actionErrorSubject.eraseToAnyPublisher()
         )
     }
     
@@ -75,7 +78,7 @@ public final class DiaryDetailViewModel: BaseViewModel {
         deleteDiaryUseCase.execute(diaryId: diaryId)
             .sink(receiveCompletion: { [weak self] completion in
                 if case let .failure(error) = completion {
-                    self?.errorSubject.send("삭제 실패: \(error.localizedDescription)")
+                    self?.actionErrorSubject.send(error)
                 }
             }, receiveValue: { [weak self] _ in
                 self?.deleteSubject.send(())
@@ -87,7 +90,7 @@ public final class DiaryDetailViewModel: BaseViewModel {
         publishDiaryUseCase.publishDiary(diaryId: diaryId)
             .sink(receiveCompletion: { [weak self] completion in
                 if case let .failure(error) = completion {
-                    self?.errorSubject.send("공개 상태 변경 실패: \(error.localizedDescription)")
+                    self?.actionErrorSubject.send(error)
                 }
             }, receiveValue: { [weak self] _ in
                 self?.publishSubject.send(true)
@@ -99,7 +102,7 @@ public final class DiaryDetailViewModel: BaseViewModel {
         publishDiaryUseCase.unpublishDiary(diaryId: diaryId)
             .sink(receiveCompletion: { [weak self] completion in
                 if case let .failure(error) = completion {
-                    self?.errorSubject.send("공개 상태 변경 실패: \(error.localizedDescription)")
+                    self?.actionErrorSubject.send(error)
                 }
             }, receiveValue: { [weak self] _ in
                 self?.publishSubject.send(false)

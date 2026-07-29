@@ -7,6 +7,7 @@
 
 import Foundation
 import Combine
+import HilingualCore
 import HilingualDomain
 
 public final class OnBoardingViewModel: BaseViewModel {
@@ -22,6 +23,7 @@ public final class OnBoardingViewModel: BaseViewModel {
         let nicknameState: AnyPublisher<nickNameTextField.State, Never>
         let startButtonEnabled: AnyPublisher<Bool, Never>
         let signUpResult: AnyPublisher<Void, Never>
+        let signUpError: AnyPublisher<Error, Never>
     }
 
     // MARK: - Private
@@ -30,6 +32,7 @@ public final class OnBoardingViewModel: BaseViewModel {
     private let deviceUseCase: DeviceUseCase
     private let uploadImageUseCase: UploadImageUseCase
     private let navigateToHomeSubject = PassthroughSubject<Void, Never>()
+    private let signUpErrorSubject = PassthroughSubject<Error, Never>()
     private var latestValidNickname: String = ""
     public var selectedImageData: Data?
     private var latestFileKey: String = ""
@@ -114,7 +117,8 @@ public final class OnBoardingViewModel: BaseViewModel {
         return Output(
             nicknameState: nicknameState.eraseToAnyPublisher(),
             startButtonEnabled: isStartButtonEnabled.eraseToAnyPublisher(),
-            signUpResult: navigateToHomeSubject.eraseToAnyPublisher()
+            signUpResult: navigateToHomeSubject.eraseToAnyPublisher(),
+            signUpError: signUpErrorSubject.eraseToAnyPublisher()
         )
     }
 
@@ -130,7 +134,7 @@ public final class OnBoardingViewModel: BaseViewModel {
     private func signUpWithImage(data: Data, adAgree: Bool) -> AnyPublisher<Void, Never> {
         uploadImageUseCase
             .execute(data: data, contentType: "image/jpeg", purpose: "PROFILE_UPLOAD")
-            .flatMap { [weak self] fileKey -> AnyPublisher<Void, Error> in
+            .flatMap { [weak self] fileKey -> AnyPublisher<Int64, Error> in
                 guard let self else {
                     return Fail(error: NSError(domain: "OnBoardingViewModel", code: -1)).eraseToAnyPublisher()
                 }
@@ -141,17 +145,21 @@ public final class OnBoardingViewModel: BaseViewModel {
                     fileKey: fileKey
                 )
             }
-            .flatMap { [weak self] _ -> AnyPublisher<Void, Error> in
+            .flatMap { [weak self] userId -> AnyPublisher<Int64, Error> in
                 guard let self else {
                     return Fail(error: NSError(domain: "OnBoardingViewModel", code: -1)).eraseToAnyPublisher()
                 }
 
-                return self.syncDeviceAfterSignUp()
+                return self.syncDeviceAfterSignUp().map { userId }.eraseToAnyPublisher()
             }
-            .handleEvents(receiveOutput: { [weak self] in
-                self?.handleSignUpSuccess()
+            .handleEvents(receiveOutput: { [weak self] userId in
+                self?.handleSignUpSuccess(userId: userId)
             })
-            .catch { _ in Empty<Void, Never>() }
+            .map { _ in () }
+            .catch { [weak self] error -> Empty<Void, Never> in
+                self?.signUpErrorSubject.send(error)
+                return Empty<Void, Never>()
+            }
             .eraseToAnyPublisher()
     }
 
@@ -161,22 +169,29 @@ public final class OnBoardingViewModel: BaseViewModel {
             adAlarmAgree: adAgree,
             fileKey: nil
         )
-        .flatMap { [weak self] _ -> AnyPublisher<Void, Error> in
+        .flatMap { [weak self] userId -> AnyPublisher<Int64, Error> in
             guard let self else {
                 return Fail(error: NSError(domain: "OnBoardingViewModel", code: -1)).eraseToAnyPublisher()
             }
 
-            return self.syncDeviceAfterSignUp()
+            return self.syncDeviceAfterSignUp().map { userId }.eraseToAnyPublisher()
         }
-        .handleEvents(receiveOutput: { [weak self] in
-            self?.handleSignUpSuccess()
+        .handleEvents(receiveOutput: { [weak self] userId in
+            self?.handleSignUpSuccess(userId: userId)
         })
-        .catch { _ in Empty<Void, Never>() }
+        .map { _ in () }
+        .catch { [weak self] error -> Empty<Void, Never> in
+            self?.signUpErrorSubject.send(error)
+            return Empty<Void, Never>()
+        }
         .eraseToAnyPublisher()
     }
 
-    private func handleSignUpSuccess() {
+    private func handleSignUpSuccess(userId: Int64) {
         UserDefaults.standard.set(true, forKey: "isProfileCompleted")
+        Task { @MainActor in
+            AmplitudeManager.shared.updateUserId(userId)
+        }
         navigateToHomeSubject.send()
     }
 

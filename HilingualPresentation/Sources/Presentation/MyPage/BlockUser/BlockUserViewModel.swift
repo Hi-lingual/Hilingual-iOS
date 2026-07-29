@@ -23,12 +23,16 @@ public final class BlockUserViewModel: BaseViewModel {
 
     public struct Output {
         let blockedUsers: AnyPublisher<[BlockedUserModel], Never>
+        let loadError: AnyPublisher<Error, Never>
+        let actionError: AnyPublisher<Error, Never>
     }
 
     // MARK: - Properties
 
     private let blockUserUseCase: BlockUserUseCase
     let blockedUsersSubject = CurrentValueSubject<[BlockedUserModel], Never>([])
+    private let loadErrorSubject = PassthroughSubject<Error, Never>()
+    private let actionErrorSubject = PassthroughSubject<Error, Never>()
 
     // MARK: - Init
 
@@ -53,7 +57,9 @@ public final class BlockUserViewModel: BaseViewModel {
             .store(in: &cancellables)
 
         return Output(
-            blockedUsers: blockedUsersSubject.eraseToAnyPublisher()
+            blockedUsers: blockedUsersSubject.eraseToAnyPublisher(),
+            loadError: loadErrorSubject.eraseToAnyPublisher(),
+            actionError: actionErrorSubject.eraseToAnyPublisher()
         )
     }
 
@@ -71,18 +77,22 @@ public final class BlockUserViewModel: BaseViewModel {
                     )
                 }
             }
-            .replaceError(with: [])
-            .sink { [weak self] models in
+            .sink(receiveCompletion: { [weak self] completion in
+                if case let .failure(error) = completion { self?.loadErrorSubject.send(error) }
+            }, receiveValue: { [weak self] models in
                 self?.blockedUsersSubject.send(models)
-            }
+            })
             .store(in: &cancellables)
     }
 
     private func unblockUser(userId: Int) {
         blockUserUseCase.unblockUser(id: userId)
             .sink(receiveCompletion: { [weak self] completion in
-                if case .finished = completion {
+                switch completion {
+                case .finished:
                     self?.updateUserBlockState(userId: userId, isBlocked: false)
+                case .failure(let error):
+                    self?.actionErrorSubject.send(error)
                 }
             }, receiveValue: { _ in })
             .store(in: &cancellables)
@@ -91,8 +101,11 @@ public final class BlockUserViewModel: BaseViewModel {
     private func blockUser(userId: Int) {
         blockUserUseCase.blockUser(id: userId)
             .sink(receiveCompletion: { [weak self] completion in
-                if case .finished = completion {
+                switch completion {
+                case .finished:
                     self?.updateUserBlockState(userId: userId, isBlocked: true)
+                case .failure(let error):
+                    self?.actionErrorSubject.send(error)
                 }
             }, receiveValue: { _ in })
             .store(in: &cancellables)

@@ -26,6 +26,7 @@ public final class NotificationSettingViewModel: BaseViewModel {
         let isMarketingOn: AnyPublisher<Bool, Never>
         let isFeedOn: AnyPublisher<Bool, Never>
         let settingUpdateError: AnyPublisher<Error, Never>
+        let loadError: AnyPublisher<Error, Never>
         let shouldShowBanner: AnyPublisher<Bool, Never>
     }
 
@@ -34,6 +35,7 @@ public final class NotificationSettingViewModel: BaseViewModel {
     private let marketingSubject = CurrentValueSubject<Bool, Never>(false)
     private let feedSubject = CurrentValueSubject<Bool, Never>(false)
     private let errorSubject = PassthroughSubject<Error, Never>()
+    private let loadErrorSubject = PassthroughSubject<Error, Never>()
 
     // MARK: - Properties
 
@@ -55,7 +57,7 @@ public final class NotificationSettingViewModel: BaseViewModel {
 
                 return self.useCase.fetchAlarmSetting()
                     .catch { [weak self] error -> Empty<AlarmSettingEntity, Never> in
-                        self?.errorSubject.send(error)
+                        self?.loadErrorSubject.send(error)
                         return .init()
                     }
                     .eraseToAnyPublisher()
@@ -91,6 +93,7 @@ public final class NotificationSettingViewModel: BaseViewModel {
             isMarketingOn: marketingSubject.eraseToAnyPublisher(),
             isFeedOn: feedSubject.eraseToAnyPublisher(),
             settingUpdateError: errorSubject.eraseToAnyPublisher(),
+            loadError: loadErrorSubject.eraseToAnyPublisher(),
             shouldShowBanner: shouldShowBanner
         )
     }

@@ -7,7 +7,7 @@
 
 import UIKit
 import Combine
-import Network
+import HilingualCore
 
 public class BaseUIViewController<VM: BaseViewBindable>: UIViewController, UIGestureRecognizerDelegate {
 
@@ -16,8 +16,7 @@ public class BaseUIViewController<VM: BaseViewBindable>: UIViewController, UIGes
     public var viewModel: VM?
     public let diContainer: any ViewControllerFactory
 
-    private let networkMonitor = NWPathMonitor()
-    private let networkQueue = DispatchQueue(label: "NetworkMonitor")
+    lazy var errorPresenter = ErrorPresenter(host: self)
 
     // MARK: - Init
     public init(viewModel: VM, diContainer: any ViewControllerFactory) {
@@ -27,7 +26,7 @@ public class BaseUIViewController<VM: BaseViewBindable>: UIViewController, UIGes
         bind(viewModel: viewModel)
         setupNavigationBar()
         observeServerError()
-        observeNetworkStatus()
+        observeSessionExpired()
         HilingualLog.debug("[VC LifeCycle] \(Self.self) init")
     }
 
@@ -84,29 +83,29 @@ public class BaseUIViewController<VM: BaseViewBindable>: UIViewController, UIGes
             .store(in: &cancellables)
     }
 
-    // MARK: - Network Error
-
-    private func observeNetworkStatus() {
-        networkMonitor.pathUpdateHandler = { [weak self] path in
-            guard let self else { return }
-            if path.status == .unsatisfied {
-                DispatchQueue.main.async {
-                    self.handleNetworkDisconnected()
-                }
+    // MARK: - Session Expired
+    private func observeSessionExpired() {
+        NotificationCenter.default.publisher(for: Notification.Name("SessionExpired"))
+            .receive(on: RunLoop.main)
+            .sink { [weak self] _ in
+                self?.handleSessionExpired()
             }
-        }
-        networkMonitor.start(queue: networkQueue)
+            .store(in: &cancellables)
     }
 
-    @MainActor
-    private func handleNetworkDisconnected() {
-        DialogManager.shared.showNetworkError(
-            using: networkMonitor)
+    private func handleSessionExpired() {
+        let splashVC = diContainer.makeSplashViewController()
+        let nav = UINavigationController(rootViewController: splashVC)
+
+        if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+           let window = scene.windows.first {
+            window.rootViewController = nav
+            window.makeKeyAndVisible()
+        }
     }
 
     // MARK: - Deinit
     deinit {
         HilingualLog.debug("[VC LifeCycle] \(Self.self) deinit")
-        networkMonitor.cancel()
     }
 }

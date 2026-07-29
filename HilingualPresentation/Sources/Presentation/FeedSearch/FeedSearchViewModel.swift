@@ -30,9 +30,9 @@ public struct FeedSearchUserModel: UserDisplayable {
 }
 
 public enum SearchState {
-    case enter // 처음 진입 시
-    case searchResult([FeedSearchUserModel]) // 검색 결과가 있으면
-    case empty // 검색 결과가 없으면
+    case enter
+    case searchResult([FeedSearchUserModel])
+    case empty
 }
 
 public final class FeedSearchViewModel: BaseViewModel {
@@ -47,12 +47,14 @@ public final class FeedSearchViewModel: BaseViewModel {
     public struct Output {
         let searchState: AnyPublisher<SearchState, Never>
         let followAction: AnyPublisher<(userId: Int, isFollowing: Bool), Never>
+        let loadError: AnyPublisher<Error, Never>
     }
-    
+
     // MARK: - Properties
-    
+
     public var input = Input(searchTrigger: .init())
     private let useCase: FeedSearchUseCase
+    private let loadErrorSubject = PassthroughSubject<Error, Never>()
     
     // MARK: - Init
     
@@ -75,7 +77,6 @@ public final class FeedSearchViewModel: BaseViewModel {
     // MARK: - Transform
     
     public func transform() -> Output {
-        // 검색 스트림
         let searchStatePublisher = input.searchTrigger
             .flatMap { [weak self] query -> AnyPublisher<SearchState, Never> in
                 guard let self = self, !query.isEmpty else {
@@ -97,13 +98,15 @@ public final class FeedSearchViewModel: BaseViewModel {
                     .map { users in
                         users.isEmpty ? .empty : .searchResult(users)
                     }
-                    .catch { _ in Just(.empty) }
+                    .catch { [weak self] error -> AnyPublisher<SearchState, Never> in
+                        self?.loadErrorSubject.send(error)
+                        return Just(.empty).eraseToAnyPublisher()
+                    }
                     .receive(on: DispatchQueue.main)
                     .eraseToAnyPublisher()
             }
             .eraseToAnyPublisher()
         
-        // 팔로우 액션 스트림
         let followActionPublisher = input.followButtonTapped
             .flatMap { [weak self] (userId, currentState) -> AnyPublisher<(userId: Int, isFollowing: Bool), Never> in
                 guard let self = self else { return Empty().eraseToAnyPublisher() }
@@ -123,7 +126,8 @@ public final class FeedSearchViewModel: BaseViewModel {
         
         return Output(
             searchState: searchStatePublisher,
-            followAction: followActionPublisher
+            followAction: followActionPublisher,
+            loadError: loadErrorSubject.eraseToAnyPublisher()
         )
     }
 }
