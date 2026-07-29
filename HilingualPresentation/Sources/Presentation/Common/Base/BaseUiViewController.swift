@@ -26,7 +26,6 @@ public class BaseUIViewController<VM: BaseViewBindable>: UIViewController, UIGes
         super.init(nibName: nil, bundle: nil)
         bind(viewModel: viewModel)
         setupNavigationBar()
-        observeSessionExpired()
         observeServerError()
         observeNetworkStatus()
         HilingualLog.debug("[VC LifeCycle] \(Self.self) init")
@@ -66,27 +65,6 @@ public class BaseUIViewController<VM: BaseViewBindable>: UIViewController, UIGes
     @objc open func menuButtonTapped() {}
     public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
         return navigationController?.viewControllers.count ?? 0 > 1
-    }
-
-    // MARK: - Session Expired
-    private func observeSessionExpired() {
-        NotificationCenter.default.publisher(for: Notification.Name("SessionExpired"))
-            .receive(on: RunLoop.main)
-            .sink { [weak self] _ in
-                self?.handleSessionExpired()
-            }
-            .store(in: &cancellables)
-    }
-
-    private func handleSessionExpired() {
-        let splashVC = diContainer.makeSplashViewController()
-        let nav = UINavigationController(rootViewController: splashVC)
-
-        if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-           let window = scene.windows.first {
-            window.rootViewController = nav
-            window.makeKeyAndVisible()
-        }
     }
 
     // MARK: - Server Error

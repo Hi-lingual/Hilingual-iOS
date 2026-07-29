@@ -5,13 +5,17 @@
 //  Created by 성현주 on 7/2/25.
 //
 
+import Combine
 import UIKit
 import HilingualPresentation
 import HilingualCore
+import HilingualNetwork
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
+
+    private var cancellables = Set<AnyCancellable>()
 
     func scene(_ scene: UIScene,
                willConnectTo session: UISceneSession,
@@ -27,11 +31,22 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             EnglishPronunciationPlayer.shared.prepare()
         }
 
+        if let response = connectionOptions.notificationResponse {
+            let userInfo = response.notification.request.content.userInfo
+            if let link = userInfo["link"] as? String,
+               let url = URL(string: link),
+               let destination = DeeplinkParser.parse(url: url) {
+                DeeplinkManager.shared.pendingDestination = destination
+            }
+        }
+
         guard let windowScene = scene as? UIWindowScene else { return }
 
         let window = UIWindow(windowScene: windowScene)
         window.backgroundColor = .white
         self.window = window
+
+        observeSessionExpired()
 
         // Step 1: Launch 화면 표시
         let launchScreenVC = LaunchScreen()
@@ -52,6 +67,33 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                 window.rootViewController = navigation
             })
         }
+    }
+
+    // MARK: - Session Expired
+
+    private func observeSessionExpired() {
+        NotificationCenter.default.publisher(for: .sessionExpired)
+            .receive(on: RunLoop.main)
+            .sink { [weak self] _ in
+                self?.routeToLogin()
+            }
+            .store(in: &cancellables)
+    }
+
+    private func routeToLogin() {
+        guard let window else { return }
+
+        FCMTokenSyncService.shared.sessionDidEnd()
+
+        let loginVC = AppDIContainer.shared.makeLoginViewController()
+        let navigation = UINavigationController(rootViewController: loginVC)
+
+        UIView.transition(with: window,
+                          duration: 0.4,
+                          options: [.transitionCrossDissolve],
+                          animations: {
+            window.rootViewController = navigation
+        })
     }
 
     // MARK: - Scene Lifecycle (기본 제공 메서드)

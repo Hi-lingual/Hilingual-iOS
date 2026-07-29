@@ -107,11 +107,8 @@ public final class SplashViewController: BaseUIViewController<SplashViewModel> {
                 guard let self else { return }
 
                 if let error {
-                    print("🔥 RemoteConfig fetch 실패: \(error.localizedDescription)")
-                    self.viewDidAppearSubject.send(())
-                    return
+                    print("🔥 RemoteConfig fetch 실패: \(error.localizedDescription) → 캐시된 설정으로 버전 검사")
                 }
-
                 self.activateRemoteConfigAndEvaluate()
             }
         }
@@ -124,9 +121,7 @@ public final class SplashViewController: BaseUIViewController<SplashViewModel> {
                 guard let self else { return }
 
                 if let error {
-                    print("🔥 RemoteConfig activate 실패: \(error.localizedDescription)")
-                    self.viewDidAppearSubject.send(())
-                    return
+                    print("🔥 RemoteConfig activate 실패: \(error.localizedDescription) → 기본값으로 버전 검사")
                 }
 
                 self.evaluateVersion()

@@ -104,6 +104,7 @@ public final class MypageViewController: BaseUIViewController<MypageViewModel> {
             .receive(on: RunLoop.main)
             .sink { [weak self] in
                 guard let self else { return }
+                FCMTokenSyncService.shared.sessionDidEnd()
                 let onboardingVC = self.diContainer.makeSplashViewController()
                 changeRootVC(onboardingVC, animated: true)
             }
