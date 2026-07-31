@@ -93,7 +93,7 @@ final class ErrorPresenter {
 
     private func presentModal(error: HilingualError, page: AnalyticsEvent.Page?, retry: (() -> Void)?) {
         let businessAction: (() -> Void)? = (error == .dataNotFound) ? retry : nil
-        let ctaAction: AnalyticsEvent.ErrorCTAAction = (error == .dataNotFound) ? .dataNotFoundGoBack : .serverErrorConfirm
+        let ctaAction: AnalyticsEvent.ErrorCTAAction = (error == .dataNotFound) ? .emptyDataConfirm : .serverErrorConfirm
 
         DialogManager.shared.show(
             message: ErrorContentPolicy.modalTitle(for: error),
@@ -115,7 +115,7 @@ final class ErrorPresenter {
 
     private static func mainCTAAction(for error: HilingualError) -> AnalyticsEvent.ErrorCTAAction {
         switch error {
-        case .dataNotFound: return .dataNotFoundGoBack
+        case .dataNotFound: return .emptyDataConfirm
         case .network: return .networkErrorRetry
         default: return .serverErrorRetry
         }
@@ -123,7 +123,7 @@ final class ErrorPresenter {
 
     private static func backCTAAction(for error: HilingualError) -> AnalyticsEvent.ErrorCTAAction? {
         switch error {
-        case .dataNotFound: return .dataNotFoundGoBack
+        case .dataNotFound: return .emptyDataConfirm
         case .network: return nil
         default: return .serverErrorGoBack
         }

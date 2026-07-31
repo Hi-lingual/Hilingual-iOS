@@ -80,7 +80,7 @@ public final class LoadingViewController: BaseUIViewController<LoadingViewModel>
         case .success:
             goToNextView()
         case .error:
-            AmplitudeManager.shared.send(.clickErrorCTA(page: .aiFeedback, action: .feedbackRetry))
+            AmplitudeManager.shared.send(.clickErrorCTA(page: .feedbackLoading, action: .serverErrorRetry))
             retryButtonTapped()
         }
     }
@@ -180,6 +180,7 @@ public final class LoadingViewController: BaseUIViewController<LoadingViewModel>
     private func retryLoadingAdIfNeeded() {
         guard adLoadRetryCount < Self.maxAdRetryCount else {
             print("🚨 재시도 횟수 초과 (\(Self.maxAdRetryCount)회) -> 광고 없이 화면 이동")
+            AmplitudeManager.shared.send(.viewAdAction(result: .failed, page: .feedbackLoading))
             if let pendingDiaryId = self.pendingDiaryId {
                 self.pendingDiaryId = nil
                 DispatchQueue.main.async {
@@ -243,7 +244,9 @@ extension LoadingViewController: FullScreenContentDelegate {
     public func adDidDismissFullScreenContent(_ ad: FullScreenPresentingAd) {
         interstitial = nil
         adLoadTimestamp = nil
-        
+
+        AmplitudeManager.shared.send(.viewAdAction(result: .completed, page: .feedbackLoading))
+
         guard let diaryId = currentDiaryId else { return }
         viewModel?.patchAdWatch(diaryId: diaryId)
         pushDiaryDetail(diaryId: diaryId)
@@ -254,6 +257,7 @@ extension LoadingViewController: FullScreenContentDelegate {
         adLoadTimestamp = nil
         
         print("🚨 전면 광고 표시 실패: \(error)")
+        AmplitudeManager.shared.send(.viewAdAction(result: .failed, page: .feedbackLoading))
         guard let diaryId = currentDiaryId else { return }
         pushDiaryDetail(diaryId: diaryId)
     }
