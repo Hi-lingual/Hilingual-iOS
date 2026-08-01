@@ -342,10 +342,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
 
             self.onboardingBottomSheet = nil
             self.isShowingOnboardingBottomSheet = false
-
-            DispatchQueue.main.async {
-                self.showNextHomeModal()
-            }
+            self.showNextHomeModal()
         }
 
         view.window?.addSubview(bottomSheet)
