@@ -21,7 +21,6 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     let dialog = Dialog()
     private let homeModal = HomeModal()
     private let notificationPermissionModal = NotificationPermissionModalView()
-    private let activeHomeModal: HomeModalKind = .notificationPermission
     private let input = HomeViewModel.Input()
     private var currentDateRequestCancellable: AnyCancellable?
     private var pendingDraftDate: Date?
@@ -40,11 +39,6 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     private var rewardedInterstitial: RewardedInterstitialAd?
     private var didEarnRecoveryReward = false
     private var recoveryTransitionOverlay: UIView?
-    
-    private enum HomeModalKind {
-        case notificationPermission
-        case recoveryStreak
-    }
     
     // MARK: - Life Cycle
     
@@ -268,24 +262,6 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     }
     
     // MARK: - Private Methods
-    
-    private func checkAndShowNotificationPermissionModal() {
-        guard AppVersionChecker.shouldShowModal else { return }
-        guard let window = self.view.window else { return }
-
-        Task {
-            let isGranted = await fetchNotificationPermission()
-
-            await MainActor.run { [weak self] in
-                guard let self else { return }
-                guard !isGranted else {
-                    AppVersionChecker.markAsShown()
-                    return
-                }
-                self.presentNotificationPermissionModal(on: window)
-            }
-        }
-    }
 
     nonisolated private func fetchNotificationPermission() async -> Bool {
         await withCheckedContinuation { continuation in
@@ -310,17 +286,11 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
 
         notificationPermissionModal.configure(
             laterAction: { [weak self] in
-                AppVersionChecker.markAsShown()
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                    self?.notificationPermissionModal.removeFromSuperview()
-                }
+                self?.notificationPermissionModal.removeFromSuperview()
             },
             enableAction: { [weak self] in
-                AppVersionChecker.markAsShown()
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                    self?.notificationPermissionModal.removeFromSuperview()
-                    self?.openSystemSettings()
-                }
+                self?.notificationPermissionModal.removeFromSuperview()
+                self?.openSystemSettings()
             }
         )
         notificationPermissionModal.dialog.showAnimation()
@@ -366,20 +336,39 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     }
     
     private func presentActiveHomeModalIfNeeded() {
-        guard let window = view.window,
+        guard !isShowingOnboardingBottomSheet,
+              !UserDefaults.standard.bool(forKey: "showHomeOnboarding"),
+              let window = view.window,
               !isHomeModalVisible else { return }
 
-        switch activeHomeModal {
+        let context = currentHomeModalContext()
+        let isShown = UserDefaults.standard.bool(forKey: didShowNotificationPermissionModalStorageKey)
+
+        guard let policy = HomeModalPolicy.evaluate(context: context, isNotificationPermissionModalShown: isShown) else {
+            return
+        }
+
+        switch policy {
         case .notificationPermission:
             showNotificationPermissionModalIfNeeded()
-
-        case .recoveryStreak:
-            let today = Date()
-            let selectedDate = homeView.calendarView.selectedDate ?? today
-            guard canShowRecoveryModal(today: today, selectedDate: selectedDate),
-                  let date = mostRecentRecoveryViewDateInCurrentMonth() else { return }
+        case .recoveryStreak(let date):
             showRecoveryModal(for: date)
         }
+    }
+
+    private func currentHomeModalContext() -> HomeModalContext {
+        let today = Date()
+        let currentMonthKey = monthKey(today)
+        return HomeModalContext(
+            today: today,
+            selectedDate: homeView.calendarView.selectedDate ?? today,
+            recoveryTickets: recoveryTickets,
+            didLoadFilledDates: didLoadFilledDates,
+            filledDates: homeView.calendarView.filledDates,
+            recoveredDates: homeView.calendarView.recoveredDates,
+            isAlreadyDismissedThisMonth: UserDefaults.standard.string(forKey: dismissedRecoveryModalMonthStorageKey) == currentMonthKey,
+            isTemporarilyDismissedThisMonth: temporarilyDismissedRecoveryMonth == currentMonthKey
+        )
     }
     
     private func showNotificationPermissionModalIfNeeded() {
@@ -460,41 +449,6 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     private var isHomeModalVisible: Bool {
         (homeModal.superview != nil && !homeModal.isHidden)
         || (notificationPermissionModal.superview != nil && !notificationPermissionModal.isHidden)
-    }
-    
-    private func canShowRecoveryModal(today: Date, selectedDate: Date) -> Bool {
-        let calendar = Calendar.current
-        let lastDay = calendar.range(of: .day, in: .month, for: today)?.count ?? 31
-        let currentMonthKey = monthKey(today)
-        let alreadyDismissed = UserDefaults.standard.string(forKey: dismissedRecoveryModalMonthStorageKey) == currentMonthKey
-        let temporarilyDismissed = temporarilyDismissedRecoveryMonth == currentMonthKey
-        
-        return didLoadFilledDates
-        && recoveryTickets > 0
-        && calendar.isDate(selectedDate, equalTo: today, toGranularity: .month)
-        && !alreadyDismissed
-        && !temporarilyDismissed
-        && calendar.component(.day, from: today) >= lastDay - 7
-    }
-    
-    private func mostRecentRecoveryViewDateInCurrentMonth() -> Date? {
-        let calendar = Calendar.current
-        let today = Date()
-        let filledDateKeys = Set(homeView.calendarView.filledDates.map { dateKey($0) })
-        let recoveredKeys = Set(homeView.calendarView.recoveredDates.map { dateKey($0) })
-        var date = calendar.date(byAdding: .day, value: -2, to: today)
-        
-        while let candidate = date,
-              calendar.isDate(candidate, equalTo: today, toGranularity: .month) {
-            let key = dateKey(candidate)
-            if !filledDateKeys.contains(key), !recoveredKeys.contains(key) {
-                return candidate
-            }
-            
-            date = calendar.date(byAdding: .day, value: -1, to: candidate)
-        }
-        
-        return nil
     }
     
     private func showRecoveryModal(for missedDate: Date) {
