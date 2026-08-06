@@ -17,8 +17,12 @@ public final class DefaultDeviceRepository: DeviceRepository {
     public init(service: DeviceService) {
         self.service = service
     }
-
+    
     public func updateCurrentDevice() -> AnyPublisher<Void, Error> {
         return service.updateCurrentDevice()
+    }
+    
+    public func updateFcmToken(fcmToken: String) -> AnyPublisher<Void, Error> {
+        return service.updateFcmToken(fcmToken: fcmToken)
     }
 }

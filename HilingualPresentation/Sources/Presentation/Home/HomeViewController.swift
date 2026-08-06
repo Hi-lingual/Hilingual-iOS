@@ -18,9 +18,9 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     private var onboardingBottomSheet: OnboardingBottomSheet?
     private var overlayView: UIControl?
     private let homeView = HomeView()
-    private let homeModal = HomeModal()
-    private let updateNoticeModal = HomeModal(buttonLabelStyle: .hidden)
     let dialog = Dialog()
+    private let homeModal = HomeModal()
+    private let notificationPermissionModal = NotificationPermissionModalView()
     private let input = HomeViewModel.Input()
     private var currentDateRequestCancellable: AnyCancellable?
     private var pendingDraftDate: Date?
@@ -34,7 +34,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     private var recoveredDateKeys: Set<String> = []
     private let recoveredDateStorageKey = "home.recoveredDateKeys"
     private let dismissedRecoveryModalMonthStorageKey = "home.dismissedRecoveryModalMonth"
-    private let didShowUpdateNoticeModalStorageKey = "home.didShowRecoveryUpdateNoticeModal"
+    private let didShowNotificationPermissionModalStorageKey = "home.didShowNotificationPermissionModal"
     private let localPushPermissionService = LocalPushPermissionService()
     private var rewardedInterstitial: RewardedInterstitialAd?
     private var didEarnRecoveryReward = false
@@ -72,11 +72,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     
     public override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        
-        if !showOnboardingBottomSheet() {
-            showNextHomeModal()
-        }
-        finishRecoveryWritingFlowIfNeeded()
+        showOnboardingBottomSheet()
     }
     
     public override func viewDidDisappear(_ animated: Bool) {
@@ -131,11 +127,14 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         
         output.userInfo
             .receive(on: RunLoop.main)
-            .sink(receiveCompletion: { completion in
+            .sink(receiveCompletion: { [weak self] completion in
                 if case let .failure(error) = completion {
-                    print("🚨 [UserInfo] API 호출 실패: \(error.localizedDescription)")
+                    self?.errorPresenter.show(error, form: .fullPage, page: .home) {
+                        self?.retryHomeInitialLoad()
+                    }
                 }
             }, receiveValue: { [weak self] userInfo in
+                self?.errorPresenter.dismiss()
                 self?.updateUserInfo(userInfo)
             })
             .store(in: &viewModel.cancellables)
@@ -151,7 +150,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                     with: monthInfo.recoveredDates
                 )
                 self.fetchAndShowDateInfo(for: self.homeView.calendarView.selectedDate ?? Date())
-                self.showRecoveryModalIfNeeded()
+                self.presentActiveHomeModalIfNeeded()
             }
             .store(in: &viewModel.cancellables)
         
@@ -186,8 +185,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     // MARK: - Action
 
     public override func addTarget() {
-        
-        // 주제 카드 눌렀을 때, 일기 작성화면으로 이동
+
         homeView.selectedInfo.cardTopicView.onTapWriteDiary = { [weak self] in
             guard let self else { return }
             guard let selectedDate = self.homeView.calendarView.selectedDate else { return }
@@ -200,8 +198,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
 
             self.input.checkDraft.send(selectedDate)
         }
-        
-        // 일기 프리뷰 눌렀을 때, 상세화면으로 이동
+
         homeView.selectedInfo.onDiaryPreviewTapped = { [weak self] in
             guard let self,
                   let date = self.homeView.calendarView.selectedDate else { return }
@@ -214,8 +211,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                 })
                 .store(in: &self.viewModel!.cancellables)
         }
-        
-        // 일기 더보기 버튼 눌렀을 때, 메뉴 토글
+
         homeView.selectedInfo.onMoreButtonTapped = { [weak self] _ in
             guard let self else { return }
             
@@ -237,8 +233,6 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                 self.showDialog(for: .unpublish, diaryId: diaryId)
                 
             case .delete:
-                // TODO: 일기 삭제 기능 재오픈 시 삭제 다이얼로그 연결 복구
-                // self.showDialog(for: .delete, diaryId: diaryId)
                 break
             }
         }
@@ -269,17 +263,53 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     
     // MARK: - Private Methods
 
-    private func showOnboardingBottomSheet() -> Bool {
-        guard UserDefaults.standard.bool(forKey: "showHomeOnboarding") else { return false }
-        guard !hasShownOnboardingBottomSheet else { return false }
-        
+    nonisolated private func fetchNotificationPermission() async -> Bool {
+        await withCheckedContinuation { continuation in
+            UNUserNotificationCenter.current().getNotificationSettings { settings in
+                let status = settings.authorizationStatus
+                continuation.resume(returning: status == .authorized
+                                            || status == .provisional
+                                            || status == .ephemeral)
+            }
+        }
+    }
+
+    private func presentNotificationPermissionModal(on window: UIWindow) {
+        guard notificationPermissionModal.superview == nil else { return }
+
+        window.addSubview(notificationPermissionModal)
+        notificationPermissionModal.snp.makeConstraints { $0.edges.equalToSuperview() }
+
+        if let bottomSheet = onboardingBottomSheet {
+            window.bringSubviewToFront(bottomSheet)
+        }
+
+        notificationPermissionModal.configure(
+            laterAction: { [weak self] in
+                self?.notificationPermissionModal.removeFromSuperview()
+            },
+            enableAction: { [weak self] in
+                self?.notificationPermissionModal.removeFromSuperview()
+                self?.openSystemSettings()
+            }
+        )
+        notificationPermissionModal.dialog.showAnimation()
+    }
+    
+    private func showOnboardingBottomSheet() {
+        guard UserDefaults.standard.bool(forKey: "showHomeOnboarding") else { return }
+        guard !hasShownOnboardingBottomSheet else { return }
+
         hasShownOnboardingBottomSheet = true
         isShowingOnboardingBottomSheet = true
+        
+        UserDefaults.standard.set(false, forKey: "showHomeOnboarding")
 
         let bottomSheet = OnboardingBottomSheet()
         onboardingBottomSheet = bottomSheet
         bottomSheet.onDismiss = { [weak self] in
             guard let self else { return }
+
             self.onboardingBottomSheet = nil
             self.isShowingOnboardingBottomSheet = false
             self.showNextHomeModal()
@@ -289,17 +319,11 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         bottomSheet.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
-
-        UserDefaults.standard.set(false, forKey: "showHomeOnboarding")
-        return true
     }
     
     private func showNextHomeModal() {
         guard !isHomeModalVisible else { return }
-        
-        if !showUpdateNoticeModalIfNeeded() {
-            showRecoveryModalIfNeeded()
-        }
+        presentActiveHomeModalIfNeeded()
     }
     
     private func finishRecoveryWritingFlowIfNeeded() {
@@ -311,41 +335,68 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         isRecoveryWritingFlowActive = false
     }
     
-    private func showUpdateNoticeModalIfNeeded() -> Bool {
+    private func presentActiveHomeModalIfNeeded() {
         guard !isShowingOnboardingBottomSheet,
+              !UserDefaults.standard.bool(forKey: "showHomeOnboarding"),
               let window = view.window,
-              shouldShowUpdateNoticeModal() else { return false }
-        
-        markUpdateNoticeModalAsShown()
-        updateNoticeModal.onDismiss = { [weak self] in
-            self?.showRecoveryModalIfNeeded()
+              !isHomeModalVisible else { return }
+
+        let context = currentHomeModalContext()
+        let isShown = UserDefaults.standard.bool(forKey: didShowNotificationPermissionModalStorageKey)
+
+        guard let policy = HomeModalPolicy.evaluate(context: context, isNotificationPermissionModalShown: isShown) else {
+            return
         }
-        window.addSubview(updateNoticeModal)
-        updateNoticeModal.snp.makeConstraints {
-            $0.edges.equalToSuperview()
+
+        switch policy {
+        case .notificationPermission:
+            showNotificationPermissionModalIfNeeded()
+        case .recoveryStreak(let date):
+            showRecoveryModal(for: date)
         }
-        
-        updateNoticeModal.isHidden = false
-        updateNoticeModal.configure(
-            title: "이제 끊긴 기록을 되살릴 수 있어요!",
-            subtitle: "미처 작성하지 못한 날짜를 누르고,\n광고 한 편 보고 끊긴 기록을 살려보세요.",
-            image: UIImage(resource: .imgModalUpdateIos),
-            buttonTitle: "확인했습니다",
-            buttonText: nil,
-            buttonAction: { [weak self] in
-                self?.updateNoticeModal.dismissModal()
-            }
+    }
+
+    private func currentHomeModalContext() -> HomeModalContext {
+        let today = Date()
+        let currentMonthKey = monthKey(today)
+        return HomeModalContext(
+            today: today,
+            selectedDate: homeView.calendarView.selectedDate ?? today,
+            recoveryTickets: recoveryTickets,
+            didLoadFilledDates: didLoadFilledDates,
+            filledDates: homeView.calendarView.filledDates,
+            recoveredDates: homeView.calendarView.recoveredDates,
+            isAlreadyDismissedThisMonth: UserDefaults.standard.string(forKey: dismissedRecoveryModalMonthStorageKey) == currentMonthKey,
+            isTemporarilyDismissedThisMonth: temporarilyDismissedRecoveryMonth == currentMonthKey
         )
-        updateNoticeModal.showAnimation()
-        return true
     }
     
-    private func shouldShowUpdateNoticeModal() -> Bool {
-        !UserDefaults.standard.bool(forKey: didShowUpdateNoticeModalStorageKey)
+    private func showNotificationPermissionModalIfNeeded() {
+        guard shouldShowNotificationPermissionModal() else { return }
+
+        Task {
+            let isGranted = await fetchNotificationPermission()
+
+            await MainActor.run { [weak self] in
+                guard let self else { return }
+                guard !isGranted else {
+                    self.markNotificationPermissionModalAsShown()
+                    return
+                }
+                guard let window = self.view.window else { return }
+
+                self.markNotificationPermissionModalAsShown()
+                self.presentNotificationPermissionModal(on: window)
+            }
+        }
     }
     
-    private func markUpdateNoticeModalAsShown() {
-        UserDefaults.standard.set(true, forKey: didShowUpdateNoticeModalStorageKey)
+    private func shouldShowNotificationPermissionModal() -> Bool {
+        !UserDefaults.standard.bool(forKey: didShowNotificationPermissionModalStorageKey)
+    }
+    
+    private func markNotificationPermissionModalAsShown() {
+        UserDefaults.standard.set(true, forKey: didShowNotificationPermissionModalStorageKey)
     }
     
     private func dateKey(_ date: Date) -> String {
@@ -395,64 +446,9 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         UserDefaults.standard.set(monthKey(Date()), forKey: dismissedRecoveryModalMonthStorageKey)
     }
     
-    private func showRecoveryModalIfNeeded() {
-        let today = Date()
-        let selectedDate = homeView.calendarView.selectedDate ?? today
-        
-        guard !isShowingOnboardingBottomSheet else { return }
-        guard !UserDefaults.standard.bool(forKey: "showHomeOnboarding") else { return }
-        guard canShowRecoveryModal(today: today, selectedDate: selectedDate) else { return }
-        guard let recoveryDate = mostRecentRecoveryViewDateInCurrentMonth() else { return }
-        
-        guard !isUpdateNoticeModalVisible else { return }
-        guard !shouldShowUpdateNoticeModal() else { return }
-        guard !isHomeModalVisible else { return }
-        showRecoveryModal(for: recoveryDate)
-    }
-    
     private var isHomeModalVisible: Bool {
-        isShowingOnboardingBottomSheet
-        || (homeModal.superview != nil && !homeModal.isHidden)
-        || isUpdateNoticeModalVisible
-    }
-    
-    private var isUpdateNoticeModalVisible: Bool {
-        updateNoticeModal.superview != nil && !updateNoticeModal.isHidden
-    }
-    
-    private func canShowRecoveryModal(today: Date, selectedDate: Date) -> Bool {
-        let calendar = Calendar.current
-        let lastDay = calendar.range(of: .day, in: .month, for: today)?.count ?? 31
-        let currentMonthKey = monthKey(today)
-        let alreadyDismissed = UserDefaults.standard.string(forKey: dismissedRecoveryModalMonthStorageKey) == currentMonthKey
-        let temporarilyDismissed = temporarilyDismissedRecoveryMonth == currentMonthKey
-        
-        return didLoadFilledDates
-        && recoveryTickets > 0
-        && calendar.isDate(selectedDate, equalTo: today, toGranularity: .month)
-        && !alreadyDismissed
-        && !temporarilyDismissed
-        && calendar.component(.day, from: today) >= lastDay - 7
-    }
-    
-    private func mostRecentRecoveryViewDateInCurrentMonth() -> Date? {
-        let calendar = Calendar.current
-        let today = Date()
-        let filledDateKeys = Set(homeView.calendarView.filledDates.map { dateKey($0) })
-        let recoveredKeys = Set(homeView.calendarView.recoveredDates.map { dateKey($0) })
-        var date = calendar.date(byAdding: .day, value: -2, to: today)
-        
-        while let candidate = date,
-              calendar.isDate(candidate, equalTo: today, toGranularity: .month) {
-            let key = dateKey(candidate)
-            if !filledDateKeys.contains(key), !recoveredKeys.contains(key) {
-                return candidate
-            }
-            
-            date = calendar.date(byAdding: .day, value: -1, to: candidate)
-        }
-        
-        return nil
+        (homeModal.superview != nil && !homeModal.isHidden)
+        || (notificationPermissionModal.superview != nil && !notificationPermissionModal.isHidden)
     }
     
     private func showRecoveryModal(for missedDate: Date) {
@@ -776,7 +772,6 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         homeView.selectedInfo.menu.snp.remakeConstraints {
             $0.top.equalTo(homeView.selectedInfo.moreImageView.snp.bottom).offset(4)
             $0.trailing.equalTo(homeView.selectedInfo.moreImageView.snp.trailing)
-            // TODO: 일기 삭제 기능 재오픈 시 오버레이 메뉴 높이 원복 검토
             $0.height.equalTo(48)
             $0.width.equalTo(182)
         }
@@ -809,9 +804,10 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                     
                     self.viewModel?.publishDiary(diaryId: diaryId)
                         .receive(on: RunLoop.main)
-                        .sink(receiveCompletion: { completion in
-                            if case .failure = completion {
-                                print("🚨 게시하기 API 호출 실패")
+                        .sink(receiveCompletion: { [weak self] completion in
+                            if case let .failure(error) = completion {
+                                self?.dialog.dismiss()
+                                self?.errorPresenter.show(error, form: .modal, page: .home)
                             }
                         }, receiveValue: { [weak self] _ in
                             guard let self else { return }
@@ -852,9 +848,10 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                     
                     self.viewModel?.unpublishDiary(diaryId: diaryId)
                         .receive(on: RunLoop.main)
-                        .sink(receiveCompletion: { completion in
-                            if case .failure = completion {
-                                print("🚨 비공개하기 API 호출 실패")
+                        .sink(receiveCompletion: { [weak self] completion in
+                            if case let .failure(error) = completion {
+                                self?.dialog.dismiss()
+                                self?.errorPresenter.show(error, form: .modal, page: .home)
                             }
                         }, receiveValue: { [weak self] _ in
                             guard let self else { return }
@@ -886,9 +883,10 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                     
                     self.viewModel?.deleteDiary(diaryId: diaryId)
                         .receive(on: RunLoop.main)
-                        .sink(receiveCompletion: { completion in
-                            if case .failure = completion {
-                                print("🚨 삭제하기 API 호출 실패")
+                        .sink(receiveCompletion: { [weak self] completion in
+                            if case let .failure(error) = completion {
+                                self?.dialog.dismiss()
+                                self?.errorPresenter.show(error, form: .modal, page: .home)
                             }
                         }, receiveValue: { [weak self] _ in
                             guard let self else { return }
@@ -1165,15 +1163,43 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
             fetchAndShowDateInfo(for: selectedDate)
         }
         if shouldShowRecoveryModal {
-            showRecoveryModalIfNeeded()
+            presentActiveHomeModalIfNeeded()
         }
     }
     
     private func refreshUserInfo(shouldShowRecoveryModal: Bool = true) {
         viewModel?.fetchUserInfo()
             .receive(on: RunLoop.main)
-            .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] userInfo in
+            .sink(receiveCompletion: { [weak self] completion in
+                if case let .failure(error) = completion {
+                    self?.errorPresenter.show(error, form: .fullPage, page: .home) {
+                        self?.retryHomeInitialLoad()
+                    }
+                }
+            }, receiveValue: { [weak self] userInfo in
+                self?.errorPresenter.dismiss()
                 self?.updateUserInfo(userInfo, shouldShowRecoveryModal: shouldShowRecoveryModal)
+            })
+            .store(in: &viewModel!.cancellables)
+    }
+
+    private func retryHomeInitialLoad() {
+        let date = homeView.calendarView.selectedDate ?? Date()
+        let calendar = Calendar.current
+        input.monthChange.send((calendar.component(.year, from: date),
+                                calendar.component(.month, from: date)))
+
+        viewModel?.fetchUserInfo()
+            .receive(on: RunLoop.main)
+            .sink(receiveCompletion: { [weak self] completion in
+                if case let .failure(error) = completion {
+                    self?.errorPresenter.show(error, form: .fullPage, page: .home) {
+                        self?.retryHomeInitialLoad()
+                    }
+                }
+            }, receiveValue: { [weak self] userInfo in
+                self?.errorPresenter.dismiss()
+                self?.updateUserInfo(userInfo)
             })
             .store(in: &viewModel!.cancellables)
     }

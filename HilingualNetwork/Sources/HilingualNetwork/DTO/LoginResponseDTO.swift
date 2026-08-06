@@ -8,6 +8,7 @@
 import Foundation
 
 public struct LoginResponseDTO: Decodable {
+    public let userId: Int64?
     public let accessToken: String
     public let refreshToken: String
     public let registerStatus: Bool

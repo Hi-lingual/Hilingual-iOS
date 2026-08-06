@@ -74,12 +74,10 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
         dialog.isHidden = true
         dialog.snp.makeConstraints { $0.edges.equalToSuperview() }
         
-        // 게시글 신고
         sharedVC.onReportTapped = { [weak self] in
             self?.showReportDialog()
         }
         
-        // 게시글 공감하기
         sharedVC.onLikeTapped = { [weak self] diaryId, isLiked in
             guard let self else { return }
             self.input.likeTapped.send((diaryId, isLiked))
@@ -89,18 +87,15 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
             }
         }
         
-        // 유저 차단 모달 띄우기
         userFeedProfileView.onBlockTapped = { [weak self] in
             self?.userFeedProfileView.dismissModal()
             self?.userFeedProfileView.showBlockDialog()
         }
 
-        // 유저 신고
         userFeedProfileView.onReportTapped = { [weak self] in
             self?.showAccountReportDialog()
         }
         
-        // 유저 차단
         userFeedProfileView.onBlockConfirmTapped = { [weak self] in
             guard let self else { return }
             self.userFeedProfileView.dismissBlockDialog()
@@ -113,7 +108,6 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
             self.updateNavigation()
         }
         
-        // 유저 차단해제
         userFeedProfileView.onUnblockTapped = { [weak self] in
             guard let self else { return }
             self.unblockTappedSubject.send(self.targetUserId)
@@ -122,7 +116,6 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
             self.updateNavigation()
         }
         
-        // 유저 팔로우 & 팔로우 해제
         userFeedProfileView.onFollowTapped = { [weak self] state in
             guard let self else { return }
             switch state {
@@ -179,6 +172,7 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
             .compactMap { $0 }
             .receive(on: RunLoop.main)
             .sink { [weak self] entity in
+                self?.errorPresenter.dismiss()
                 self?.userFeedProfileView.configureProfile(
                     nickname: entity.nickname,
                     profileImageURL: entity.profileImg,
@@ -194,6 +188,24 @@ public final class UserFeedProfileViewController: BaseUIViewController<FeedProfi
             .receive(on: RunLoop.main)
             .sink { [weak self] state in
                 self?.userFeedProfileView.followButtonState(state)
+            }
+            .store(in: &cancellables)
+
+        output.loadError
+            .receive(on: RunLoop.main)
+            .sink { [weak self] error in
+                guard let self else { return }
+                self.errorPresenter.show(error, form: .fullPage, page: .userProfile) {
+                    self.input.reloadProfile.send(())
+                    self.input.reloadFeeds.send(())
+                }
+            }
+            .store(in: &cancellables)
+
+        output.actionError
+            .receive(on: RunLoop.main)
+            .sink { [weak self] error in
+                self?.errorPresenter.show(error, form: .modal, page: .userProfile)
             }
             .store(in: &cancellables)
     }

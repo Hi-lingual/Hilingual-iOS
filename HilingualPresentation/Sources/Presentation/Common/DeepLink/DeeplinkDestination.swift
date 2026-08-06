@@ -7,7 +7,7 @@
 
 import Foundation
 
-public enum DeeplinkDestination {
+public enum DeeplinkDestination: Sendable {
     case diaryDetail(diaryId: Int)
     case userProfile(userId: Int)
     case home

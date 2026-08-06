@@ -9,6 +9,7 @@ import Combine
 
 public protocol DeviceUseCase {
     func updateCurrentDevice() -> AnyPublisher<Void, Error>
+    func updateFcmToken(fcmToken: String) -> AnyPublisher<Void, Error>
 }
 
 public final class DefaultDeviceUseCase: DeviceUseCase {
@@ -21,5 +22,9 @@ public final class DefaultDeviceUseCase: DeviceUseCase {
 
     public func updateCurrentDevice() -> AnyPublisher<Void, Error> {
         return repository.updateCurrentDevice()
+    }
+    
+    public func updateFcmToken(fcmToken: String) -> AnyPublisher<Void, Error> {
+        return repository.updateFcmToken(fcmToken: fcmToken)
     }
 }

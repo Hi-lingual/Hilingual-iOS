@@ -47,6 +47,7 @@ public final class SplashViewModel: BaseViewModel {
         self.tokenStore = tokenStore
         self.socialLoginUseCase = socialLoginUseCase
         self.deviceUseCase = deviceUseCase
+        super.init()
     }
 
     // MARK: - Transform
@@ -112,6 +113,10 @@ public final class SplashViewModel: BaseViewModel {
                         refreshToken: response.refreshToken
                     )
 
+                    Task { @MainActor in
+                        FCMTokenSyncService.shared.sessionDidAuthenticate()
+                    }
+
 //                    #if DEBUG
 //                    let isProfileCompleted = true
 //                    print("[SplashVM] ⚙️ DEBUG 모드라서 → isProfileCompleted 강제 true임 ㅋㅋ")
@@ -131,12 +136,15 @@ public final class SplashViewModel: BaseViewModel {
             )
             .store(in: &cancellables)
     }
-
     private func syncDevice(after response: LoginResponseEntity) -> AnyPublisher<LoginResponseEntity, Error> {
-        deviceUseCase.updateCurrentDevice()
+        return deviceUseCase.updateCurrentDevice()
             .handleEvents(receiveOutput: {
                 print("[SplashVM] ✅ device API 성공")
             })
+            .catch { error -> AnyPublisher<Void, Error> in
+                print("[SplashVM] ⚠️ device API 실패 (무시하고 진행): \(error)")
+                return Just(()).setFailureType(to: Error.self).eraseToAnyPublisher()
+            }
             .map { response }
             .eraseToAnyPublisher()
     }

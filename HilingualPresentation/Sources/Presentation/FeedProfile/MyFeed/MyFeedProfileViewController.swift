@@ -131,6 +131,7 @@ public final class MyFeedProfileViewController: BaseUIViewController<FeedProfile
             .compactMap { $0 }
             .receive(on: RunLoop.main)
             .sink { [weak self] entity in
+                self?.errorPresenter.dismiss()
                 self?.myFeedProfileView.configureProfile(
                     nickname: entity.nickname,
                     profileImageURL: entity.profileImg,
@@ -138,6 +139,23 @@ public final class MyFeedProfileViewController: BaseUIViewController<FeedProfile
                     following: entity.following,
                     streak: entity.streak
                 )
+            }
+            .store(in: &viewModel.cancellables)
+
+        output.loadError
+            .receive(on: RunLoop.main)
+            .sink { [weak self] error in
+                self?.errorPresenter.show(error, form: .fullPage, page: .myFeed) {
+                    input.reloadProfile.send(())
+                    input.reloadFeeds.send(())
+                }
+            }
+            .store(in: &viewModel.cancellables)
+
+        output.actionError
+            .receive(on: RunLoop.main)
+            .sink { [weak self] error in
+                self?.errorPresenter.show(error, form: .modal, page: .myFeed)
             }
             .store(in: &viewModel.cancellables)
     }
