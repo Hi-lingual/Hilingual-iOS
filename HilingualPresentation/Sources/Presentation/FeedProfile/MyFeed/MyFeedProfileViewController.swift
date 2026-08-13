@@ -9,6 +9,7 @@ import UIKit
 import Foundation
 import SafariServices
 import Combine
+import HilingualCore
 
 public final class MyFeedProfileViewController: BaseUIViewController<FeedProfileViewModel> {
     
@@ -116,7 +117,9 @@ public final class MyFeedProfileViewController: BaseUIViewController<FeedProfile
     
     public override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        
+
+        AmplitudeManager.shared.send(.viewPage(page: .myFeed))
+
         sharedVC.refresh()
         likedVC.refresh()
     }

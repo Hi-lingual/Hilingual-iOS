@@ -50,15 +50,8 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
         writingStartTime = Date()
         
 
-        // 1️⃣ [Amplitude] 페이지 진입 (pageview)
-        AmplitudeManager.shared.send(
-            .pageviewDiaryWriting(
-                entryId: entryId,
-                backSource: .from(backSource),
-                selectedDate: selectedDate,
-                recommendedTopic: .from(topicData)
-            )
-        )
+        // 1️⃣ [Amplitude] 페이지 진입 (view_page)
+        AmplitudeManager.shared.send(.viewPage(page: .writeDiary))
         
         viewModel?.loadDraftIfExists(for: selectedDate)
     }
@@ -217,7 +210,7 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
         let dateString = selectedDate.toFormattedString("yyyy-MM-dd")
 
         AmplitudeManager.shared.send(
-            .submittedEntryDiary(
+            .clickSubmitEntry(
                 entryId: entryId,
                 hasPhoto: imageData != nil,
                 charCount: text.count,
@@ -284,9 +277,10 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
     @objc public override func backButtonTapped() {
         // 2️⃣ 뒤로가기 버튼 클릭
         AmplitudeManager.shared.send(
-            .clickBackDiary(
+            .clickBack(
                 entryId: entryId,
-                backSource: .uiButton
+                backSource: .uiButton,
+                page: .writeDiary
             )
         )
         if isImageChanged() {

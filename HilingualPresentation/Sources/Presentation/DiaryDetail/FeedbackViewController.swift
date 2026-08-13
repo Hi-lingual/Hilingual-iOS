@@ -74,7 +74,7 @@ public final class FeedbackViewController: BaseUIViewController<FeedbackViewMode
     public override func viewDidLoad() {
         super.viewDidLoad()
         viewDidLoadSubject.send(())
-        AmplitudeManager.shared.send(.pageviewFeedback(page: self.page))
+        AmplitudeManager.shared.send(.viewPage(page: self.page))
 
         feedbackView.onToggleChanged = { [weak self] isEnabled in
             guard let self = self else { return }
@@ -84,7 +84,7 @@ public final class FeedbackViewController: BaseUIViewController<FeedbackViewMode
             } else {
                 self.toggleClickCount += 1
                 AmplitudeManager.shared.send(
-                    .clickFeedbackToggle(
+                    .clickToggle(
                         page: self.page,
                         toggleClickCount: self.toggleClickCount,
                         toggleState: isEnabled
@@ -93,8 +93,11 @@ public final class FeedbackViewController: BaseUIViewController<FeedbackViewMode
             }
         }
         
-        feedbackView.onDiaryPronunciationTapped = { isFirstPlay in
-            AmplitudeManager.shared.send(.clickDiaryPronunciationBtn(isFirstPlay: isFirstPlay))
+        feedbackView.onDiaryPronunciationTapped = { [weak self] isFirstPlay in
+            guard let self else { return }
+            AmplitudeManager.shared.send(
+                .clickDiaryPronunciationBtnPlay(isFirstPlay: isFirstPlay, page: self.page)
+            )
         }
         
         if showsAdBanner {

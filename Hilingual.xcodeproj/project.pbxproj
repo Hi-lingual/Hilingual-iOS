@@ -23,9 +23,9 @@
 		E5C79B352E15282100E461C3 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5C79B2D2E15282100E461C3 /* SceneDelegate.swift */; };
 		E5C84AC92E1538C700CBD669 /* AppDIContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5C84AC82E1538C700CBD669 /* AppDIContainer.swift */; };
 		E5CBCFB42EC4B3E100475E81 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = E5CBCFB32EC4B3E100475E81 /* FirebaseCore */; };
-		E5CBCFC42EC4B3E100475E81 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = E5CBCFC32EC4B3E100475E81 /* FirebaseAnalytics */; };
-		E5CBCFC12EC4B3E100475E81 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = E5CBCFC02EC4B3E100475E81 /* FirebaseCrashlytics */; };
 		E5CBCFB62EC4B3E100475E81 /* FirebaseRemoteConfig in Frameworks */ = {isa = PBXBuildFile; productRef = E5CBCFB52EC4B3E100475E81 /* FirebaseRemoteConfig */; };
+		E5CBCFC12EC4B3E100475E81 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = E5CBCFC02EC4B3E100475E81 /* FirebaseCrashlytics */; };
+		E5CBCFC42EC4B3E100475E81 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = E5CBCFC32EC4B3E100475E81 /* FirebaseAnalytics */; };
 		E5D5D0A92E171AC300DABE8D /* HilingualData in Frameworks */ = {isa = PBXBuildFile; productRef = E5D5D0A82E171AC300DABE8D /* HilingualData */; };
 		E5D5D0AC2E17289000DABE8D /* HilingualPresentation in Frameworks */ = {isa = PBXBuildFile; productRef = E5D5D0AB2E17289000DABE8D /* HilingualPresentation */; };
 /* End PBXBuildFile section */
@@ -250,23 +250,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		E5F1A0012FCB000100000001 /* Configure Firebase */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"$(SRCROOT)/Hilingual/GoogleService-Info-Debug.plist",
-				"$(SRCROOT)/Hilingual/GoogleService-Info-Release.plist",
-			);
-			name = "Configure Firebase";
-			outputPaths = (
-				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/GoogleService-Info.plist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "set -e\n\ncase \"${CONFIGURATION}\" in\n  Debug) FIREBASE_PLIST=\"${SRCROOT}/Hilingual/GoogleService-Info-Debug.plist\" ;;\n  Release) FIREBASE_PLIST=\"${SRCROOT}/Hilingual/GoogleService-Info-Release.plist\" ;;\n  *) echo \"error: Unsupported configuration ${CONFIGURATION}\" >&2; exit 1 ;;\nesac\n\nDESTINATION=\"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/GoogleService-Info.plist\"\nmkdir -p \"$(dirname \"${DESTINATION}\")\"\ncp \"${FIREBASE_PLIST}\" \"${DESTINATION}\"\n\necho \"Configured Firebase for ${CONFIGURATION}: ${FIREBASE_PLIST}\"\n";
-		};
 		E5CBCFC22EC4B3E100475E81 /* Upload Crashlytics dSYM */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
@@ -286,6 +269,23 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${BUILD_DIR%/Build/*}/SourcePackages/checkouts/firebase-ios-sdk/Crashlytics/run\"\n";
+		};
+		E5F1A0012FCB000100000001 /* Configure Firebase */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/Hilingual/GoogleService-Info-Debug.plist",
+				"$(SRCROOT)/Hilingual/GoogleService-Info-Release.plist",
+			);
+			name = "Configure Firebase";
+			outputPaths = (
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/GoogleService-Info.plist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -e\n\ncase \"${CONFIGURATION}\" in\n  Debug) FIREBASE_PLIST=\"${SRCROOT}/Hilingual/GoogleService-Info-Debug.plist\" ;;\n  Release) FIREBASE_PLIST=\"${SRCROOT}/Hilingual/GoogleService-Info-Release.plist\" ;;\n  *) echo \"error: Unsupported configuration ${CONFIGURATION}\" >&2; exit 1 ;;\nesac\n\nDESTINATION=\"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/GoogleService-Info.plist\"\nmkdir -p \"$(dirname \"${DESTINATION}\")\"\ncp \"${FIREBASE_PLIST}\" \"${DESTINATION}\"\n\necho \"Configured Firebase for ${CONFIGURATION}: ${FIREBASE_PLIST}\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -344,7 +344,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.3.2;
+				MARKETING_VERSION = 2.4.2;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.Hilingual$(BUNDLE_ID_SUFFIX)";
 				PRODUCT_NAME = "Hilingual-Dev";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -385,7 +385,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.3.2;
+				MARKETING_VERSION = 2.4.2;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.Hilingual$(BUNDLE_ID_SUFFIX)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -621,16 +621,6 @@
 			package = E5A100022FCA000100000001 /* XCLocalSwiftPackageReference "HilingualDomain" */;
 			productName = HilingualDomain;
 		};
-		E5CBCFC02EC4B3E100475E81 /* FirebaseCrashlytics */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = E5CBCFB22EC4B3E100475E81 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseCrashlytics;
-		};
-		E5CBCFC32EC4B3E100475E81 /* FirebaseAnalytics */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = E5CBCFB22EC4B3E100475E81 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseAnalytics;
-		};
 		E5CBCFB32EC4B3E100475E81 /* FirebaseCore */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = E5CBCFB22EC4B3E100475E81 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
@@ -640,6 +630,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = E5CBCFB22EC4B3E100475E81 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseRemoteConfig;
+		};
+		E5CBCFC02EC4B3E100475E81 /* FirebaseCrashlytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E5CBCFB22EC4B3E100475E81 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCrashlytics;
+		};
+		E5CBCFC32EC4B3E100475E81 /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E5CBCFB22EC4B3E100475E81 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
 		};
 		E5D5D0A82E171AC300DABE8D /* HilingualData */ = {
 			isa = XCSwiftPackageProductDependency;
