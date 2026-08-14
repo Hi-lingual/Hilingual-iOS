@@ -20,10 +20,12 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
 
     private var selectedSortIndex: Int = 0
     private var isSearching: Bool = false
+    private var isUnmemorizedOnly: Bool = false
 
     // MARK: - Inputs
 
     private let sortSubject = PassthroughSubject<SortOption, Never>()
+    private let unmemorizedOnlySubject = PassthroughSubject<Bool, Never>()
     private let selectedWordIdSubject = PassthroughSubject<Int, Never>()
     private let bookmarkToggledSubject = PassthroughSubject<(Int, Bool), Never>()
     private let refreshSubject = PassthroughSubject<Void, Never>()
@@ -47,6 +49,9 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
         wordBookView.searchBar.resignFirstResponder()
         wordBookView.showHeaderView(true)
         selectedSortIndex = 0
+        isUnmemorizedOnly = false
+        wordBookView.updateUnmemorizedOnly(false)
+        unmemorizedOnlySubject.send(false)
         wordBookView.tableView.contentInset.top = 0
         sortSubject.send(.latest)
         wordBookView.updateHeaderView(totalCount: fullWordList.reduce(0) { $0 + $1.1.count }, sortIndex: selectedSortIndex)
@@ -91,6 +96,7 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
     public override func addTarget() {
         wordBookView.refreshControl.addTarget(self, action: #selector(didPullToRefresh), for: .valueChanged)
         wordBookView.sortButton.addTarget(self, action: #selector(didTapSort), for: .touchUpInside)
+        wordBookView.unmemorizedOnlyButton.addTarget(self, action: #selector(didTapUnmemorizedOnly), for: .touchUpInside)
         wordBookView.emptyView.emptyButton.addTarget(self, action: #selector(didTapEmptyAdd), for: .touchUpInside)
         wordBookView.studyButton.addTarget(self, action: #selector(didTapStudy), for: .touchUpInside)
     }
@@ -99,6 +105,7 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
         let input = WordBookViewModel.Input(
             viewDidLoad: Empty().eraseToAnyPublisher(),
             sortChanged: sortSubject.eraseToAnyPublisher(),
+            unmemorizedOnlyChanged: unmemorizedOnlySubject.eraseToAnyPublisher(),
             selectedWordId: selectedWordIdSubject.eraseToAnyPublisher(),
             bookmarkToggled: bookmarkToggledSubject.eraseToAnyPublisher(),
             refreshTriggered: refreshSubject.eraseToAnyPublisher(),
@@ -259,6 +266,13 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
     private func didTapEmptyAdd() {
         print("일기 쓰러 이동")
         customTabBarController?.selectedIndex = 0
+    }
+
+    @objc
+    private func didTapUnmemorizedOnly() {
+        isUnmemorizedOnly.toggle()
+        wordBookView.updateUnmemorizedOnly(isUnmemorizedOnly)
+        unmemorizedOnlySubject.send(isUnmemorizedOnly)
     }
 
     @objc

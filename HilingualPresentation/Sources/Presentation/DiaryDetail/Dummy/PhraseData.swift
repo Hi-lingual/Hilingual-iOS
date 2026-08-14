@@ -13,6 +13,7 @@ struct PhraseData: Codable {
     let reason: String
     let createdAt: String
     var isMarked: Bool
+    var isMemorized: Bool = false
 }
 
 

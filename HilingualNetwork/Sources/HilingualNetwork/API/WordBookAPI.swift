@@ -8,7 +8,7 @@
 import Moya
 
 public enum WordBookAPI {
-    case fetchWordList(sort: Int)
+    case fetchWordList(sort: Int, unmemorizedOnly: Bool)
     case fetchWordDetail(id: Int)
     case toggleBookmark(phraseId: Int, isBookmarked: Bool)
 }
@@ -36,8 +36,11 @@ extension WordBookAPI: BaseTargetType {
 
     public var task: Task {
         switch self {
-        case .fetchWordList(let sort):
-            return .requestParameters(parameters: ["sort": sort], encoding: URLEncoding.queryString)
+        case .fetchWordList(let sort, let unmemorizedOnly):
+            return .requestParameters(
+                parameters: ["sort": sort, "unmemorizedOnly": unmemorizedOnly],
+                encoding: URLEncoding.queryString
+            )
 
         case .fetchWordDetail:
             return .requestPlain

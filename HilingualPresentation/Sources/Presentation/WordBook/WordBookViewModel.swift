@@ -17,6 +17,7 @@ public final class WordBookViewModel: BaseViewModel {
     public struct Input {
         let viewDidLoad: AnyPublisher<Void, Never>
         let sortChanged: AnyPublisher<SortOption, Never>
+        let unmemorizedOnlyChanged: AnyPublisher<Bool, Never>
         let selectedWordId: AnyPublisher<Int, Never>
         let bookmarkToggled: AnyPublisher<(Int, Bool), Never>
         let refreshTriggered: AnyPublisher<Void, Never>
@@ -44,6 +45,7 @@ public final class WordBookViewModel: BaseViewModel {
     private let loadErrorSubject = PassthroughSubject<Error, Never>()
     private let actionErrorSubject = PassthroughSubject<Error, Never>()
     private var currentSortOption: SortOption = .latest
+    private var currentUnmemorizedOnly: Bool = false
 
     // MARK: - Init
 
@@ -60,14 +62,24 @@ public final class WordBookViewModel: BaseViewModel {
     public func transform(input: Input) -> Output {
         input.viewDidLoad
             .sink { [weak self] in
-                self?.fetchWords(sort: self?.currentSortOption ?? .latest)
+                guard let self else { return }
+                self.fetchWords(sort: self.currentSortOption, unmemorizedOnly: self.currentUnmemorizedOnly)
             }
             .store(in: &cancellables)
 
         input.sortChanged
             .sink { [weak self] option in
-                self?.currentSortOption = option
-                self?.fetchWords(sort: option)
+                guard let self else { return }
+                self.currentSortOption = option
+                self.fetchWords(sort: option, unmemorizedOnly: self.currentUnmemorizedOnly)
+            }
+            .store(in: &cancellables)
+
+        input.unmemorizedOnlyChanged
+            .sink { [weak self] isOn in
+                guard let self else { return }
+                self.currentUnmemorizedOnly = isOn
+                self.fetchWords(sort: self.currentSortOption, unmemorizedOnly: isOn)
             }
             .store(in: &cancellables)
 
@@ -85,7 +97,8 @@ public final class WordBookViewModel: BaseViewModel {
 
         input.refreshTriggered
                .sink { [weak self] in
-                   self?.fetchWords(sort: self?.currentSortOption ?? .latest)
+                   guard let self else { return }
+                   self.fetchWords(sort: self.currentSortOption, unmemorizedOnly: self.currentUnmemorizedOnly)
                }
                .store(in: &cancellables)
 
@@ -106,8 +119,8 @@ public final class WordBookViewModel: BaseViewModel {
 
     // MARK: - Private Methods
 
-    private func fetchWords(sort: SortOption) {
-        fetchWordListUseCase.execute(sort: sort)
+    private func fetchWords(sort: SortOption, unmemorizedOnly: Bool) {
+        fetchWordListUseCase.execute(sort: sort, unmemorizedOnly: unmemorizedOnly)
             .map { wordList in
                 wordList.map { (date, items) in
                     let phraseDataList = items.map { entity in
@@ -122,7 +135,8 @@ public final class WordBookViewModel: BaseViewModel {
                                 writtenDate: entity.writtenDate,
                                 savedRoot: entity.savedRoot
                             ),
-                            isMarked: entity.isMarked
+                            isMarked: entity.isMarked,
+                            isMemorized: entity.isMemorized
                         )
                     }
                     return (date: date, items: phraseDataList)

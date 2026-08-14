@@ -58,6 +58,19 @@ final class WordBookView: BaseUIView {
         return label
     }()
 
+    let unmemorizedOnlyButton: UIButton = {
+        let button = UIButton(type: .system)
+        let image = UIImage(named: "btn_unknown_checkbox_18_ios", in: .module, compatibleWith: nil)?
+            .withRenderingMode(.alwaysOriginal)
+        button.setImage(image, for: .normal)
+        button.setTitle(" 모르는 단어만 보기", for: .normal)
+        button.setTitleColor(.gray500, for: .normal)
+        button.titleLabel?.font = .pretendard(.body_r_14)
+        button.contentHorizontalAlignment = .left
+        button.semanticContentAttribute = .forceLeftToRight
+        return button
+    }()
+
     let sortButton: UIButton = {
         let button = UIButton(type: .system)
         let image = UIImage(named: "ic_list_24_ios", in: .module, compatibleWith: nil)?
@@ -78,7 +91,7 @@ final class WordBookView: BaseUIView {
         let container = UIView()
         container.backgroundColor = .clear
 
-        let stack = UIStackView(arrangedSubviews: [totalCountLabel, sortButton])
+        let stack = UIStackView(arrangedSubviews: [unmemorizedOnlyButton, sortButton])
         stack.axis = .horizontal
         stack.alignment = .center
         stack.distribution = .equalSpacing
@@ -109,7 +122,7 @@ final class WordBookView: BaseUIView {
         let button = UIButton(type: .system)
 
         var config = UIButton.Configuration.filled()
-        var title = AttributedString("단어 복습하기")
+        var title = AttributedString("복습하기")
         title.font = UIFont.pretendard(.body_sb_14)
         config.attributedTitle = title
         config.baseForegroundColor = .white
@@ -204,6 +217,13 @@ final class WordBookView: BaseUIView {
         } else {
             sortButton.setTitle(nil, for: .normal)
         }
+    }
+
+    func updateUnmemorizedOnly(_ isOn: Bool) {
+        let imageName = isOn ? "btn_unknown_checkbox_filled_18_ios" : "btn_unknown_checkbox_18_ios"
+        let image = UIImage(named: imageName, in: .module, compatibleWith: nil)?
+            .withRenderingMode(.alwaysOriginal)
+        unmemorizedOnlyButton.setImage(image, for: .normal)
     }
 
     func showHeaderView(_ show: Bool) {

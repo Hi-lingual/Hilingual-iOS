@@ -19,6 +19,7 @@ public struct WordEntity: Equatable, Hashable {
     public let explanation: String?
     public let example: String?
     public let isMarked: Bool
+    public let isMemorized: Bool
     public let writtenFrom: String?
     public let writtenDate: String?
     public let savedRoot: Int?
@@ -30,6 +31,7 @@ public struct WordEntity: Equatable, Hashable {
         explanation: String?,
         example: String?,
         isMarked: Bool,
+        isMemorized: Bool = false,
         writtenFrom: String?,
         writtenDate: String?,
         savedRoot: Int?
@@ -40,6 +42,7 @@ public struct WordEntity: Equatable, Hashable {
         self.explanation = explanation
         self.example = example
         self.isMarked = isMarked
+        self.isMemorized = isMemorized
         self.writtenFrom = writtenFrom
         self.writtenDate = writtenDate
         self.savedRoot = savedRoot

@@ -8,7 +8,7 @@
 import Combine
 
 public protocol WordBookRepository {
-    func fetchWords(sort: SortOption) -> AnyPublisher<[(date: String, items: [WordEntity])], Error>
+    func fetchWords(sort: SortOption, unmemorizedOnly: Bool) -> AnyPublisher<[(date: String, items: [WordEntity])], Error>
     func fetchWordDetail(id: Int) -> AnyPublisher<WordEntity, Error>
     func toggleBookmark(phraseId: Int, isBookmarked: Bool) -> AnyPublisher<Void, Error>
 }

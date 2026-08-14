@@ -19,8 +19,8 @@ public final class DefaultWordRepository: WordBookRepository {
         self.service = service
     }
 
-    public func fetchWords(sort: SortOption) -> AnyPublisher<[(date: String, items: [WordEntity])], Error> {
-        return service.fetchWordList(sort: sort.rawValue)
+    public func fetchWords(sort: SortOption, unmemorizedOnly: Bool) -> AnyPublisher<[(date: String, items: [WordEntity])], Error> {
+        return service.fetchWordList(sort: sort.rawValue, unmemorizedOnly: unmemorizedOnly)
             .map { wrapperDTO in
                 wrapperDTO.data.wordList.map { group in
                     let items: [WordEntity] = group.words.map { wordDTO in
@@ -28,9 +28,10 @@ public final class DefaultWordRepository: WordBookRepository {
                             phraseId: wordDTO.phraseId,
                             phraseType: wordDTO.phraseType,
                             phrase: wordDTO.phrase,
-                            explanation: nil,
+                            explanation: wordDTO.explanation,
                             example: nil,
                             isMarked: wordDTO.isBookmarked,
+                            isMemorized: wordDTO.isMemorized,
                             writtenFrom: nil,
                             writtenDate: nil,
                             savedRoot: nil

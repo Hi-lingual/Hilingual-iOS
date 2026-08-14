@@ -25,6 +25,7 @@ final class WordCard: UIView {
     private let reasonLabel = UILabel()
     private let pronunciationButton = UIButton(type: .custom)
     private let bookmarkButton = UIButton(type: .custom)
+    private let knownBadge = KnownBadgeView()
 
     // MARK: - State
 
@@ -77,11 +78,12 @@ final class WordCard: UIView {
         savedDateLabel.text = "\(data.createdAt)"
         reasonLabel.isHidden = data.reason.isEmpty
         reasonLabel.text = "\(data.reason)"
-        
+
         explanationLabel.isHidden = false
         reasonLabel.isHidden = false
         savedDateLabel.isHidden = false
-        
+        knownBadge.isHidden = !(type == .basic && data.isMemorized)
+
         switch type {
         case .basic:
             phraseLabel.font = .pretendard(.body_r_17)
@@ -104,7 +106,20 @@ final class WordCard: UIView {
                 $0.top.equalTo(chipStackView.snp.bottom).offset(4)
                 $0.leading.equalToSuperview().inset(12)
                 $0.trailing.equalTo(bookmarkButton.snp.leading).inset(4)
-                $0.bottom.equalToSuperview().inset(12)
+            }
+            if data.isMemorized {
+                knownBadge.snp.remakeConstraints {
+                    $0.top.equalTo(phraseLabel.snp.bottom).offset(4)
+                    $0.leading.equalToSuperview().inset(12)
+                    $0.bottom.equalToSuperview().inset(12)
+                }
+            } else {
+                knownBadge.snp.remakeConstraints {
+                    $0.top.equalTo(phraseLabel.snp.bottom)
+                    $0.leading.equalToSuperview().inset(12)
+                    $0.height.equalTo(0)
+                    $0.bottom.equalToSuperview().inset(12)
+                }
             }
 
         case .withExample:
@@ -209,7 +224,8 @@ final class WordCard: UIView {
             savedDateLabel,
             reasonLabel,
             pronunciationButton,
-            bookmarkButton
+            bookmarkButton,
+            knownBadge
         )
     }
 
@@ -280,5 +296,39 @@ final class WordCard: UIView {
         case "AI": return .ai
         default: return nil
         }
+    }
+}
+
+fileprivate final class KnownBadgeView: UIView {
+
+    private let iconView = UIImageView()
+    private let label = UILabel()
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+
+        iconView.image = UIImage(named: "ic_check_gray_28_ios", in: .module, compatibleWith: nil)
+        iconView.contentMode = .scaleAspectFit
+
+        label.text = "아는 단어"
+        label.font = .pretendard(.cap_r_12)
+        label.textColor = .gray400
+
+        addSubviews(iconView, label)
+
+        iconView.snp.makeConstraints {
+            $0.leading.centerY.equalToSuperview()
+            $0.width.height.equalTo(16)
+        }
+
+        label.snp.makeConstraints {
+            $0.leading.equalTo(iconView.snp.trailing).offset(2)
+            $0.centerY.equalToSuperview()
+            $0.trailing.equalToSuperview()
+        }
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 }

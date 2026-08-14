@@ -10,7 +10,7 @@ import Combine
 import Moya
 
 public protocol WordBookService {
-    func fetchWordList(sort: Int) -> AnyPublisher<WordBookResponseWrapperDTO, Error>
+    func fetchWordList(sort: Int, unmemorizedOnly: Bool) -> AnyPublisher<WordBookResponseWrapperDTO, Error>
     func fetchWordDetail(id: Int) -> AnyPublisher<WordDetailResponseWrapperDTO, Error>
     func toggleBookmark(phraseId: Int, isBookmarked: Bool) -> AnyPublisher<Void, Error>
 
@@ -23,8 +23,8 @@ public final class DefaultWordBookService: BaseService<WordBookAPI>, WordBookSer
             .eraseToAnyPublisher()
     }
 
-    public func fetchWordList(sort: Int) -> AnyPublisher<WordBookResponseWrapperDTO, Error> {
-        return request(.fetchWordList(sort: sort), as: WordBookResponseWrapperDTO.self)
+    public func fetchWordList(sort: Int, unmemorizedOnly: Bool) -> AnyPublisher<WordBookResponseWrapperDTO, Error> {
+        return request(.fetchWordList(sort: sort, unmemorizedOnly: unmemorizedOnly), as: WordBookResponseWrapperDTO.self)
             .mapError { $0 as Error }
             .eraseToAnyPublisher()
     }
