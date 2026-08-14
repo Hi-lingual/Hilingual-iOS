@@ -26,6 +26,7 @@ public final class RecommendedExpressionViewModel: BaseViewModel {
         let errorMessage: AnyPublisher<String, Never>
         let loadError: AnyPublisher<Error, Never>
         let bookmarkError: AnyPublisher<Error, Never>
+        let bookmarkAdded: AnyPublisher<Void, Never>
     }
 
     // MARK: - Properties
@@ -39,6 +40,7 @@ public final class RecommendedExpressionViewModel: BaseViewModel {
     private let errorSubject = PassthroughSubject<String, Never>()
     private let loadErrorSubject = PassthroughSubject<Error, Never>()
     private let bookmarkErrorSubject = PassthroughSubject<Error, Never>()
+    private let bookmarkAddedSubject = PassthroughSubject<Void, Never>()
 
     public init(diaryId: Int, recommendedExpressionUseCase: RecommendedExpressionUseCase, toggleBookmarkUseCase: ToggleBookmarkUseCase) {
         self.diaryId = diaryId
@@ -62,7 +64,8 @@ public final class RecommendedExpressionViewModel: BaseViewModel {
             fetchExpression: recommendecExpressionSubject.eraseToAnyPublisher(),
             errorMessage: errorSubject.eraseToAnyPublisher(),
             loadError: loadErrorSubject.eraseToAnyPublisher(),
-            bookmarkError: bookmarkErrorSubject.eraseToAnyPublisher()
+            bookmarkError: bookmarkErrorSubject.eraseToAnyPublisher(),
+            bookmarkAdded: bookmarkAddedSubject.eraseToAnyPublisher()
         )
     }
 
@@ -84,6 +87,9 @@ public final class RecommendedExpressionViewModel: BaseViewModel {
                 switch completion {
                 case .finished:
                     self?.updateBookmarkState(phraseId: phraseId, isBookmarked: isBookmarked)
+                    if isBookmarked {
+                        self?.bookmarkAddedSubject.send(())
+                    }
                 case .failure(let error):
                     self?.bookmarkErrorSubject.send(error)
                 }
