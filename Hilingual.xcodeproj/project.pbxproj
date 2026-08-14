@@ -344,7 +344,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.4.2;
+				MARKETING_VERSION = 2.4.3;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.Hilingual$(BUNDLE_ID_SUFFIX)";
 				PRODUCT_NAME = "Hilingual-Dev";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -385,7 +385,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.4.2;
+				MARKETING_VERSION = 2.4.3;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.Hilingual$(BUNDLE_ID_SUFFIX)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
