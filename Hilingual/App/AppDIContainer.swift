@@ -110,7 +110,7 @@ final class AppDIContainer: ViewControllerFactory {
     }
 
     public func makeWordBookViewController() -> WordBookViewController {
-        return WordBookViewController(viewModel: makeWordBookViewmodel(), diContainer: self)
+        return WordBookViewController(viewModel: makeWordBookViewmodel(), diContainer: self, wordBookUseCase: makeWordBookUseCase())
     }
 
     public func makeVerificationCodeViewController() -> VerificationCodeViewController {

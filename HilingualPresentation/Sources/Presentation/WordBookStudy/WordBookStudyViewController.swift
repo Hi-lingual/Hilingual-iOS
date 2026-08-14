@@ -6,12 +6,15 @@
 //
 
 import UIKit
+import Combine
+import HilingualDomain
 
 final class WordBookStudyViewController: UIViewController {
 
     // MARK: - Properties
 
     private let words: [PhraseData]
+    private let useCase: WordBookUseCase
     private let bufferSize = 3
     private let cardSpacing: CGFloat = 10
 
@@ -19,13 +22,16 @@ final class WordBookStudyViewController: UIViewController {
     private var loadedCards: [WordStudyCard] = []
     private var didSetupCards = false
     private var baseCardFrame: CGRect?
+    private var memorizedResults: [Int64: Bool] = [:]
+    private var cancellables = Set<AnyCancellable>()
 
     // MARK: - Init
 
-    init(words: [PhraseData]) {
+    init(words: [PhraseData], useCase: WordBookUseCase) {
         self.words = words
+        self.useCase = useCase
         super.init(nibName: nil, bundle: nil)
-        modalPresentationStyle = .pageSheet
+        modalPresentationStyle = .fullScreen
     }
 
     @available(*, unavailable)
@@ -35,14 +41,13 @@ final class WordBookStudyViewController: UIViewController {
 
     // MARK: - Lifecycle
 
-    public override func loadView() {
+    override func loadView() {
         view = WordBookStudyView()
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
         addTarget()
-        configureSheet()
         updateRemainingCount()
     }
 
@@ -63,17 +68,21 @@ final class WordBookStudyViewController: UIViewController {
     }
 
     private func addTarget() {
-        studyView.backButton.addTarget(self, action: #selector(didTapClose), for: .touchUpInside)
+        studyView.backButton.addTarget(self, action: #selector(didTapBack), for: .touchUpInside)
         studyView.notRememberedButton.addTarget(self, action: #selector(didTapNotRemembered), for: .touchUpInside)
         studyView.rememberedButton.addTarget(self, action: #selector(didTapRemembered), for: .touchUpInside)
-        studyView.completeButton.addTarget(self, action: #selector(didTapComplete), for: .touchUpInside)
+        studyView.primaryButton.addTarget(self, action: #selector(didTapPrimary), for: .touchUpInside)
     }
 
     // MARK: - Actions
 
     @objc
-    private func didTapClose() {
-        dismiss(animated: true)
+    private func didTapBack() {
+        if memorizedResults.isEmpty {
+            dismiss(animated: true)
+        } else {
+            studyView.setState(.exitPrompt)
+        }
     }
 
     @objc
@@ -87,13 +96,15 @@ final class WordBookStudyViewController: UIViewController {
     }
 
     @objc
-    private func didTapComplete() {
-        dismiss(animated: true)
+    private func didTapPrimary() {
+        submitAndDismiss()
     }
+
+    // MARK: - Cards
 
     private func loadInitialCards() {
         guard !words.isEmpty else {
-            studyView.emptyContainerView.isHidden = false
+            showCompleteState()
             return
         }
 
@@ -112,10 +123,14 @@ final class WordBookStudyViewController: UIViewController {
         updateRemainingCount()
     }
 
-    private func createCard(for index: Int) -> WordStudyCard {
-        let card = WordStudyCard(word: words[index])
+    private func createCard(for cardIndex: Int) -> WordStudyCard {
+        let word = words[cardIndex]
+        let card = WordStudyCard(word: word)
         card.delegate = self
         card.frame = cardFrame(at: loadedCards.count)
+        card.onFlipped = { [weak self] in
+            self?.studyView.hideHint()
+        }
         return card
     }
 
@@ -127,11 +142,9 @@ final class WordBookStudyViewController: UIViewController {
 
     private func layoutCards(animated: Bool) {
         guard !loadedCards.isEmpty else {
-            studyView.showCompleteState()
+            showCompleteState()
             return
         }
-
-        studyView.emptyContainerView.isHidden = true
 
         for (i, card) in loadedCards.enumerated() {
             let frame = cardFrame(at: i)
@@ -170,6 +183,34 @@ final class WordBookStudyViewController: UIViewController {
         layoutCards(animated: true)
         updateRemainingCount()
     }
+
+    private func showCompleteState() {
+        studyView.setState(.completed)
+    }
+
+    // MARK: - API
+
+    private func submitAndDismiss() {
+        let items = memorizedResults.map { MemorizationEntity(phraseId: Int($0.key), isMemorized: $0.value) }
+        guard !items.isEmpty else {
+            dismiss(animated: true)
+            return
+        }
+
+        studyView.primaryButton.isEnabled = false
+
+        useCase.updateMemorization(items: items)
+            .receive(on: RunLoop.main)
+            .sink(receiveCompletion: { [weak self] completion in
+                self?.studyView.primaryButton.isEnabled = true
+                if case .failure = completion {
+                    self?.dismiss(animated: true)
+                }
+            }, receiveValue: { [weak self] in
+                self?.dismiss(animated: true)
+            })
+            .store(in: &cancellables)
+    }
 }
 
 private extension WordBookStudyViewController {
@@ -185,21 +226,12 @@ private extension WordBookStudyViewController {
         studyView.updateRemainingCount(remaining)
     }
 
-    func configureSheet() {
-        guard let sheet = sheetPresentationController else { return }
-        sheet.detents = [.large()]
-        sheet.prefersGrabberVisible = false
-        sheet.preferredCornerRadius = 28
-    }
-
     func ensureBaseCardFrame() {
         guard baseCardFrame == nil else { return }
         let horizontalInset: CGFloat = 20
         let containerBounds = studyView.cardContainerView.bounds
-        let maxHeight = min(containerBounds.height, 420)
-        let minHeight: CGFloat = 240
-        let cardHeight = max(minHeight, min(maxHeight, containerBounds.height * 0.72))
-        let originY = max(8, (containerBounds.height - cardHeight) / 2)
+        let cardHeight: CGFloat = 400
+        let originY = max(0, (containerBounds.height - cardHeight) / 2)
         baseCardFrame = CGRect(
             x: horizontalInset,
             y: originY,
@@ -213,10 +245,18 @@ private extension WordBookStudyViewController {
 
 extension WordBookStudyViewController: WordStudyCardDelegate {
     func cardDidSwipeLeft(_ card: WordStudyCard) {
+        recordResult(for: card, isMemorized: false)
         advanceCards(from: card)
     }
 
     func cardDidSwipeRight(_ card: WordStudyCard) {
+        recordResult(for: card, isMemorized: true)
         advanceCards(from: card)
+    }
+
+    private func recordResult(for card: WordStudyCard, isMemorized: Bool) {
+        guard index < words.count else { return }
+        let word = words[index]
+        memorizedResults[word.phraseId] = isMemorized
     }
 }

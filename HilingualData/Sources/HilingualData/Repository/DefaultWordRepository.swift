@@ -69,4 +69,8 @@ public final class DefaultWordRepository: WordBookRepository {
             return service.toggleBookmark(phraseId: phraseId, isBookmarked: isBookmarked)
         }
 
+    public func updateMemorization(items: [MemorizationEntity]) -> AnyPublisher<Void, Error> {
+        let dtoItems = items.map { MemorizationItemDTO(phraseId: $0.phraseId, isMemorized: $0.isMemorized) }
+        return service.updateMemorization(items: dtoItems)
+    }
 }

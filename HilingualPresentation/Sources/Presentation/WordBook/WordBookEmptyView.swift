@@ -11,6 +11,7 @@ import SnapKit
 enum WordBookEmptyState {
     case noWords
     case noSearchResult
+    case noUnmemorized
 }
 
 final class WordBookEmptyView: UIView {
@@ -96,6 +97,12 @@ final class WordBookEmptyView: UIView {
             emptyImageView.image = UIImage(named: "img_search_ios", in: .module, compatibleWith: nil)
             emptyImageView.isHidden = false
             emptyLabel.text = "검색 결과가 없어요."
+            emptyButton.isHidden = true
+
+        case .noUnmemorized:
+            emptyImageView.image = UIImage(named: "img_word_ios", in: .module, compatibleWith: nil)
+            emptyImageView.isHidden = false
+            emptyLabel.text = "모두 아는 단어예요!"
             emptyButton.isHidden = true
         }
     }

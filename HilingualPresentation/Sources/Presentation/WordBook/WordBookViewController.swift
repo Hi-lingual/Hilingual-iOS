@@ -12,6 +12,10 @@ import HilingualCore
 
 public final class WordBookViewController: BaseUIViewController<WordBookViewModel> {
 
+    // MARK: - Dependencies
+
+    private let wordBookUseCase: WordBookUseCase
+
     // MARK: - View & State
 
     private let wordBookView = WordBookView()
@@ -21,6 +25,22 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
     private var selectedSortIndex: Int = 0
     private var isSearching: Bool = false
     private var isUnmemorizedOnly: Bool = false
+
+    // MARK: - Init
+
+    public init(
+        viewModel: WordBookViewModel,
+        diContainer: any ViewControllerFactory,
+        wordBookUseCase: WordBookUseCase
+    ) {
+        self.wordBookUseCase = wordBookUseCase
+        super.init(viewModel: viewModel, diContainer: diContainer)
+    }
+
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 
     // MARK: - Inputs
 
@@ -151,10 +171,10 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
             .sink { [weak self] words in
                 guard let self = self else { return }
                 guard !words.isEmpty else {
-                    self.showToast(message: "북마크된 단어가 없어요.")
+                    self.showToast(message: "복습할 단어가 없어요.")
                     return
                 }
-                let studyVC = WordBookStudyViewController(words: words)
+                let studyVC = WordBookStudyViewController(words: words, useCase: self.wordBookUseCase)
                 studyVC.modalPresentationStyle = .fullScreen
                 self.present(studyVC, animated: true)
             }
@@ -182,14 +202,20 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
     // MARK: - Private Methods
 
     private func updateViewState() {
-        let isAllEmpty = fullWordList.allSatisfy { $0.1.isEmpty }
         let isFilteredEmpty = filteredWordList.allSatisfy { $0.1.isEmpty }
 
         wordBookView.tableView.isHidden = isFilteredEmpty
         wordBookView.emptyView.isHidden = !isFilteredEmpty
 
         if isFilteredEmpty {
-            let state: WordBookEmptyState = isAllEmpty ? .noWords : .noSearchResult
+            let state: WordBookEmptyState
+            if isSearching {
+                state = .noSearchResult
+            } else if isUnmemorizedOnly {
+                state = .noUnmemorized
+            } else {
+                state = .noWords
+            }
             wordBookView.emptyView.configure(state: state)
         }
     }
@@ -288,9 +314,9 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
     private func didTapStudy() {
         AmplitudeManager.shared.send(.clickVocabularyReviewBtn)
 
-        let bookmarkedWords = fullWordList.flatMap { $0.1 }.filter { $0.isMarked }
-        guard !bookmarkedWords.isEmpty else {
-            showToast(message: "북마크된 단어가 없어요.")
+        let allWords = fullWordList.flatMap { $0.1 }
+        guard !allWords.isEmpty else {
+            showToast(message: "복습할 단어가 없어요.")
             return
         }
 

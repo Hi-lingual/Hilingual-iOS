@@ -13,7 +13,7 @@ public protocol WordBookService {
     func fetchWordList(sort: Int, unmemorizedOnly: Bool) -> AnyPublisher<WordBookResponseWrapperDTO, Error>
     func fetchWordDetail(id: Int) -> AnyPublisher<WordDetailResponseWrapperDTO, Error>
     func toggleBookmark(phraseId: Int, isBookmarked: Bool) -> AnyPublisher<Void, Error>
-
+    func updateMemorization(items: [MemorizationItemDTO]) -> AnyPublisher<Void, Error>
 }
 
 public final class DefaultWordBookService: BaseService<WordBookAPI>, WordBookService {
@@ -31,6 +31,13 @@ public final class DefaultWordBookService: BaseService<WordBookAPI>, WordBookSer
 
     public func toggleBookmark(phraseId: Int, isBookmarked: Bool) -> AnyPublisher<Void, Error> {
         return requestPlain(.toggleBookmark(phraseId: phraseId, isBookmarked: isBookmarked))
+            .map { _ in () }
+            .mapError { $0 as Error }
+            .eraseToAnyPublisher()
+    }
+
+    public func updateMemorization(items: [MemorizationItemDTO]) -> AnyPublisher<Void, Error> {
+        return requestPlain(.updateMemorization(items: items))
             .map { _ in () }
             .mapError { $0 as Error }
             .eraseToAnyPublisher()

@@ -82,7 +82,7 @@ final class WordCard: UIView {
         explanationLabel.isHidden = false
         reasonLabel.isHidden = false
         savedDateLabel.isHidden = false
-        knownBadge.isHidden = !(type == .basic && data.isMemorized)
+        knownBadge.isHidden = !((type == .basic || type == .withDate) && data.isMemorized)
 
         switch type {
         case .basic:
@@ -109,16 +109,15 @@ final class WordCard: UIView {
             }
             if data.isMemorized {
                 knownBadge.snp.remakeConstraints {
-                    $0.top.equalTo(phraseLabel.snp.bottom).offset(4)
+                    $0.top.equalTo(phraseLabel.snp.bottom).offset(14)
                     $0.leading.equalToSuperview().inset(12)
-                    $0.bottom.equalToSuperview().inset(12)
+                    $0.bottom.equalToSuperview().inset(14)
                 }
             } else {
                 knownBadge.snp.remakeConstraints {
                     $0.top.equalTo(phraseLabel.snp.bottom)
                     $0.leading.equalToSuperview().inset(12)
-                    $0.height.equalTo(0)
-                    $0.bottom.equalToSuperview().inset(12)
+                    $0.bottom.equalToSuperview().inset(14)
                 }
             }
 
@@ -150,14 +149,14 @@ final class WordCard: UIView {
             phraseLabel.font = .pretendard(.head_r_20)
             explanationLabel.font = .pretendard(.body_r_14)
             savedDateLabel.font = .pretendard(.cap_r_12)
-            
+
             phraseLabel.numberOfLines = 2
             reasonLabel.isHidden = true
-            
+
             chipStackView.snp.remakeConstraints {
                 $0.top.leading.equalToSuperview().inset(24)
             }
-            
+
             phraseLabel.snp.remakeConstraints {
                 $0.top.equalTo(chipStackView.snp.bottom).offset(4)
                 $0.leading.equalToSuperview().inset(24)
@@ -169,7 +168,12 @@ final class WordCard: UIView {
                 $0.leading.equalToSuperview().inset(24)
                 $0.trailing.equalTo(bookmarkButton.snp.leading).inset(8)
             }
-            
+
+            knownBadge.snp.remakeConstraints {
+                $0.top.equalTo(explanationLabel.snp.bottom).offset(20)
+                $0.leading.equalToSuperview().inset(24)
+            }
+
             savedDateLabel.snp.remakeConstraints {
                 $0.top.equalTo(explanationLabel.snp.bottom).offset(80)
                 $0.trailing.equalToSuperview().inset(24)
@@ -299,30 +303,30 @@ final class WordCard: UIView {
     }
 }
 
-fileprivate final class KnownBadgeView: UIView {
+private final class KnownBadgeView: UIView {
 
-    private let iconView = UIImageView()
-    private let label = UILabel()
+    private let checkIconImageView = UIImageView()
+    private let titleLabel = UILabel()
 
     override init(frame: CGRect) {
         super.init(frame: frame)
 
-        iconView.image = UIImage(named: "ic_check_gray_28_ios", in: .module, compatibleWith: nil)
-        iconView.contentMode = .scaleAspectFit
+        checkIconImageView.image = UIImage(named: "ic_check_16_ios", in: .module, compatibleWith: nil)
+        checkIconImageView.contentMode = .scaleAspectFit
 
-        label.text = "아는 단어"
-        label.font = .pretendard(.cap_r_12)
-        label.textColor = .gray400
+        titleLabel.text = "아는 단어"
+        titleLabel.font = .pretendard(.cap_r_12)
+        titleLabel.textColor = .gray400
 
-        addSubviews(iconView, label)
+        addSubviews(checkIconImageView, titleLabel)
 
-        iconView.snp.makeConstraints {
+        checkIconImageView.snp.makeConstraints {
             $0.leading.centerY.equalToSuperview()
             $0.width.height.equalTo(16)
         }
 
-        label.snp.makeConstraints {
-            $0.leading.equalTo(iconView.snp.trailing).offset(2)
+        titleLabel.snp.makeConstraints {
+            $0.leading.equalTo(checkIconImageView.snp.trailing).offset(2)
             $0.centerY.equalToSuperview()
             $0.trailing.equalToSuperview()
         }

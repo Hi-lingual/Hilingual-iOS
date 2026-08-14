@@ -10,6 +10,7 @@ import Combine
 public protocol WordBookUseCase {
     func execute(sort: SortOption, unmemorizedOnly: Bool) -> AnyPublisher<[(date: String, items: [WordEntity])], Error>
     func getWordDetail(id: Int) -> AnyPublisher<WordEntity, Error>
+    func updateMemorization(items: [MemorizationEntity]) -> AnyPublisher<Void, Error>
 }
 
 public final class DefaultWordBookUseCase: WordBookUseCase {
@@ -25,5 +26,8 @@ public final class DefaultWordBookUseCase: WordBookUseCase {
     }
     public func getWordDetail(id: Int) -> AnyPublisher<WordEntity, Error> {
         return repository.fetchWordDetail(id: id)
+    }
+    public func updateMemorization(items: [MemorizationEntity]) -> AnyPublisher<Void, Error> {
+        return repository.updateMemorization(items: items)
     }
 }
