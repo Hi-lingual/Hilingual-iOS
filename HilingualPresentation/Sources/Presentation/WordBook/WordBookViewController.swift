@@ -57,6 +57,11 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
         navigationController?.setNavigationBarHidden(false, animated: animated)
     }
 
+    public override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        AmplitudeManager.shared.send(.viewPage(page: .vocabulary))
+    }
+
     public override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -126,7 +131,9 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
                     self?.bookmarkToggledSubject.send((phraseId, isMarked))
                 }
                 self?.wordDetailDialog.onPronunciationTapped = { isFirstPlay in
-                    AmplitudeManager.shared.send(.clickVocabPronunciationBtn(isFirstPlay: isFirstPlay))
+                    AmplitudeManager.shared.send(
+                        .clickVocabPronunciationBtnPlay(isFirstPlay: isFirstPlay, page: .vocabulary)
+                    )
                 }
                 self?.wordDetailDialog.showAnimation()
             }
@@ -181,7 +188,17 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
     }
 
     private func updateSort(by index: Int) {
+        let previousIndex = selectedSortIndex
         selectedSortIndex = index
+
+        if previousIndex != index {
+            AmplitudeManager.shared.send(
+                .clickVocabularySortChanged(
+                    previousSortType: Self.vocabSortType(from: previousIndex),
+                    sortType: Self.vocabSortType(from: index)
+                )
+            )
+        }
 
         switch index {
         case 0:
@@ -255,7 +272,7 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
 
     @objc
     private func didTapStudy() {
-        AmplitudeManager.shared.send(.clickVocabReviewBtn)
+        AmplitudeManager.shared.send(.clickVocabularyReviewBtn)
 
         let bookmarkedWords = fullWordList.flatMap { $0.1 }.filter { $0.isMarked }
         guard !bookmarkedWords.isEmpty else {
@@ -327,7 +344,12 @@ extension WordBookViewController: UITableViewDataSource, UITableViewDelegate {
 
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let item = filteredWordList[indexPath.section].1[indexPath.row]
+        AmplitudeManager.shared.send(.clickVocaLookup(page: .vocabulary))
         selectedWordIdSubject.send(Int(item.phraseId))
+    }
+
+    private static func vocabSortType(from index: Int) -> AnalyticsEvent.VocabSortType {
+        index == 1 ? .alphabetical : .latest
     }
 }
 

@@ -120,7 +120,7 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
             self.toggleClickCount += 1
             
             AmplitudeManager.shared.send(
-                .clickFeedbackToggle(
+                .clickToggle(
                     page: self.feedbackPage,
                     toggleClickCount: self.toggleClickCount,
                     toggleState: isEnabled
@@ -285,9 +285,10 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
 
     @objc public override func backButtonTapped() {
         AmplitudeManager.shared.send(
-            .clickBackFeedback(
+            .clickBack(
                 entryId: entryId,
-                backSource: .uiButton
+                backSource: .uiButton,
+                page: self.feedbackPage
             )
         )
         navigationController?.popToRootViewController(animated: true)
@@ -379,7 +380,7 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
                 guard let self = self else { return }
                 self.dialog.dismiss()
 
-                AmplitudeManager.shared.send(.submittedPostDiary(entryId: self.entryId))
+                AmplitudeManager.shared.send(.clickPostDiary(entryId: self.entryId))
 
                 self.publishTappedSubject.send(())
             }

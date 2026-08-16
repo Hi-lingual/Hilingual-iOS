@@ -7,6 +7,7 @@
 
 import UIKit
 import Combine
+import HilingualCore
 @preconcurrency import GoogleMobileAds
 
 public final class HomeViewController: BaseUIViewController<HomeViewModel> {
@@ -72,6 +73,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     
     public override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        AmplitudeManager.shared.send(.viewPage(page: .home))
         showOnboardingBottomSheet()
     }
     
@@ -189,7 +191,11 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         homeView.selectedInfo.cardTopicView.onTapWriteDiary = { [weak self] in
             guard let self else { return }
             guard let selectedDate = self.homeView.calendarView.selectedDate else { return }
-            
+
+            AmplitudeManager.shared.send(
+                .clickHomeDiaryWrite(openTime: Date().timeIntervalSince1970)
+            )
+
             let topic = self.homeView.selectedInfo.topicData
 
             self.pendingDraftDate = selectedDate
@@ -224,14 +230,22 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         
         homeView.selectedInfo.onMenuAction = { [weak self] action, diaryId in
             guard let self else { return }
-            
+
+            let menuName: AnalyticsEvent.HomeMenuName
+            switch action {
+            case .publish: menuName = .publish
+            case .unpublish: menuName = .unpublish
+            case .delete: menuName = .delete
+            }
+            AmplitudeManager.shared.send(.clickHomeMoreMenu(menuName: menuName))
+
             switch action {
             case .publish:
                 self.showDialog(for: .publish, diaryId: diaryId)
-                
+
             case .unpublish:
                 self.showDialog(for: .unpublish, diaryId: diaryId)
-                
+
             case .delete:
                 break
             }
@@ -254,6 +268,8 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         homeView.selectedInfo.onTapRecovery = { [weak self] in
             guard let self else { return }
             guard let selectedDate = self.homeView.calendarView.selectedDate else { return }
+
+            AmplitudeManager.shared.send(.clickHomeStreakRevive)
 
             self.pendingRecoveryDate = selectedDate
             self.isRecoveryWritingFlowActive = true
@@ -958,6 +974,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     }
     
     @objc private func profileImageTapped() {
+        AmplitudeManager.shared.send(.clickHomeProfile)
         goToMyFeedProefileView()
     }
     
@@ -994,9 +1011,17 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     }
     
     private func goToDiaryDetailView(diaryId: Int) {
+        AmplitudeManager.shared.send(
+            .clickHomeDiaryView(
+                entryId: String(diaryId),
+                entrySource: .home,
+                openTime: Date().timeIntervalSince1970
+            )
+        )
+
         let detailVC = diContainer.makeDiaryDetailViewController(diaryId: diaryId)
         detailVC.hidesBottomBarWhenPushed = true
-        
+
         navigationController?.pushViewController(detailVC, animated: true)
     }
     
@@ -1095,6 +1120,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
 
     @MainActor
     private func showRecoveryAdFailureDialog() {
+        AmplitudeManager.shared.send(.viewAdAction(result: .failed, page: .home))
         DialogManager.shared.show(message: "광고를 불러오지 못했어요.\n잠시 후 다시 시도해주세요.")
     }
     
@@ -1133,6 +1159,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                 self.rewardedInterstitial?.present(from: self) { [weak self] in
                     print("✅ 전면 광고 시청 완료")
                     self?.didEarnRecoveryReward = true
+                    AmplitudeManager.shared.send(.viewAdAction(result: .completed, page: .home))
                     self?.showRecoveryTransitionOverlay()
                 }
             }
@@ -1218,6 +1245,7 @@ extension HomeViewController: FullScreenContentDelegate {
         rewardedInterstitial = nil
 
         guard didEarnRecoveryReward else {
+            AmplitudeManager.shared.send(.viewAdAction(result: .dismissed, page: .home))
             resetRecoveryAdState()
             return
         }

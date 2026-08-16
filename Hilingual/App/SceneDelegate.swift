@@ -36,6 +36,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             if let link = userInfo["link"] as? String,
                let url = URL(string: link),
                let destination = DeeplinkParser.parse(url: url) {
+                let analytics = destination.pushNotificationAnalytics
+                AmplitudeManager.shared.send(
+                    .clickPushNotification(notificationType: analytics.type, page: analytics.page)
+                )
                 DeeplinkManager.shared.pendingDestination = destination
             }
         }

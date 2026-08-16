@@ -8,6 +8,7 @@
 import UIKit
 import Combine
 import SnapKit
+import HilingualCore
 
 public final class LoginOnBoardingViewController: BaseUIViewController<LoginOnBoardingViewModel> {
 
@@ -39,6 +40,7 @@ public final class LoginOnBoardingViewController: BaseUIViewController<LoginOnBo
 
     public override func viewDidLoad() {
         super.viewDidLoad()
+        AmplitudeManager.shared.send(.viewPage(page: .onboarding))
         loginOnBoardingView.collectionView.dataSource = self
         loginOnBoardingView.collectionView.delegate = self
         applyPageState(animated: false)
@@ -83,6 +85,7 @@ public final class LoginOnBoardingViewController: BaseUIViewController<LoginOnBo
 
     @objc
     private func skipTapped() {
+        AmplitudeManager.shared.send(.clickOnboardingSkip(onboardingStep: currentPage))
         UserDefaults.standard.set(true, forKey: "hasLoggedInBefore")
         print("[LoginOnBoardingVC] ⏭️ 건너뛰기 탭 - hasLoggedInBefore 저장: true")
         startTappedSubject.send()

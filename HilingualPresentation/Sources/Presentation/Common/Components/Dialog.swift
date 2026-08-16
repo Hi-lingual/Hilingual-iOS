@@ -306,7 +306,7 @@ extension Dialog {
             leftButton.addAction(UIAction { [weak self] _ in
                 if let entryId = entryId {
                     AmplitudeManager.shared.send(
-                        .clickModal(
+                        .clickBackModal(
                             entryId: entryId,
                             action: .continueWriting
                         )
@@ -320,7 +320,7 @@ extension Dialog {
         rightButton.addAction(UIAction { [weak self] _ in
             if let entryId = entryId {
                 AmplitudeManager.shared.send(
-                    .clickModal(
+                    .clickBackModal(
                         entryId: entryId,
                         action: .confirmExit
                     )

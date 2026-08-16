@@ -7,6 +7,7 @@
 
 import UIKit
 import SnapKit
+import HilingualCore
 
 final class CardTopicView: UIView {
 
@@ -170,6 +171,7 @@ final class CardTopicView: UIView {
     }
     
     @objc private func didTapChangeTopic() {
+        AmplitudeManager.shared.send(.clickHomeSwitchLanguage)
         let isEnglishVisible = !topicEnLabel.isHidden
         topicEnLabel.isHidden = isEnglishVisible
         topicKorLabel.isHidden = !isEnglishVisible
