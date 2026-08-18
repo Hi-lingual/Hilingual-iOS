@@ -13,13 +13,3 @@ public protocol WordBookRepository {
     func toggleBookmark(phraseId: Int, isBookmarked: Bool) -> AnyPublisher<Void, Error>
     func updateMemorization(items: [MemorizationEntity]) -> AnyPublisher<Void, Error>
 }
-
-public struct MemorizationEntity: Equatable, Hashable {
-    public let phraseId: Int
-    public let isMemorized: Bool
-
-    public init(phraseId: Int, isMemorized: Bool) {
-        self.phraseId = phraseId
-        self.isMemorized = isMemorized
-    }
-}
