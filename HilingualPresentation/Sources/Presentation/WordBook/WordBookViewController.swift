@@ -69,6 +69,7 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
 
     public override func viewDidLoad() {
         super.viewDidLoad()
+        view.backgroundColor = .gray100
 
         DispatchQueue.main.async { [weak self] in
             guard let self = self,

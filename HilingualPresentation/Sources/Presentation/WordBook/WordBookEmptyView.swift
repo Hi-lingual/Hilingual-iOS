@@ -100,7 +100,7 @@ final class WordBookEmptyView: UIView {
             emptyButton.isHidden = true
 
         case .noWordsToMemorize:
-            emptyImageView.image = UIImage(named: "img_word_ios", in: .module, compatibleWith: nil)
+            emptyImageView.image = UIImage(resource: .imgFinishGIos)
             emptyImageView.isHidden = false
             emptyLabel.text = "모두 아는 단어예요!"
             emptyButton.isHidden = true
