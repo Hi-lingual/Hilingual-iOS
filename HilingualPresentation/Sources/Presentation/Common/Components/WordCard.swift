@@ -111,13 +111,15 @@ final class WordCard: UIView {
                 knownBadge.snp.remakeConstraints {
                     $0.top.equalTo(phraseLabel.snp.bottom).offset(14)
                     $0.leading.equalToSuperview().inset(12)
-                    $0.bottom.equalToSuperview().inset(14)
+                    $0.height.equalTo(16)
+                    $0.bottom.equalToSuperview().inset(12)
                 }
             } else {
                 knownBadge.snp.remakeConstraints {
                     $0.top.equalTo(phraseLabel.snp.bottom)
                     $0.leading.equalToSuperview().inset(12)
-                    $0.bottom.equalToSuperview().inset(14)
+                    $0.height.equalTo(0)
+                    $0.bottom.equalToSuperview().inset(10)
                 }
             }
 
@@ -172,6 +174,7 @@ final class WordCard: UIView {
             knownBadge.snp.remakeConstraints {
                 $0.top.equalTo(explanationLabel.snp.bottom).offset(20)
                 $0.leading.equalToSuperview().inset(24)
+                $0.height.equalTo(16)
             }
 
             savedDateLabel.snp.remakeConstraints {
