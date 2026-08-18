@@ -14,7 +14,7 @@ final class KnownBadgeView: BaseUIView {
     private let titleLabel = UILabel()
 
     override func setUI() {
-        checkIconImageView.image = UIImage(named: "ic_check_16_ios", in: .module, compatibleWith: nil)
+        checkIconImageView.image = UIImage(resource: .icCheck16Ios)
         checkIconImageView.contentMode = .scaleAspectFit
 
         titleLabel.text = "아는 단어"

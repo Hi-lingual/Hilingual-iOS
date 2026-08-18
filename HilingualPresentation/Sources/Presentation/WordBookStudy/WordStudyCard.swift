@@ -75,7 +75,7 @@ final class WordStudyCard: UIView {
     }()
     private let frontFlipHintImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = UIImage(named: "ic_reverse_28_ios", in: .module, compatibleWith: nil)
+        imageView.image = UIImage(resource: .icReverse28Ios)
         imageView.contentMode = .scaleAspectFit
         return imageView
     }()
@@ -97,7 +97,7 @@ final class WordStudyCard: UIView {
     }()
     private let backFlipHintImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = UIImage(named: "ic_reverse_28_ios", in: .module, compatibleWith: nil)
+        imageView.image = UIImage(resource: .icReverse28Ios)
         imageView.contentMode = .scaleAspectFit
         return imageView
     }()

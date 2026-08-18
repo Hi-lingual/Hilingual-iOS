@@ -60,7 +60,7 @@ final class WordBookView: BaseUIView {
 
     let unmemorizedOnlyButton: UIButton = {
         let button = UIButton(type: .system)
-        let image = UIImage(named: "btn_unknown_checkbox_18_ios", in: .module, compatibleWith: nil)?
+        let image = UIImage(resource: .btnUnknownCheckbox18Ios)
             .withRenderingMode(.alwaysOriginal)
         button.setImage(image, for: .normal)
         button.setTitle(" 모르는 단어만 보기", for: .normal)
@@ -131,7 +131,7 @@ final class WordBookView: BaseUIView {
         config.background.cornerRadius = 30
         config.cornerStyle = .fixed
         config.contentInsets = NSDirectionalEdgeInsets(top: 12, leading: 16, bottom: 12, trailing: 16)
-        config.image = UIImage(named: "ic_card_24_ios", in: .module, compatibleWith: nil)?
+        config.image = UIImage(resource: .icCard24Ios)
             .withRenderingMode(.alwaysOriginal)
         config.imagePadding = 4
         config.imagePlacement = .leading
@@ -227,8 +227,7 @@ final class WordBookView: BaseUIView {
     }
 
     func updateUnmemorizedOnly(_ isOn: Bool) {
-        let imageName = isOn ? "btn_unknown_checkbox_filled_18_ios" : "btn_unknown_checkbox_18_ios"
-        let image = UIImage(named: imageName, in: .module, compatibleWith: nil)?
+        let image = UIImage(resource: isOn ? .btnUnknownCheckboxFilled18Ios : .btnUnknownCheckbox18Ios)
             .withRenderingMode(.alwaysOriginal)
         unmemorizedOnlyButton.setImage(image, for: .normal)
     }
