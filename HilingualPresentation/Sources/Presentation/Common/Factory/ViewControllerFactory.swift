@@ -18,6 +18,7 @@ public protocol ViewControllerFactory {
     func makeMypageViewController() -> MypageViewController
     func makeLoadingViewController() -> LoadingViewController
     func makeWordBookViewController() -> WordBookViewController
+    func makeWordBookStudyViewController(words: [PhraseData]) -> WordBookStudyViewController
     func makeDiaryDetailViewController(diaryId: Int) -> DiaryDetailViewController
     func makeFeedbackViewController(diaryId: Int) -> FeedbackViewController
     func makeRecommendedExpressionViewController(diaryId: Int) -> RecommendedExpressionViewController

@@ -7,14 +7,12 @@
 
 import UIKit
 import Combine
-import HilingualDomain
 
-final class WordBookStudyViewController: UIViewController {
+public final class WordBookStudyViewController: BaseUIViewController<WordBookStudyViewModel> {
 
     // MARK: - Properties
 
     private let words: [PhraseData]
-    private let useCase: WordBookUseCase
     private let bufferSize = 3
     private let cardSpacing: CGFloat = 10
 
@@ -22,43 +20,44 @@ final class WordBookStudyViewController: UIViewController {
     private var loadedCards: [WordStudyCard] = []
     private var didSetupCards = false
     private var baseCardFrame: CGRect?
-    private var memorizedResults: [Int64: Bool] = [:]
-    private var cancellables = Set<AnyCancellable>()
+
+    // MARK: - Input Subjects
+
+    private let cardSwipedSubject = PassthroughSubject<(phraseId: Int64, isMemorized: Bool), Never>()
+    private let submitTappedSubject = PassthroughSubject<Void, Never>()
+    private let retryRequestedSubject = PassthroughSubject<Void, Never>()
 
     // MARK: - Init
 
-    init(words: [PhraseData], useCase: WordBookUseCase) {
+    public init(
+        viewModel: WordBookStudyViewModel,
+        diContainer: any ViewControllerFactory,
+        words: [PhraseData]
+    ) {
         self.words = words
-        self.useCase = useCase
-        super.init(nibName: nil, bundle: nil)
+        super.init(viewModel: viewModel, diContainer: diContainer)
         modalPresentationStyle = .fullScreen
-    }
-
-    @available(*, unavailable)
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
     }
 
     // MARK: - Lifecycle
 
-    override func loadView() {
+    public override func loadView() {
         view = WordBookStudyView()
     }
 
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
-        addTarget()
         updateRemainingCount()
     }
 
-    override func viewDidLayoutSubviews() {
+    public override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         if didSetupCards {
             layoutCards(animated: false)
         }
     }
 
-    override func viewDidAppear(_ animated: Bool) {
+    public override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         if !didSetupCards {
             view.layoutIfNeeded()
@@ -67,21 +66,58 @@ final class WordBookStudyViewController: UIViewController {
         }
     }
 
-    private func addTarget() {
+    // MARK: - Setup
+
+    public override func addTarget() {
         studyView.backButton.addTarget(self, action: #selector(didTapBack), for: .touchUpInside)
         studyView.notRememberedButton.addTarget(self, action: #selector(didTapNotRemembered), for: .touchUpInside)
         studyView.rememberedButton.addTarget(self, action: #selector(didTapRemembered), for: .touchUpInside)
         studyView.primaryButton.addTarget(self, action: #selector(didTapPrimary), for: .touchUpInside)
     }
 
+    public override func bind(viewModel: WordBookStudyViewModel) {
+        super.bind(viewModel: viewModel)
+
+        let input = WordBookStudyViewModel.Input(
+            cardSwiped: cardSwipedSubject.eraseToAnyPublisher(),
+            submitTapped: submitTappedSubject.eraseToAnyPublisher(),
+            retryRequested: retryRequestedSubject.eraseToAnyPublisher()
+        )
+        let output = viewModel.transform(input: input)
+
+        output.submitSucceeded
+            .receive(on: RunLoop.main)
+            .sink { [weak self] in
+                self?.dismiss(animated: true)
+            }
+            .store(in: &cancellables)
+
+        output.actionError
+            .receive(on: RunLoop.main)
+            .sink { [weak self] error in
+                guard let self else { return }
+                self.errorPresenter.show(error, form: .modal, page: .vocabulary) { [weak self] in
+                    self?.retryRequestedSubject.send(())
+                }
+            }
+            .store(in: &cancellables)
+
+        output.isSubmitting
+            .receive(on: RunLoop.main)
+            .sink { [weak self] isSubmitting in
+                self?.studyView.primaryButton.isEnabled = !isSubmitting
+            }
+            .store(in: &cancellables)
+    }
+
     // MARK: - Actions
 
     @objc
     private func didTapBack() {
-        if memorizedResults.isEmpty {
-            dismiss(animated: true)
-        } else {
+        if viewModel?.hasAnyResult == true {
             studyView.setState(.exitPrompt)
+        } else {
+            dismiss(animated: true)
         }
     }
 
@@ -97,7 +133,7 @@ final class WordBookStudyViewController: UIViewController {
 
     @objc
     private func didTapPrimary() {
-        submitAndDismiss()
+        submitTappedSubject.send(())
     }
 
     // MARK: - Cards
@@ -187,30 +223,6 @@ final class WordBookStudyViewController: UIViewController {
     private func showCompleteState() {
         studyView.setState(.completed)
     }
-
-    // MARK: - API
-
-    private func submitAndDismiss() {
-        let items = memorizedResults.map { MemorizationEntity(phraseId: Int($0.key), isMemorized: $0.value) }
-        guard !items.isEmpty else {
-            dismiss(animated: true)
-            return
-        }
-
-        studyView.primaryButton.isEnabled = false
-
-        useCase.updateMemorization(items: items)
-            .receive(on: RunLoop.main)
-            .sink(receiveCompletion: { [weak self] completion in
-                self?.studyView.primaryButton.isEnabled = true
-                if case .failure = completion {
-                    self?.dismiss(animated: true)
-                }
-            }, receiveValue: { [weak self] in
-                self?.dismiss(animated: true)
-            })
-            .store(in: &cancellables)
-    }
 }
 
 private extension WordBookStudyViewController {
@@ -245,16 +257,12 @@ private extension WordBookStudyViewController {
 
 extension WordBookStudyViewController: WordStudyCardDelegate {
     func cardDidSwipeLeft(_ card: WordStudyCard) {
-        recordResult(for: card, isMemorized: false)
+        cardSwipedSubject.send((phraseId: card.phraseId, isMemorized: false))
         advanceCards(from: card)
     }
 
     func cardDidSwipeRight(_ card: WordStudyCard) {
-        recordResult(for: card, isMemorized: true)
+        cardSwipedSubject.send((phraseId: card.phraseId, isMemorized: true))
         advanceCards(from: card)
-    }
-
-    private func recordResult(for card: WordStudyCard, isMemorized: Bool) {
-        memorizedResults[card.phraseId] = isMemorized
     }
 }
