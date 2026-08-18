@@ -71,7 +71,7 @@ public extension BaseUIViewController {
         case .closeOnly:
             navigationItem.titleView = nil
             navigationItem.leftBarButtonItem = makeBarButton(
-                imageName: "ic_close_44_black_ios",
+                imageName: "ic_close_24_b_ios",
                 action: #selector(closeTapped)
             )
             navigationItem.rightBarButtonItem = nil
