@@ -99,7 +99,7 @@ final class WordBookView: BaseUIView {
 
         container.addSubview(stack)
         stack.snp.makeConstraints {
-            $0.top.bottom.equalToSuperview().inset(12)
+            $0.top.bottom.equalToSuperview().inset(12).priority(.high)
             $0.leading.trailing.equalToSuperview().inset(16)
         }
 
