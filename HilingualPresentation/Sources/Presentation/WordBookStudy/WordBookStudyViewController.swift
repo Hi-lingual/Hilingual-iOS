@@ -255,8 +255,6 @@ extension WordBookStudyViewController: WordStudyCardDelegate {
     }
 
     private func recordResult(for card: WordStudyCard, isMemorized: Bool) {
-        guard index < words.count else { return }
-        let word = words[index]
-        memorizedResults[word.phraseId] = isMemorized
+        memorizedResults[card.phraseId] = isMemorized
     }
 }

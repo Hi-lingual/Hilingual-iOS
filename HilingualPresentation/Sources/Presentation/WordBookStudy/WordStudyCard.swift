@@ -42,6 +42,7 @@ final class WordStudyCard: UIView {
     weak var delegate: WordStudyCardDelegate?
 
     private let word: PhraseData
+    var phraseId: Int64 { word.phraseId }
 
     // MARK: - Faces
     private let cardContentView = UIView()
@@ -49,6 +50,7 @@ final class WordStudyCard: UIView {
     private let backFaceView = UIView()
     private var isShowingBack = false
     private var isAnimatingFlip = false
+    private var didCommit = false
 
     // MARK: - Front
     private let frontChipStack: UIStackView = {
@@ -437,7 +439,9 @@ final class WordStudyCard: UIView {
     }
 
     private func animateOut(direction: SwipeDirection) {
-        guard let superview = superview else { return }
+        guard let superview = superview, !didCommit else { return }
+        didCommit = true
+        isUserInteractionEnabled = false
 
         let xOffset = direction == .right
             ? superview.bounds.width + bounds.width
@@ -467,7 +471,9 @@ final class WordStudyCard: UIView {
     }
 
     private func commitFromButton(direction: SwipeDirection) {
-        guard let superview = superview else { return }
+        guard let superview = superview, !didCommit else { return }
+        didCommit = true
+        isUserInteractionEnabled = false
         axis = .x
         let isRight = direction == .right
 
