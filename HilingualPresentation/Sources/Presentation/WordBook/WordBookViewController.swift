@@ -191,7 +191,7 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
             if isSearching {
                 state = .noSearchResult
             } else if isUnmemorizedOnly {
-                state = .noUnmemorized
+                state = .noWordsToMemorize
             } else {
                 state = .noWords
             }
