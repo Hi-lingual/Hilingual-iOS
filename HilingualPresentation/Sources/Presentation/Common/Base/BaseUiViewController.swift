@@ -62,6 +62,7 @@ public class BaseUIViewController<VM: BaseViewBindable>: UIViewController, UIGes
     open func navigationType() -> NavigationType? { nil }
     @objc open func backButtonTapped() { navigationController?.popViewController(animated: true) }
     @objc open func menuButtonTapped() {}
+    @objc open func closeTapped() { dismiss(animated: true) }
     public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
         return navigationController?.viewControllers.count ?? 0 > 1
     }
