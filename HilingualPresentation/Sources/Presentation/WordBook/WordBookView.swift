@@ -60,7 +60,7 @@ final class WordBookView: BaseUIView {
 
     let unmemorizedOnlyButton: UIButton = {
         let button = UIButton(type: .system)
-        let image = UIImage(resource: .btnUnknownCheckbox18Ios)
+        let image = UIImage(resource: .icCheckbox24Ios)
             .withRenderingMode(.alwaysOriginal)
         button.setImage(image, for: .normal)
         button.setTitle(" 모르는 단어만 보기", for: .normal)
@@ -227,7 +227,7 @@ final class WordBookView: BaseUIView {
     }
 
     func updateUnmemorizedOnly(_ isOn: Bool) {
-        let image = UIImage(resource: isOn ? .btnUnknownCheckboxFilled18Ios : .btnUnknownCheckbox18Ios)
+        let image = UIImage(resource: isOn ? .icCheckbox24FillIos : .icCheckbox24Ios)
             .withRenderingMode(.alwaysOriginal)
         unmemorizedOnlyButton.setImage(image, for: .normal)
     }
