@@ -16,24 +16,6 @@ final class WordBookStudyView: BaseUIView {
         case exitPrompt
     }
 
-    // MARK: - Header
-
-    let backButton: UIButton = {
-        let button = UIButton(type: .system)
-        let image = UIImage(named: "ic_arrow_left_b_24_ios", in: .module, compatibleWith: nil)
-        button.setImage(image, for: .normal)
-        button.tintColor = .black
-        return button
-    }()
-
-    let remainingLabel: UILabel = {
-        let label = UILabel()
-        label.textColor = .black
-        label.font = .pretendard(.head_sb_18)
-        label.textAlignment = .center
-        return label
-    }()
-
     // MARK: - Studying State
 
     private let hintLabel: UILabel = {
@@ -124,8 +106,6 @@ final class WordBookStudyView: BaseUIView {
         backgroundColor = .gray100
 
         addSubviews(
-            backButton,
-            remainingLabel,
             hintLabel,
             cardContainerView,
             actionStackView,
@@ -135,19 +115,8 @@ final class WordBookStudyView: BaseUIView {
     }
 
     override func setLayout() {
-        backButton.snp.makeConstraints {
-            $0.top.equalTo(safeAreaLayoutGuide).offset(12)
-            $0.leading.equalToSuperview().inset(16)
-            $0.width.height.equalTo(28)
-        }
-
-        remainingLabel.snp.makeConstraints {
-            $0.centerY.equalTo(backButton)
-            $0.centerX.equalToSuperview()
-        }
-
         cardContainerView.snp.makeConstraints {
-            $0.top.equalTo(backButton.snp.bottom).offset(16)
+            $0.top.equalTo(safeAreaLayoutGuide).offset(16)
             $0.leading.trailing.equalToSuperview()
             $0.bottom.equalTo(actionStackView.snp.top).offset(-16)
         }
@@ -179,10 +148,6 @@ final class WordBookStudyView: BaseUIView {
 
     // MARK: - Public
 
-    func updateRemainingCount(_ count: Int) {
-        remainingLabel.text = "\(count)개"
-    }
-
     func hideHint() {
         guard !hintLabel.isHidden else { return }
         UIView.animate(withDuration: 0.2, animations: {
@@ -195,8 +160,6 @@ final class WordBookStudyView: BaseUIView {
     func setState(_ state: State) {
         switch state {
         case .studying:
-            backButton.isHidden = false
-            remainingLabel.isHidden = false
             hintLabel.isHidden = false
             cardContainerView.isHidden = false
             actionStackView.isHidden = false
@@ -205,15 +168,13 @@ final class WordBookStudyView: BaseUIView {
 
         case .completed:
             configureTerminal(
-                imageName: "img_finish_ios",
+                imageName: "img_finish_study_ios",
                 imageHeight: 180,
                 text: "단어를 모두 복습했어요.\n노력하는 당신이 대단해요!",
                 buttonTitle: "완료"
             )
 
         case .exitPrompt:
-            backButton.isHidden = true
-            remainingLabel.isHidden = true
             configureTerminal(
                 imageName: "img_onboarding_bottomsheet_4_ios",
                 imageHeight: 172,

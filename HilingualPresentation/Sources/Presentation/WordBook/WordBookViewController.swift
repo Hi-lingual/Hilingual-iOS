@@ -156,7 +156,9 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
                     return
                 }
                 let studyVC = self.diContainer.makeWordBookStudyViewController(words: words)
-                self.present(studyVC, animated: true)
+                let studyNav = UINavigationController(rootViewController: studyVC)
+                studyNav.modalPresentationStyle = .fullScreen
+                self.present(studyNav, animated: true)
             }
             .store(in: &cancellables)
 
@@ -292,6 +294,8 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
 
     @objc
     private func didTapStudy() {
+        guard !isUnmemorizedOnly else { return }
+
         AmplitudeManager.shared.send(.clickVocabularyReviewBtn)
 
         let allWords = fullWordList.flatMap { $0.1 }

@@ -20,6 +20,7 @@ public final class WordBookStudyViewController: BaseUIViewController<WordBookStu
     private var loadedCards: [WordStudyCard] = []
     private var didSetupCards = false
     private var baseCardFrame: CGRect?
+    private var currentState: WordBookStudyView.State = .studying
 
     // MARK: - Input Subjects
 
@@ -36,7 +37,6 @@ public final class WordBookStudyViewController: BaseUIViewController<WordBookStu
     ) {
         self.words = words
         super.init(viewModel: viewModel, diContainer: diContainer)
-        modalPresentationStyle = .fullScreen
     }
 
     // MARK: - Lifecycle
@@ -47,7 +47,13 @@ public final class WordBookStudyViewController: BaseUIViewController<WordBookStu
 
     public override func viewDidLoad() {
         super.viewDidLoad()
+        view.backgroundColor = .gray100
         updateRemainingCount()
+    }
+
+    public override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(false, animated: false)
     }
 
     public override func viewDidLayoutSubviews() {
@@ -66,10 +72,35 @@ public final class WordBookStudyViewController: BaseUIViewController<WordBookStu
         }
     }
 
+    // MARK: - Navigation
+
+    public override func navigationType() -> NavigationType? {
+        switch currentState {
+        case .studying:
+            let remaining = max(words.count - index, 0)
+            return .backTitle("\(remaining)개")
+        case .exitPrompt:
+            return .closeOnly
+        case .completed:
+            return nil
+        }
+    }
+
+    public override func backButtonTapped() {
+        if viewModel?.hasAnyResult == true {
+            setState(.exitPrompt)
+        } else {
+            dismiss(animated: true)
+        }
+    }
+
+    public override func closeTapped() {
+        setState(.studying)
+    }
+
     // MARK: - Setup
 
     public override func addTarget() {
-        studyView.backButton.addTarget(self, action: #selector(didTapBack), for: .touchUpInside)
         studyView.notRememberedButton.addTarget(self, action: #selector(didTapNotRemembered), for: .touchUpInside)
         studyView.rememberedButton.addTarget(self, action: #selector(didTapRemembered), for: .touchUpInside)
         studyView.primaryButton.addTarget(self, action: #selector(didTapPrimary), for: .touchUpInside)
@@ -113,15 +144,6 @@ public final class WordBookStudyViewController: BaseUIViewController<WordBookStu
     // MARK: - Actions
 
     @objc
-    private func didTapBack() {
-        if viewModel?.hasAnyResult == true {
-            studyView.setState(.exitPrompt)
-        } else {
-            dismiss(animated: true)
-        }
-    }
-
-    @objc
     private func didTapNotRemembered() {
         loadedCards.first?.swipeLeft()
     }
@@ -134,6 +156,21 @@ public final class WordBookStudyViewController: BaseUIViewController<WordBookStu
     @objc
     private func didTapPrimary() {
         submitTappedSubject.send(())
+    }
+
+    // MARK: - State
+
+    private func setState(_ state: WordBookStudyView.State) {
+        currentState = state
+        studyView.setState(state)
+
+        switch state {
+        case .studying, .exitPrompt:
+            navigationController?.setNavigationBarHidden(false, animated: false)
+            setupNavigationBar()
+        case .completed:
+            navigationController?.setNavigationBarHidden(true, animated: false)
+        }
     }
 
     // MARK: - Cards
@@ -221,7 +258,7 @@ public final class WordBookStudyViewController: BaseUIViewController<WordBookStu
     }
 
     private func showCompleteState() {
-        studyView.setState(.completed)
+        setState(.completed)
     }
 }
 
@@ -234,8 +271,7 @@ private extension WordBookStudyViewController {
     }
 
     func updateRemainingCount() {
-        let remaining = max(words.count - index, 0)
-        studyView.updateRemainingCount(remaining)
+        setupNavigationBar()
     }
 
     func ensureBaseCardFrame() {
