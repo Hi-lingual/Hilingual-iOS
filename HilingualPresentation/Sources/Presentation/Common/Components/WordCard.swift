@@ -302,37 +302,3 @@ final class WordCard: UIView {
         }
     }
 }
-
-private final class KnownBadgeView: UIView {
-
-    private let checkIconImageView = UIImageView()
-    private let titleLabel = UILabel()
-
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-
-        checkIconImageView.image = UIImage(named: "ic_check_16_ios", in: .module, compatibleWith: nil)
-        checkIconImageView.contentMode = .scaleAspectFit
-
-        titleLabel.text = "아는 단어"
-        titleLabel.font = .pretendard(.cap_r_12)
-        titleLabel.textColor = .gray400
-
-        addSubviews(checkIconImageView, titleLabel)
-
-        checkIconImageView.snp.makeConstraints {
-            $0.leading.centerY.equalToSuperview()
-            $0.width.height.equalTo(16)
-        }
-
-        titleLabel.snp.makeConstraints {
-            $0.leading.equalTo(checkIconImageView.snp.trailing).offset(2)
-            $0.centerY.equalToSuperview()
-            $0.trailing.equalToSuperview()
-        }
-    }
-
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-}
