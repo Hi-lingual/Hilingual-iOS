@@ -294,16 +294,15 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
 
     @objc
     private func didTapStudy() {
-        guard !isUnmemorizedOnly else { return }
-
-        AmplitudeManager.shared.send(.clickVocabularyReviewBtn)
-
         let allWords = fullWordList.flatMap { $0.1 }
-        guard !allWords.isEmpty else {
+
+        if allWords.isEmpty {
+            if isUnmemorizedOnly { return }
             showToast(message: "복습할 단어가 없어요.")
             return
         }
 
+        AmplitudeManager.shared.send(.clickVocabularyReviewBtn)
         studyRequestedSubject.send(())
     }
 
