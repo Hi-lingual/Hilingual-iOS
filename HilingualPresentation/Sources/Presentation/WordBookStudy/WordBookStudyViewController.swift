@@ -87,15 +87,16 @@ public final class WordBookStudyViewController: BaseUIViewController<WordBookStu
     }
 
     public override func backButtonTapped() {
-        if viewModel?.hasAnyResult == true {
-            setState(.exitPrompt)
-        } else {
+        switch currentState {
+        case .studying:
+            if viewModel?.hasAnyResult == true {
+                setState(.exitPrompt)
+            } else {
+                dismiss(animated: true)
+            }
+        case .exitPrompt, .completed:
             dismiss(animated: true)
         }
-    }
-
-    public override func closeTapped() {
-        setState(.studying)
     }
 
     // MARK: - Setup

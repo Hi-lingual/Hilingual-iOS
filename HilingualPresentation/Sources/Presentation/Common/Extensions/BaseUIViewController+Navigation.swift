@@ -72,7 +72,7 @@ public extension BaseUIViewController {
             navigationItem.titleView = nil
             navigationItem.leftBarButtonItem = makeBarButton(
                 imageName: "ic_close_24_b_ios",
-                action: #selector(closeTapped)
+                action: #selector(backButtonTapped)
             )
             navigationItem.rightBarButtonItem = nil
         }
