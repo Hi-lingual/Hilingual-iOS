@@ -18,11 +18,11 @@ extension FeedProfileAPI: BaseTargetType {
     public var path: String {
         switch self {
         case .fetchSharedFeed(let targetUserId):
-            return "/feed/profiles/\(targetUserId)/diaries/shared"
+            return "/v1/feed/profiles/\(targetUserId)/diaries/shared"
         case .fetchLikedFeed(let targetUserId):
-            return "/feed/profiles/\(targetUserId)/diaries/liked"
+            return "/v1/feed/profiles/\(targetUserId)/diaries/liked"
         case .fetchProfileInfo(let targetUserId):
-            return "/feed/profiles/\(targetUserId)"
+            return "/v1/feed/profiles/\(targetUserId)"
         }
     }
     

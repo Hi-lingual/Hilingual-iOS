@@ -13,6 +13,7 @@ final class FeedbackView: BaseUIView {
     // MARK: - Properties
 
     var onToggleChanged: ((Bool) -> Void)?
+    var onDiaryPronunciationTapped: ((Bool) -> Void)?
 
     // MARK: - UI Components
 
@@ -31,20 +32,14 @@ final class FeedbackView: BaseUIView {
         label.textColor = .gray700
         return label
     }()
-
-    let AILabel: UILabel = {
-        let label = UILabel()
-        label.font = .pretendard(.body_r_14)
-        label.textColor = .gray500
-        label.text = "교정된 일기"
-        return label
-    }()
     
     let dropdown = Dropdown(style: .selectedDate)
     
-    lazy var controlSwitch: CustomToggle = {
-        let toggle = CustomToggle(frame: CGRect(x: 0, y: 0, width: 52, height: 28))
-        toggle.addTarget(self, action: #selector(toggleButtonTapped), for: .valueChanged)
+    lazy var segmentToggle: SegmentToggle = {
+        let toggle = SegmentToggle(titles: ["교정본", "원본"])
+        toggle.onIndexChanged = { [weak self] index in
+            self?.toggleButtonTapped(isEnabled: index == 0)
+        }
         return toggle
     }()
 
@@ -117,6 +112,12 @@ final class FeedbackView: BaseUIView {
 
         return view
     }()
+    
+    private let headerSpacer: UIView = {
+        let view = UIView()
+        view.setContentHuggingPriority(.defaultLow, for: .horizontal)
+        return view
+    }()
 
     // MARK: - Custom Method
 
@@ -125,7 +126,7 @@ final class FeedbackView: BaseUIView {
         scrollView.addSubview(contentView)
         contentView.axis = .vertical
         contentView.addArrangedSubviews(headerStackView, dropdown, diaryTextView, feedbackStackView, bottomSpacingView)
-        headerStackView.addArrangedSubviews(dateLabel, AILabel, controlSwitch)
+        headerStackView.addArrangedSubviews(dateLabel, headerSpacer, segmentToggle)
         feedbackStackView.addArrangedSubview(feedbackLabel)
 
         backgroundColor = .gray100
@@ -141,11 +142,10 @@ final class FeedbackView: BaseUIView {
 
         contentView.setCustomSpacing(12, after: headerStackView)
         contentView.setCustomSpacing(12, after: dropdown)
-        headerStackView.setCustomSpacing(4, after: AILabel)
 
-        controlSwitch.snp.makeConstraints {
-            $0.height.equalTo(28)
-            $0.width.equalTo(52)
+        segmentToggle.snp.makeConstraints {
+            $0.height.equalTo(31)
+            $0.width.equalTo(139)
         }
 
         contentView.layoutMargins = UIEdgeInsets(top: 18, left: 16, bottom: 0, right: 16)
@@ -172,6 +172,10 @@ final class FeedbackView: BaseUIView {
         }
 
         contentView.setCustomSpacing(40, after: diaryTextView)
+    }
+
+    func stopSpeech() {
+        diaryTextView.stopSpeech()
     }
 
     func scrollToTop() {
@@ -217,6 +221,9 @@ final class FeedbackView: BaseUIView {
             diffRanges: data.diffRanges,
             isHighlightingEnabled: data.isHighlightingEnabled,
         )
+        diaryTextView.onSpeechButtonTapped = { [weak self] isFirstPlay in
+            self?.onDiaryPronunciationTapped?(isFirstPlay)
+        }
     }
 
     func configureFeedbacks(data: [FeedbackItem]) {
@@ -273,7 +280,7 @@ final class FeedbackView: BaseUIView {
 
     // MARK: - Actions
 
-    @objc private func toggleButtonTapped() {
+    private func toggleButtonTapped(isEnabled: Bool) {
         guard var data = currentDiaryData else { return }
 
         data = DiaryViewData(
@@ -282,13 +289,12 @@ final class FeedbackView: BaseUIView {
             originalText: data.originalText,
             rewriteText: data.rewriteText,
             diffRanges: data.diffRanges,
-            isHighlightingEnabled: !data.isHighlightingEnabled,
+            isHighlightingEnabled: isEnabled,
             isPublished: data.isPublished
         )
 
         configureDiary(data: data)
         currentDiaryData = data
-
-        onToggleChanged?(data.isHighlightingEnabled)
+        onToggleChanged?(isEnabled)
     }
 }

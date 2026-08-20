@@ -9,6 +9,7 @@ import Combine
 
 public protocol DiaryWritingUseCase {
     func postDiaryWriting(_ entity: DiaryWritingEntity) -> AnyPublisher<DiaryWritingResponseEntity, Error>
+    func postDiaryRecovery(_ entity: DiaryWritingEntity) -> AnyPublisher<DiaryWritingResponseEntity, Error>
 }
 
 public final class DefaultDiaryWritingUseCase: DiaryWritingUseCase {
@@ -21,5 +22,9 @@ public final class DefaultDiaryWritingUseCase: DiaryWritingUseCase {
 
     public func postDiaryWriting(_ entity: DiaryWritingEntity) -> AnyPublisher<DiaryWritingResponseEntity, Error> {
         return repository.postDiaryWriting(entity)
+    }
+
+    public func postDiaryRecovery(_ entity: DiaryWritingEntity) -> AnyPublisher<DiaryWritingResponseEntity, Error> {
+        return repository.postDiaryRecovery(entity)
     }
 }

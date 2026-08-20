@@ -10,20 +10,19 @@ import SnapKit
 
 final class WordBookStudyView: BaseUIView {
 
-    // MARK: - UI
+    enum State {
+        case studying
+        case completed
+        case exitPrompt
+    }
 
-    let backButton: UIButton = {
-        let button = UIButton(type: .system)
-        let image = UIImage(named: "ic_arrow_left_b_24_ios", in: .module, compatibleWith: nil)
-        button.setImage(image, for: .normal)
-        button.tintColor = .black
-        return button
-    }()
+    // MARK: - Studying State
 
-    let remainingLabel: UILabel = {
+    private let hintLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .black
-        label.font = .pretendard(.head_sb_18)
+        label.text = "가볍게 탭하여 한글 뜻을 확인하세요."
+        label.textColor = .gray500
+        label.font = .pretendard(.body_m_15)
         label.textAlignment = .center
         return label
     }()
@@ -36,7 +35,7 @@ final class WordBookStudyView: BaseUIView {
 
     let notRememberedButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("모르겠어요", for: .normal)
+        button.setTitle("몰라요", for: .normal)
         button.setTitleColor(.gray850, for: .normal)
         button.titleLabel?.font = UIFont.pretendard(.body_m_16)
         button.backgroundColor = .white
@@ -48,7 +47,7 @@ final class WordBookStudyView: BaseUIView {
 
     let rememberedButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("외웠어요", for: .normal)
+        button.setTitle("알아요", for: .normal)
         button.setTitleColor(.white, for: .normal)
         button.titleLabel?.font = UIFont.pretendard(.body_m_16)
         button.backgroundColor = .hilingualBlack
@@ -65,9 +64,34 @@ final class WordBookStudyView: BaseUIView {
         return stack
     }()
 
-    let completeButton: UIButton = {
+    // MARK: - Terminal State (Complete / ExitPrompt)
+
+    private let terminalImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFit
+        return imageView
+    }()
+
+    private let terminalTextLabel: UILabel = {
+        let label = UILabel()
+        label.numberOfLines = 2
+        label.textColor = .black
+        label.font = UIFont.pretendard(.head_sb_20)
+        label.textAlignment = .center
+        return label
+    }()
+
+    private lazy var terminalContainerView: UIStackView = {
+        let stack = UIStackView(arrangedSubviews: [terminalImageView, terminalTextLabel])
+        stack.axis = .vertical
+        stack.alignment = .center
+        stack.spacing = 16
+        stack.isHidden = true
+        return stack
+    }()
+
+    let primaryButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("완료", for: .normal)
         button.setTitleColor(.white, for: .normal)
         button.titleLabel?.font = UIFont.pretendard(.body_m_16)
         button.backgroundColor = .hilingualBlack
@@ -76,56 +100,31 @@ final class WordBookStudyView: BaseUIView {
         return button
     }()
 
-    private let emptyImageView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.image = UIImage(named: "img_login_ios_v2", in: .module, compatibleWith: nil)
-        imageView.contentMode = .scaleAspectFit
-        return imageView
-    }()
-
-    private let emptyTextLabel: UILabel = {
-        let label = UILabel()
-        label.text = "단어를 모두 확인했어요.\n 다른 단어도 보러 가볼까요?"
-        label.numberOfLines = 2
-        label.textColor = .black
-        label.font = UIFont.pretendard(.head_sb_20)
-        label.textAlignment = .center
-        return label
-    }()
-
-    lazy var emptyContainerView: UIStackView = {
-        let stack = UIStackView(arrangedSubviews: [emptyImageView, emptyTextLabel])
-        stack.axis = .vertical
-        stack.alignment = .center
-        stack.spacing = 16
-        stack.isHidden = true
-        return stack
-    }()
-
     // MARK: - Setup
 
     override func setUI() {
-        backgroundColor = .gray200
+        backgroundColor = .gray100
 
-        addSubviews(backButton, remainingLabel, cardContainerView, actionStackView, completeButton, emptyContainerView)
+        addSubviews(
+            hintLabel,
+            cardContainerView,
+            actionStackView,
+            terminalContainerView,
+            primaryButton
+        )
     }
 
     override func setLayout() {
-        backButton.snp.makeConstraints {
-            $0.top.equalTo(safeAreaLayoutGuide).offset(12)
-            $0.leading.equalToSuperview().inset(16)
-            $0.width.height.equalTo(28)
-        }
-
-        remainingLabel.snp.makeConstraints {
-            $0.top.equalTo(safeAreaLayoutGuide).offset(12)
-            $0.centerX.equalToSuperview()
-        }
-
         cardContainerView.snp.makeConstraints {
-            $0.top.equalTo(remainingLabel.snp.bottom).offset(16)
+            $0.top.equalTo(safeAreaLayoutGuide).offset(16)
             $0.leading.trailing.equalToSuperview()
-            $0.bottom.equalTo(actionStackView.snp.top).offset(-12)
+            $0.bottom.equalTo(actionStackView.snp.top).offset(-16)
+        }
+
+        hintLabel.snp.makeConstraints {
+            $0.bottom.equalTo(cardContainerView.snp.centerY).offset(-220)
+            $0.centerX.equalToSuperview()
+            $0.leading.trailing.equalToSuperview().inset(20)
         }
 
         actionStackView.snp.makeConstraints {
@@ -134,38 +133,78 @@ final class WordBookStudyView: BaseUIView {
             $0.height.equalTo(52)
         }
 
-        completeButton.snp.makeConstraints {
+        primaryButton.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview().inset(20)
             $0.bottom.equalTo(safeAreaLayoutGuide).inset(16)
             $0.height.equalTo(52)
         }
 
-        emptyContainerView.snp.makeConstraints {
-            $0.center.equalToSuperview()
-        }
-
-        emptyImageView.snp.makeConstraints {
-            $0.width.height.equalTo(180)
+        terminalContainerView.snp.makeConstraints {
+            $0.centerX.equalToSuperview()
+            $0.centerY.equalToSuperview().inset(40)
+            $0.horizontalEdges.equalToSuperview().inset(16)
         }
     }
 
-    func updateRemainingCount(_ count: Int) {
-        remainingLabel.text = "\(count)개 남음"
+    // MARK: - Public
+
+    func hideHint() {
+        guard !hintLabel.isHidden else { return }
+        UIView.animate(withDuration: 0.2, animations: {
+            self.hintLabel.alpha = 0
+        }, completion: { _ in
+            self.hintLabel.isHidden = true
+        })
     }
 
-    func showCompleteState() {
-        completeButton.isHidden = false
-        completeButton.alpha = 0
+    func setState(_ state: State) {
+        switch state {
+        case .studying:
+            hintLabel.isHidden = false
+            cardContainerView.isHidden = false
+            actionStackView.isHidden = false
+            terminalContainerView.isHidden = true
+            primaryButton.isHidden = true
 
-        emptyContainerView.isHidden = false
-        emptyContainerView.alpha = 0
+        case .completed:
+            configureTerminal(
+                imageName: "img_finish_study_ios",
+                imageHeight: 180,
+                text: "단어를 모두 복습했어요.\n노력하는 당신이 대단해요!",
+                buttonTitle: "완료"
+            )
 
-        UIView.animate(withDuration: 0.3) {
-            self.actionStackView.alpha = 0
-            self.completeButton.alpha = 1
-            self.emptyContainerView.alpha = 1
-        } completion: { _ in
-            self.actionStackView.isHidden = true
+        case .exitPrompt:
+            configureTerminal(
+                imageName: "img_onboarding_bottomsheet_4_ios",
+                imageHeight: 172,
+                text: "잠시만요!\n복습한 단어를 저장할까요?",
+                buttonTitle: "저장하기"
+            )
         }
+    }
+
+    private func configureTerminal(imageName: String, imageHeight: CGFloat, text: String, buttonTitle: String) {
+        hintLabel.isHidden = true
+        cardContainerView.isHidden = true
+        actionStackView.isHidden = true
+
+        let image = UIImage(named: imageName, in: .module, compatibleWith: nil)
+        terminalImageView.image = image
+
+        let aspectRatio: CGFloat = {
+            guard let size = image?.size, size.height > 0 else { return 1 }
+            return size.width / size.height
+        }()
+        terminalImageView.snp.remakeConstraints {
+            $0.height.equalTo(imageHeight)
+            $0.width.equalTo(terminalImageView.snp.height).multipliedBy(aspectRatio)
+        }
+
+        terminalTextLabel.text = text
+        terminalContainerView.isHidden = false
+
+        primaryButton.setTitle(buttonTitle, for: .normal)
+        primaryButton.isHidden = false
     }
 }

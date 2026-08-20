@@ -8,7 +8,16 @@
 import UIKit
 import SnapKit
 
+enum ProfileRowType {
+    case none
+    case editable
+}
+
 final class ProfileRow: UIView {
+
+    // MARK: - Properties
+
+    private let type: ProfileRowType
 
     // MARK: - UI Components
 
@@ -27,9 +36,36 @@ final class ProfileRow: UIView {
         return label
     }()
 
+    private let editImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.image = UIImage(resource: .icPen24Ios)
+            .withRenderingMode(.alwaysTemplate)
+        imageView.tintColor = .gray300
+        imageView.contentMode = .scaleAspectFit
+        return imageView
+    }()
+
+    private lazy var trailingStackView: UIStackView = {
+        let stackView = UIStackView(arrangedSubviews: trailingViews)
+        stackView.axis = .horizontal
+        stackView.alignment = .center
+        stackView.spacing = 8
+        return stackView
+    }()
+
+    private var trailingViews: [UIView] {
+        switch type {
+        case .none:
+            return [valueLabel]
+        case .editable:
+            return [valueLabel, editImageView]
+        }
+    }
+
     // MARK: - Init
 
-    init(title: String, value: String) {
+    init(title: String, value: String, type: ProfileRowType = .none) {
+        self.type = type
         super.init(frame: .zero)
         titleLabel.text = title
         valueLabel.text = value
@@ -48,18 +84,25 @@ final class ProfileRow: UIView {
         layer.cornerRadius = 8
         layer.borderWidth = 1
         layer.borderColor = UIColor.gray200.cgColor
-        addSubviews(titleLabel, valueLabel)
+        addSubviews(titleLabel, trailingStackView)
     }
 
     private func setupLayout() {
         titleLabel.snp.makeConstraints {
-            $0.leading.equalToSuperview().inset(16)
+            $0.leading.equalToSuperview().inset(20)
             $0.centerY.equalToSuperview()
         }
 
-        valueLabel.snp.makeConstraints {
+        if case .editable = type {
+            editImageView.snp.makeConstraints {
+                $0.size.equalTo(24)
+            }
+        }
+
+        trailingStackView.snp.makeConstraints {
             $0.trailing.equalToSuperview().inset(16)
             $0.centerY.equalToSuperview()
+            $0.leading.equalTo(titleLabel.snp.trailing).offset(12)
         }
     }
 

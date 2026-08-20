@@ -8,10 +8,13 @@
 import Foundation
 
 public struct MonthInfoEntity {
-    public let dates: [Date]
+    public let writtenDates: [Date]
+    public let recoveredDates: [Date]
+    public var dates: [Date] { writtenDates }
     
     //다른 모듈에서 사용하기 위한 초기화
-    public init(dates: [Date]) {
-        self.dates = dates
+    public init(writtenDates: [Date], recoveredDates: [Date] = []) {
+        self.writtenDates = writtenDates
+        self.recoveredDates = recoveredDates
     }
 }

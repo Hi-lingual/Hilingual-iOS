@@ -19,6 +19,9 @@ final class MypageView: BaseUIView {
         case blockedUsers
         case support
         case policy
+        #if DEBUG
+        case debug
+        #endif
     }
 
     // MARK: - Public
@@ -72,7 +75,7 @@ final class MypageView: BaseUIView {
 
     let editButton: UIButton = {
         let button = UIButton()
-        button.setImage(UIImage(named: "ic_pen_24_ios", in: .module, compatibleWith: nil), for: .normal)
+        button.setImage(UIImage(resource: .icPen24Ios), for: .normal)
         button.tintColor = .gray400
         return button
     }()
@@ -124,12 +127,18 @@ final class MypageView: BaseUIView {
         return button
     }()
 
-    private let menuItems: [(item: MenuItem, title: String, icon: String)] = [
-        (.notification, "알림 설정", "ic_bell_24_ios"),
-        (.blockedUsers, "차단한 유저", "ic_block_black_24_ios"),
-        (.support, "고객센터", "ic_customer_24_ios"),
-        (.policy, "개인정보 처리방침 및 이용약관", "ic_document_24_ios")
-    ]
+    private let menuItems: [(item: MenuItem, title: String, icon: String)] = {
+        var items: [(item: MenuItem, title: String, icon: String)] = [
+            (.notification, "알림 설정", "ic_bell_24_ios"),
+            (.blockedUsers, "차단한 유저", "ic_block_black_24_ios"),
+            (.support, "고객센터", "ic_customer_24_ios"),
+            (.policy, "개인정보 처리방침 및 이용약관", "ic_document_24_ios")
+        ]
+        #if DEBUG
+        items.append((.debug, "DEBUG", "ic_setting_24_ios"))
+        #endif
+        return items
+    }()
 
     private var menuRows: [UIControl] = []
     private var bannerHeightConstraint: Constraint?
@@ -327,9 +336,8 @@ final class MypageView: BaseUIView {
     // MARK: - Ad
 
     func updateBannerHeight(_ height: CGFloat) {
-        let clamped = min(height, 70)
-        bannerContainerView.isHidden = clamped <= 0
-        bannerHeightConstraint?.update(offset: max(clamped, 0))
+        bannerContainerView.isHidden = false
+        bannerHeightConstraint?.update(offset: 70)
     }
 }
 

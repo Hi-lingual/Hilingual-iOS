@@ -12,6 +12,7 @@ final class OnboardingBottomSheet: UIView {
 
     // MARK: - Properties
 
+    var onDismiss: (() -> Void)?
     private var currentStep: Int = 0
 
     private let onboardingTexts: [String] = [
@@ -106,6 +107,9 @@ final class OnboardingBottomSheet: UIView {
         scrollView.addSubview(pageStackView)
         scrollView.delegate = self
         
+        let dimTapGesture = UITapGestureRecognizer(target: self, action: #selector(dimViewTapped))
+        dimView.addGestureRecognizer(dimTapGesture)
+        
         closeButton.addAction(UIAction { [weak self] _ in self?.dismiss()}, for: .touchUpInside)
         startButton.addAction(UIAction { [weak self] _ in self?.showNextStep()}, for: .touchUpInside)
     }
@@ -188,6 +192,11 @@ final class OnboardingBottomSheet: UIView {
         onboardingIndicatorView.update(currentIndex: currentStep, animated: false)
     }
 
+    @objc
+    private func dimViewTapped() {
+        dismiss()
+    }
+
     private func showNextStep() {
         guard currentStep < onboardingTexts.count - 1 else {
             dismiss()
@@ -218,6 +227,7 @@ final class OnboardingBottomSheet: UIView {
             },
             completion: { _ in
                 self.removeFromSuperview()
+                self.onDismiss?()
             }
         )
     }

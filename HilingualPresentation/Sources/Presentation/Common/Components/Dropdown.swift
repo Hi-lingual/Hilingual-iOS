@@ -9,11 +9,13 @@ import UIKit
 
 enum DropdownStyle {
     case today
+    case recoveryDate
     case selectedDate
 
     var backgroundColor: UIColor {
         switch self {
         case .today: return .gray100
+        case .recoveryDate: return .gray100
         case .selectedDate: return .white
         }
     }
@@ -21,6 +23,7 @@ enum DropdownStyle {
     var contentBackgroundColor: UIColor {
         switch self {
         case .today: return .white
+        case .recoveryDate: return .white
         case .selectedDate: return .gray100
         }
     }
@@ -28,6 +31,7 @@ enum DropdownStyle {
     var titleText: String {
         switch self {
         case .today: return "오늘의 추천 주제 참고하기"
+        case .recoveryDate: return "이날의 추천 주제 참고하기"
         case .selectedDate: return "이날의 추천 주제 참고하기"
         }
     }

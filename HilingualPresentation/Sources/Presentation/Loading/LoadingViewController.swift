@@ -8,13 +8,20 @@
 import Foundation
 import Combine
 import GoogleMobileAds
+import HilingualCore
 
 public final class LoadingViewController: BaseUIViewController<LoadingViewModel> {
     
     // MARK: - Properties
     
+    private var adLoadRetryCount = 0
+    private static let maxAdRetryCount = 3
+    private var pendingDiaryId: Int?
+    
     private let loadingView = LoadingView()
     private var interstitial: InterstitialAd?
+    
+    private var adLoadTimestamp: Date?
     
     private let retryTappedSubject = PassthroughSubject<Void, Never>()
     private let closeTappedSubject = PassthroughSubject<Void, Never>()
@@ -27,7 +34,6 @@ public final class LoadingViewController: BaseUIViewController<LoadingViewModel>
         super.viewDidLoad()
         addTarget()
         setStyle()
-        loadInterstitialAd()
     }
     
     public override func viewWillAppear(_ animated: Bool) {
@@ -74,6 +80,7 @@ public final class LoadingViewController: BaseUIViewController<LoadingViewModel>
         case .success:
             goToNextView()
         case .error:
+            AmplitudeManager.shared.send(.clickErrorCTA(page: .feedbackLoading, action: .serverErrorRetry))
             retryButtonTapped()
         }
     }
@@ -115,23 +122,80 @@ public final class LoadingViewController: BaseUIViewController<LoadingViewModel>
         
         output.goToHome
             .receive(on: RunLoop.main)
-            .sink { [weak self] in self?.goToHomeView() }
+            .sink { [weak self] in
+                guard let self else { return }
+                if self.loadingView.currentState == .error {
+                    self.navigationController?.popViewController(animated: true)
+                } else {
+                    self.goToHomeView()
+                }
+            }
             .store(in: &cancellables)
     }
     
     // MARK: - Navigation
     
-    private func loadInterstitialAd() {
-        InterstitialAd.load(
-            with: Bundle.main.infoDictionary?["AD_INTERSTITIAL_UNIT_ID"] as? String ?? "",
-            request: Request()
-        ) { [weak self] ad, error in
-            if let error {
-                print("Interstitial load failed: \(error)")
+    public func preloadAd() {
+        if let _ = interstitial, isAdValid() { return }
+        
+        let unitID = Bundle.main.infoDictionary?["AD_INTERSTITIAL_UNIT_ID"] as? String ?? ""
+        
+        InterstitialAd.load(with: unitID, request: Request()) { [weak self] ad, error in
+            guard let self = self else { return }
+            
+            if let error = error {
+                print("❌ 광고 로드 실패: \(error.localizedDescription)")
+                self.retryLoadingAdIfNeeded()
                 return
             }
-            self?.interstitial = ad
-            self?.interstitial?.fullScreenContentDelegate = self
+            
+            guard let ad = ad else {
+                print("🚨 예외 상황: 에러는 없으나 광고 객체가 nil입니다.")
+                self.retryLoadingAdIfNeeded()
+                return
+            }
+            
+            self.adLoadRetryCount = 0
+            self.interstitial = ad
+            self.interstitial?.fullScreenContentDelegate = self
+            self.adLoadTimestamp = Date()
+            print("✅ 광고 로드 완료")
+            
+            if let pendingDiaryId = self.pendingDiaryId {
+                self.pendingDiaryId = nil
+                self.currentDiaryId = pendingDiaryId
+                
+                DispatchQueue.main.async {
+                    ad.present(from: self)
+                }
+            }
+        }
+    }
+    
+    private func isAdValid() -> Bool {
+        guard let timestamp = adLoadTimestamp else { return false }
+        return Date().timeIntervalSince(timestamp) < 3600
+    }
+    
+    private func retryLoadingAdIfNeeded() {
+        guard adLoadRetryCount < Self.maxAdRetryCount else {
+            print("🚨 재시도 횟수 초과 (\(Self.maxAdRetryCount)회) -> 광고 없이 화면 이동")
+            AmplitudeManager.shared.send(.viewAdAction(result: .failed, page: .feedbackLoading))
+            if let pendingDiaryId = self.pendingDiaryId {
+                self.pendingDiaryId = nil
+                DispatchQueue.main.async {
+                    self.pushDiaryDetail(diaryId: pendingDiaryId)
+                }
+            }
+            return
+        }
+        
+        let delay = pow(2.0, Double(adLoadRetryCount))
+        adLoadRetryCount += 1
+        print("🔄 광고 재시도 예약: \(delay)초 후 로드 (시도 \(adLoadRetryCount)/\(Self.maxAdRetryCount))")
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
+            self?.preloadAd()
         }
     }
     
@@ -141,10 +205,18 @@ public final class LoadingViewController: BaseUIViewController<LoadingViewModel>
             .first()
             .sink { [weak self] (diaryId: Int) in
                 guard let self = self else { return }
-                self.currentDiaryId = diaryId
-                if let ad = self.interstitial {
-                    ad.present(from: self)
-                } else {
+                
+                if let ad = self.interstitial, self.isAdValid() {
+                    self.currentDiaryId = diaryId
+                    DispatchQueue.main.async {
+                        ad.present(from: self)
+                    }
+                }
+                else if self.adLoadRetryCount < Self.maxAdRetryCount {
+                    self.pendingDiaryId = diaryId
+                }
+                else {
+                    self.currentDiaryId = diaryId
                     self.pushDiaryDetail(diaryId: diaryId)
                 }
             }
@@ -162,17 +234,30 @@ public final class LoadingViewController: BaseUIViewController<LoadingViewModel>
     }
 }
 
+// MARK: - OfflineNavigable
+
+extension LoadingViewController: OfflineNavigable {}
+
 // MARK: - FullScreenContentDelegate
 
 extension LoadingViewController: FullScreenContentDelegate {
     public func adDidDismissFullScreenContent(_ ad: FullScreenPresentingAd) {
+        interstitial = nil
+        adLoadTimestamp = nil
+
+        AmplitudeManager.shared.send(.viewAdAction(result: .completed, page: .feedbackLoading))
+
         guard let diaryId = currentDiaryId else { return }
         viewModel?.patchAdWatch(diaryId: diaryId)
         pushDiaryDetail(diaryId: diaryId)
     }
     
     public func ad(_ ad: FullScreenPresentingAd, didFailToPresentFullScreenContentWithError error: Error) {
-        print("Interstitial present failed: \(error)")
+        interstitial = nil
+        adLoadTimestamp = nil
+        
+        print("🚨 전면 광고 표시 실패: \(error)")
+        AmplitudeManager.shared.send(.viewAdAction(result: .failed, page: .feedbackLoading))
         guard let diaryId = currentDiaryId else { return }
         pushDiaryDetail(diaryId: diaryId)
     }

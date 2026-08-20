@@ -17,9 +17,9 @@ extension FollowListAPI: BaseTargetType {
     public var path: String {
         switch self {
         case .fetchFollowers(let targetUserId):
-            return "/users/following/\(targetUserId)/followers"
+            return "/v1/users/following/\(targetUserId)/followers"
         case .fetchFollowings(let targetUserId):
-            return "/users/following/\(targetUserId)/followings"
+            return "/v1/users/following/\(targetUserId)/followings"
         }
     }
     

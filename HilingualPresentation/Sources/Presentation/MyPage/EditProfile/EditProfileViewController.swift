@@ -23,6 +23,7 @@ public final class EditProfileViewController: BaseUIViewController<EditProfileVi
     }()
 
     private let withdrawTappedSubject = PassthroughSubject<Void, Never>()
+    private var currentNickname: String?
 
     // MARK: - Life Cycle
 
@@ -55,6 +56,7 @@ public final class EditProfileViewController: BaseUIViewController<EditProfileVi
             .receive(on: RunLoop.main)
             .sink { [weak self] in
                 guard let self else { return }
+                FCMTokenSyncService.shared.sessionDidEnd()
                 let onboardingVC = self.diContainer.makeSplashViewController()
                 changeRootVC(onboardingVC,animated: true)
             }
@@ -65,6 +67,8 @@ public final class EditProfileViewController: BaseUIViewController<EditProfileVi
             .receive(on: RunLoop.main)
             .sink { [weak self] profile in
                 guard let profile else { return }
+                self?.errorPresenter.dismiss()
+                self?.currentNickname = profile.nickname
                 self?.editProfileView.configure(
                     profileImageURL: profile.profileImg,
                     nickname: profile.nickname,
@@ -82,9 +86,24 @@ public final class EditProfileViewController: BaseUIViewController<EditProfileVi
 
         output.profileImageUploadError
             .receive(on: RunLoop.main)
-            .sink { error in
-                // TODO: 실패 시 Alert 처리 등
-                print("프로필 이미지 업로드 실패: \(error)")
+            .sink { [weak self] error in
+                self?.errorPresenter.show(error, form: .modal, page: .editProfile)
+            }
+            .store(in: &cancellables)
+
+        output.withdrawError
+            .receive(on: RunLoop.main)
+            .sink { [weak self] error in
+                self?.errorPresenter.show(error, form: .modal, page: .editProfile)
+            }
+            .store(in: &cancellables)
+
+        output.loadError
+            .receive(on: RunLoop.main)
+            .sink { [weak self] error in
+                self?.errorPresenter.show(error, form: .fullPage, page: .editProfile) {
+                    self?.viewModel?.fetchUserProfile()
+                }
             }
             .store(in: &cancellables)
     }
@@ -107,6 +126,10 @@ public final class EditProfileViewController: BaseUIViewController<EditProfileVi
 
         editProfileView.onSelectGallery = { [weak self] in
             self?.presentImagePicker()
+        }
+
+        editProfileView.onNicknameTapped = { [weak self] in
+            self?.pushNicknameEditViewController()
         }
     }
 
@@ -148,6 +171,16 @@ public final class EditProfileViewController: BaseUIViewController<EditProfileVi
         let picker = PHPickerViewController(configuration: pickerConfig)
         picker.delegate = self
         present(picker, animated: true)
+    }
+
+    private func pushNicknameEditViewController() {
+        guard let currentNickname else { return }
+        let nicknameEditVC = diContainer.makeNicknameEditViewController(currentNickname: currentNickname)
+        nicknameEditVC.onNicknameChanged = { [weak self] nickname in
+            self?.currentNickname = nickname
+            self?.editProfileView.nicknameRow.setValue(value: nickname)
+        }
+        navigationController?.pushViewController(nicknameEditVC, animated: true)
     }
 }
 

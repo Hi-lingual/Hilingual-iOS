@@ -50,9 +50,10 @@ public final class FeedListViewController: BaseUIViewController<FeedViewModel> {
 
             if let firstFeed = self.currentFeeds.first {
                 AmplitudeManager.shared.send(
-                    .refreshTriggered(
+                    .clickRefresh(
                         entryId: String(firstFeed.diaryID),
-                        method: .auto
+                        method: .auto,
+                        page: .feed
                     )
                 )
             }
@@ -66,7 +67,7 @@ public final class FeedListViewController: BaseUIViewController<FeedViewModel> {
 
             if !user.isMine {
                 AmplitudeManager.shared.send(
-                    .viewProfileUser(
+                    .clickProfileView(
                         profileUserId: String(user.userID),
                         entrySource: .feed,
                         entryId: String(user.diaryID),
@@ -90,8 +91,6 @@ public final class FeedListViewController: BaseUIViewController<FeedViewModel> {
             guard let self else { return }
             let feed = self.currentFeeds[row]
 
-            AmplitudeManager.shared.send(.pageviewFeed(entryId: String(feed.diaryID)))
-
             let vc = self.diContainer.makeSharedDiaryViewController(diaryId: feed.diaryID)
             vc.hidesBottomBarWhenPushed = true
             self.navigationController?.pushViewController(vc, animated: true)
@@ -101,8 +100,6 @@ public final class FeedListViewController: BaseUIViewController<FeedViewModel> {
             guard let self else { return }
             let feed = self.currentFeeds[row]
 
-            AmplitudeManager.shared.send(.pageviewFeed(entryId: String(feed.diaryID)))
-
             let vc = self.diContainer.makeSharedDiaryViewController(diaryId: feed.diaryID)
             vc.hidesBottomBarWhenPushed = true
             self.navigationController?.pushViewController(vc, animated: true)
@@ -111,8 +108,6 @@ public final class FeedListViewController: BaseUIViewController<FeedViewModel> {
         feedCellView.onDetailTapped = { [weak self] row in
             guard let self else { return }
             let feed = self.currentFeeds[row]
-
-            AmplitudeManager.shared.send(.pageviewFeed(entryId: String(feed.diaryID)))
 
             let vc = self.diContainer.makeSharedDiaryViewController(diaryId: feed.diaryID)
             vc.hidesBottomBarWhenPushed = true
@@ -144,11 +139,28 @@ public final class FeedListViewController: BaseUIViewController<FeedViewModel> {
             .receive(on: RunLoop.main)
             .sink { [weak self] (feeds, haveFollowing) in
                 guard let self else { return }
+                self.errorPresenter.dismiss()
                 self.currentFeeds = feeds
                 self.feedCellView.apply(
                     items: feeds,
                     followingState: haveFollowing
                 )
+            }
+            .store(in: &cancellables)
+
+        output.loadError
+            .receive(on: RunLoop.main)
+            .sink { [weak self] error in
+                self?.errorPresenter.show(error, form: .fullPage, page: .feed) {
+                    self?.input.reload.send(())
+                }
+            }
+            .store(in: &cancellables)
+
+        output.actionError
+            .receive(on: RunLoop.main)
+            .sink { [weak self] error in
+                self?.errorPresenter.show(error, form: .modal, page: .feed)
             }
             .store(in: &cancellables)
     }
@@ -162,9 +174,10 @@ public final class FeedListViewController: BaseUIViewController<FeedViewModel> {
     @objc private func didTopScrollRefresh() {
         if let firstFeed = currentFeeds.first {
             AmplitudeManager.shared.send(
-                .refreshTriggered(
+                .clickRefresh(
                     entryId: String(firstFeed.diaryID),
-                    method: .pullToRefresh
+                    method: .pullToRefresh,
+                    page: .feed
                 )
             )
         }

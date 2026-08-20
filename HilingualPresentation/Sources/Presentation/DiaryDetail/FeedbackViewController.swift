@@ -9,6 +9,7 @@ import Foundation
 import Combine
 import UIKit
 import GoogleMobileAds
+import HilingualCore
 
 // MARK: - Model
 
@@ -35,18 +36,19 @@ public final class FeedbackViewController: BaseUIViewController<FeedbackViewMode
     var onDateLoaded: ((String) -> Void)?
     var publishedInfoLoaded: ((Bool) -> Void)?
     var onToggleChanged: ((Bool) -> Void)?
-
+    private let viewDidLoadSubject = PassthroughSubject<Void, Never>()
     private var date: String = ""
 
-    private let feedbackView = FeedbackView()
-    private let dialog = Dialog()
-
-    private let viewDidLoadSubject = PassthroughSubject<Void, Never>()
-
-    // MARK: - Ad
+    private var toggleClickCount: Int = 0
+    public var page: AnalyticsEvent.Page
 
     public var showsAdBanner: Bool = false
     private var bannerView: BannerView?
+    
+    // MARK: - UI Components
+    
+    private let feedbackView = FeedbackView()
+    private let dialog = Dialog()
 
     private lazy var adPlaceholderImageView: UIImageView = {
         let imageView = UIImageView(image: UIImage(resource: .imgLoadingFeedIos))
@@ -56,13 +58,46 @@ public final class FeedbackViewController: BaseUIViewController<FeedbackViewMode
     }()
 
     // MARK: - LifeCycle
+    
+    public init(viewModel: FeedbackViewModel,
+                diContainer: any ViewControllerFactory,
+                diaryId: Int,
+                page: AnalyticsEvent.Page = .feedback) {
+        self.page = page
+        super.init(viewModel: viewModel, diContainer: diContainer)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 
     public override func viewDidLoad() {
         super.viewDidLoad()
         viewDidLoadSubject.send(())
+        AmplitudeManager.shared.send(.viewPage(page: self.page))
 
         feedbackView.onToggleChanged = { [weak self] isEnabled in
-            self?.onToggleChanged?(isEnabled)
+            guard let self = self else { return }
+
+            if let customToggleAction = self.onToggleChanged {
+                customToggleAction(isEnabled)
+            } else {
+                self.toggleClickCount += 1
+                AmplitudeManager.shared.send(
+                    .clickToggle(
+                        page: self.page,
+                        toggleClickCount: self.toggleClickCount,
+                        toggleState: isEnabled
+                    )
+                )
+            }
+        }
+        
+        feedbackView.onDiaryPronunciationTapped = { [weak self] isFirstPlay in
+            guard let self else { return }
+            AmplitudeManager.shared.send(
+                .clickDiaryPronunciationBtnPlay(isFirstPlay: isFirstPlay, page: self.page)
+            )
         }
         
         if showsAdBanner {
@@ -72,6 +107,11 @@ public final class FeedbackViewController: BaseUIViewController<FeedbackViewMode
 
     public override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+    }
+
+    public override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        feedbackView.stopSpeech()
     }
 
     // MARK: - Custom Method
@@ -158,12 +198,23 @@ public final class FeedbackViewController: BaseUIViewController<FeedbackViewMode
                     }
                 },
                 receiveValue: { [weak self] feedbackList in
+                    self?.errorPresenter.dismiss()
                     let feedbackItems: [FeedbackItem] = feedbackList.map {
                         FeedbackItem(original: $0.original, rewrite: $0.rewrite, explanation: $0.explain)
                     }
                     self?.feedbackView.configureFeedbacks(data: feedbackItems)
                 }
             )
+            .store(in: &cancellables)
+
+        output.feedbackError
+            .receive(on: RunLoop.main)
+            .sink { [weak self] error in
+                guard let self else { return }
+                self.errorPresenter.show(error, form: .fullPage, page: .feedback) { [weak self] in
+                    self?.viewModel?.fetchFeedback()
+                }
+            }
             .store(in: &cancellables)
 
         output.fetchDiaryResult
@@ -175,6 +226,7 @@ public final class FeedbackViewController: BaseUIViewController<FeedbackViewMode
                     }
                 },
                 receiveValue: { [weak self] entity in
+                    self?.errorPresenter.dismiss()
                     let diffRanges = entity.diffRanges.map {
                         HighlightTextView.DiffRange(
                             start: $0.start,
@@ -200,6 +252,15 @@ public final class FeedbackViewController: BaseUIViewController<FeedbackViewMode
                     self?.feedbackView.configureDiary(data: diaryViewData)
                 }
             )
+            .store(in: &cancellables)
+
+        output.diaryDetailError
+            .receive(on: RunLoop.main)
+            .sink { [weak self] error in
+                self?.errorPresenter.show(error, form: .fullPage, page: .feedback) { [weak self] in
+                    self?.viewModel?.fetchDiaryDetail()
+                }
+            }
             .store(in: &cancellables)
     }
 

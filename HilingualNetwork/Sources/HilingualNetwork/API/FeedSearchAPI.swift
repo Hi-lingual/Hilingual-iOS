@@ -16,7 +16,7 @@ extension FeedSearchAPI: BaseTargetType {
     public var path: String {
         switch self {
         case .searchUsers:
-            return "/feed/search"
+            return "/v1/feed/search"
         }
     }
     

@@ -8,6 +8,7 @@
 import Foundation
 
 public struct UserProfileResponseDTO: Decodable {
+    public let userId: Int64?
     public let profileImg: String
     public let nickname: String
     public let provider: String

@@ -36,4 +36,22 @@ public final class DefaultDiaryWritingRepository: DiaryWritingRepository {
             .mapError { $0 as Error }
             .eraseToAnyPublisher()
     }
+
+    public func postDiaryRecovery(_ entity: DiaryWritingEntity) -> AnyPublisher<DiaryWritingResponseEntity, Error> {
+        let requestDTO = DiaryRecoveryRequestDTO(
+            originalText: entity.originalText,
+            date: entity.date,
+            fileKey: entity.image?.fileKey
+        )
+        
+        return service.postDiaryRecovery(requestDTO: requestDTO)
+            .map { responseDTO in
+                DiaryWritingResponseEntity(
+                    diaryId: responseDTO.data.diaryId,
+                    isAdWatched: responseDTO.data.isAdWatched
+                )
+            }
+            .mapError { $0 as Error }
+            .eraseToAnyPublisher()
+    }
 }

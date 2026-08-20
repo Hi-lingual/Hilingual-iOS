@@ -40,7 +40,7 @@ public final class AmplitudeManager: @unchecked Sendable {
             return
         }
 
-        let configuration = Configuration(apiKey: apiKey)
+        let configuration = Configuration(apiKey: apiKey, minIdLength: 1)
         configuration.defaultTracking.sessions = true
         configuration.defaultTracking.screenViews = true
 
@@ -74,9 +74,30 @@ public final class AmplitudeManager: @unchecked Sendable {
     }
 
     public func setUserId(_ userId: String?) {
-        guard ensureInitialized() else { return }
+        guard ensureInitialized() else {
+            #if DEBUG
+            print("[Amplitude] ⚠️ setUserId 무시됨 — 미초기화 (userId: \(String(describing: userId)))")
+            #endif
+            return
+        }
 
         amplitude?.setUserId(userId: userId)
+        #if DEBUG
+        print("[Amplitude] ✅ setUserId = \(String(describing: userId))")
+        #endif
+    }
+
+    /// 서버 userId(Long)를 Amplitude userId로 설정한다.
+    public func updateUserId(_ userId: Int64) {
+        #if DEBUG
+        print("[Amplitude] 📥 updateUserId(\(userId)) 호출됨")
+        #endif
+        setUserId(String(userId))
+    }
+
+    /// 로그아웃/탈퇴 시 userId를 해제한다.
+    public func clearUserId() {
+        setUserId(nil)
     }
 
     public func setUserProperty(key: String, value: Any) {

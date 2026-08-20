@@ -5,13 +5,22 @@
 //  Created by 성현주 on 8/26/25.
 //
 
-
 import UIKit
 
 public final class DeeplinkManager {
 
     @MainActor public static let shared = DeeplinkManager()
+    @MainActor public var onPendingDestinationSet: ((DeeplinkDestination) -> Bool)?
+    
+    @MainActor public var pendingDestination: DeeplinkDestination? {
+        didSet {
+            guard let destination = pendingDestination else { return }
 
+            if onPendingDestinationSet?(destination) == true {
+                pendingDestination = nil
+            }
+        }
+    }
     private init() {}
 
     @MainActor

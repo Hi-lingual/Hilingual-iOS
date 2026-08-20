@@ -43,6 +43,8 @@ replacements = {
     "__AD_FEEDBACK_UNIT_ID_RELEASE__": os.environ["AD_FEEDBACK_UNIT_ID_RELEASE"],
     "__AD_INTERSTITIAL_UNIT_ID_DEBUG__": os.environ["AD_INTERSTITIAL_UNIT_ID_DEBUG"],
     "__AD_INTERSTITIAL_UNIT_ID_RELEASE__": os.environ["AD_INTERSTITIAL_UNIT_ID_RELEASE"],
+    "__AD_RECOVERY_UNIT_ID_DEBUG__": os.environ["AD_RECOVERY_UNIT_ID_DEBUG"],
+    "__AD_RECOVERY_UNIT_ID_RELEASE__": os.environ["AD_RECOVERY_UNIT_ID_RELEASE"],
 }
 
 content = template_path.read_text(encoding="utf-8")
@@ -67,6 +69,8 @@ require_env AD_FEEDBACK_UNIT_ID_DEBUG
 require_env AD_FEEDBACK_UNIT_ID_RELEASE
 require_env AD_INTERSTITIAL_UNIT_ID_DEBUG
 require_env AD_INTERSTITIAL_UNIT_ID_RELEASE
+require_env AD_RECOVERY_UNIT_ID_DEBUG
+require_env AD_RECOVERY_UNIT_ID_RELEASE
 
 write_from_template "$DEBUG_TEMPLATE" "$DEBUG_OUTPUT"
 write_from_template "$RELEASE_TEMPLATE" "$RELEASE_OUTPUT"

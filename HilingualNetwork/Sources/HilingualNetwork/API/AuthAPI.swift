@@ -19,13 +19,13 @@ extension AuthAPI: NoAuthorizeTargetType {
     public var path: String {
         switch self {
         case .socialLogin:
-            return "/auth/login"
+            return "/v1/auth/login"
         case .refreshToken:
-            return "/users/reissue"
+            return "/v1/users/reissue"
         case .withdraw:
-            return "/auth/leave"
+            return "/v1/auth/leave"
         case .logout:
-            return "/auth/logout"
+            return "/v1/auth/logout"
         }
     }
 

@@ -6,8 +6,9 @@
 //
 
 import UIKit
+import Combine
 
-final class WordBookStudyViewController: UIViewController {
+public final class WordBookStudyViewController: BaseUIViewController<WordBookStudyViewModel> {
 
     // MARK: - Properties
 
@@ -19,18 +20,23 @@ final class WordBookStudyViewController: UIViewController {
     private var loadedCards: [WordStudyCard] = []
     private var didSetupCards = false
     private var baseCardFrame: CGRect?
+    private var currentState: WordBookStudyView.State = .studying
+
+    // MARK: - Input Subjects
+
+    private let cardSwipedSubject = PassthroughSubject<(phraseId: Int64, isMemorized: Bool), Never>()
+    private let submitTappedSubject = PassthroughSubject<Void, Never>()
+    private let retryRequestedSubject = PassthroughSubject<Void, Never>()
 
     // MARK: - Init
 
-    init(words: [PhraseData]) {
+    public init(
+        viewModel: WordBookStudyViewModel,
+        diContainer: any ViewControllerFactory,
+        words: [PhraseData]
+    ) {
         self.words = words
-        super.init(nibName: nil, bundle: nil)
-        modalPresentationStyle = .pageSheet
-    }
-
-    @available(*, unavailable)
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        super.init(viewModel: viewModel, diContainer: diContainer)
     }
 
     // MARK: - Lifecycle
@@ -39,21 +45,25 @@ final class WordBookStudyViewController: UIViewController {
         view = WordBookStudyView()
     }
 
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
-        addTarget()
-        configureSheet()
+        view.backgroundColor = .gray100
         updateRemainingCount()
     }
 
-    override func viewDidLayoutSubviews() {
+    public override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(false, animated: false)
+    }
+
+    public override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         if didSetupCards {
             layoutCards(animated: false)
         }
     }
 
-    override func viewDidAppear(_ animated: Bool) {
+    public override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         if !didSetupCards {
             view.layoutIfNeeded()
@@ -62,19 +72,77 @@ final class WordBookStudyViewController: UIViewController {
         }
     }
 
-    private func addTarget() {
-        studyView.backButton.addTarget(self, action: #selector(didTapClose), for: .touchUpInside)
+    // MARK: - Navigation
+
+    public override func navigationType() -> NavigationType? {
+        switch currentState {
+        case .studying:
+            let remaining = max(words.count - index, 0)
+            return .backTitle("\(remaining)개")
+        case .exitPrompt:
+            return .closeOnly
+        case .completed:
+            return nil
+        }
+    }
+
+    public override func backButtonTapped() {
+        switch currentState {
+        case .studying:
+            if viewModel?.hasAnyResult == true {
+                setState(.exitPrompt)
+            } else {
+                dismiss(animated: true)
+            }
+        case .exitPrompt, .completed:
+            dismiss(animated: true)
+        }
+    }
+
+    // MARK: - Setup
+
+    public override func addTarget() {
         studyView.notRememberedButton.addTarget(self, action: #selector(didTapNotRemembered), for: .touchUpInside)
         studyView.rememberedButton.addTarget(self, action: #selector(didTapRemembered), for: .touchUpInside)
-        studyView.completeButton.addTarget(self, action: #selector(didTapComplete), for: .touchUpInside)
+        studyView.primaryButton.addTarget(self, action: #selector(didTapPrimary), for: .touchUpInside)
+    }
+
+    public override func bind(viewModel: WordBookStudyViewModel) {
+        super.bind(viewModel: viewModel)
+
+        let input = WordBookStudyViewModel.Input(
+            cardSwiped: cardSwipedSubject.eraseToAnyPublisher(),
+            submitTapped: submitTappedSubject.eraseToAnyPublisher(),
+            retryRequested: retryRequestedSubject.eraseToAnyPublisher()
+        )
+        let output = viewModel.transform(input: input)
+
+        output.submitSucceeded
+            .receive(on: RunLoop.main)
+            .sink { [weak self] in
+                self?.dismiss(animated: true)
+            }
+            .store(in: &cancellables)
+
+        output.actionError
+            .receive(on: RunLoop.main)
+            .sink { [weak self] error in
+                guard let self else { return }
+                self.errorPresenter.show(error, form: .modal, page: .vocabulary) { [weak self] in
+                    self?.retryRequestedSubject.send(())
+                }
+            }
+            .store(in: &cancellables)
+
+        output.isSubmitting
+            .receive(on: RunLoop.main)
+            .sink { [weak self] isSubmitting in
+                self?.studyView.primaryButton.isEnabled = !isSubmitting
+            }
+            .store(in: &cancellables)
     }
 
     // MARK: - Actions
-
-    @objc
-    private func didTapClose() {
-        dismiss(animated: true)
-    }
 
     @objc
     private func didTapNotRemembered() {
@@ -87,13 +155,30 @@ final class WordBookStudyViewController: UIViewController {
     }
 
     @objc
-    private func didTapComplete() {
-        dismiss(animated: true)
+    private func didTapPrimary() {
+        submitTappedSubject.send(())
     }
+
+    // MARK: - State
+
+    private func setState(_ state: WordBookStudyView.State) {
+        currentState = state
+        studyView.setState(state)
+
+        switch state {
+        case .studying, .exitPrompt:
+            navigationController?.setNavigationBarHidden(false, animated: false)
+            setupNavigationBar()
+        case .completed:
+            navigationController?.setNavigationBarHidden(true, animated: false)
+        }
+    }
+
+    // MARK: - Cards
 
     private func loadInitialCards() {
         guard !words.isEmpty else {
-            studyView.emptyContainerView.isHidden = false
+            showCompleteState()
             return
         }
 
@@ -112,10 +197,14 @@ final class WordBookStudyViewController: UIViewController {
         updateRemainingCount()
     }
 
-    private func createCard(for index: Int) -> WordStudyCard {
-        let card = WordStudyCard(word: words[index])
+    private func createCard(for cardIndex: Int) -> WordStudyCard {
+        let word = words[cardIndex]
+        let card = WordStudyCard(word: word)
         card.delegate = self
         card.frame = cardFrame(at: loadedCards.count)
+        card.onFlipped = { [weak self] in
+            self?.studyView.hideHint()
+        }
         return card
     }
 
@@ -127,11 +216,9 @@ final class WordBookStudyViewController: UIViewController {
 
     private func layoutCards(animated: Bool) {
         guard !loadedCards.isEmpty else {
-            studyView.showCompleteState()
+            showCompleteState()
             return
         }
-
-        studyView.emptyContainerView.isHidden = true
 
         for (i, card) in loadedCards.enumerated() {
             let frame = cardFrame(at: i)
@@ -170,6 +257,10 @@ final class WordBookStudyViewController: UIViewController {
         layoutCards(animated: true)
         updateRemainingCount()
     }
+
+    private func showCompleteState() {
+        setState(.completed)
+    }
 }
 
 private extension WordBookStudyViewController {
@@ -181,25 +272,15 @@ private extension WordBookStudyViewController {
     }
 
     func updateRemainingCount() {
-        let remaining = max(words.count - index, 0)
-        studyView.updateRemainingCount(remaining)
-    }
-
-    func configureSheet() {
-        guard let sheet = sheetPresentationController else { return }
-        sheet.detents = [.large()]
-        sheet.prefersGrabberVisible = false
-        sheet.preferredCornerRadius = 28
+        setupNavigationBar()
     }
 
     func ensureBaseCardFrame() {
         guard baseCardFrame == nil else { return }
         let horizontalInset: CGFloat = 20
         let containerBounds = studyView.cardContainerView.bounds
-        let maxHeight = min(containerBounds.height, 420)
-        let minHeight: CGFloat = 240
-        let cardHeight = max(minHeight, min(maxHeight, containerBounds.height * 0.72))
-        let originY = max(8, (containerBounds.height - cardHeight) / 2)
+        let cardHeight: CGFloat = 400
+        let originY = max(0, (containerBounds.height - cardHeight) / 2)
         baseCardFrame = CGRect(
             x: horizontalInset,
             y: originY,
@@ -213,10 +294,12 @@ private extension WordBookStudyViewController {
 
 extension WordBookStudyViewController: WordStudyCardDelegate {
     func cardDidSwipeLeft(_ card: WordStudyCard) {
+        cardSwipedSubject.send((phraseId: card.phraseId, isMemorized: false))
         advanceCards(from: card)
     }
 
     func cardDidSwipeRight(_ card: WordStudyCard) {
+        cardSwipedSubject.send((phraseId: card.phraseId, isMemorized: true))
         advanceCards(from: card)
     }
 }

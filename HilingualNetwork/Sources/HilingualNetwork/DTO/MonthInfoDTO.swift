@@ -19,4 +19,5 @@ public struct DateListDTO: Decodable {
 
 public struct DateDTO: Decodable {
     public let date: String
+    public let status: String?
 }

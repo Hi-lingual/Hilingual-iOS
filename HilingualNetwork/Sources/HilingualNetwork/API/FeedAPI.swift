@@ -16,8 +16,8 @@ public enum FeedAPI {
 extension FeedAPI: BaseTargetType {
     public var path: String {
         switch self {
-        case .fetchRecommendFeed: return "/feed/recommend"
-        case .fetchFollowingFeed:   return "/feed/following"
+        case .fetchRecommendFeed: return "/v1/feed/recommend"
+        case .fetchFollowingFeed:   return "/v1/feed/following"
         }
     }
     public var method: Moya.Method { .get }

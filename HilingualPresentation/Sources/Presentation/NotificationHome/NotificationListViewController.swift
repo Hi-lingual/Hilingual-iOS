@@ -79,6 +79,7 @@ public final class NotificationListViewController: BaseUIViewController<Notifica
             output.generalNotifications
                 .receive(on: DispatchQueue.main)
                 .sink { [weak self] list in
+                    self?.errorPresenter.dismiss()
                     self?.notificationView.notificationListModel = NotificationListModel(
                         type: .feed(raw),
                         items: list
@@ -91,6 +92,7 @@ public final class NotificationListViewController: BaseUIViewController<Notifica
             output.noticeNotifications
                 .receive(on: DispatchQueue.main)
                 .sink { [weak self] list in
+                    self?.errorPresenter.dismiss()
                     self?.notificationView.notificationListModel = NotificationListModel(
                         type: .notice(raw),
                         items: list
@@ -99,6 +101,16 @@ public final class NotificationListViewController: BaseUIViewController<Notifica
                 }
                 .store(in: &cancellables)
         }
+
+        output.loadError
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] error in
+                self?.notificationView.refreshControl.endRefreshing()
+                self?.errorPresenter.show(error, form: .fullPage, page: .notification) {
+                    self?.fetchTrigger.send(())
+                }
+            }
+            .store(in: &cancellables)
     }
 
     //MARK: - Private Method
@@ -156,15 +168,13 @@ extension NotificationListViewController: UITableViewDelegate {
                 guard let diaryId = selectedItem.targetId else {return}
 
                 AmplitudeManager.shared.send(
-                    .viewProfileUser(
+                    .clickProfileView(
                         profileUserId: String(selectedItem.targetId ?? 0),
                         entrySource: .notification,
                         entryId: String(diaryId),
                         page: .notification
                     )
                 )
-
-                AmplitudeManager.shared.send(.pageviewPostedDiary(entryId: String(diaryId)))
 
                 let vc = self.diContainer.makeSharedDiaryViewController(diaryId: diaryId)
                 navigationController?.pushViewController(vc, animated: true)
@@ -173,7 +183,7 @@ extension NotificationListViewController: UITableViewDelegate {
                 guard let userId = selectedItem.targetId else {return}
 
                 AmplitudeManager.shared.send(
-                    .viewProfileUser(
+                    .clickProfileView(
                         profileUserId: String(userId),
                         entrySource: .notification,
                         entryId: String(selectedItem.id),

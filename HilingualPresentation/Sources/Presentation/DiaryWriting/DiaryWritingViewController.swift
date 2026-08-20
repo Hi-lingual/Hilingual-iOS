@@ -27,6 +27,7 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
     let saveModal = Modal()
     private let textCountSubject = PassthroughSubject<Int, Never>()
     private let topicData: (String, String)?
+    private let isRecoveryWriting: Bool
     public let selectedDate: Date
     var currentPickerMode: PickerMode?
     var shouldLoadDraft: Bool
@@ -49,15 +50,8 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
         writingStartTime = Date()
         
 
-        // 1️⃣ [Amplitude] 페이지 진입 (pageview)
-        AmplitudeManager.shared.send(
-            .pageviewDiaryWriting(
-                entryId: entryId,
-                backSource: .from(backSource),
-                selectedDate: selectedDate,
-                recommendedTopic: .from(topicData)
-            )
-        )
+        // 1️⃣ [Amplitude] 페이지 진입 (view_page)
+        AmplitudeManager.shared.send(.viewPage(page: .writeDiary))
         
         viewModel?.loadDraftIfExists(for: selectedDate)
     }
@@ -77,9 +71,11 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
         topicData: (String, String)?,
         selectedDate: Date,
         backSource: String = "ui_button",
-        shouldLoadDraft: Bool = true
+        shouldLoadDraft: Bool = true,
+        isRecoveryWriting: Bool = false
     ) {
         self.topicData = topicData
+        self.isRecoveryWriting = isRecoveryWriting
         self.selectedDate = selectedDate
         self.shouldLoadDraft = shouldLoadDraft
         self.backSource = backSource
@@ -93,7 +89,8 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
         diaryWritingView.updateView(for: selectedDate)
 
         if let topic = topicData {
-            diaryWritingView.setTopic(kor: topic.0, en: topic.1)
+            let dropdownStyle: DropdownStyle = isRecoveryWriting ? .recoveryDate : .today
+            diaryWritingView.setTopic(kor: topic.0, en: topic.1, style: dropdownStyle)
         }
     }
 
@@ -213,7 +210,7 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
         let dateString = selectedDate.toFormattedString("yyyy-MM-dd")
 
         AmplitudeManager.shared.send(
-            .submittedEntryDiary(
+            .clickSubmitEntry(
                 entryId: entryId,
                 hasPhoto: imageData != nil,
                 charCount: text.count,
@@ -222,7 +219,13 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
         )
 
         let loadingVC = diContainer.makeLoadingViewController()
-        loadingVC.viewModel?.postDiary(originalText: text, date: dateString, imageFile: imageData)
+        loadingVC.viewModel?.postDiary(
+            originalText: text,
+            date: dateString,
+            imageFile: imageData,
+            isRecoveryWriting: isRecoveryWriting
+        )
+        loadingVC.preloadAd()
         navigationController?.pushViewController(loadingVC, animated: true)
     }
 
@@ -274,9 +277,10 @@ public final class DiaryWritingViewController: BaseUIViewController<DiaryWriting
     @objc public override func backButtonTapped() {
         // 2️⃣ 뒤로가기 버튼 클릭
         AmplitudeManager.shared.send(
-            .clickBackDiary(
+            .clickBack(
                 entryId: entryId,
-                backSource: .uiButton
+                backSource: .uiButton,
+                page: .writeDiary
             )
         )
         if isImageChanged() {

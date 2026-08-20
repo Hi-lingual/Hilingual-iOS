@@ -11,6 +11,13 @@ import Kingfisher
 
 final class ProfileView: UIView {
     
+    private static func makeDotView() -> UIView {
+        let view = UIView()
+        view.backgroundColor = .white
+        view.layer.cornerRadius = 1
+        return view
+    }
+    
     private let nameLabel: UILabel = {
         let label = UILabel()
         label.font = .pretendard(.head_sb_18)
@@ -29,7 +36,7 @@ final class ProfileView: UIView {
     private let totalImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFit
-        imageView.image = UIImage(named: "ic_bubble_16_ios", in: .module, compatibleWith: nil)
+        imageView.image = UIImage(resource: .icBubble16Ios)
         return imageView
     }()
     
@@ -40,21 +47,32 @@ final class ProfileView: UIView {
         return label
     }()
     
-    private let dot: UIView = {
-        let view = UIView()
-        view.backgroundColor = .white
-        view.layer.cornerRadius = 1
-        return view
-    }()
+    private let dot1 = makeDotView()
     
     private let streakImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFit
-        imageView.image = UIImage(named: "ic_fire_16_ios", in: .module, compatibleWith: nil)
+        imageView.image = UIImage(resource: .icFire16Ios)
         return imageView
     }()
     
     private let streakLabel: UILabel = {
+        let label = UILabel()
+        label.font = .pretendard(.cap_r_12)
+        label.textColor = .white
+        return label
+    }()
+    
+    private let dot2 = makeDotView()
+    
+    private let returnImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFit
+        imageView.image = UIImage(resource: .icReturn16Ios)
+        return imageView
+    }()
+    
+    private let returnLabel: UILabel = {
         let label = UILabel()
         label.font = .pretendard(.cap_r_12)
         label.textColor = .white
@@ -80,7 +98,7 @@ final class ProfileView: UIView {
     private(set) var alarmButton: UIButton = {
         let button = UIButton()
         button.setImage(
-            UIImage(named: "ic_alarm_28_ios", in: .module, compatibleWith: nil),
+            UIImage(resource: .icAlarm28Ios),
             for: .normal
         )
         return button
@@ -108,14 +126,22 @@ final class ProfileView: UIView {
         statusStack.addArrangedSubviews(
             totalImageView,
             totalLabel,
-            dot,
+            dot1,
             streakImageView,
-            streakLabel)
+            streakLabel,
+            dot2,
+            returnImageView,
+            returnLabel
+        )
     }
     
     private func setupLayout() {
         
-        dot.snp.makeConstraints {
+        dot1.snp.makeConstraints {
+            $0.size.equalTo(2)
+        }
+        
+        dot2.snp.makeConstraints {
             $0.size.equalTo(2)
         }
         
@@ -140,6 +166,7 @@ final class ProfileView: UIView {
         profileImageURL: String? = nil,
         totalDiaries: Int = 0,
         streak: Int = 0,
+        recoveryTickets: Int = 0,
         newAlarm: Bool = false
     ) {
         nameLabel.attributedText = .pretendard(
@@ -147,13 +174,10 @@ final class ProfileView: UIView {
             text: nickname
         )
         totalLabel.text = "총 \(totalDiaries)편"
-        streakLabel.text = "\(streak)일 연속 작성 중"
+        streakLabel.text = "\(streak)일 연속"
+        returnLabel.text = "\(recoveryTickets)개"
         
-        let defaultImage = UIImage(
-            named: "img_profile_normal_ios",
-            in: .module,
-            compatibleWith: nil
-        )
+        let defaultImage = UIImage(resource: .imgProfileNormalIos)
         
         if let urlString = profileImageURL,
            let url = URL(string: urlString),
@@ -174,12 +198,12 @@ final class ProfileView: UIView {
         }
         if newAlarm {
             alarmButton.setImage(
-                UIImage(named: "ic_newAlarm_28_ios", in: .module, compatibleWith: nil),
+                UIImage(resource: .icNewAlarm28Ios),
                 for: .normal
             )
         } else {
             alarmButton.setImage(
-                UIImage(named: "ic_alarm_28_ios", in: .module, compatibleWith: nil),
+                UIImage(resource: .icAlarm28Ios),
                 for: .normal
             )
         }

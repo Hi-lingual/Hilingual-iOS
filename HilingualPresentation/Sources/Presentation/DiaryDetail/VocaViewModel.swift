@@ -24,6 +24,9 @@ public final class RecommendedExpressionViewModel: BaseViewModel {
     public struct Output {
         let fetchExpression: AnyPublisher<[RecommendedExpressionEntity.Phrase], Never>
         let errorMessage: AnyPublisher<String, Never>
+        let loadError: AnyPublisher<Error, Never>
+        let bookmarkError: AnyPublisher<Error, Never>
+        let bookmarkAdded: AnyPublisher<Void, Never>
     }
 
     // MARK: - Properties
@@ -33,8 +36,11 @@ public final class RecommendedExpressionViewModel: BaseViewModel {
 
     private let recommendecExpressionSubject = PassthroughSubject<[RecommendedExpressionEntity.Phrase], Never>()
     private let bookmarkToggledSubject = PassthroughSubject<(Int, Bool), Never>()
-    
+
     private let errorSubject = PassthroughSubject<String, Never>()
+    private let loadErrorSubject = PassthroughSubject<Error, Never>()
+    private let bookmarkErrorSubject = PassthroughSubject<Error, Never>()
+    private let bookmarkAddedSubject = PassthroughSubject<Void, Never>()
 
     public init(diaryId: Int, recommendedExpressionUseCase: RecommendedExpressionUseCase, toggleBookmarkUseCase: ToggleBookmarkUseCase) {
         self.diaryId = diaryId
@@ -45,20 +51,7 @@ public final class RecommendedExpressionViewModel: BaseViewModel {
     public func transform(input: Input) -> Output {
         input.viewDidLoad
             .sink { [weak self] in
-                guard let self = self else { return }
-
-                self.recommendedExpressionUseCase.fetchRecommendedExpression(diaryId: diaryId)
-                    .sink(receiveCompletion: { [weak self] completion in
-                        switch completion {
-                        case .failure(let error):
-                            self?.errorSubject.send("조회 실패: \(error.localizedDescription)")
-                        case .finished:
-                            break
-                        }
-                    }, receiveValue: { [weak self] ExpressionData in
-                        self?.recommendecExpressionSubject.send(ExpressionData)
-                    })
-                    .store(in: &self.cancellables)
+                self?.fetchRecommendedExpression()
             }
             .store(in: &cancellables)
         input .bookmarkToggled
@@ -69,8 +62,23 @@ public final class RecommendedExpressionViewModel: BaseViewModel {
 
         return Output(
             fetchExpression: recommendecExpressionSubject.eraseToAnyPublisher(),
-            errorMessage: errorSubject.eraseToAnyPublisher()
+            errorMessage: errorSubject.eraseToAnyPublisher(),
+            loadError: loadErrorSubject.eraseToAnyPublisher(),
+            bookmarkError: bookmarkErrorSubject.eraseToAnyPublisher(),
+            bookmarkAdded: bookmarkAddedSubject.eraseToAnyPublisher()
         )
+    }
+
+    func fetchRecommendedExpression() {
+        recommendedExpressionUseCase.fetchRecommendedExpression(diaryId: diaryId)
+            .sink(receiveCompletion: { [weak self] completion in
+                if case let .failure(error) = completion {
+                    self?.loadErrorSubject.send(error)
+                }
+            }, receiveValue: { [weak self] expressionData in
+                self?.recommendecExpressionSubject.send(expressionData)
+            })
+            .store(in: &cancellables)
     }
     
     private func toggleBookmark(phraseId: Int, isBookmarked: Bool) {
@@ -79,8 +87,11 @@ public final class RecommendedExpressionViewModel: BaseViewModel {
                 switch completion {
                 case .finished:
                     self?.updateBookmarkState(phraseId: phraseId, isBookmarked: isBookmarked)
+                    if isBookmarked {
+                        self?.bookmarkAddedSubject.send(())
+                    }
                 case .failure(let error):
-                    self?.errorSubject.send(error.localizedDescription)
+                    self?.bookmarkErrorSubject.send(error)
                 }
             }, receiveValue: { _ in })
             .store(in: &cancellables)

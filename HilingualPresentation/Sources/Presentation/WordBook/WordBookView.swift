@@ -58,6 +58,19 @@ final class WordBookView: BaseUIView {
         return label
     }()
 
+    let unmemorizedOnlyButton: UIButton = {
+        let button = UIButton(type: .system)
+        let image = UIImage(resource: .icCheckbox24Ios)
+            .withRenderingMode(.alwaysOriginal)
+        button.setImage(image, for: .normal)
+        button.setTitle(" 모르는 단어만 보기", for: .normal)
+        button.setTitleColor(.gray500, for: .normal)
+        button.titleLabel?.font = .pretendard(.body_r_14)
+        button.contentHorizontalAlignment = .left
+        button.semanticContentAttribute = .forceLeftToRight
+        return button
+    }()
+
     let sortButton: UIButton = {
         let button = UIButton(type: .system)
         let image = UIImage(named: "ic_list_24_ios", in: .module, compatibleWith: nil)?
@@ -76,16 +89,17 @@ final class WordBookView: BaseUIView {
 
     lazy var statusHeaderView: UIView = {
         let container = UIView()
-        container.backgroundColor = .clear
+        container.backgroundColor = .gray100
 
-        let stack = UIStackView(arrangedSubviews: [totalCountLabel, sortButton])
+        let stack = UIStackView(arrangedSubviews: [unmemorizedOnlyButton, sortButton])
         stack.axis = .horizontal
         stack.alignment = .center
         stack.distribution = .equalSpacing
+        stack.spacing = 8
 
         container.addSubview(stack)
         stack.snp.makeConstraints {
-            $0.top.bottom.equalToSuperview().inset(12)
+            $0.top.bottom.equalToSuperview().inset(12).priority(.high)
             $0.leading.trailing.equalToSuperview().inset(16)
         }
 
@@ -109,18 +123,24 @@ final class WordBookView: BaseUIView {
         let button = UIButton(type: .system)
 
         var config = UIButton.Configuration.filled()
-        config.title = "단어 복습하기"
+        var title = AttributedString("복습하기")
+        title.font = UIFont.pretendard(.body_sb_14)
+        config.attributedTitle = title
         config.baseForegroundColor = .white
         config.baseBackgroundColor = .hilingualBlack
-        config.cornerStyle = .capsule
-        config.contentInsets = NSDirectionalEdgeInsets(top: 14, leading: 24, bottom: 14, trailing: 24)
+        config.background.cornerRadius = 30
+        config.cornerStyle = .fixed
+        config.contentInsets = NSDirectionalEdgeInsets(top: 12, leading: 16, bottom: 12, trailing: 16)
+        config.image = UIImage(resource: .icCard24Ios)
+            .withRenderingMode(.alwaysOriginal)
+        config.imagePadding = 4
+        config.imagePlacement = .leading
 
         button.configuration = config
-        button.titleLabel?.font = UIFont.pretendard(.body_sb_14)
         button.layer.shadowColor = UIColor.black.cgColor
         button.layer.shadowOpacity = 0.2
-        button.layer.shadowRadius = 8
-        button.layer.shadowOffset = CGSize(width: 0, height: 4)
+        button.layer.shadowRadius = 4
+        button.layer.shadowOffset = CGSize(width: 0, height: 2)
         return button
     }()
 
@@ -132,22 +152,19 @@ final class WordBookView: BaseUIView {
 
     // MARK: - Lifecycle
 
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        updateHeaderViewLayout()
-    }
-
     override func setUI() {
-        
+
         titleLabel.attributedText = .pretendard(
             .head_sb_18,
             text: "나의 단어장"
         )
-        
+
+        backgroundColor = .gray100
         navigationContainer.backgroundColor = .hilingualBlack
 
         addSubviews(
             navigationContainer,
+            statusHeaderView,
             tableView,
             emptyView,
             studyButton
@@ -157,9 +174,8 @@ final class WordBookView: BaseUIView {
             titleLabel,
             searchBar
         )
-        showHeaderView(true)
         tableView.refreshControl = refreshControl
-        setStudyButtonVisible(false)
+        setStudyButtonVisible(true)
     }
 
     override func setLayout() {
@@ -178,13 +194,18 @@ final class WordBookView: BaseUIView {
             $0.leading.trailing.equalToSuperview().inset(8)
         }
 
-        tableView.snp.makeConstraints {
+        statusHeaderView.snp.makeConstraints {
             $0.top.equalTo(navigationContainer.snp.bottom)
+            $0.leading.trailing.equalToSuperview()
+        }
+
+        tableView.snp.makeConstraints {
+            $0.top.equalTo(statusHeaderView.snp.bottom)
             $0.leading.trailing.bottom.equalToSuperview()
         }
 
         emptyView.snp.makeConstraints {
-            $0.top.equalTo(navigationContainer.snp.bottom).offset(120)
+            $0.top.equalTo(statusHeaderView.snp.bottom).offset(80)
             $0.leading.trailing.bottom.equalToSuperview()
         }
 
@@ -205,25 +226,25 @@ final class WordBookView: BaseUIView {
         }
     }
 
+    func updateUnmemorizedOnly(_ isOn: Bool) {
+        let image = UIImage(resource: isOn ? .icCheckbox24FillIos : .icCheckbox24Ios)
+            .withRenderingMode(.alwaysOriginal)
+        unmemorizedOnlyButton.setImage(image, for: .normal)
+    }
+
     func showHeaderView(_ show: Bool) {
-        if show {
-            updateHeaderViewLayout()
-            tableView.tableHeaderView = statusHeaderView
-        } else {
-            tableView.tableHeaderView = nil
+        statusHeaderView.isHidden = !show
+        statusHeaderView.snp.remakeConstraints {
+            $0.top.equalTo(navigationContainer.snp.bottom)
+            $0.leading.trailing.equalToSuperview()
+            if !show {
+                $0.height.equalTo(0)
+            }
         }
     }
 
     func setStudyButtonVisible(_ isVisible: Bool) {
         studyButton.isHidden = !isVisible
         tableView.contentInset.bottom = isVisible ? studyButtonVisibleInset : studyButtonHiddenInset
-    }
-
-    private func updateHeaderViewLayout() {
-        let headerSize = statusHeaderView.systemLayoutSizeFitting(CGSize(
-            width: bounds.width,
-            height: UIView.layoutFittingCompressedSize.height
-        ))
-        statusHeaderView.frame = CGRect(origin: .zero, size: headerSize)
     }
 }

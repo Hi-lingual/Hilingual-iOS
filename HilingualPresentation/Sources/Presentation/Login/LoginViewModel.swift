@@ -7,9 +7,11 @@
 
 import Foundation
 import Combine
+import HilingualCore
 import HilingualDomain
 
 public final class LoginViewModel: BaseViewModel {
+    
     public struct Input {
         let loginTapped: AnyPublisher<Void, Never>
     }
@@ -64,8 +66,9 @@ public final class LoginViewModel: BaseViewModel {
         return socialLoginUseCase.execute()
             .handleEvents(
                 receiveOutput: { [weak self] result in
-                    self?.handleLoginSuccess(result)
-                    self?.syncDevice()
+                    guard let self else { return }
+                    self.handleLoginSuccess(result)
+                    self.syncDevice()
                 },
                 receiveCompletion: { completion in
                     print("[LoginVM] 🔚 로그인 흐름 완료: \(completion)")
@@ -79,17 +82,20 @@ public final class LoginViewModel: BaseViewModel {
     }
 
     private func syncDevice() {
+        Task { @MainActor in
+            FCMTokenSyncService.shared.sessionDidAuthenticate()
+        }
+
         deviceUseCase.updateCurrentDevice()
-            .handleEvents(receiveOutput: {
-                print("[LoginVM] ✅ device API 성공")
-            })
             .sink(
                 receiveCompletion: { completion in
                     if case let .failure(error) = completion {
                         print("[LoginVM] ⚠️ device API 실패: \(error.localizedDescription)")
                     }
                 },
-                receiveValue: { _ in }
+                receiveValue: { _ in
+                    print("[LoginVM] ✅ device API 성공")
+                }
             )
             .store(in: &cancellables)
     }
@@ -100,7 +106,13 @@ public final class LoginViewModel: BaseViewModel {
         print("[LoginVM] ♻️ refreshToken: \(result.refreshToken.prefix(10))...")
         print("[LoginVM] 🔍 isProfileCompleted: \(result.isProfileCompleted)")
 
+        HomeRecoveryStorage.clearSessionCache()
         saveLoginState(result)
+        if let userId = result.userId {
+            Task { @MainActor in
+                AmplitudeManager.shared.updateUserId(userId)
+            }
+        }
         navigateAfterLogin(result)
     }
 

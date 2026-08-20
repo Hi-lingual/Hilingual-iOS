@@ -59,12 +59,15 @@ public final class TabBarViewController: UIViewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
+        NetworkMonitor.shared.start()
         setupChildViewControllers()
         setupUI()
         setupLayout()
         setupTabBarAction()
         customTabBarView.loadAd(rootViewController: self)
         selectTab(at: 0)
+        setupDeeplinkObserver()
+        handlePendingDeeplink()
     }
 
     public override func viewDidLayoutSubviews() {
@@ -82,9 +85,36 @@ public final class TabBarViewController: UIViewController {
             makeNavigationController(root: factory.makeMypageViewController())
         ]
     }
+    
+    private func setupDeeplinkObserver() {
+        DeeplinkManager.shared.onPendingDestinationSet = { [weak self] destination in
+            guard let self else { return false }
+
+            let homeNav = self.childNavigationControllers[0]
+            DeeplinkManager.shared.handle(destination, from: homeNav, di: self.factory)
+
+            if self.currentIndex != 0 {
+                self.selectTab(at: 0)
+            }
+
+            return true
+        }
+    }
+
+    private func handlePendingDeeplink() {
+        guard let destination = DeeplinkManager.shared.pendingDestination else { return }
+        DeeplinkManager.shared.pendingDestination = nil
+
+        let homeNav = childNavigationControllers[0]
+        DeeplinkManager.shared.handle(destination, from: homeNav, di: factory)
+
+        if currentIndex != 0 {
+            selectTab(at: 0)
+        }
+    }
 
     private func makeNavigationController(root: UIViewController) -> UINavigationController {
-        let nav = UINavigationController(rootViewController: root)
+        let nav = NetworkAwareNavigationController(rootViewController: root)
         nav.delegate = self
         return nav
     }

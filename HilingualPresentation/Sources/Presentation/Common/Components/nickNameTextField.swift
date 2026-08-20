@@ -12,7 +12,7 @@ final class nickNameTextField: BaseUIView {
 
     public enum State {
         case normal
-        case error(String)
+        case error(String, shouldShake: Bool = true)
         case success(String)
         case wait
     }
@@ -28,6 +28,8 @@ final class nickNameTextField: BaseUIView {
     var text: String {
         return textField.text ?? ""
     }
+
+    private var isShowingError = false
 
     // MARK: - UI Components
 
@@ -119,26 +121,40 @@ final class nickNameTextField: BaseUIView {
         )
     }
 
+    func setText(_ text: String) {
+        let noSpaces = text.replacingOccurrences(of: " ", with: "")
+        let trimmed = noSpaces.count > maxLength ? String(noSpaces.prefix(maxLength)) : noSpaces
+        textField.attributedText = .pretendard(.body_m_16, text: trimmed)
+        updateCharacterCount()
+    }
+
     func updateState(_ state: State) {
         switch state {
         case .normal:
+            isShowingError = false
             textField.layer.borderColor = UIColor.clear.cgColor
             messageLabel.text = ""
             stopLoading()
 
-        case .error(let message):
+        case .error(let message, let shouldShake):
+            if shouldShake && !isShowingError {
+                shakeTextField()
+            }
+            isShowingError = true
             textField.layer.borderColor = UIColor.alertRed.cgColor
             messageLabel.text = message
             messageLabel.textColor = .alertRed
             stopLoading()
 
         case .success(let message):
+            isShowingError = false
             textField.layer.borderColor = UIColor.clear.cgColor
             messageLabel.text = message
             messageLabel.textColor = .hilingualBlue
             stopLoading()
 
         case .wait:
+            isShowingError = false
             textField.layer.borderColor = UIColor.clear.cgColor
             messageLabel.text = ""
             startLoading()
@@ -184,6 +200,14 @@ final class nickNameTextField: BaseUIView {
         characterCountLabel.text = "\(text.count)/\(maxLength)"
     }
 
+    private func shakeTextField() {
+        let animation = CAKeyframeAnimation(keyPath: "transform.translation.x")
+        animation.timingFunction = CAMediaTimingFunction(name: .linear)
+        animation.duration = 0.35
+        animation.values = [-6, 6, -4, 4, -2, 2, 0]
+        textField.layer.add(animation, forKey: "errorShake")
+    }
+
     private func addTextPadding() {
         let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: 12, height: 0))
         textField.leftView = paddingView
@@ -205,9 +229,6 @@ final class nickNameTextField: BaseUIView {
     @objc
     private func textDidChange() {
         let current = textField.text ?? ""
-        let noSpaces = current.replacingOccurrences(of: " ", with: "")
-        let trimmed = noSpaces.count > maxLength ? String(noSpaces.prefix(maxLength)) : noSpaces
-        textField.attributedText = .pretendard(.body_m_16, text: trimmed)
-        updateCharacterCount()
+        setText(current)
     }
 }

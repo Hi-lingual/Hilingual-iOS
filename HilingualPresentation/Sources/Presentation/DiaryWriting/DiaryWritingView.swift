@@ -251,7 +251,8 @@ final class DiaryWritingView: BaseUIView {
     
     // MARK: - Private Methods
     
-    func setTopic(kor: String, en: String) {
+    func setTopic(kor: String, en: String, style: DropdownStyle = .today) {
+        dropdown.applyStyle(style)
         dropdown.configure(kor: kor, en: en)
     }
     

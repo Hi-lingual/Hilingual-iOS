@@ -17,7 +17,7 @@ extension FollowingAPI: BaseTargetType {
     public var path: String {
         switch self {
         case .follow(let targetUserId), .unfollow(let targetUserId):
-            return "/users/following/\(targetUserId)"
+            return "/v1/users/following/\(targetUserId)"
         }
     }
     

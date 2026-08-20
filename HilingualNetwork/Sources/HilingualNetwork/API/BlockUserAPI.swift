@@ -18,11 +18,11 @@ extension BlockUserAPI: BaseTargetType {
     public var path: String {
         switch self {
         case .fetchBlockUserList:
-            return "/users/mypage/blocks"
+            return "/v1/users/mypage/blocks"
         case .blockUser(let userId):
-            return "/users/block/\(userId)"
+            return "/v1/users/block/\(userId)"
         case .unblockUser(let userId):
-            return "/users/unblock/\(userId)"
+            return "/v1/users/unblock/\(userId)"
         }
     }
 

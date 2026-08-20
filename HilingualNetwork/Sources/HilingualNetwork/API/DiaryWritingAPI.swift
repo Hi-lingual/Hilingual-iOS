@@ -10,24 +10,31 @@ import Moya
 
 public enum DiaryWritingAPI {
     case postDiaryWriting(DiaryWritingRequestDTO)
+    case postDiaryRecovery(DiaryRecoveryRequestDTO)
 }
 
 extension DiaryWritingAPI: BaseTargetType {
-
     public var path: String {
         switch self {
         case .postDiaryWriting:
-            return "/diaries"
+            return "/v1/diaries"
+        case .postDiaryRecovery:
+            return "/v1/diaries/recovery"
         }
     }
 
     public var method: Moya.Method {
-        return .post
+        switch self {
+        case .postDiaryWriting, .postDiaryRecovery:
+            return .post
+        }
     }
 
     public var task: Task {
         switch self {
         case .postDiaryWriting(let requestDTO):
+            return .requestJSONEncodable(requestDTO)
+        case .postDiaryRecovery(let requestDTO):
             return .requestJSONEncodable(requestDTO)
         }
     }

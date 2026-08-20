@@ -10,26 +10,33 @@ import Moya
 
 public enum DeviceAPI {
     case updateDevice(requestDTO: DeviceRequestDTO)
+    case updateFcmToken(requestDTO: FcmTokenRequestDTO)
 }
 
 extension DeviceAPI: BaseTargetType {
     public var path: String {
         switch self {
         case .updateDevice:
-            return "/users/device"
+            return "/v1/users/device"
+        case .updateFcmToken:
+            return "/v1/users/device/fcm-token"
         }
     }
-
+    
     public var method: Moya.Method {
         switch self {
         case .updateDevice:
             return .put
+        case .updateFcmToken:
+            return .patch
         }
     }
-
+    
     public var task: Task {
         switch self {
         case let .updateDevice(requestDTO):
+            return .requestJSONEncodable(requestDTO)
+        case let .updateFcmToken(requestDTO):
             return .requestJSONEncodable(requestDTO)
         }
     }

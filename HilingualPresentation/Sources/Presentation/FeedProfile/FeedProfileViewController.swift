@@ -79,7 +79,7 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
             if user.isMine || Int64(user.userID) == targetId { return }
 
             AmplitudeManager.shared.send(
-                .viewProfileUser(
+                .clickProfileView(
                     profileUserId: String(user.userID),
                     entrySource: .userProfile,
                     entryId: String(user.diaryID),
@@ -95,8 +95,6 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
             guard let self else { return }
             let feed = self.feedCellView.feeds[row]
 
-            AmplitudeManager.shared.send(.pageviewPostedDiary(entryId: String(feed.diaryID)))
-
             let vc = self.diContainer.makeSharedDiaryViewController(diaryId: feed.diaryID)
             vc.hidesBottomBarWhenPushed = true
             self.navigationController?.pushViewController(vc, animated: true)
@@ -105,8 +103,6 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
             guard let self else { return }
             let feed = self.feedCellView.feeds[row]
 
-            AmplitudeManager.shared.send(.pageviewPostedDiary(entryId: String(feed.diaryID)))
-
             let vc = self.diContainer.makeSharedDiaryViewController(diaryId: feed.diaryID)
             vc.hidesBottomBarWhenPushed = true
             self.navigationController?.pushViewController(vc, animated: true)
@@ -114,8 +110,6 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
         feedCellView.onDetailTapped = { [weak self] row in
             guard let self else { return }
             let feed = self.feedCellView.feeds[row]
-
-            AmplitudeManager.shared.send(.pageviewPostedDiary(entryId: String(feed.diaryID)))
 
             let vc = self.diContainer.makeSharedDiaryViewController(diaryId: feed.diaryID)
             vc.hidesBottomBarWhenPushed = true
@@ -186,9 +180,10 @@ public final class FeedProfileViewController: BaseUIViewController<FeedProfileVi
     @objc private func didTopScrollRefresh() {
         if let firstFeed = feedCellView.feeds.first {
             AmplitudeManager.shared.send(
-                .refreshTriggered(
+                .clickRefresh(
                     entryId: String(firstFeed.diaryID),
-                    method: .pullToRefresh
+                    method: .pullToRefresh,
+                    page: .feedProfile
                 )
             )
         }

@@ -6,11 +6,13 @@
 //
 
 public struct UserProfileEntity {
+    public let userId: Int64?
     public let profileImg: String
     public let nickname: String
     public let provider: String
-    
-    public init(profileImg: String, nickname: String, provider: String) {
+
+    public init(userId: Int64?, profileImg: String, nickname: String, provider: String) {
+        self.userId = userId
         self.profileImg = profileImg
         self.nickname = nickname
         self.provider = provider

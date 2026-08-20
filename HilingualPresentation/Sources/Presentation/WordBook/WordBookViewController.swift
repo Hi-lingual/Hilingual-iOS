@@ -8,6 +8,7 @@
 import UIKit
 import Combine
 import HilingualDomain
+import HilingualCore
 
 public final class WordBookViewController: BaseUIViewController<WordBookViewModel> {
 
@@ -19,10 +20,12 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
 
     private var selectedSortIndex: Int = 0
     private var isSearching: Bool = false
+    private var isUnmemorizedOnly: Bool = false
 
     // MARK: - Inputs
 
     private let sortSubject = PassthroughSubject<SortOption, Never>()
+    private let unmemorizedOnlySubject = PassthroughSubject<Bool, Never>()
     private let selectedWordIdSubject = PassthroughSubject<Int, Never>()
     private let bookmarkToggledSubject = PassthroughSubject<(Int, Bool), Never>()
     private let refreshSubject = PassthroughSubject<Void, Never>()
@@ -46,11 +49,12 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
         wordBookView.searchBar.resignFirstResponder()
         wordBookView.showHeaderView(true)
         selectedSortIndex = 0
+        isUnmemorizedOnly = false
+        wordBookView.updateUnmemorizedOnly(false)
+        unmemorizedOnlySubject.send(false)
         wordBookView.tableView.contentInset.top = 0
-        applyFeatureFlags()
         sortSubject.send(.latest)
         wordBookView.updateHeaderView(totalCount: fullWordList.reduce(0) { $0 + $1.1.count }, sortIndex: selectedSortIndex)
-        refreshSubject.send(())
     }
 
     public override func viewWillDisappear(_ animated: Bool) {
@@ -58,8 +62,14 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
         navigationController?.setNavigationBarHidden(false, animated: animated)
     }
 
+    public override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        AmplitudeManager.shared.send(.viewPage(page: .vocabulary))
+    }
+
     public override func viewDidLoad() {
         super.viewDidLoad()
+        view.backgroundColor = .gray100
 
         DispatchQueue.main.async { [weak self] in
             guard let self = self,
@@ -87,14 +97,16 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
     public override func addTarget() {
         wordBookView.refreshControl.addTarget(self, action: #selector(didPullToRefresh), for: .valueChanged)
         wordBookView.sortButton.addTarget(self, action: #selector(didTapSort), for: .touchUpInside)
+        wordBookView.unmemorizedOnlyButton.addTarget(self, action: #selector(didTapUnmemorizedOnly), for: .touchUpInside)
         wordBookView.emptyView.emptyButton.addTarget(self, action: #selector(didTapEmptyAdd), for: .touchUpInside)
         wordBookView.studyButton.addTarget(self, action: #selector(didTapStudy), for: .touchUpInside)
     }
 
     public override func bind(viewModel: WordBookViewModel) {
         let input = WordBookViewModel.Input(
-            viewDidLoad: Just(()).eraseToAnyPublisher(),
+            viewDidLoad: Empty().eraseToAnyPublisher(),
             sortChanged: sortSubject.eraseToAnyPublisher(),
+            unmemorizedOnlyChanged: unmemorizedOnlySubject.eraseToAnyPublisher(),
             selectedWordId: selectedWordIdSubject.eraseToAnyPublisher(),
             bookmarkToggled: bookmarkToggledSubject.eraseToAnyPublisher(),
             refreshTriggered: refreshSubject.eraseToAnyPublisher(),
@@ -107,6 +119,7 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
             .receive(on: RunLoop.main)
             .sink { [weak self] wordList in
                 guard let self = self else { return }
+                self.errorPresenter.dismiss()
                 self.fullWordList = wordList
                 self.filteredWordList = wordList
                 self.updateViewState()
@@ -125,6 +138,11 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
                 self?.wordDetailDialog.onBookmarkToggled = { [weak self] phraseId, isMarked in
                     self?.bookmarkToggledSubject.send((phraseId, isMarked))
                 }
+                self?.wordDetailDialog.onPronunciationTapped = { isFirstPlay in
+                    AmplitudeManager.shared.send(
+                        .clickVocabPronunciationBtnPlay(isFirstPlay: isFirstPlay, page: .vocabulary)
+                    )
+                }
                 self?.wordDetailDialog.showAnimation()
             }
             .store(in: &cancellables)
@@ -134,12 +152,31 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
             .sink { [weak self] words in
                 guard let self = self else { return }
                 guard !words.isEmpty else {
-                    self.showToast(message: "북마크된 단어가 없어요.")
+                    self.showToast(message: "복습할 단어가 없어요.")
                     return
                 }
-                let studyVC = WordBookStudyViewController(words: words)
-                studyVC.modalPresentationStyle = .fullScreen
-                self.present(studyVC, animated: true)
+                let studyVC = self.diContainer.makeWordBookStudyViewController(words: words)
+                let studyNav = UINavigationController(rootViewController: studyVC)
+                studyNav.modalPresentationStyle = .fullScreen
+                self.present(studyNav, animated: true)
+            }
+            .store(in: &cancellables)
+
+        output.loadError
+            .receive(on: RunLoop.main)
+            .sink { [weak self] error in
+                guard let self else { return }
+                let form: ErrorDisplayForm = (HilingualError.from(error) == .dataNotFound) ? .modal : .fullPage
+                self.errorPresenter.show(error, form: form, page: .vocabulary) {
+                    self.refreshSubject.send(())
+                }
+            }
+            .store(in: &cancellables)
+
+        output.actionError
+            .receive(on: RunLoop.main)
+            .sink { [weak self] error in
+                self?.errorPresenter.show(error, form: .modal, page: .vocabulary)
             }
             .store(in: &cancellables)
     }
@@ -147,20 +184,36 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
     // MARK: - Private Methods
 
     private func updateViewState() {
-        let isAllEmpty = fullWordList.allSatisfy { $0.1.isEmpty }
         let isFilteredEmpty = filteredWordList.allSatisfy { $0.1.isEmpty }
 
         wordBookView.tableView.isHidden = isFilteredEmpty
         wordBookView.emptyView.isHidden = !isFilteredEmpty
 
         if isFilteredEmpty {
-            let state: WordBookEmptyState = isAllEmpty ? .noWords : .noSearchResult
+            let state: WordBookEmptyState
+            if isSearching {
+                state = .noSearchResult
+            } else if isUnmemorizedOnly {
+                state = .noWordsToMemorize
+            } else {
+                state = .noWords
+            }
             wordBookView.emptyView.configure(state: state)
         }
     }
 
     private func updateSort(by index: Int) {
+        let previousIndex = selectedSortIndex
         selectedSortIndex = index
+
+        if previousIndex != index {
+            AmplitudeManager.shared.send(
+                .clickVocabularySortChanged(
+                    previousSortType: Self.vocabSortType(from: previousIndex),
+                    sortType: Self.vocabSortType(from: index)
+                )
+            )
+        }
 
         switch index {
         case 0:
@@ -200,15 +253,6 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
         updateViewState()
     }
 
-    private func applyFeatureFlags() {
-        let nickname = UserDefaults.standard.string(forKey: "currentUser.nickname")
-        let isEnabled = FeatureFlagService.shared.isEnabled(
-            .wordStudyAllowedNicknames,
-            nickname: nickname
-        )
-        wordBookView.setStudyButtonVisible(isEnabled)
-    }
-
     // MARK: - Action Method
 
     @objc
@@ -233,6 +277,13 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
     }
 
     @objc
+    private func didTapUnmemorizedOnly() {
+        isUnmemorizedOnly.toggle()
+        wordBookView.updateUnmemorizedOnly(isUnmemorizedOnly)
+        unmemorizedOnlySubject.send(isUnmemorizedOnly)
+    }
+
+    @objc
     private func didTapSort() {
         modal.configure(selectedIndex: selectedSortIndex) { [weak self] selected in
             self?.updateSort(by: selected)
@@ -243,12 +294,15 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
 
     @objc
     private func didTapStudy() {
-        let bookmarkedWords = fullWordList.flatMap { $0.1 }.filter { $0.isMarked }
-        guard !bookmarkedWords.isEmpty else {
-            showToast(message: "북마크된 단어가 없어요.")
+        let allWords = fullWordList.flatMap { $0.1 }
+
+        if allWords.isEmpty {
+            if isUnmemorizedOnly { return }
+            showToast(message: "복습할 단어가 없어요.")
             return
         }
 
+        AmplitudeManager.shared.send(.clickVocabularyReviewBtn)
         studyRequestedSubject.send(())
     }
 
@@ -313,7 +367,12 @@ extension WordBookViewController: UITableViewDataSource, UITableViewDelegate {
 
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let item = filteredWordList[indexPath.section].1[indexPath.row]
+        AmplitudeManager.shared.send(.clickVocaLookup(page: .vocabulary))
         selectedWordIdSubject.send(Int(item.phraseId))
+    }
+
+    private static func vocabSortType(from index: Int) -> AnalyticsEvent.VocabSortType {
+        index == 1 ? .alphabetical : .latest
     }
 }
 

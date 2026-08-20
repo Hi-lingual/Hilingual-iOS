@@ -21,6 +21,10 @@ public struct NicknameAvailabilityDTO: Decodable {
 
 // MARK: - RegisterProfile
 
+public struct RegisterProfileResponseDTO: Decodable {
+    public let userId: Int64
+}
+
 public struct RegisterProfileRequestDTO: Encodable {
     public let nickname: String
     public let adAlarmAgree: Bool

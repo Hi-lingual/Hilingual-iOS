@@ -17,11 +17,11 @@ extension DiaryControlAPI: BaseTargetType {
     public var path: String {
         switch self {
         case .deleteDiary(let diaryId):
-            return "/diaries/\(diaryId)"
+            return "/v1/diaries/\(diaryId)"
         case .publishDiary(let diaryId):
-            return "/diaries/\(diaryId)/publish"
+            return "/v1/diaries/\(diaryId)/publish"
         case .unpublishDiary(let diaryId):
-            return "/diaries/\(diaryId)/unpublish"
+            return "/v1/diaries/\(diaryId)/unpublish"
         }
     }
     

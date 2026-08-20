@@ -15,8 +15,18 @@ extension DateListDTO {
         formatter.dateFormat = "yyyy-MM-dd"
         formatter.locale = Locale(identifier: "ko_KR")
 
-        let parsedDates = dateList.compactMap { formatter.date(from: $0.date) }
+        let writtenDates = dateList.compactMap { dto -> Date? in
+            guard dto.status != "UNLOCKED" else { return nil }
+            return formatter.date(from: dto.date)
+        }
+        let recoveredDates = dateList.compactMap { dto -> Date? in
+            guard dto.status == "UNLOCKED" else { return nil }
+            return formatter.date(from: dto.date)
+        }
 
-        return MonthInfoEntity(dates: parsedDates)
+        return MonthInfoEntity(
+            writtenDates: writtenDates,
+            recoveredDates: recoveredDates
+        )
     }
 }

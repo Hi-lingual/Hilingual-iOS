@@ -20,16 +20,16 @@ extension NotificationAPI: BaseTargetType {
     public var path: String {
         switch self {
         case .fetchNotificationSettings, .toggleNotificationSetting:
-            return "/users/mypage/noti"
+            return "/v1/users/mypage/noti"
 
         case .getNotifications:
-            return "/users/notifications"
+            return "/v1/users/notifications"
 
         case .getNotificationDetail(let id):
-            return "/users/notifications/\(id)"
+            return "/v1/users/notifications/\(id)"
 
         case .markAsRead(let id):
-            return "/users/notifications/\(id)/read"
+            return "/v1/users/notifications/\(id)/read"
         }
     }
 

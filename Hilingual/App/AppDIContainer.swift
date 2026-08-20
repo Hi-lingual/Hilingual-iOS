@@ -27,6 +27,10 @@ final class AppDIContainer: ViewControllerFactory {
         NetworkEnvironment.configure(AppBaseURLProvider())
     }
 
+    func configureFCMTokenSync() {
+        FCMTokenSyncService.shared.configure(deviceUseCase: makeDeviceUseCase())
+    }
+
     public func makeTabBarViewController() -> HilingualPresentation.TabBarViewController {
         return TabBarViewController(diContainer: self)
     }
@@ -56,14 +60,17 @@ final class AppDIContainer: ViewControllerFactory {
     }
     
     public func makeFeedbackViewController(diaryId: Int) -> FeedbackViewController {
-//        return FeedbackViewController(viewModel: makeFeedbackViewModel(diaryId: diaryId), diContainer: self)
         let viewModel = FeedbackViewModel(
-                diaryId: diaryId,
-                diaryDetailUseCase: makeDiaryDetailUseCase(),
-                feedbackUseCase: makeFeedbackUseCase(),
-                homeUseCase: makeHomeUseCase()
-            )
-            return FeedbackViewController(viewModel: viewModel, diContainer:  self)
+            diaryId: diaryId,
+            diaryDetailUseCase: makeDiaryDetailUseCase(),
+            feedbackUseCase: makeFeedbackUseCase(),
+            homeUseCase: makeHomeUseCase()
+        )
+        return FeedbackViewController(
+            viewModel: viewModel,
+            diContainer: self,
+            diaryId: diaryId
+        )
     }
     
     public func makeRecommendedExpressionViewController(diaryId: Int) -> RecommendedExpressionViewController {
@@ -83,7 +90,8 @@ final class AppDIContainer: ViewControllerFactory {
     func makeDiaryWritingViewController(
         topicData: (String, String)?,
         selectedDate: Date,
-        shouldLoadDraft: Bool
+        shouldLoadDraft: Bool,
+        isRecoveryWriting: Bool
     ) -> DiaryWritingViewController {
         
         let viewModel = makeDiaryWritingViewModel()
@@ -92,7 +100,8 @@ final class AppDIContainer: ViewControllerFactory {
             diContainer: self,
             topicData: topicData,
             selectedDate: selectedDate,
-            shouldLoadDraft: shouldLoadDraft
+            shouldLoadDraft: shouldLoadDraft,
+            isRecoveryWriting: isRecoveryWriting
         )
     }
 
@@ -102,6 +111,14 @@ final class AppDIContainer: ViewControllerFactory {
 
     public func makeWordBookViewController() -> WordBookViewController {
         return WordBookViewController(viewModel: makeWordBookViewmodel(), diContainer: self)
+    }
+
+    public func makeWordBookStudyViewController(words: [PhraseData]) -> WordBookStudyViewController {
+        return WordBookStudyViewController(
+            viewModel: makeWordBookStudyViewModel(),
+            diContainer: self,
+            words: words
+        )
     }
 
     public func makeVerificationCodeViewController() -> VerificationCodeViewController {
@@ -177,12 +194,20 @@ final class AppDIContainer: ViewControllerFactory {
         return EditProfileViewController(viewModel: makeEditProfileViewModel(), diContainer: self)
     }
 
+    public func makeNicknameEditViewController(currentNickname: String) -> NicknameEditViewController {
+        return NicknameEditViewController(
+            viewModel: makeNicknameEditViewModel(currentNickname: currentNickname),
+            diContainer: self,
+            currentNickname: currentNickname
+        )
+    }
+
     public func makeBlockUserViewController() -> BlockUserViewController {
         return BlockUserViewController(viewModel: makeBlockUserViewModel(), diContainer: self)
     }
 
     public func makeNotificationSettingViewController() -> NotificationSettingViewController {
-        return NotificationSettingViewController(viewModel: makeNotificationViewModel(), diContainer: self)
+        return NotificationSettingViewController(viewModel: makeNotificationSettingViewModel(), diContainer: self)
     }
 
     public func makeFeedSearchViewController() -> FeedSearchViewController {
@@ -479,9 +504,26 @@ extension AppDIContainer {
     private func makeHomeUseCase() -> HomeUseCase {
         return DefaultHomeUseCase(repository: makeHomeRepository())
     }
+
+    private func makeHomeAdWatchService() -> HomeAdWatchService {
+        return DefaultHomeAdWatchService()
+    }
+
+    private func makeHomeAdWatchRepository() -> HomeAdWatchRepository {
+        return DefaultHomeAdWatchRepository(service: makeHomeAdWatchService())
+    }
+
+    private func makeHomeAdWatchUseCase() -> HomeAdWatchUseCase {
+        return DefaultHomeAdWatchUseCase(repository: makeHomeAdWatchRepository())
+    }
     
     private func makeHomeViewModel() -> HomeViewModel {
-        return HomeViewModel(useCase: makeHomeUseCase(), fetchTemporaryDiaryUseCase: makeFetchTemporaryDiaryUseCase(), localPushUseCase: makeLocalPushUseCase())
+        return HomeViewModel(
+            useCase: makeHomeUseCase(),
+            fetchTemporaryDiaryUseCase: makeFetchTemporaryDiaryUseCase(),
+            localPushUseCase: makeLocalPushUseCase(),
+            homeAdWatchUseCase: makeHomeAdWatchUseCase()
+        )
     }
 }
 
@@ -518,6 +560,10 @@ extension AppDIContainer {
 
     private func makeWordBookViewmodel() -> WordBookViewModel {
         return WordBookViewModel(fetchWordListUseCase: makeWordBookUseCase(), toggleBookmarkUseCase: makeToggleBookmarkUseCase())
+    }
+
+    private func makeWordBookStudyViewModel() -> WordBookStudyViewModel {
+        return WordBookStudyViewModel(useCase: makeWordBookUseCase())
     }
 }
 
@@ -563,15 +609,15 @@ extension AppDIContainer {
         return DefaultNotificationSettingService()
     }
 
-    private func makeNotificationRepository() -> AlarmSettingRepository {
+    private func makeNotificationSettingRepository() -> AlarmSettingRepository {
         return DefaultAlarmSettingRepository(service: makeNotificationSettingService())
     }
 
     private func makeNotificationUseCase() -> AlarmSettingUseCase {
-        return DefaultAlarmSettingUseCase(repository: makeNotificationRepository())
+        return DefaultAlarmSettingUseCase(repository: makeNotificationSettingRepository())
     }
 
-    private func makeNotificationViewModel() -> NotificationSettingViewModel {
+    private func makeNotificationSettingViewModel() -> NotificationSettingViewModel {
         return NotificationSettingViewModel(useCase: makeNotificationUseCase())
     }
 }
@@ -817,5 +863,13 @@ extension AppDIContainer {
 
     private func makeEditProfileViewModel() -> EditProfileViewModel {
         return EditProfileViewModel(fetchUserProfileUseCase: makefetchUserProfileUseCase(), uploadImageUseCase: makeUploadImageUseCase(), mypageUseCase: makeMypageUseCase())
+    }
+
+    private func makeNicknameEditViewModel(currentNickname: String) -> NicknameEditViewModel {
+        return NicknameEditViewModel(
+            currentNickname: currentNickname,
+            onBoardingUseCase: makeOnBoardingUseCase(),
+            userProfileUseCase: makefetchUserProfileUseCase()
+        )
     }
 }

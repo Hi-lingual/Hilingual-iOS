@@ -32,6 +32,8 @@ public final class FeedViewModel: BaseViewModel, BaseViewModelType {
         let publishResult: AnyPublisher<Bool, Never>
         let likeResult: AnyPublisher<(Int, Bool), Never>
         let userProfileImage: AnyPublisher<String?, Never>
+        let loadError: AnyPublisher<Error, Never>
+        let actionError: AnyPublisher<Error, Never>
     }
     
     // MARK: - Dependencies
@@ -51,6 +53,8 @@ public final class FeedViewModel: BaseViewModel, BaseViewModelType {
     private let publishSubject = PassthroughSubject<Bool, Never>()
     private let likeSubject = PassthroughSubject<(Int, Bool), Never>()
     private let userProfileImageSubject = CurrentValueSubject<String?, Never>(nil)
+    private let loadErrorSubject = PassthroughSubject<Error, Never>()
+    private let actionErrorSubject = PassthroughSubject<Error, Never>()
     
     // MARK: - Init
     
@@ -97,15 +101,19 @@ public final class FeedViewModel: BaseViewModel, BaseViewModelType {
         }
         
         input.unpublish
-            .sink { [weak self] diaryId in
-                _ = self?.unpublishDiary(diaryId: diaryId)
+            .flatMap { [weak self] diaryId -> AnyPublisher<Bool, Never> in
+                guard let self else { return Empty().eraseToAnyPublisher() }
+                return self.unpublishDiary(diaryId: diaryId)
             }
+            .sink { _ in }
             .store(in: &cancellables)
-        
+
         input.likeTapped
-            .sink { [weak self] (diaryId, isLiked) in
-                _ = self?.toggleLike(diaryId: diaryId, isLiked: isLiked)
+            .flatMap { [weak self] (diaryId, isLiked) -> AnyPublisher<(Int, Bool), Never> in
+                guard let self else { return Empty().eraseToAnyPublisher() }
+                return self.toggleLike(diaryId: diaryId, isLiked: isLiked)
             }
+            .sink { _ in }
             .store(in: &cancellables)
         
         return Output(
@@ -115,7 +123,9 @@ public final class FeedViewModel: BaseViewModel, BaseViewModelType {
             errorMessage: errorSubject.eraseToAnyPublisher(),
             publishResult: publishSubject.eraseToAnyPublisher(),
             likeResult: likeSubject.eraseToAnyPublisher(),
-            userProfileImage: userProfileImageSubject.eraseToAnyPublisher()
+            userProfileImage: userProfileImageSubject.eraseToAnyPublisher(),
+            loadError: loadErrorSubject.eraseToAnyPublisher(),
+            actionError: actionErrorSubject.eraseToAnyPublisher()
         )
     }
     
@@ -156,12 +166,12 @@ public final class FeedViewModel: BaseViewModel, BaseViewModelType {
                 self?.isLoadingSubject.send(false)
             })
             .catch { [weak self] error -> AnyPublisher<[FeedModel], Never> in
-                self?.errorSubject.send("피드 불러오기 실패: \(error.localizedDescription)")
+                self?.loadErrorSubject.send(error)
                 return Empty<[FeedModel], Never>().eraseToAnyPublisher()
             }
             .eraseToAnyPublisher()
     }
-    
+
     public func fetchUserProfileImage() -> AnyPublisher<String?, Never> {
         return homeUseCase.fetchUserInfo()
             .map { userInfo in
@@ -178,7 +188,7 @@ public final class FeedViewModel: BaseViewModel, BaseViewModelType {
         return publishDiaryUseCase.unpublishDiary(diaryId: diaryId)
             .map { _ in false }
             .catch { [weak self] error -> AnyPublisher<Bool, Never> in
-                self?.errorSubject.send("비공개 실패: \(error.localizedDescription)")
+                self?.actionErrorSubject.send(error)
                 return Empty<Bool, Never>().eraseToAnyPublisher()
             }
             .handleEvents(receiveOutput: { [weak self] result in
@@ -189,9 +199,9 @@ public final class FeedViewModel: BaseViewModel, BaseViewModelType {
     
     public func toggleLike(diaryId: Int, isLiked: Bool) -> AnyPublisher<(Int, Bool), Never> {
         return toggleLikeUseCase.toggleLike(diaryId: diaryId, isLiked: isLiked)
-            .map { _ in (diaryId, !isLiked) }
+            .map { _ in (diaryId, isLiked) }
             .catch { [weak self] error -> AnyPublisher<(Int, Bool), Never> in
-                self?.errorSubject.send("공감하기 실패: \(error.localizedDescription)")
+                self?.actionErrorSubject.send(error)
                 return Empty<(Int, Bool), Never>().eraseToAnyPublisher()
             }
             .handleEvents(receiveOutput: { [weak self] result in

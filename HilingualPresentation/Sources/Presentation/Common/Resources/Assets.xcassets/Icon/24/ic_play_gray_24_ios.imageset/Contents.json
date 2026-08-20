@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "ic_play_24_ios.pdf",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

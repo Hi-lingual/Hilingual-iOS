@@ -10,6 +10,7 @@ import Combine
 public protocol FetchUserProfileUseCase {
     func fetchMyProfile() -> AnyPublisher<UserProfileEntity, Error>
     func updateProfileImage(fileKey: String) -> AnyPublisher<Void, Error>
+    func updateNickname(nickname: String) -> AnyPublisher<Void, Error>
 }
 
 public final class DefaultFetchUserProfileUseCase: FetchUserProfileUseCase {
@@ -25,5 +26,9 @@ public final class DefaultFetchUserProfileUseCase: FetchUserProfileUseCase {
 
     public func updateProfileImage(fileKey: String) -> AnyPublisher<Void, Error> {
         return repository.updateProfileImage(fileKey: fileKey)
+    }
+
+    public func updateNickname(nickname: String) -> AnyPublisher<Void, Error> {
+        return repository.updateNickname(nickname: nickname)
     }
 }

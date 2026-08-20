@@ -22,6 +22,13 @@ final class CalendarView: UIView {
         }
     }
 
+    var recoveredDates: [Date] = [] {
+        didSet {
+            calendarViews.forEach { $0.recoveredDates = recoveredDates }
+            updateScrollViewHeight()
+        }
+    }
+
     // MARK: - UI Components
 
     private let headerView = CalendarHeaderView()
@@ -154,6 +161,7 @@ final class CalendarView: UIView {
 
         calendarViews.forEach {
             $0.filledDates = filledDates
+            $0.recoveredDates = recoveredDates
         }
 
         updateScrollViewHeight()

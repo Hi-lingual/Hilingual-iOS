@@ -10,13 +10,15 @@ public struct UserInfoEntity {
     public let profileImg: String
     public let totalDiaries: Int
     public let streak: Int
+    public let recoveryTickets: Int
     public let newAlarm: Bool
 
-    public init(nickname: String, profileImg: String, totalDiaries: Int, streak: Int, newAlarm: Bool) {
+    public init(nickname: String, profileImg: String, totalDiaries: Int, streak: Int, recoveryTickets: Int, newAlarm: Bool) {
         self.nickname = nickname
         self.profileImg = profileImg
         self.totalDiaries = totalDiaries
         self.streak = streak
+        self.recoveryTickets = recoveryTickets
         self.newAlarm = newAlarm
     }
 }
