@@ -20,10 +20,12 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
 
     private var selectedSortIndex: Int = 0
     private var isSearching: Bool = false
+    private var isUnmemorizedOnly: Bool = false
 
     // MARK: - Inputs
 
     private let sortSubject = PassthroughSubject<SortOption, Never>()
+    private let unmemorizedOnlySubject = PassthroughSubject<Bool, Never>()
     private let selectedWordIdSubject = PassthroughSubject<Int, Never>()
     private let bookmarkToggledSubject = PassthroughSubject<(Int, Bool), Never>()
     private let refreshSubject = PassthroughSubject<Void, Never>()
@@ -47,6 +49,9 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
         wordBookView.searchBar.resignFirstResponder()
         wordBookView.showHeaderView(true)
         selectedSortIndex = 0
+        isUnmemorizedOnly = false
+        wordBookView.updateUnmemorizedOnly(false)
+        unmemorizedOnlySubject.send(false)
         wordBookView.tableView.contentInset.top = 0
         sortSubject.send(.latest)
         wordBookView.updateHeaderView(totalCount: fullWordList.reduce(0) { $0 + $1.1.count }, sortIndex: selectedSortIndex)
@@ -64,6 +69,7 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
 
     public override func viewDidLoad() {
         super.viewDidLoad()
+        view.backgroundColor = .gray100
 
         DispatchQueue.main.async { [weak self] in
             guard let self = self,
@@ -91,6 +97,7 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
     public override func addTarget() {
         wordBookView.refreshControl.addTarget(self, action: #selector(didPullToRefresh), for: .valueChanged)
         wordBookView.sortButton.addTarget(self, action: #selector(didTapSort), for: .touchUpInside)
+        wordBookView.unmemorizedOnlyButton.addTarget(self, action: #selector(didTapUnmemorizedOnly), for: .touchUpInside)
         wordBookView.emptyView.emptyButton.addTarget(self, action: #selector(didTapEmptyAdd), for: .touchUpInside)
         wordBookView.studyButton.addTarget(self, action: #selector(didTapStudy), for: .touchUpInside)
     }
@@ -99,6 +106,7 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
         let input = WordBookViewModel.Input(
             viewDidLoad: Empty().eraseToAnyPublisher(),
             sortChanged: sortSubject.eraseToAnyPublisher(),
+            unmemorizedOnlyChanged: unmemorizedOnlySubject.eraseToAnyPublisher(),
             selectedWordId: selectedWordIdSubject.eraseToAnyPublisher(),
             bookmarkToggled: bookmarkToggledSubject.eraseToAnyPublisher(),
             refreshTriggered: refreshSubject.eraseToAnyPublisher(),
@@ -144,12 +152,13 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
             .sink { [weak self] words in
                 guard let self = self else { return }
                 guard !words.isEmpty else {
-                    self.showToast(message: "북마크된 단어가 없어요.")
+                    self.showToast(message: "복습할 단어가 없어요.")
                     return
                 }
-                let studyVC = WordBookStudyViewController(words: words)
-                studyVC.modalPresentationStyle = .fullScreen
-                self.present(studyVC, animated: true)
+                let studyVC = self.diContainer.makeWordBookStudyViewController(words: words)
+                let studyNav = UINavigationController(rootViewController: studyVC)
+                studyNav.modalPresentationStyle = .fullScreen
+                self.present(studyNav, animated: true)
             }
             .store(in: &cancellables)
 
@@ -175,14 +184,20 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
     // MARK: - Private Methods
 
     private func updateViewState() {
-        let isAllEmpty = fullWordList.allSatisfy { $0.1.isEmpty }
         let isFilteredEmpty = filteredWordList.allSatisfy { $0.1.isEmpty }
 
         wordBookView.tableView.isHidden = isFilteredEmpty
         wordBookView.emptyView.isHidden = !isFilteredEmpty
 
         if isFilteredEmpty {
-            let state: WordBookEmptyState = isAllEmpty ? .noWords : .noSearchResult
+            let state: WordBookEmptyState
+            if isSearching {
+                state = .noSearchResult
+            } else if isUnmemorizedOnly {
+                state = .noWordsToMemorize
+            } else {
+                state = .noWords
+            }
             wordBookView.emptyView.configure(state: state)
         }
     }
@@ -262,6 +277,13 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
     }
 
     @objc
+    private func didTapUnmemorizedOnly() {
+        isUnmemorizedOnly.toggle()
+        wordBookView.updateUnmemorizedOnly(isUnmemorizedOnly)
+        unmemorizedOnlySubject.send(isUnmemorizedOnly)
+    }
+
+    @objc
     private func didTapSort() {
         modal.configure(selectedIndex: selectedSortIndex) { [weak self] selected in
             self?.updateSort(by: selected)
@@ -272,14 +294,15 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
 
     @objc
     private func didTapStudy() {
-        AmplitudeManager.shared.send(.clickVocabularyReviewBtn)
+        let allWords = fullWordList.flatMap { $0.1 }
 
-        let bookmarkedWords = fullWordList.flatMap { $0.1 }.filter { $0.isMarked }
-        guard !bookmarkedWords.isEmpty else {
-            showToast(message: "북마크된 단어가 없어요.")
+        if allWords.isEmpty {
+            if isUnmemorizedOnly { return }
+            showToast(message: "복습할 단어가 없어요.")
             return
         }
 
+        AmplitudeManager.shared.send(.clickVocabularyReviewBtn)
         studyRequestedSubject.send(())
     }
 

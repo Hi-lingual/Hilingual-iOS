@@ -18,6 +18,7 @@ public extension BaseUIViewController {
         case backTitleMenu(title: String, rightIconName: String? = nil)
         case backOnly
         case backSearchBar
+        case closeOnly
     }
 
     // MARK: - Setup
@@ -63,8 +64,16 @@ public extension BaseUIViewController {
                 imageName: "ic_arrow_left_b_24_ios",
                 action: #selector(backButtonTapped)
             )
-            
+
             navigationItem.titleView = SearchBar()
+            navigationItem.rightBarButtonItem = nil
+
+        case .closeOnly:
+            navigationItem.titleView = nil
+            navigationItem.leftBarButtonItem = makeBarButton(
+                imageName: "ic_close_24_b_ios",
+                action: #selector(backButtonTapped)
+            )
             navigationItem.rightBarButtonItem = nil
         }
     }

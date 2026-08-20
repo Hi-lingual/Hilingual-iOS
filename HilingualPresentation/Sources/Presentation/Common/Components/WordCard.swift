@@ -25,6 +25,7 @@ final class WordCard: UIView {
     private let reasonLabel = UILabel()
     private let pronunciationButton = UIButton(type: .custom)
     private let bookmarkButton = UIButton(type: .custom)
+    private let knownBadge = KnownBadgeView()
 
     // MARK: - State
 
@@ -77,11 +78,12 @@ final class WordCard: UIView {
         savedDateLabel.text = "\(data.createdAt)"
         reasonLabel.isHidden = data.reason.isEmpty
         reasonLabel.text = "\(data.reason)"
-        
+
         explanationLabel.isHidden = false
         reasonLabel.isHidden = false
         savedDateLabel.isHidden = false
-        
+        knownBadge.isHidden = !((type == .basic || type == .withDate) && data.isMemorized)
+
         switch type {
         case .basic:
             phraseLabel.font = .pretendard(.body_r_17)
@@ -104,7 +106,21 @@ final class WordCard: UIView {
                 $0.top.equalTo(chipStackView.snp.bottom).offset(4)
                 $0.leading.equalToSuperview().inset(12)
                 $0.trailing.equalTo(bookmarkButton.snp.leading).inset(4)
-                $0.bottom.equalToSuperview().inset(12)
+            }
+            if data.isMemorized {
+                knownBadge.snp.remakeConstraints {
+                    $0.top.equalTo(phraseLabel.snp.bottom).offset(14)
+                    $0.leading.equalToSuperview().inset(12)
+                    $0.height.equalTo(16)
+                    $0.bottom.equalToSuperview().inset(12)
+                }
+            } else {
+                knownBadge.snp.remakeConstraints {
+                    $0.top.equalTo(phraseLabel.snp.bottom)
+                    $0.leading.equalToSuperview().inset(12)
+                    $0.height.equalTo(0)
+                    $0.bottom.equalToSuperview().inset(10)
+                }
             }
 
         case .withExample:
@@ -135,14 +151,14 @@ final class WordCard: UIView {
             phraseLabel.font = .pretendard(.head_r_20)
             explanationLabel.font = .pretendard(.body_r_14)
             savedDateLabel.font = .pretendard(.cap_r_12)
-            
+
             phraseLabel.numberOfLines = 2
             reasonLabel.isHidden = true
-            
+
             chipStackView.snp.remakeConstraints {
                 $0.top.leading.equalToSuperview().inset(24)
             }
-            
+
             phraseLabel.snp.remakeConstraints {
                 $0.top.equalTo(chipStackView.snp.bottom).offset(4)
                 $0.leading.equalToSuperview().inset(24)
@@ -154,7 +170,13 @@ final class WordCard: UIView {
                 $0.leading.equalToSuperview().inset(24)
                 $0.trailing.equalTo(bookmarkButton.snp.leading).inset(8)
             }
-            
+
+            knownBadge.snp.remakeConstraints {
+                $0.top.equalTo(explanationLabel.snp.bottom).offset(20)
+                $0.leading.equalToSuperview().inset(24)
+                $0.height.equalTo(16)
+            }
+
             savedDateLabel.snp.remakeConstraints {
                 $0.top.equalTo(explanationLabel.snp.bottom).offset(80)
                 $0.trailing.equalToSuperview().inset(24)
@@ -209,7 +231,8 @@ final class WordCard: UIView {
             savedDateLabel,
             reasonLabel,
             pronunciationButton,
-            bookmarkButton
+            bookmarkButton,
+            knownBadge
         )
     }
 

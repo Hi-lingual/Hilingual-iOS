@@ -17,6 +17,7 @@ public final class WordBookViewModel: BaseViewModel {
     public struct Input {
         let viewDidLoad: AnyPublisher<Void, Never>
         let sortChanged: AnyPublisher<SortOption, Never>
+        let unmemorizedOnlyChanged: AnyPublisher<Bool, Never>
         let selectedWordId: AnyPublisher<Int, Never>
         let bookmarkToggled: AnyPublisher<(Int, Bool), Never>
         let refreshTriggered: AnyPublisher<Void, Never>
@@ -44,6 +45,7 @@ public final class WordBookViewModel: BaseViewModel {
     private let loadErrorSubject = PassthroughSubject<Error, Never>()
     private let actionErrorSubject = PassthroughSubject<Error, Never>()
     private var currentSortOption: SortOption = .latest
+    private var currentUnmemorizedOnly: Bool = false
 
     // MARK: - Init
 
@@ -60,14 +62,24 @@ public final class WordBookViewModel: BaseViewModel {
     public func transform(input: Input) -> Output {
         input.viewDidLoad
             .sink { [weak self] in
-                self?.fetchWords(sort: self?.currentSortOption ?? .latest)
+                guard let self else { return }
+                self.fetchWords(sort: self.currentSortOption, unmemorizedOnly: self.currentUnmemorizedOnly)
             }
             .store(in: &cancellables)
 
         input.sortChanged
             .sink { [weak self] option in
-                self?.currentSortOption = option
-                self?.fetchWords(sort: option)
+                guard let self else { return }
+                self.currentSortOption = option
+                self.fetchWords(sort: option, unmemorizedOnly: self.currentUnmemorizedOnly)
+            }
+            .store(in: &cancellables)
+
+        input.unmemorizedOnlyChanged
+            .sink { [weak self] isOn in
+                guard let self else { return }
+                self.currentUnmemorizedOnly = isOn
+                self.fetchWords(sort: self.currentSortOption, unmemorizedOnly: isOn)
             }
             .store(in: &cancellables)
 
@@ -85,7 +97,8 @@ public final class WordBookViewModel: BaseViewModel {
 
         input.refreshTriggered
                .sink { [weak self] in
-                   self?.fetchWords(sort: self?.currentSortOption ?? .latest)
+                   guard let self else { return }
+                   self.fetchWords(sort: self.currentSortOption, unmemorizedOnly: self.currentUnmemorizedOnly)
                }
                .store(in: &cancellables)
 
@@ -106,8 +119,8 @@ public final class WordBookViewModel: BaseViewModel {
 
     // MARK: - Private Methods
 
-    private func fetchWords(sort: SortOption) {
-        fetchWordListUseCase.execute(sort: sort)
+    private func fetchWords(sort: SortOption, unmemorizedOnly: Bool) {
+        fetchWordListUseCase.execute(sort: sort, unmemorizedOnly: unmemorizedOnly)
             .map { wordList in
                 wordList.map { (date, items) in
                     let phraseDataList = items.map { entity in
@@ -122,7 +135,8 @@ public final class WordBookViewModel: BaseViewModel {
                                 writtenDate: entity.writtenDate,
                                 savedRoot: entity.savedRoot
                             ),
-                            isMarked: entity.isMarked
+                            isMarked: entity.isMarked,
+                            isMemorized: entity.isMemorized
                         )
                     }
                     return (date: date, items: phraseDataList)
@@ -140,6 +154,11 @@ public final class WordBookViewModel: BaseViewModel {
 
 
     private func fetchWordDetail(id: Int) {
+        let memorizedById: [Int64: Bool] = Dictionary(
+            wordListSubject.value.flatMap { $0.items }.map { ($0.phraseId, $0.isMemorized) },
+            uniquingKeysWith: { first, _ in first }
+        )
+
         fetchWordListUseCase.getWordDetail(id: id)
             .map {
                 PhraseData(
@@ -153,7 +172,8 @@ public final class WordBookViewModel: BaseViewModel {
                         writtenDate: $0.writtenDate,
                         savedRoot: $0.savedRoot
                     ),
-                    isMarked: $0.isMarked
+                    isMarked: $0.isMarked,
+                    isMemorized: memorizedById[Int64($0.phraseId)] ?? false
                 )
             }
             .sink(receiveCompletion: { [weak self] completion in
@@ -195,45 +215,7 @@ public final class WordBookViewModel: BaseViewModel {
     }
 
     private func fetchStudyWords() {
-        let bookmarkedIds = wordListSubject.value
-            .flatMap { $0.items }
-            .filter { $0.isMarked }
-            .map { Int($0.phraseId) }
-
-        guard !bookmarkedIds.isEmpty else {
-            studyWordsSubject.send([])
-            return
-        }
-
-        let publishers = bookmarkedIds.map { id in
-            fetchWordListUseCase.getWordDetail(id: id)
-                .map { entity -> PhraseData in
-                    PhraseData(
-                        phraseId: Int64(entity.phraseId),
-                        phraseType: entity.phraseType,
-                        phrase: entity.phrase,
-                        explanation: entity.explanation ?? "",
-                        reason: entity.example ?? "",
-                        createdAt: DisplayDateFormatter.wordSavedSource(
-                            writtenFrom: entity.writtenFrom,
-                            writtenDate: entity.writtenDate,
-                            savedRoot: entity.savedRoot
-                        ),
-                        isMarked: entity.isMarked
-                    )
-                }
-                .eraseToAnyPublisher()
-        }
-
-        Publishers.MergeMany(publishers)
-            .collect()
-            .sink(receiveCompletion: { [weak self] completion in
-                if case let .failure(error) = completion {
-                    self?.actionErrorSubject.send(error)
-                }
-            }, receiveValue: { [weak self] words in
-                self?.studyWordsSubject.send(words)
-            })
-            .store(in: &cancellables)
+        let allWords = wordListSubject.value.flatMap { $0.items }
+        studyWordsSubject.send(allWords)
     }
 }

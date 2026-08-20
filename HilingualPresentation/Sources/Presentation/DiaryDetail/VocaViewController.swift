@@ -165,6 +165,29 @@ public final class RecommendedExpressionViewController: BaseUIViewController<Rec
                 }
             }
             .store(in: &cancellables)
+
+        output.bookmarkAdded
+            .receive(on: RunLoop.main)
+            .sink { [weak self] in
+                self?.presentBookmarkAddedToast()
+            }
+            .store(in: &cancellables)
+    }
+
+    private func presentBookmarkAddedToast() {
+        let tabBarController = customTabBarController
+        let navController = navigationController
+
+        let toast = ToastMessage()
+        view.addSubview(toast)
+        toast.configure(
+            type: .withButton,
+            message: "단어장에 추가되었어요.",
+            actionTitle: "보러가기"
+        ) {
+            tabBarController?.selectedIndex = 1
+            navController?.popToRootViewController(animated: false)
+        }
     }
 
     private func showErrorDialog(message: String) {

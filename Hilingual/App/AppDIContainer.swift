@@ -113,6 +113,14 @@ final class AppDIContainer: ViewControllerFactory {
         return WordBookViewController(viewModel: makeWordBookViewmodel(), diContainer: self)
     }
 
+    public func makeWordBookStudyViewController(words: [PhraseData]) -> WordBookStudyViewController {
+        return WordBookStudyViewController(
+            viewModel: makeWordBookStudyViewModel(),
+            diContainer: self,
+            words: words
+        )
+    }
+
     public func makeVerificationCodeViewController() -> VerificationCodeViewController {
         return VerificationCodeViewController(viewModel: makeVerificationCodeViewModel(), diContainer: self)
     }
@@ -552,6 +560,10 @@ extension AppDIContainer {
 
     private func makeWordBookViewmodel() -> WordBookViewModel {
         return WordBookViewModel(fetchWordListUseCase: makeWordBookUseCase(), toggleBookmarkUseCase: makeToggleBookmarkUseCase())
+    }
+
+    private func makeWordBookStudyViewModel() -> WordBookStudyViewModel {
+        return WordBookStudyViewModel(useCase: makeWordBookUseCase())
     }
 }
 
