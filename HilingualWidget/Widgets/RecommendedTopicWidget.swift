@@ -234,5 +234,4 @@ private extension RecommendedTopicWidgetEntry {
         isWrittenToday: false,
         topicEn: "What surprised you today?"
     )
-
 }
