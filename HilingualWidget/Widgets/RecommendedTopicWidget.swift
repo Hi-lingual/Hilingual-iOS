@@ -12,7 +12,7 @@ import WidgetKit
 
 struct RecommendedTopicWidgetEntry: TimelineEntry {
     let date: Date
-    let isWritten: Bool
+    let isWrittenToday: Bool?
     let topicEn: String
 }
 
@@ -24,12 +24,23 @@ struct RecommendedTopicWidgetProvider: TimelineProvider {
     }
 
     func getSnapshot(in context: Context, completion: @escaping (RecommendedTopicWidgetEntry) -> Void) {
-        completion(.default)
+        completion(Self.entryFromStore() ?? .default)
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<RecommendedTopicWidgetEntry>) -> Void) {
-        let nextRefreshDate = Calendar.current.date(byAdding: .hour, value: 1, to: .now) ?? .now
-        completion(Timeline(entries: [.default], policy: .after(nextRefreshDate)))
+        let nextRefreshDate = Date().widgetNextRefreshDate
+        let entry = Self.entryFromStore() ?? .default
+        completion(Timeline(entries: [entry], policy: .after(nextRefreshDate)))
+    }
+
+    private static func entryFromStore() -> RecommendedTopicWidgetEntry? {
+        guard let snapshot = WidgetContentStore.loadTopic() else { return nil }
+
+        return RecommendedTopicWidgetEntry(
+            date: snapshot.updatedAt,
+            isWrittenToday: snapshot.isWrittenToday,
+            topicEn: snapshot.topicEn ?? RecommendedTopicWidgetEntry.failureTopicText
+        )
     }
 }
 
@@ -57,14 +68,14 @@ struct RecommendedTopicWidgetEntryView: View {
                 .font(layout.textFont)
                 .foregroundStyle(dateColor)
 
-            if isMediumFamily {
+            if isMediumFamily, let isWrittenToday = entry.isWrittenToday {
                 Text("·")
                     .font(layout.textFont)
                     .foregroundStyle(.gray400)
 
-                Text(statusText)
+                Text(statusText(isWritten: isWrittenToday))
                     .font(.pretendard(.body_m_14))
-                    .foregroundStyle(statusColor)
+                    .foregroundStyle(statusColor(isWritten: isWrittenToday))
             }
 
             Spacer(minLength: 0)
@@ -120,16 +131,16 @@ struct RecommendedTopicWidgetEntryView: View {
         Date().widgetMonthDayWeekdayText
     }
 
-    private var statusText: String {
-        entry.isWritten ? "작성완료" : "미작성"
+    private func statusText(isWritten: Bool) -> String {
+        isWritten ? "작성완료" : "미작성"
     }
 
     private var dateColor: Color {
         colorScheme == .dark ? .gray200 : .white
     }
 
-    private var statusColor: Color {
-        entry.isWritten ? .hilingualOrange : .gray400
+    private func statusColor(isWritten: Bool) -> Color {
+        isWritten ? .hilingualOrange : .gray400
     }
 
     private var headerBackgroundColor: Color {
@@ -212,59 +223,12 @@ struct RecommendedTopicWidget: Widget {
 // MARK: - Extensions
 
 private extension RecommendedTopicWidgetEntry {
+    static let failureTopicText = "지금은 주제를 불러올 수 없어요"
+
     static let `default` = RecommendedTopicWidgetEntry(
         date: .now,
-        isWritten: false,
+        isWrittenToday: false,
         topicEn: "What surprised you today?"
     )
 
-    static let written = RecommendedTopicWidgetEntry(
-        date: .now,
-        isWritten: true,
-        topicEn: "What surprised you today?"
-    )
-
-    static let longTopic = RecommendedTopicWidgetEntry(
-        date: .now,
-        isWritten: true,
-        topicEn: "What is something small that made you smile today?"
-    )
-}
-
-// MARK: - Preview
-
-#Preview("Topic Unwritten Medium", as: .systemMedium) {
-    RecommendedTopicWidget()
-} timeline: {
-    RecommendedTopicWidgetEntry.default
-}
-
-#Preview("Topic Written Medium", as: .systemMedium) {
-    RecommendedTopicWidget()
-} timeline: {
-    RecommendedTopicWidgetEntry.written
-}
-
-#Preview("Topic Long Medium", as: .systemMedium) {
-    RecommendedTopicWidget()
-} timeline: {
-    RecommendedTopicWidgetEntry.longTopic
-}
-
-#Preview("Topic Unwritten Small", as: .systemSmall) {
-    RecommendedTopicWidget()
-} timeline: {
-    RecommendedTopicWidgetEntry.default
-}
-
-#Preview("Topic Written Small", as: .systemSmall) {
-    RecommendedTopicWidget()
-} timeline: {
-    RecommendedTopicWidgetEntry.written
-}
-
-#Preview("Topic Long Small", as: .systemSmall) {
-    RecommendedTopicWidget()
-} timeline: {
-    RecommendedTopicWidgetEntry.longTopic
 }

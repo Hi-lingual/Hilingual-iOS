@@ -14,7 +14,25 @@ struct StreakWidgetEntry: TimelineEntry {
     let date: Date
     let isLoggedIn: Bool
     let streak: Int
-    let writtenWeekdays: [Bool]
+    let recentDays: [StreakWidgetRecentDay]
+}
+
+struct StreakWidgetRecentDay {
+    let dayOfWeek: String
+    let isWritten: Bool
+
+    var weekdayText: String {
+        switch dayOfWeek {
+        case "MON": "월"
+        case "TUE": "화"
+        case "WED": "수"
+        case "THU": "목"
+        case "FRI": "금"
+        case "SAT": "토"
+        case "SUN": "일"
+        default: dayOfWeek
+        }
+    }
 }
 
 // MARK: - Provider
@@ -25,12 +43,29 @@ struct StreakWidgetProvider: TimelineProvider {
     }
 
     func getSnapshot(in context: Context, completion: @escaping (StreakWidgetEntry) -> Void) {
-        completion(.default)
+        completion(Self.entryFromStore() ?? .default)
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<StreakWidgetEntry>) -> Void) {
-        let nextRefreshDate = Calendar.current.date(byAdding: .hour, value: 1, to: .now) ?? .now
-        completion(Timeline(entries: [.default], policy: .after(nextRefreshDate)))
+        let nextRefreshDate = Date().widgetNextRefreshDate
+        let entry = Self.entryFromStore() ?? .loggedOut
+        completion(Timeline(entries: [entry], policy: .after(nextRefreshDate)))
+    }
+
+    private static func entryFromStore() -> StreakWidgetEntry? {
+        guard let snapshot = WidgetContentStore.loadStreak() else { return nil }
+
+        return StreakWidgetEntry(
+            date: snapshot.updatedAt,
+            isLoggedIn: snapshot.isLoggedIn,
+            streak: snapshot.streak,
+            recentDays: snapshot.recentDays.map {
+                StreakWidgetRecentDay(
+                    dayOfWeek: $0.dayOfWeek,
+                    isWritten: $0.isWritten
+                )
+            }
+        )
     }
 }
 
@@ -63,7 +98,7 @@ struct StreakWidgetEntryView: View {
                 Spacer(minLength: weekdayTopSpacing)
 
                 StreakWeekdayRow(
-                    writtenWeekdays: entry.writtenWeekdays,
+                    recentDays: entry.recentDays,
                     isLoggedIn: entry.isLoggedIn
                 )
             } else {
@@ -339,7 +374,6 @@ private struct StreakImageView: View {
     }
 }
 
-// TODO: 프리뷰 지우기
 // MARK: - Extensions
 
 private extension StreakWidgetEntry {
@@ -347,54 +381,19 @@ private extension StreakWidgetEntry {
         date: .now,
         isLoggedIn: true,
         streak: 4,
-        writtenWeekdays: [false, true, true, true, true]
+        recentDays: [
+            StreakWidgetRecentDay(dayOfWeek: "WED", isWritten: false),
+            StreakWidgetRecentDay(dayOfWeek: "THU", isWritten: true),
+            StreakWidgetRecentDay(dayOfWeek: "FRI", isWritten: true),
+            StreakWidgetRecentDay(dayOfWeek: "SAT", isWritten: true),
+            StreakWidgetRecentDay(dayOfWeek: "SUN", isWritten: true)
+        ]
     )
-}
 
-// MARK: - Preview
-
-#Preview("Streak N Medium", as: .systemMedium) {
-    StreakWidget()
-} timeline: {
-    StreakWidgetEntry.default
-}
-
-#Preview("Streak Locked Medium", as: .systemMedium) {
-    StreakWidget()
-} timeline: {
-    StreakWidgetEntry(date: .now, isLoggedIn: false, streak: 0, writtenWeekdays: [])
-}
-
-#Preview("Streak Locked Small", as: .systemSmall) {
-    StreakWidget()
-} timeline: {
-    StreakWidgetEntry(date: .now, isLoggedIn: false, streak: 0, writtenWeekdays: [])
-}
-
-#Preview("Streak 0 Medium", as: .systemMedium) {
-    StreakWidget()
-} timeline: {
-    StreakWidgetEntry(
+    static let loggedOut = StreakWidgetEntry(
         date: .now,
-        isLoggedIn: true,
+        isLoggedIn: false,
         streak: 0,
-        writtenWeekdays: [false, false, false, false, false]
+        recentDays: []
     )
-}
-
-#Preview("Streak 0 Small", as: .systemSmall) {
-    StreakWidget()
-} timeline: {
-    StreakWidgetEntry(
-        date: .now,
-        isLoggedIn: true,
-        streak: 0,
-        writtenWeekdays: [false, false, false, false, false]
-    )
-}
-
-#Preview("Streak N Small", as: .systemSmall) {
-    StreakWidget()
-} timeline: {
-    StreakWidgetEntry.default
 }

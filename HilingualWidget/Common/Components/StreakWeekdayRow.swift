@@ -11,22 +11,20 @@ import WidgetKit
 // MARK: - View
 
 struct StreakWeekdayRow: View {
-    let writtenWeekdays: [Bool]
+    let recentDays: [StreakWidgetRecentDay]
     let isLoggedIn: Bool
 
     var body: some View {
         HStack(spacing: 6) {
-            ForEach(Self.weekdayLabels.indices, id: \.self) { index in
+            ForEach(Array(recentDays.enumerated()), id: \.offset) { _, day in
                 StreakWeekdayChip(
-                    title: Self.weekdayLabels[index],
-                    isWritten: writtenWeekdays[safe: index] ?? false,
+                    title: day.weekdayText,
+                    isWritten: day.isWritten,
                     isLoggedIn: isLoggedIn
                 )
             }
         }
     }
-
-    private static let weekdayLabels = ["월", "화", "수", "목", "금"]
 }
 
 // MARK: - Components
@@ -46,7 +44,7 @@ private struct StreakWeekdayChip: View {
 
     var body: some View {
         ZStack {
-            Image(imageName)
+            Image(imageResource)
                 .resizable()
                 .scaledToFit()
 
@@ -68,26 +66,18 @@ private struct StreakWeekdayChip: View {
         return isWritten ? .written : .unwritten
     }
 
-    private var imageName: String {
+    private var imageResource: ImageResource {
         switch state {
         case .locked:
-            return colorScheme == .dark ? "chip_widgetdate_locked_gray" : "chip_widgetdate_locked_lightgray"
+            return colorScheme == .dark ? .chipWidgetdateLockedGray : .chipWidgetdateLockedLightgray
         case .written:
-            return "chip_widgetdate_written_orange"
+            return .chipWidgetdateWrittenOrange
         case .unwritten:
-            return colorScheme == .dark ? "chip_widgetdate_unwritten_gray" : "chip_widgetdate_unwritten_lightgray"
+            return colorScheme == .dark ? .chipWidgetdateUnwrittenGray : .chipWidgetdateUnwrittenLightgray
         }
     }
 
     private var textColor: Color {
         state == .written ? .white : .gray500
-    }
-}
-
-// MARK: - Extensions
-
-private extension Array {
-    subscript(safe index: Int) -> Element? {
-        indices.contains(index) ? self[index] : nil
     }
 }
