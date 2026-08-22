@@ -12,6 +12,8 @@
 		3A1464192F59BD11001D047C /* GoogleMobileAds in Frameworks */ = {isa = PBXBuildFile; productRef = 3A1464182F59BD11001D047C /* GoogleMobileAds */; };
 		3A79AE862F953801000AC0AC /* Release.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 3A79AE852F953801000AC0AC /* Release.xcconfig */; };
 		3A79AE882F953813000AC0AC /* Debug.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 3A79AE872F953813000AC0AC /* Debug.xcconfig */; };
+		3A954D70303A0463000D8448 /* WidgetContentStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A954D6F303A0463000D8448 /* WidgetContentStore.swift */; };
+		3A954D72303A046E000D8448 /* WidgetSyncService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A954D71303A046E000D8448 /* WidgetSyncService.swift */; };
 		3ABC3EDD3038B366002E0D08 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3ABC3EDC3038B366002E0D08 /* WidgetKit.framework */; };
 		3ABC3EDF3038B366002E0D08 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3ABC3EDE3038B366002E0D08 /* SwiftUI.framework */; };
 		3ABC3EEA3038B367002E0D08 /* HilingualWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 3ABC3EDB3038B366002E0D08 /* HilingualWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -71,6 +73,9 @@
 		14D69FD3A8604888BF89423D /* HilingualCore */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = HilingualCore; sourceTree = "<group>"; };
 		3A79AE852F953801000AC0AC /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
 		3A79AE872F953813000AC0AC /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
+		3A954D6A303A007C000D8448 /* HilingualWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = HilingualWidgetExtension.entitlements; sourceTree = "<group>"; };
+		3A954D6F303A0463000D8448 /* WidgetContentStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetContentStore.swift; sourceTree = "<group>"; };
+		3A954D71303A046E000D8448 /* WidgetSyncService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetSyncService.swift; sourceTree = "<group>"; };
 		3ABC3EDB3038B366002E0D08 /* HilingualWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = HilingualWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		3ABC3EDC3038B366002E0D08 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		3ABC3EDE3038B366002E0D08 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
@@ -145,6 +150,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		3A954D6B303A0315000D8448 /* Widget */ = {
+			isa = PBXGroup;
+			children = (
+				3A954D6F303A0463000D8448 /* WidgetContentStore.swift */,
+				3A954D71303A046E000D8448 /* WidgetSyncService.swift */,
+			);
+			path = Widget;
+			sourceTree = "<group>";
+		};
 		E5151BFF2E15DEA700497996 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -169,6 +183,7 @@
 		E5C79B052E15281900E461C3 = {
 			isa = PBXGroup;
 			children = (
+				3A954D6A303A007C000D8448 /* HilingualWidgetExtension.entitlements */,
 				E5C2F3932E1709DC003DF6C4 /* HilingualNetwork */,
 				E5D5D0A72E171AA900DABE8D /* HilingualData */,
 				E5C2F3972E171509003DF6C4 /* HilingualDomain */,
@@ -211,6 +226,7 @@
 				E5C84AC82E1538C700CBD669 /* AppDIContainer.swift */,
 				E5C79B2A2E15282100E461C3 /* LaunchScreen.storyboard */,
 				E51DB2032E1D9E47000C2BEA /* Config */,
+				3A954D6B303A0315000D8448 /* Widget */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -400,7 +416,9 @@
 				E51DB2242E1E4407000C2BEA /* AppBaseURLProvider.swift in Sources */,
 				E5C84AC92E1538C700CBD669 /* AppDIContainer.swift in Sources */,
 				E51DB2052E1D9E8B000C2BEA /* AppConfig.swift in Sources */,
+				3A954D70303A0463000D8448 /* WidgetContentStore.swift in Sources */,
 				E5C79B342E15282100E461C3 /* AppDelegate.swift in Sources */,
+				3A954D72303A046E000D8448 /* WidgetSyncService.swift in Sources */,
 				E5C79B352E15282100E461C3 /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -433,9 +451,10 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
 				BUNDLE_ID_SUFFIX = .dev;
+				CODE_SIGN_ENTITLEMENTS = HilingualWidgetExtension.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2026072101;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = C9XX799UJH;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -443,7 +462,7 @@
 				INFOPLIST_FILE = HilingualWidget/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = HilingualWidget;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -468,16 +487,17 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
 				BUNDLE_ID_SUFFIX = "";
+				CODE_SIGN_ENTITLEMENTS = HilingualWidgetExtension.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2026072101;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = HilingualWidget/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = HilingualWidget;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
