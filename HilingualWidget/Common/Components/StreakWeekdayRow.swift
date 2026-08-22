@@ -78,6 +78,9 @@ private struct StreakWeekdayChip: View {
     }
 
     private var textColor: Color {
-        state == .written ? .white : .gray500
+        if colorScheme == .dark {
+            return .white
+        }
+        return state == .written ? .white : .gray500
     }
 }
