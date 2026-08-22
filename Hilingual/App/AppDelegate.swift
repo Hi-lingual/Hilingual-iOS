@@ -35,7 +35,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
         _ = CoreDataStorage.shared
         
         AppDIContainer.shared.configureFCMTokenSync()
-        
+        AppDIContainer.shared.configureWidgetSync()
+
         Messaging.messaging().delegate = self
         UNUserNotificationCenter.current().delegate = self
         UIApplication.shared.registerForRemoteNotifications()

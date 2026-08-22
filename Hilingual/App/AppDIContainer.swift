@@ -31,6 +31,10 @@ final class AppDIContainer: ViewControllerFactory {
         FCMTokenSyncService.shared.configure(deviceUseCase: makeDeviceUseCase())
     }
 
+    func configureWidgetSync() {
+        WidgetSyncService.shared.configure(useCase: makeWidgetUseCase())
+    }
+
     public func makeTabBarViewController() -> HilingualPresentation.TabBarViewController {
         return TabBarViewController(diContainer: self)
     }
@@ -524,6 +528,29 @@ extension AppDIContainer {
             localPushUseCase: makeLocalPushUseCase(),
             homeAdWatchUseCase: makeHomeAdWatchUseCase()
         )
+    }
+}
+
+// MARK: - WidgetDIContainer
+
+extension AppDIContainer {
+    private func makeWidgetTopicService() -> WidgetTopicService {
+        return DefaultWidgetTopicService()
+    }
+
+    private func makeWidgetStreakService() -> WidgetStreakService {
+        return DefaultWidgetStreakService()
+    }
+
+    private func makeWidgetRepository() -> WidgetRepository {
+        return DefaultWidgetRepository(
+            topicService: makeWidgetTopicService(),
+            streakService: makeWidgetStreakService()
+        )
+    }
+
+    private func makeWidgetUseCase() -> WidgetUseCase {
+        return DefaultWidgetUseCase(repository: makeWidgetRepository())
     }
 }
 
