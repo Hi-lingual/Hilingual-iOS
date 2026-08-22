@@ -80,7 +80,7 @@ struct RecommendedTopicWidgetEntryView: View {
 
             Spacer(minLength: 0)
 
-            if isMediumFamily {
+            if isMediumFamily && shouldShowRemainingTime {
                 remainingTimeView
             }
         }
@@ -108,7 +108,7 @@ struct RecommendedTopicWidgetEntryView: View {
 
             Spacer(minLength: 0)
 
-            if !isMediumFamily {
+            if !isMediumFamily && shouldShowRemainingTime {
                 remainingTimeView
             }
         }
@@ -161,6 +161,10 @@ struct RecommendedTopicWidgetEntryView: View {
 
     private var remainingTimeColor: Color {
         colorScheme == .dark ? .gray200 : .gray500
+    }
+
+    private var shouldShowRemainingTime: Bool {
+        entry.isWrittenToday != true
     }
 
     private var isMediumFamily: Bool {
