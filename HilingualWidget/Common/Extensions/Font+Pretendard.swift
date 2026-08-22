@@ -36,6 +36,7 @@ extension Font {
         case body_sb_14
         case body_m_14
         case body_r_14
+        case body_sb_12
         case body_m_12
 
         case cap_r_12
@@ -65,6 +66,7 @@ extension Font {
         case .body_sb_14: return .pretendard(weight: .semiBold, size: 14)
         case .body_m_14: return .pretendard(weight: .medium, size: 14)
         case .body_r_14: return .pretendard(weight: .regular, size: 14)
+        case .body_sb_12: return .pretendard(weight: .semiBold, size: 12)
         case .body_m_12: return .pretendard(weight: .medium, size: 12)
 
         case .cap_r_12: return .pretendard(weight: .regular, size: 12)

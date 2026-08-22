@@ -317,7 +317,7 @@ private struct StreakLoginPlaceholder: View {
 
     private var textFont: Font {
         switch size {
-        case .small: .pretendard(.body_m_12)
+        case .small: .pretendard(.body_sb_12)
         case .medium: .pretendard(.body_sb_14)
         }
     }
