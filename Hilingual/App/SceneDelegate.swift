@@ -102,7 +102,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     // MARK: - Scene Lifecycle (기본 제공 메서드)
 
-    func sceneDidBecomeActive(_ scene: UIScene) { }
+    func sceneDidBecomeActive(_ scene: UIScene) {
+        WidgetSyncService.shared.syncTodayWidgets()
+    }
     func sceneWillResignActive(_ scene: UIScene) { }
     func sceneWillEnterForeground(_ scene: UIScene) { }
     func sceneDidEnterBackground(_ scene: UIScene) { }

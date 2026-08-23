@@ -12,6 +12,11 @@
 		3A1464192F59BD11001D047C /* GoogleMobileAds in Frameworks */ = {isa = PBXBuildFile; productRef = 3A1464182F59BD11001D047C /* GoogleMobileAds */; };
 		3A79AE862F953801000AC0AC /* Release.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 3A79AE852F953801000AC0AC /* Release.xcconfig */; };
 		3A79AE882F953813000AC0AC /* Debug.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 3A79AE872F953813000AC0AC /* Debug.xcconfig */; };
+		3A954D70303A0463000D8448 /* WidgetContentStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A954D6F303A0463000D8448 /* WidgetContentStore.swift */; };
+		3A954D72303A046E000D8448 /* WidgetSyncService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A954D71303A046E000D8448 /* WidgetSyncService.swift */; };
+		3ABC3EDD3038B366002E0D08 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3ABC3EDC3038B366002E0D08 /* WidgetKit.framework */; };
+		3ABC3EDF3038B366002E0D08 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3ABC3EDE3038B366002E0D08 /* SwiftUI.framework */; };
+		3ABC3EEA3038B367002E0D08 /* HilingualWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 3ABC3EDB3038B366002E0D08 /* HilingualWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		3AE5E5BD2FE69D010058F960 /* MetaAdapterTarget in Frameworks */ = {isa = PBXBuildFile; productRef = 3AE5E5BC2FE69D010058F960 /* MetaAdapterTarget */; };
 		E51B4C542E28DC11000B16D0 /* AppIcon.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E51B4C532E28DC11000B16D0 /* AppIcon.xcassets */; };
 		E51DB2052E1D9E8B000C2BEA /* AppConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = E51DB2042E1D9E8B000C2BEA /* AppConfig.swift */; };
@@ -30,7 +35,28 @@
 		E5D5D0AC2E17289000DABE8D /* HilingualPresentation in Frameworks */ = {isa = PBXBuildFile; productRef = E5D5D0AB2E17289000DABE8D /* HilingualPresentation */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		3ABC3EE83038B367002E0D08 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E5C79B062E15281900E461C3 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3ABC3EDA3038B366002E0D08;
+			remoteInfo = HilingualWidgetExtension;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXCopyFilesBuildPhase section */
+		3ABC3EEB3038B367002E0D08 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				3ABC3EEA3038B367002E0D08 /* HilingualWidgetExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E5151C022E15DEA700497996 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -47,6 +73,12 @@
 		14D69FD3A8604888BF89423D /* HilingualCore */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = HilingualCore; sourceTree = "<group>"; };
 		3A79AE852F953801000AC0AC /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
 		3A79AE872F953813000AC0AC /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
+		3A954D6A303A007C000D8448 /* HilingualWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = HilingualWidgetExtension.entitlements; sourceTree = "<group>"; };
+		3A954D6F303A0463000D8448 /* WidgetContentStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetContentStore.swift; sourceTree = "<group>"; };
+		3A954D71303A046E000D8448 /* WidgetSyncService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetSyncService.swift; sourceTree = "<group>"; };
+		3ABC3EDB3038B366002E0D08 /* HilingualWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = HilingualWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		3ABC3EDC3038B366002E0D08 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		3ABC3EDE3038B366002E0D08 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		E51B4C532E28DC11000B16D0 /* AppIcon.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = AppIcon.xcassets; sourceTree = "<group>"; };
 		E51DB2002E1CF7AD000C2BEA /* Hilingual.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Hilingual.entitlements; sourceTree = "<group>"; };
 		E51DB2042E1D9E8B000C2BEA /* AppConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfig.swift; sourceTree = "<group>"; };
@@ -65,7 +97,37 @@
 		E5D5D0AA2E1727BB00DABE8D /* HilingualPresentation */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = HilingualPresentation; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		3ABC3EEE3038B367002E0D08 /* Exceptions for "HilingualWidget" folder in "HilingualWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 3ABC3EDA3038B366002E0D08 /* HilingualWidgetExtension */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		3ABC3EE03038B366002E0D08 /* HilingualWidget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				3ABC3EEE3038B367002E0D08 /* Exceptions for "HilingualWidget" folder in "HilingualWidgetExtension" target */,
+			);
+			path = HilingualWidget;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
 /* Begin PBXFrameworksBuildPhase section */
+		3ABC3ED83038B366002E0D08 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3ABC3EDF3038B366002E0D08 /* SwiftUI.framework in Frameworks */,
+				3ABC3EDD3038B366002E0D08 /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E5C79B0B2E15281900E461C3 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -88,9 +150,20 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		3A954D6B303A0315000D8448 /* Widget */ = {
+			isa = PBXGroup;
+			children = (
+				3A954D6F303A0463000D8448 /* WidgetContentStore.swift */,
+				3A954D71303A046E000D8448 /* WidgetSyncService.swift */,
+			);
+			path = Widget;
+			sourceTree = "<group>";
+		};
 		E5151BFF2E15DEA700497996 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				3ABC3EDC3038B366002E0D08 /* WidgetKit.framework */,
+				3ABC3EDE3038B366002E0D08 /* SwiftUI.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -110,12 +183,14 @@
 		E5C79B052E15281900E461C3 = {
 			isa = PBXGroup;
 			children = (
+				3A954D6A303A007C000D8448 /* HilingualWidgetExtension.entitlements */,
 				E5C2F3932E1709DC003DF6C4 /* HilingualNetwork */,
 				E5D5D0A72E171AA900DABE8D /* HilingualData */,
 				E5C2F3972E171509003DF6C4 /* HilingualDomain */,
 				14D69FD3A8604888BF89423D /* HilingualCore */,
 				E5D5D0AA2E1727BB00DABE8D /* HilingualPresentation */,
 				E5C79B2F2E15282100E461C3 /* Hilingual */,
+				3ABC3EE03038B366002E0D08 /* HilingualWidget */,
 				E5151BFF2E15DEA700497996 /* Frameworks */,
 				E5C79B0F2E15281900E461C3 /* Products */,
 			);
@@ -126,6 +201,7 @@
 			isa = PBXGroup;
 			children = (
 				E5C79B0E2E15281900E461C3 /* Hilingual-Dev.app */,
+				3ABC3EDB3038B366002E0D08 /* HilingualWidgetExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -150,6 +226,7 @@
 				E5C84AC82E1538C700CBD669 /* AppDIContainer.swift */,
 				E5C79B2A2E15282100E461C3 /* LaunchScreen.storyboard */,
 				E51DB2032E1D9E47000C2BEA /* Config */,
+				3A954D6B303A0315000D8448 /* Widget */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -157,6 +234,28 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		3ABC3EDA3038B366002E0D08 /* HilingualWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3ABC3EEF3038B367002E0D08 /* Build configuration list for PBXNativeTarget "HilingualWidgetExtension" */;
+			buildPhases = (
+				3ABC3ED73038B366002E0D08 /* Sources */,
+				3ABC3ED83038B366002E0D08 /* Frameworks */,
+				3ABC3ED93038B366002E0D08 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				3ABC3EE03038B366002E0D08 /* HilingualWidget */,
+			);
+			name = HilingualWidgetExtension;
+			packageProductDependencies = (
+			);
+			productName = HilingualWidgetExtension;
+			productReference = 3ABC3EDB3038B366002E0D08 /* HilingualWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		E5C79B0D2E15281900E461C3 /* Hilingual */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = E5C79B212E15281B00E461C3 /* Build configuration list for PBXNativeTarget "Hilingual" */;
@@ -167,10 +266,12 @@
 				E5F1A0012FCB000100000001 /* Configure Firebase */,
 				E5151C022E15DEA700497996 /* Embed Frameworks */,
 				E5CBCFC22EC4B3E100475E81 /* Upload Crashlytics dSYM */,
+				3ABC3EEB3038B367002E0D08 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				3ABC3EE93038B367002E0D08 /* PBXTargetDependency */,
 			);
 			name = Hilingual;
 			packageProductDependencies = (
@@ -198,9 +299,12 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1640;
+				LastSwiftUpdateCheck = 2660;
 				LastUpgradeCheck = 1640;
 				TargetAttributes = {
+					3ABC3EDA3038B366002E0D08 = {
+						CreatedOnToolsVersion = 26.6;
+					};
 					E5C79B0D2E15281900E461C3 = {
 						CreatedOnToolsVersion = 16.4;
 					};
@@ -231,11 +335,19 @@
 			projectRoot = "";
 			targets = (
 				E5C79B0D2E15281900E461C3 /* Hilingual */,
+				3ABC3EDA3038B366002E0D08 /* HilingualWidgetExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		3ABC3ED93038B366002E0D08 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E5C79B0C2E15281900E461C3 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -290,6 +402,13 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		3ABC3ED73038B366002E0D08 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E5C79B0A2E15281900E461C3 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -297,12 +416,22 @@
 				E51DB2242E1E4407000C2BEA /* AppBaseURLProvider.swift in Sources */,
 				E5C84AC92E1538C700CBD669 /* AppDIContainer.swift in Sources */,
 				E51DB2052E1D9E8B000C2BEA /* AppConfig.swift in Sources */,
+				3A954D70303A0463000D8448 /* WidgetContentStore.swift in Sources */,
 				E5C79B342E15282100E461C3 /* AppDelegate.swift in Sources */,
+				3A954D72303A046E000D8448 /* WidgetSyncService.swift in Sources */,
 				E5C79B352E15282100E461C3 /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		3ABC3EE93038B367002E0D08 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 3ABC3EDA3038B366002E0D08 /* HilingualWidgetExtension */;
+			targetProxy = 3ABC3EE83038B367002E0D08 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		E5C79B2A2E15282100E461C3 /* LaunchScreen.storyboard */ = {
@@ -316,6 +445,77 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		3ABC3EEC3038B367002E0D08 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				BUNDLE_ID_SUFFIX = .dev;
+				CODE_SIGN_ENTITLEMENTS = HilingualWidgetExtension.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = C9XX799UJH;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = HilingualWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = HilingualWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.Hilingual$(BUNDLE_ID_SUFFIX).HilingualWidget";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		3ABC3EED3038B367002E0D08 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				BUNDLE_ID_SUFFIX = "";
+				CODE_SIGN_ENTITLEMENTS = HilingualWidgetExtension.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = HilingualWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = HilingualWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.Hilingual$(BUNDLE_ID_SUFFIX).HilingualWidget";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 		E5C79B222E15281B00E461C3 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 3A79AE872F953813000AC0AC /* Debug.xcconfig */;
@@ -520,6 +720,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		3ABC3EEF3038B367002E0D08 /* Build configuration list for PBXNativeTarget "HilingualWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3ABC3EEC3038B367002E0D08 /* Debug */,
+				3ABC3EED3038B367002E0D08 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		E5C79B092E15281900E461C3 /* Build configuration list for PBXProject "Hilingual" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
