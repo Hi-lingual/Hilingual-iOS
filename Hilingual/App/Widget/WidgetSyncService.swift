@@ -39,6 +39,12 @@ final class WidgetSyncService {
                 self?.saveLoggedOutWidgetState()
             }
             .store(in: &cancellables)
+
+        NotificationCenter.default.publisher(for: .hilingualDiaryDidChange)
+            .sink { [weak self] _ in
+                self?.syncTodayWidgets()
+            }
+            .store(in: &cancellables)
     }
 
     private func saveLoggedOutWidgetState() {

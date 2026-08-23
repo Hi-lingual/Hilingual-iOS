@@ -9,6 +9,10 @@ import Foundation
 import Combine
 import HilingualDomain
 
+public extension Notification.Name {
+    static let hilingualDiaryDidChange = Notification.Name("hilingual.diary.didChange")
+}
+
 public final class LoadingViewModel: BaseViewModel {
 
     // MARK: - Dependencies
@@ -223,6 +227,7 @@ public final class LoadingViewModel: BaseViewModel {
         if success {
             clearRecoveryDateIfNeeded()
             errorCount = 0
+            NotificationCenter.default.post(name: .hilingualDiaryDidChange, object: nil)
             stateSubject.send(.success)
         } else {
             errorCount += 1
