@@ -74,14 +74,14 @@ struct RecommendedTopicWidgetEntryView: View {
                 .font(layout.textFont)
                 .foregroundStyle(dateColor)
 
-            if isMediumFamily, !entry.isFailed, let isWrittenToday = entry.isWrittenToday {
+            if isMediumFamily {
                 Text("·")
                     .font(layout.textFont)
                     .foregroundStyle(.gray400)
 
-                Text(statusText(isWritten: isWrittenToday))
+                Text(statusText(isWritten: displayIsWrittenToday))
                     .font(.pretendard(.body_m_14))
-                    .foregroundStyle(statusColor(isWritten: isWrittenToday))
+                    .foregroundStyle(statusColor(isWritten: displayIsWrittenToday))
             }
 
             Spacer(minLength: 0)
@@ -135,6 +135,10 @@ struct RecommendedTopicWidgetEntryView: View {
 
     private var formattedDate: String {
         entry.date.widgetMonthDayWeekdayText
+    }
+
+    private var displayIsWrittenToday: Bool {
+        entry.isWrittenToday == true
     }
 
     private func statusText(isWritten: Bool) -> String {

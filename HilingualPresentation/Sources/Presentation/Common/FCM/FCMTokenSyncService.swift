@@ -6,7 +6,13 @@
 //
 
 import Combine
+import Foundation
 import HilingualDomain
+
+public extension Notification.Name {
+    static let hilingualSessionDidAuthenticate = Notification.Name("hilingual.session.didAuthenticate")
+    static let hilingualSessionDidEnd = Notification.Name("hilingual.session.didEnd")
+}
 
 @MainActor
 public final class FCMTokenSyncService {
@@ -38,6 +44,7 @@ public final class FCMTokenSyncService {
 
     public func sessionDidAuthenticate() {
         isSessionAuthenticated = true
+        NotificationCenter.default.post(name: .hilingualSessionDidAuthenticate, object: nil)
         syncIfPossible()
     }
 
@@ -45,6 +52,7 @@ public final class FCMTokenSyncService {
         isSessionAuthenticated = false
         syncedToken = nil
         syncCancellable = nil
+        NotificationCenter.default.post(name: .hilingualSessionDidEnd, object: nil)
     }
 
     // MARK: - Sync

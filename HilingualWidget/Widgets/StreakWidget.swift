@@ -394,6 +394,14 @@ private extension StreakWidgetEntry {
         date: .now,
         isLoggedIn: false,
         streak: 0,
-        recentDays: []
+        recentDays: loggedOutRecentDays
     )
+
+    private static let loggedOutRecentDays: [StreakWidgetRecentDay] = [
+        StreakWidgetRecentDay(dayOfWeek: "MON", isWritten: false),
+        StreakWidgetRecentDay(dayOfWeek: "TUE", isWritten: false),
+        StreakWidgetRecentDay(dayOfWeek: "WED", isWritten: false),
+        StreakWidgetRecentDay(dayOfWeek: "THU", isWritten: false),
+        StreakWidgetRecentDay(dayOfWeek: "FRI", isWritten: false)
+    ]
 }

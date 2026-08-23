@@ -71,11 +71,19 @@ enum WidgetContentStore {
         let snapshot = StreakSnapshot(
             isLoggedIn: false,
             streak: 0,
-            recentDays: [],
+            recentDays: loggedOutRecentDays,
             updatedAt: updatedAt
         )
         save(snapshot, forKey: streakKey)
     }
+
+    private static let loggedOutRecentDays: [RecentDaySnapshot] = [
+        RecentDaySnapshot(dayOfWeek: "MON", isWritten: false),
+        RecentDaySnapshot(dayOfWeek: "TUE", isWritten: false),
+        RecentDaySnapshot(dayOfWeek: "WED", isWritten: false),
+        RecentDaySnapshot(dayOfWeek: "THU", isWritten: false),
+        RecentDaySnapshot(dayOfWeek: "FRI", isWritten: false)
+    ]
 
     private static func save<T: Encodable>(_ value: T, forKey key: String) {
         guard let data = try? JSONEncoder().encode(value) else { return }

@@ -8,6 +8,7 @@
 import Combine
 import Foundation
 import HilingualDomain
+import HilingualPresentation
 import WidgetKit
 
 @MainActor
@@ -21,6 +22,28 @@ final class WidgetSyncService {
 
     func configure(useCase: WidgetUseCase) {
         self.useCase = useCase
+        bindSessionNotifications()
+    }
+
+    private func bindSessionNotifications() {
+        cancellables.removeAll()
+
+        NotificationCenter.default.publisher(for: .hilingualSessionDidAuthenticate)
+            .sink { [weak self] _ in
+                self?.syncTodayWidgets()
+            }
+            .store(in: &cancellables)
+
+        NotificationCenter.default.publisher(for: .hilingualSessionDidEnd)
+            .sink { [weak self] _ in
+                self?.saveLoggedOutWidgetState()
+            }
+            .store(in: &cancellables)
+    }
+
+    private func saveLoggedOutWidgetState() {
+        WidgetContentStore.saveLoggedOutStreak()
+        WidgetCenter.shared.reloadTimelines(ofKind: "StreakWidget")
     }
 
     func syncTodayWidgets() {
@@ -53,9 +76,15 @@ final class WidgetSyncService {
 
 private extension Date {
     var widgetAPIDateText: String {
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "ko_KR")
-        formatter.dateFormat = "yyyy-MM-dd"
-        return formatter.string(from: self)
+        ISO8601Format(
+            Date.ISO8601FormatStyle(
+                dateSeparator: .dash,
+                dateTimeSeparator: .standard,
+                timeZone: .current
+            )
+            .year()
+            .month()
+            .day()
+        )
     }
 }

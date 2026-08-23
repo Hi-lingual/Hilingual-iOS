@@ -9,17 +9,27 @@ import Foundation
 
 extension Date {
     var widgetMonthDayWeekdayText: String {
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "ko_KR")
-        formatter.dateFormat = "M월 d일 E"
-        return formatter.string(from: self)
+        formatted(
+            .verbatim(
+                "\(month: .defaultDigits)월 \(day: .defaultDigits)일 \(weekday: .abbreviated)" as Date.FormatString,
+                locale: Locale(identifier: "ko_KR"),
+                timeZone: .current,
+                calendar: .current
+            )
+        )
     }
 
     var widgetAPIDateText: String {
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "ko_KR")
-        formatter.dateFormat = "yyyy-MM-dd"
-        return formatter.string(from: self)
+        ISO8601Format(
+            Date.ISO8601FormatStyle(
+                dateSeparator: .dash,
+                dateTimeSeparator: .standard,
+                timeZone: .current
+            )
+            .year()
+            .month()
+            .day()
+        )
     }
 
     var widgetRemainingHoursInTwoDays: Int {
