@@ -13,6 +13,7 @@ import WidgetKit
 struct RecommendedTopicWidgetEntry: TimelineEntry {
     let date: Date
     let isWrittenToday: Bool?
+    let isFailed: Bool
     let topicEn: String
 }
 
@@ -24,21 +25,26 @@ struct RecommendedTopicWidgetProvider: TimelineProvider {
     }
 
     func getSnapshot(in context: Context, completion: @escaping (RecommendedTopicWidgetEntry) -> Void) {
-        completion(Self.entryFromStore() ?? .default)
+        completion(Self.entryFromStore(referenceDate: Date()) ?? .default)
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<RecommendedTopicWidgetEntry>) -> Void) {
-        let nextRefreshDate = Date().widgetNextRefreshDate
-        let entry = Self.entryFromStore() ?? .default
+        let referenceDate = Date()
+        let nextRefreshDate = referenceDate.widgetNextRefreshDate
+        let entry = Self.entryFromStore(referenceDate: referenceDate) ?? .failure(date: referenceDate)
         completion(Timeline(entries: [entry], policy: .after(nextRefreshDate)))
     }
 
-    private static func entryFromStore() -> RecommendedTopicWidgetEntry? {
-        guard let snapshot = WidgetContentStore.loadTopic() else { return nil }
+    private static func entryFromStore(referenceDate: Date) -> RecommendedTopicWidgetEntry? {
+        guard let snapshot = WidgetContentStore.loadTopic(),
+              Calendar.current.isDate(snapshot.updatedAt, inSameDayAs: referenceDate) else {
+            return nil
+        }
 
         return RecommendedTopicWidgetEntry(
-            date: snapshot.updatedAt,
+            date: referenceDate,
             isWrittenToday: snapshot.isWrittenToday,
+            isFailed: snapshot.isFailed,
             topicEn: snapshot.topicEn ?? RecommendedTopicWidgetEntry.failureTopicText
         )
     }
@@ -68,7 +74,7 @@ struct RecommendedTopicWidgetEntryView: View {
                 .font(layout.textFont)
                 .foregroundStyle(dateColor)
 
-            if isMediumFamily, let isWrittenToday = entry.isWrittenToday {
+            if isMediumFamily, !entry.isFailed, let isWrittenToday = entry.isWrittenToday {
                 Text("·")
                     .font(layout.textFont)
                     .foregroundStyle(.gray400)
@@ -121,14 +127,14 @@ struct RecommendedTopicWidgetEntryView: View {
         HStack(spacing: 4) {
             Image(.icTime16)
 
-            Text("\(Date().widgetRemainingHoursInTwoDays)시간 남음")
+            Text("\(entry.date.widgetRemainingHoursInTwoDays)시간 남음")
                 .font(.pretendard(.body_m_12))
                 .foregroundStyle(remainingTimeColor)
         }
     }
 
     private var formattedDate: String {
-        Date().widgetMonthDayWeekdayText
+        entry.date.widgetMonthDayWeekdayText
     }
 
     private func statusText(isWritten: Bool) -> String {
@@ -164,7 +170,7 @@ struct RecommendedTopicWidgetEntryView: View {
     }
 
     private var shouldShowRemainingTime: Bool {
-        entry.isWrittenToday != true
+        !entry.isFailed && entry.isWrittenToday != true
     }
 
     private var isMediumFamily: Bool {
@@ -229,9 +235,19 @@ struct RecommendedTopicWidget: Widget {
 private extension RecommendedTopicWidgetEntry {
     static let failureTopicText = "지금은 주제를 불러올 수 없어요"
 
+    static func failure(date: Date) -> RecommendedTopicWidgetEntry {
+        RecommendedTopicWidgetEntry(
+            date: date,
+            isWrittenToday: nil,
+            isFailed: true,
+            topicEn: failureTopicText
+        )
+    }
+
     static let `default` = RecommendedTopicWidgetEntry(
         date: .now,
         isWrittenToday: false,
+        isFailed: false,
         topicEn: "What surprised you today?"
     )
 }
