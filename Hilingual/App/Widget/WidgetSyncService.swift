@@ -16,7 +16,8 @@ final class WidgetSyncService {
     static let shared = WidgetSyncService()
 
     private var useCase: WidgetUseCase?
-    private var cancellables = Set<AnyCancellable>()
+    private var notificationCancellables = Set<AnyCancellable>()
+    private var syncCancellables = Set<AnyCancellable>()
 
     private init() {}
 
@@ -26,34 +27,37 @@ final class WidgetSyncService {
     }
 
     private func bindSessionNotifications() {
-        cancellables.removeAll()
+        notificationCancellables.removeAll()
 
         NotificationCenter.default.publisher(for: .hilingualSessionDidAuthenticate)
             .sink { [weak self] _ in
                 self?.syncTodayWidgets()
             }
-            .store(in: &cancellables)
+            .store(in: &notificationCancellables)
 
         NotificationCenter.default.publisher(for: .hilingualSessionDidEnd)
             .sink { [weak self] _ in
                 self?.saveLoggedOutWidgetState()
             }
-            .store(in: &cancellables)
+            .store(in: &notificationCancellables)
 
         NotificationCenter.default.publisher(for: .hilingualDiaryDidChange)
             .sink { [weak self] _ in
                 self?.syncTodayWidgets()
             }
-            .store(in: &cancellables)
+            .store(in: &notificationCancellables)
     }
 
     private func saveLoggedOutWidgetState() {
+        syncCancellables.removeAll()
         WidgetContentStore.saveLoggedOutStreak()
         WidgetCenter.shared.reloadTimelines(ofKind: "StreakWidget")
     }
 
     func syncTodayWidgets() {
         guard let useCase else { return }
+
+        syncCancellables.removeAll()
 
         let today = Date()
         let dateString = today.widgetAPIDateText
@@ -68,7 +72,7 @@ final class WidgetSyncService {
                 WidgetContentStore.saveTopic(entity, updatedAt: today)
                 WidgetCenter.shared.reloadTimelines(ofKind: "RecommendedTopicWidget")
             }
-            .store(in: &cancellables)
+            .store(in: &syncCancellables)
 
         useCase.fetchWidgetStreak(date: dateString)
             .sink { _ in
@@ -76,7 +80,7 @@ final class WidgetSyncService {
                 WidgetContentStore.saveStreak(entity, updatedAt: today)
                 WidgetCenter.shared.reloadTimelines(ofKind: "StreakWidget")
             }
-            .store(in: &cancellables)
+            .store(in: &syncCancellables)
     }
 }
 
