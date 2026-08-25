@@ -228,8 +228,8 @@ struct RecommendedTopicWidget: Widget {
         StaticConfiguration(kind: kind, provider: RecommendedTopicWidgetProvider()) { entry in
             RecommendedTopicWidgetEntryView(entry: entry)
         }
-        .configurationDisplayName("추천 주제")
-        .description("오늘의 영어 일기 주제를 확인해요.")
+        .configurationDisplayName("오늘의 추천 주제")
+        .description("오늘의 영어 일기 주제를 확인해요")
         .supportedFamilies([.systemSmall, .systemMedium])
         .contentMarginsDisabled()
     }

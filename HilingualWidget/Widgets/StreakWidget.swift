@@ -275,7 +275,6 @@ private enum StreakWidgetLayout {
 }
 
 // MARK: - Widget
-// TODO: 수아언니한테 확인받고 문구 교체!
 
 struct StreakWidget: Widget {
     let kind = "StreakWidget"
@@ -284,8 +283,8 @@ struct StreakWidget: Widget {
         StaticConfiguration(kind: kind, provider: StreakWidgetProvider()) { entry in
             StreakWidgetEntryView(entry: entry)
         }
-        .configurationDisplayName("연속 학습")
-        .description("하이링구얼 연속 학습일을 확인해요.")
+        .configurationDisplayName("연속 작성일 확인")
+        .description("나의 연속 작성 일수를 확인할 수 있어요")
         .supportedFamilies([.systemSmall, .systemMedium])
         .contentMarginsDisabled()
     }
