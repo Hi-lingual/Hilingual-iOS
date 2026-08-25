@@ -63,6 +63,7 @@ struct RecommendedTopicWidgetEntryView: View {
             headerView
             contentView
         }
+        .widgetURL(URL(string: "hilingual://app/home"))
         .containerBackground(for: .widget) {
             contentBackgroundColor
         }

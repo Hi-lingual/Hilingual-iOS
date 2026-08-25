@@ -44,6 +44,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             }
         }
 
+        if let url = connectionOptions.urlContexts.first?.url {
+            handleDeepLink(url)
+        }
+
         guard let windowScene = scene as? UIWindowScene else { return }
 
         let window = UIWindow(windowScene: windowScene)
@@ -71,6 +75,17 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                 window.rootViewController = navigation
             })
         }
+    }
+
+    func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
+        guard let url = URLContexts.first?.url else { return }
+        handleDeepLink(url)
+    }
+
+    @MainActor
+    private func handleDeepLink(_ url: URL) {
+        guard let destination = DeeplinkParser.parse(url: url) else { return }
+        DeeplinkManager.shared.pendingDestination = destination
     }
 
     // MARK: - Session Expired
