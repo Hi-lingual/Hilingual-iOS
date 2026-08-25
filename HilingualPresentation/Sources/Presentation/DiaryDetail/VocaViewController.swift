@@ -185,6 +185,7 @@ public final class RecommendedExpressionViewController: BaseUIViewController<Rec
             message: "단어장에 추가되었어요.",
             actionTitle: "보러가기"
         ) {
+            AmplitudeManager.shared.send(.vocabularyToastAction(action: .gotoVoca))
             tabBarController?.selectedIndex = 1
             navController?.popToRootViewController(animated: false)
         }

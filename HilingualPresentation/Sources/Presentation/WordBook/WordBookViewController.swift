@@ -278,6 +278,7 @@ public final class WordBookViewController: BaseUIViewController<WordBookViewMode
 
     @objc
     private func didTapUnmemorizedOnly() {
+        AmplitudeManager.shared.send(.clickVocabularyUnknownFilter)
         isUnmemorizedOnly.toggle()
         wordBookView.updateUnmemorizedOnly(isUnmemorizedOnly)
         unmemorizedOnlySubject.send(isUnmemorizedOnly)

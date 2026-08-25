@@ -12,6 +12,7 @@ public enum AnalyticsEvent {
     case clickDropdown(entryId: String, recommendedTopic: RecommendedTopic, clickCount: Int)
     case bookmarkAction(entryId: String, entrySource: EntrySource, action: BookmarkAction)
     case toastAction(action: ToastAction, toastId: ToastId, entryId: String)
+    case vocabularyToastAction(action: ToastAction)
     case clickBack(entryId: String, backSource: BackSource, page: Page)
     case clickVocabPronunciationBtnPlay(isFirstPlay: Bool, page: Page)
     case clickDiaryPronunciationBtnPlay(isFirstPlay: Bool, page: Page)
@@ -39,6 +40,7 @@ public enum AnalyticsEvent {
     )
     case clickPostDiary(entryId: String)
     case clickVocabularyReviewBtn
+    case clickVocabularyUnknownFilter
     case clickVocabularySortChanged(previousSortType: VocabSortType, sortType: VocabSortType)
     case clickVocaLookup(page: Page)
     case clickHomeMoreMenu(menuName: HomeMenuName)
@@ -80,6 +82,8 @@ extension AnalyticsEvent {
             return "click_feedback.post_diary"
         case .clickVocabularyReviewBtn:
             return "click_vocabulary.review_btn"
+        case .clickVocabularyUnknownFilter:
+            return "click_vocabulary.unknown_filter"
         case .clickVocabularySortChanged:
             return "click_vocabulary.sort_changed"
         case .clickVocaLookup:
@@ -104,6 +108,8 @@ extension AnalyticsEvent {
             return "click_widget"
         case .widgetCount:
             return "widget_count"
+        case .vocabularyToastAction:
+            return "toast_action"
         default:
             // 공통 이벤트: caseName을 snake_case로 변환
             // (click_back, click_empathy_action, click_dropdown, bookmark_action,
@@ -200,6 +206,11 @@ extension AnalyticsEvent {
                 "toast_id": toastId.analyticsPropertyName,
                 "entry_id": entryId
             ]
+        case let .vocabularyToastAction(action):
+            return [
+                "toast_action": action.analyticsPropertyName,
+                "page": Page.vocabulary.analyticsPropertyName
+            ]
         case let .clickPostDiary(entryId):
             return [
                 "entry_id": entryId
@@ -208,6 +219,10 @@ extension AnalyticsEvent {
             return [
                 "page": Page.vocabulary.analyticsPropertyName,
                 "section": Section.vocabCard.analyticsPropertyName
+            ]
+        case .clickVocabularyUnknownFilter:
+            return [
+                "page": Page.vocabulary.analyticsPropertyName
             ]
         case let .clickVocabularySortChanged(previousSortType, sortType):
             return [
@@ -504,6 +519,7 @@ extension AnalyticsEvent {
     public enum ToastAction: String, Sendable {
         case ctaClick = "cta_click"
         case autoDismiss = "auto_dismiss"
+        case gotoVoca = "goto_voca"
 
         var analyticsPropertyName: String { rawValue }
     }
