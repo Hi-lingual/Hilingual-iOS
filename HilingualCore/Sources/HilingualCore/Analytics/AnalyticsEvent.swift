@@ -49,6 +49,8 @@ public enum AnalyticsEvent {
     case clickHomeStreakRevive
     case clickOnboardingSkip(onboardingStep: Int)
     case clickErrorCTA(page: Page, action: ErrorCTAAction)
+    case clickWidget(widgetType: WidgetType)
+    case widgetCount(diaryTopicCount: Int, streakCount: Int, totalCount: Int)
 }
 
 extension AnalyticsEvent {
@@ -98,6 +100,10 @@ extension AnalyticsEvent {
             return "click_onboarding.skip"
         case let .clickErrorCTA(page, action):
             return "click_\(page.analyticsPropertyName).\(action.rawValue)"
+        case .clickWidget:
+            return "click_widget"
+        case .widgetCount:
+            return "widget_count"
         default:
             // 공통 이벤트: caseName을 snake_case로 변환
             // (click_back, click_empathy_action, click_dropdown, bookmark_action,
@@ -261,6 +267,16 @@ extension AnalyticsEvent {
             return [
                 "page": page.analyticsPropertyName
             ]
+        case let .clickWidget(widgetType):
+            return [
+                "widget_type": widgetType.analyticsPropertyName
+            ]
+        case let .widgetCount(diaryTopicCount, streakCount, totalCount):
+            return [
+                "widget_count_diary_topic": diaryTopicCount,
+                "widget_count_streak": streakCount,
+                "widget_count_total": totalCount
+            ]
         }
     }
 
@@ -385,6 +401,23 @@ extension AnalyticsEvent {
         case reminderDaily = "reminder_daily"
         case friendFollow = "friend_follow"
         case diaryEmpathy = "diary_empathy"
+
+        var analyticsPropertyName: String { rawValue }
+    }
+
+    public enum WidgetType: String, Sendable {
+        case diaryTopic = "diary_topic"
+        case streak = "streak"
+
+        public static func from(_ value: String?) -> WidgetType? {
+            guard let value else { return nil }
+
+            switch value {
+            case "diary_topic": return .diaryTopic
+            case "streak": return .streak
+            default: return nil
+            }
+        }
 
         var analyticsPropertyName: String { rawValue }
     }

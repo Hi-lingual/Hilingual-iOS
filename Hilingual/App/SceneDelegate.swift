@@ -85,7 +85,21 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     @MainActor
     private func handleDeepLink(_ url: URL) {
         guard let destination = DeeplinkParser.parse(url: url) else { return }
+
+        if let widgetType = widgetType(from: url) {
+            AmplitudeManager.shared.send(.clickWidget(widgetType: widgetType))
+        }
+
         DeeplinkManager.shared.pendingDestination = destination
+    }
+
+    private func widgetType(from url: URL) -> AnalyticsEvent.WidgetType? {
+        let components = URLComponents(url: url, resolvingAgainstBaseURL: false)
+        let widgetType = components?.queryItems?.first {
+            $0.name.lowercased() == "widget_type"
+        }?.value
+
+        return AnalyticsEvent.WidgetType.from(widgetType)
     }
 
     // MARK: - Session Expired
@@ -119,6 +133,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     func sceneDidBecomeActive(_ scene: UIScene) {
         WidgetSyncService.shared.syncTodayWidgets()
+        WidgetSyncService.shared.syncWidgetCountAnalytics()
     }
     func sceneWillResignActive(_ scene: UIScene) { }
     func sceneWillEnterForeground(_ scene: UIScene) { }

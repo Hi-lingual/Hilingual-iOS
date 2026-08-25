@@ -83,7 +83,7 @@ struct StreakWidgetEntryView: View {
             contentStack
             imageView
         }
-        .widgetURL(URL(string: "hilingual://app/home"))
+        .widgetURL(URL(string: "hilingual://app/home?widget_type=streak"))
         .containerBackground(for: .widget) {
             backgroundColor
         }
