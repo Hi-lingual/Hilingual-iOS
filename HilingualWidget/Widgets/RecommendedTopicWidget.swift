@@ -219,7 +219,6 @@ private enum RecommendedTopicWidgetLayout {
 }
 
 // MARK: - Widget
-// TODO: 수아언니한테 확인받고 문구 교체!
 
 struct RecommendedTopicWidget: Widget {
     let kind = "RecommendedTopicWidget"
