@@ -284,7 +284,7 @@ struct StreakWidget: Widget {
             StreakWidgetEntryView(entry: entry)
         }
         .configurationDisplayName("연속 작성일 확인")
-        .description("나의 연속 작성 일수를 확인할 수 있어요")
+        .description("나의 연속 작성일수를 확인할 수 있어요")
         .supportedFamilies([.systemSmall, .systemMedium])
         .contentMarginsDisabled()
     }
