@@ -63,6 +63,7 @@ struct RecommendedTopicWidgetEntryView: View {
             headerView
             contentView
         }
+        .widgetURL(URL(string: "hilingual://app/home?widget_type=diary_topic"))
         .containerBackground(for: .widget) {
             contentBackgroundColor
         }
@@ -218,7 +219,6 @@ private enum RecommendedTopicWidgetLayout {
 }
 
 // MARK: - Widget
-// TODO: 수아언니한테 확인받고 문구 교체!
 
 struct RecommendedTopicWidget: Widget {
     let kind = "RecommendedTopicWidget"
@@ -227,8 +227,8 @@ struct RecommendedTopicWidget: Widget {
         StaticConfiguration(kind: kind, provider: RecommendedTopicWidgetProvider()) { entry in
             RecommendedTopicWidgetEntryView(entry: entry)
         }
-        .configurationDisplayName("추천 주제")
-        .description("오늘의 영어 일기 주제를 확인해요.")
+        .configurationDisplayName("오늘의 추천 주제")
+        .description("오늘의 영어 일기 주제를 확인해요")
         .supportedFamilies([.systemSmall, .systemMedium])
         .contentMarginsDisabled()
     }

@@ -11,7 +11,7 @@ public enum AnalyticsEvent {
     case clickEmpathyAction(entryId: String, action: EmpathyAction)
     case clickDropdown(entryId: String, recommendedTopic: RecommendedTopic, clickCount: Int)
     case bookmarkAction(entryId: String, entrySource: EntrySource, action: BookmarkAction)
-    case toastAction(action: ToastAction, toastId: ToastId, entryId: String)
+    case toastAction(action: ToastAction, toastId: ToastId, entryId: String? = nil, page: Page? = nil)
     case clickBack(entryId: String, backSource: BackSource, page: Page)
     case clickVocabPronunciationBtnPlay(isFirstPlay: Bool, page: Page)
     case clickDiaryPronunciationBtnPlay(isFirstPlay: Bool, page: Page)
@@ -39,6 +39,7 @@ public enum AnalyticsEvent {
     )
     case clickPostDiary(entryId: String)
     case clickVocabularyReviewBtn
+    case clickVocabularyUnknownFilter
     case clickVocabularySortChanged(previousSortType: VocabSortType, sortType: VocabSortType)
     case clickVocaLookup(page: Page)
     case clickHomeMoreMenu(menuName: HomeMenuName)
@@ -49,6 +50,8 @@ public enum AnalyticsEvent {
     case clickHomeStreakRevive
     case clickOnboardingSkip(onboardingStep: Int)
     case clickErrorCTA(page: Page, action: ErrorCTAAction)
+    case clickWidget(widgetType: WidgetType)
+    case widgetCount(diaryTopicCount: Int, streakCount: Int, totalCount: Int)
 }
 
 extension AnalyticsEvent {
@@ -78,6 +81,8 @@ extension AnalyticsEvent {
             return "click_feedback.post_diary"
         case .clickVocabularyReviewBtn:
             return "click_vocabulary.review_btn"
+        case .clickVocabularyUnknownFilter:
+            return "click_vocabulary.unknown_filter"
         case .clickVocabularySortChanged:
             return "click_vocabulary.sort_changed"
         case .clickVocaLookup:
@@ -98,6 +103,10 @@ extension AnalyticsEvent {
             return "click_onboarding.skip"
         case let .clickErrorCTA(page, action):
             return "click_\(page.analyticsPropertyName).\(action.rawValue)"
+        case .clickWidget:
+            return "click_widget"
+        case .widgetCount:
+            return "widget_count"
         default:
             // 공통 이벤트: caseName을 snake_case로 변환
             // (click_back, click_empathy_action, click_dropdown, bookmark_action,
@@ -188,12 +197,18 @@ extension AnalyticsEvent {
                 "entry_source": entrySource.analyticsPropertyName,
                 "bookmark_action": action.analyticsPropertyName
             ]
-        case let .toastAction(action, toastId, entryId):
-            return [
+        case let .toastAction(action, toastId, entryId, page):
+            var props: [String: Any] = [
                 "toast_action": action.analyticsPropertyName,
-                "toast_id": toastId.analyticsPropertyName,
-                "entry_id": entryId
+                "toast_id": toastId.analyticsPropertyName
             ]
+            if let entryId {
+                props["entry_id"] = entryId
+            }
+            if let page {
+                props["page"] = page.analyticsPropertyName
+            }
+            return props
         case let .clickPostDiary(entryId):
             return [
                 "entry_id": entryId
@@ -202,6 +217,10 @@ extension AnalyticsEvent {
             return [
                 "page": Page.vocabulary.analyticsPropertyName,
                 "section": Section.vocabCard.analyticsPropertyName
+            ]
+        case .clickVocabularyUnknownFilter:
+            return [
+                "page": Page.vocabulary.analyticsPropertyName
             ]
         case let .clickVocabularySortChanged(previousSortType, sortType):
             return [
@@ -260,6 +279,16 @@ extension AnalyticsEvent {
         case let .clickErrorCTA(page, _):
             return [
                 "page": page.analyticsPropertyName
+            ]
+        case let .clickWidget(widgetType):
+            return [
+                "widget_type": widgetType.analyticsPropertyName
+            ]
+        case let .widgetCount(diaryTopicCount, streakCount, totalCount):
+            return [
+                "widget_count_diary_topic": diaryTopicCount,
+                "widget_count_streak": streakCount,
+                "widget_count_total": totalCount
             ]
         }
     }
@@ -389,6 +418,23 @@ extension AnalyticsEvent {
         var analyticsPropertyName: String { rawValue }
     }
 
+    public enum WidgetType: String, Sendable {
+        case diaryTopic = "diary_topic"
+        case streak = "streak"
+
+        public static func from(_ value: String?) -> WidgetType? {
+            guard let value else { return nil }
+
+            switch value {
+            case "diary_topic": return .diaryTopic
+            case "streak": return .streak
+            default: return nil
+            }
+        }
+
+        var analyticsPropertyName: String { rawValue }
+    }
+
     public enum AdResult: String, Sendable {
         case completed = "completed"
         case dismissed = "dismissed"
@@ -471,12 +517,14 @@ extension AnalyticsEvent {
     public enum ToastAction: String, Sendable {
         case ctaClick = "cta_click"
         case autoDismiss = "auto_dismiss"
+        case gotoVoca = "goto_voca"
 
         var analyticsPropertyName: String { rawValue }
     }
 
     public enum ToastId: String, Sendable {
         case diaryPostSuccess = "diary_post_success"
+        case vocaAddSuccess = "voca_add_success"
 
         var analyticsPropertyName: String { rawValue }
     }

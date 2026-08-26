@@ -44,6 +44,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             }
         }
 
+        if let url = connectionOptions.urlContexts.first?.url {
+            handleDeepLink(url)
+        }
+
         guard let windowScene = scene as? UIWindowScene else { return }
 
         let window = UIWindow(windowScene: windowScene)
@@ -71,6 +75,31 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                 window.rootViewController = navigation
             })
         }
+    }
+
+    func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
+        guard let url = URLContexts.first?.url else { return }
+        handleDeepLink(url)
+    }
+
+    @MainActor
+    private func handleDeepLink(_ url: URL) {
+        guard let destination = DeeplinkParser.parse(url: url) else { return }
+
+        if let widgetType = widgetType(from: url) {
+            AmplitudeManager.shared.send(.clickWidget(widgetType: widgetType))
+        }
+
+        DeeplinkManager.shared.pendingDestination = destination
+    }
+
+    private func widgetType(from url: URL) -> AnalyticsEvent.WidgetType? {
+        let components = URLComponents(url: url, resolvingAgainstBaseURL: false)
+        let widgetType = components?.queryItems?.first {
+            $0.name.lowercased() == "widget_type"
+        }?.value
+
+        return AnalyticsEvent.WidgetType.from(widgetType)
     }
 
     // MARK: - Session Expired
@@ -104,6 +133,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     func sceneDidBecomeActive(_ scene: UIScene) {
         WidgetSyncService.shared.syncTodayWidgets()
+        WidgetSyncService.shared.syncWidgetCountAnalytics()
     }
     func sceneWillResignActive(_ scene: UIScene) { }
     func sceneWillEnterForeground(_ scene: UIScene) { }
