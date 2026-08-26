@@ -11,8 +11,7 @@ public enum AnalyticsEvent {
     case clickEmpathyAction(entryId: String, action: EmpathyAction)
     case clickDropdown(entryId: String, recommendedTopic: RecommendedTopic, clickCount: Int)
     case bookmarkAction(entryId: String, entrySource: EntrySource, action: BookmarkAction)
-    case toastAction(action: ToastAction, toastId: ToastId, entryId: String)
-    case vocabularyToastAction(action: ToastAction)
+    case toastAction(action: ToastAction, toastId: ToastId, entryId: String? = nil, page: Page? = nil)
     case clickBack(entryId: String, backSource: BackSource, page: Page)
     case clickVocabPronunciationBtnPlay(isFirstPlay: Bool, page: Page)
     case clickDiaryPronunciationBtnPlay(isFirstPlay: Bool, page: Page)
@@ -108,8 +107,6 @@ extension AnalyticsEvent {
             return "click_widget"
         case .widgetCount:
             return "widget_count"
-        case .vocabularyToastAction:
-            return "toast_action"
         default:
             // 공통 이벤트: caseName을 snake_case로 변환
             // (click_back, click_empathy_action, click_dropdown, bookmark_action,
@@ -200,17 +197,18 @@ extension AnalyticsEvent {
                 "entry_source": entrySource.analyticsPropertyName,
                 "bookmark_action": action.analyticsPropertyName
             ]
-        case let .toastAction(action, toastId, entryId):
-            return [
+        case let .toastAction(action, toastId, entryId, page):
+            var props: [String: Any] = [
                 "toast_action": action.analyticsPropertyName,
-                "toast_id": toastId.analyticsPropertyName,
-                "entry_id": entryId
+                "toast_id": toastId.analyticsPropertyName
             ]
-        case let .vocabularyToastAction(action):
-            return [
-                "toast_action": action.analyticsPropertyName,
-                "page": Page.vocabulary.analyticsPropertyName
-            ]
+            if let entryId {
+                props["entry_id"] = entryId
+            }
+            if let page {
+                props["page"] = page.analyticsPropertyName
+            }
+            return props
         case let .clickPostDiary(entryId):
             return [
                 "entry_id": entryId
@@ -526,6 +524,7 @@ extension AnalyticsEvent {
 
     public enum ToastId: String, Sendable {
         case diaryPostSuccess = "diary_post_success"
+        case vocaAddSuccess = "voca_add_success"
 
         var analyticsPropertyName: String { rawValue }
     }
