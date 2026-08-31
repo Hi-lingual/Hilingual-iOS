@@ -45,12 +45,12 @@ final class CustomCalendarCell: UICollectionViewCell {
 
     private func setupLayout() {
         bubbleView.snp.makeConstraints {
-            $0.center.equalToSuperview()
+            $0.top.centerX.equalToSuperview()
             $0.size.equalTo(34)
         }
 
         dayLabel.snp.makeConstraints {
-            $0.center.equalToSuperview()
+            $0.center.equalTo(bubbleView)
         }
 
         dotView.snp.makeConstraints {

@@ -52,7 +52,7 @@ final class CalendarContentView: UICollectionView {
     init() {
         let layout = UICollectionViewFlowLayout()
         layout.minimumInteritemSpacing = 0
-        layout.minimumLineSpacing = 14
+        layout.minimumLineSpacing = 6
         layout.estimatedItemSize = .zero
 
         super.init(frame: .zero, collectionViewLayout: layout)
@@ -147,7 +147,7 @@ final class CalendarContentView: UICollectionView {
         guard width > 0 else { return }
 
         (collectionViewLayout as? UICollectionViewFlowLayout)?.itemSize =
-            CGSize(width: width, height: 34)
+            CGSize(width: width, height: 42)
     }
 }
 
@@ -232,8 +232,8 @@ extension CalendarContentView {
     }
 
     override var intrinsicContentSize: CGSize {
-        let rowHeight: CGFloat = 34
-        let lineSpacing: CGFloat = 14
+        let rowHeight: CGFloat = 42
+        let lineSpacing: CGFloat = 6
 
         let height =
             CGFloat(rowCount) * rowHeight +
