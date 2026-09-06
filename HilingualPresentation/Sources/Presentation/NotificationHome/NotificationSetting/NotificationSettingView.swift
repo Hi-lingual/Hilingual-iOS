@@ -47,7 +47,6 @@ final class NotificationSettingView: BaseUIView {
     
     private let reminderSubtitleLabel: UILabel = {
         let label = UILabel()
-        label.text = "설정한 시간에 리마인드 알림을 보내드려요."
         label.font = .pretendard(.cap_r_12)
         label.textColor = .gray400
         return label
