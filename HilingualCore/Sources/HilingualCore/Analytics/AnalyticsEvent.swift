@@ -411,7 +411,9 @@ extension AnalyticsEvent {
     }
 
     public enum NotificationType: String, Sendable {
-        case reminderDaily = "reminder_daily"
+        case reminderStreak = "reminder_streak"
+        case reminderWinback = "reminder_winback"
+        case reminderCustom = "reminder_custom"
         case friendFollow = "friend_follow"
         case diaryEmpathy = "diary_empathy"
 
