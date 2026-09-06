@@ -46,4 +46,5 @@ public protocol ViewControllerFactory {
     func makeNicknameEditViewController(currentNickname: String) -> NicknameEditViewController
     func makeBlockUserViewController() -> BlockUserViewController
     func makeNotificationSettingViewController() -> NotificationSettingViewController
+    func makeReminderTimeSettingViewController() -> ReminderTimeSettingViewController
 }
