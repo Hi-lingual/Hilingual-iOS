@@ -33,8 +33,8 @@ public final class DeeplinkManager {
         case .userProfile(let userId):
             let vc = di.makeUserFeedProfileViewController(userId: Int64(userId))
             nav.pushViewController(vc, animated: true)
-
-        case .home:
+            
+        case .home, .reminderStreak, .reminderWinback, .reminderCustom:
             nav.popToRootViewController(animated: true)
         }
     }
