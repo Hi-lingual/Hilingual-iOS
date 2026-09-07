@@ -144,8 +144,8 @@ public final class DiaryReminderLocalDataSource {
             guard let self else { return }
             
             let content = UNMutableNotificationContent()
-            content.title = "일기 쓸 시간이에요"
-            content.body = "오늘 하루는 어땠나요? 잊지 말고 일기를 남겨보세요."
+            content.title = "일기 쓸 시간이에요 ⏰"
+            content.body = " 지금 떠오르는 생각을 영어로 기록해 보세요."
             content.sound = .default
             
             var comps = self.calendar.dateComponents([.year, .month, .day], from: date)
