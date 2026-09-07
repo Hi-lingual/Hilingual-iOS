@@ -6,11 +6,14 @@
 //
 
 import Combine
+import Foundation
 
 public protocol DiaryReminderRepository {
     func isReminderEnabled() -> Bool
     func setReminderEnabled(_ isEnabled: Bool)
     func fetchReminderConfig() -> (hour: Int, minute: Int, weekdays: Set<Int>)?
     func scheduleReminder(hour: Int, minute: Int, weekdays: Set<Int>) -> AnyPublisher<Void, Error>
+    func refreshUpcomingReminders() -> AnyPublisher<Void, Error>
+    func skipTodayReminder(date: Date)
     func cancelReminder()
 }

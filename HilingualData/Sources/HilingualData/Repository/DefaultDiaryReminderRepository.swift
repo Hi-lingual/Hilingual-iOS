@@ -7,6 +7,7 @@
 
 import Combine
 import HilingualDomain
+import Foundation
 
 public final class DefaultDiaryReminderRepository: DiaryReminderRepository {
 
@@ -21,6 +22,14 @@ public final class DefaultDiaryReminderRepository: DiaryReminderRepository {
 
     public func scheduleReminder(hour: Int, minute: Int, weekdays: Set<Int>) -> AnyPublisher<Void, Error> {
         localDataSource.schedule(hour: hour, minute: minute, weekdays: weekdays)
+    }
+    
+    public func refreshUpcomingReminders() -> AnyPublisher<Void, Error> {
+        localDataSource.refreshUpcomingOccurrences()
+    }
+
+    public func skipTodayReminder(date: Date) {
+        localDataSource.cancelReminder(for: date)
     }
 
     public func cancelReminder() { localDataSource.cancel() }

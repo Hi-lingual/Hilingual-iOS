@@ -17,10 +17,13 @@ public final class DiaryReminderLocalDataSource {
         static let scheduledWeekdaysKey = "diaryReminderScheduledWeekdays"
         static let hourKey = "diaryReminderHour"
         static let minuteKey = "diaryReminderMinute"
+        static let scheduledDateKeysKey = "diaryReminderScheduledDateKeys"
+        static let rollingWindowDays = 14
     }
 
     private let notificationCenter: UNUserNotificationCenter
     private let userDefaults: UserDefaults
+    private let calendar = Calendar.current
 
     public init(
         notificationCenter: UNUserNotificationCenter = .current(),
@@ -51,53 +54,123 @@ public final class DiaryReminderLocalDataSource {
     }
 
     public func schedule(hour: Int, minute: Int, weekdays: Set<Int>) -> AnyPublisher<Void, Error> {
-        cancel()
+        cancelAll()
 
-        let publishers = weekdays.map { scheduleSingle(weekday: $0, hour: hour, minute: minute) }
         userDefaults.set(Array(weekdays), forKey: Constant.scheduledWeekdaysKey)
         userDefaults.set(hour, forKey: Constant.hourKey)
         userDefaults.set(minute, forKey: Constant.minuteKey)
 
-        return Publishers.MergeMany(publishers)
-            .collect()
-            .map { _ in () }
-            .eraseToAnyPublisher()
+        return scheduleUpcomingOccurrences(hour: hour, minute: minute, weekdays: weekdays)
+    }
+    
+    public func refreshUpcomingOccurrences() -> AnyPublisher<Void, Error> {
+        guard let config = fetchConfig() else {
+            return Just(()).setFailureType(to: Error.self).eraseToAnyPublisher()
+        }
+        return scheduleUpcomingOccurrences(hour: config.hour, minute: config.minute, weekdays: config.weekdays)
+    }
+
+    public func cancelReminder(for date: Date) {
+        let key = dateKey(date)
+        var scheduledKeys = Set(userDefaults.stringArray(forKey: Constant.scheduledDateKeysKey) ?? [])
+        guard scheduledKeys.contains(key) else { return }
+
+        notificationCenter.removePendingNotificationRequests(withIdentifiers: ["\(Constant.identifierPrefix)\(key)"])
+        scheduledKeys.remove(key)
+        userDefaults.set(Array(scheduledKeys), forKey: Constant.scheduledDateKeysKey)
     }
 
     public func cancel() {
-        let scheduled = userDefaults.array(forKey: Constant.scheduledWeekdaysKey) as? [Int] ?? []
-        let identifiers = scheduled.map { "\(Constant.identifierPrefix)\($0)" }
-        notificationCenter.removePendingNotificationRequests(withIdentifiers: identifiers)
+        cancelAll()
         userDefaults.removeObject(forKey: Constant.scheduledWeekdaysKey)
         userDefaults.removeObject(forKey: Constant.hourKey)
         userDefaults.removeObject(forKey: Constant.minuteKey)
     }
-
-    private func scheduleSingle(weekday: Int, hour: Int, minute: Int) -> AnyPublisher<Void, Error> {
+    
+    // MARK: - Private
+    
+    private func cancelAll() {
+        let scheduledKeys = userDefaults.stringArray(forKey: Constant.scheduledDateKeysKey) ?? []
+        let identifiers = scheduledKeys.map { "\(Constant.identifierPrefix)\($0)" }
+        notificationCenter.removePendingNotificationRequests(withIdentifiers: identifiers)
+        userDefaults.removeObject(forKey: Constant.scheduledDateKeysKey)
+    }
+    
+    private func scheduleUpcomingOccurrences(
+        hour: Int,
+        minute: Int,
+        weekdays: Set<Int>
+    ) -> AnyPublisher<Void, Error> {
+        let today = calendar.startOfDay(for: Date())
+        var alreadyScheduled = Set(userDefaults.stringArray(forKey: Constant.scheduledDateKeysKey) ?? [])
+        var targetDates: [Date] = []
+        
+        for offset in 0..<Constant.rollingWindowDays {
+            guard let date = calendar.date(byAdding: .day, value: offset, to: today) else { continue }
+            let weekday = calendar.component(.weekday, from: date)
+            guard weekdays.contains(weekday) else { continue }
+            
+            if offset == 0 {
+                var comps = calendar.dateComponents([.year, .month, .day], from: date)
+                comps.hour = hour
+                comps.minute = minute
+                if let fireDate = calendar.date(from: comps), fireDate <= Date() { continue }
+            }
+            
+            let key = dateKey(date)
+            guard !alreadyScheduled.contains(key) else { continue }
+            targetDates.append(date)
+        }
+        
+        guard !targetDates.isEmpty else {
+            return Just(()).setFailureType(to: Error.self).eraseToAnyPublisher()
+        }
+        
+        let publishers = targetDates.map { scheduleSingle(date: $0, hour: hour, minute: minute) }
+        
+        return Publishers.MergeMany(publishers)
+            .collect()
+            .handleEvents(receiveOutput: { [weak self] _ in
+                guard let self else { return }
+                targetDates.forEach { alreadyScheduled.insert(self.dateKey($0)) }
+                self.userDefaults.set(Array(alreadyScheduled), forKey: Constant.scheduledDateKeysKey)
+            })
+            .map { _ in () }
+            .eraseToAnyPublisher()
+    }
+    
+    private func scheduleSingle(date: Date, hour: Int, minute: Int) -> AnyPublisher<Void, Error> {
         Future { [weak self] promise in
             guard let self else { return }
-
+            
             let content = UNMutableNotificationContent()
             content.title = "일기 쓸 시간이에요"
             content.body = "오늘 하루는 어땠나요? 잊지 말고 일기를 남겨보세요."
             content.sound = .default
-
-            var dateComponents = DateComponents()
-            dateComponents.weekday = weekday
-            dateComponents.hour = hour
-            dateComponents.minute = minute
-
-            let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: true)
+            
+            var comps = self.calendar.dateComponents([.year, .month, .day], from: date)
+            comps.hour = hour
+            comps.minute = minute
+            
+            let trigger = UNCalendarNotificationTrigger(dateMatching: comps, repeats: false)
             let request = UNNotificationRequest(
-                identifier: "\(Constant.identifierPrefix)\(weekday)",
+                identifier: "\(Constant.identifierPrefix)\(self.dateKey(date))",
                 content: content,
                 trigger: trigger
             )
-
+            
             self.notificationCenter.add(request) { error in
                 error == nil ? promise(.success(())) : promise(.failure(error!))
             }
         }
         .eraseToAnyPublisher()
+    }
+    
+    private func dateKey(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.calendar = Calendar(identifier: .gregorian)
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "yyyyMMdd"
+        return formatter.string(from: date)
     }
 }
