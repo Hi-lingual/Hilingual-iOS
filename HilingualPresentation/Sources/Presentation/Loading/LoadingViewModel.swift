@@ -240,12 +240,8 @@ public final class LoadingViewModel: BaseViewModel {
     }
 
     private func skipTodayReminderIfWritingToday() {
-        guard let date else { return }
-        let formatter = DateFormatter()
-        formatter.calendar = Calendar(identifier: .gregorian)
-        formatter.locale = Locale(identifier: "en_US_POSIX")
-        formatter.dateFormat = "yyyy-MM-dd"
-        guard let writtenDate = formatter.date(from: date),
+        guard let date,
+              let writtenDate = DisplayDateFormatter.parseAPIDate(date),
               Calendar.current.isDateInToday(writtenDate) else { return }
 
         diaryReminderUseCase.skipTodayReminderIfNeeded(for: writtenDate)
