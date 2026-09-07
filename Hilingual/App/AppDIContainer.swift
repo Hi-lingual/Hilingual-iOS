@@ -561,7 +561,8 @@ extension AppDIContainer {
         return LoadingViewModel(
             diaryWritingUseCase: makeDiaryWritingUseCase(),
             uploadImageUseCase: makeUploadImageUseCase(),
-            diaryAdWatchUseCase: makeDiaryAdWatchUseCase()
+            diaryAdWatchUseCase: makeDiaryAdWatchUseCase(),
+            diaryReminderUseCase: makeDiaryReminderUseCase()
         )
     }
 }

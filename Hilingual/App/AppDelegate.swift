@@ -99,12 +99,13 @@ extension AppDelegate: @preconcurrency UNUserNotificationCenterDelegate {
         }
 
         print("[Deeplink] 푸시 탭 → \(destination)")
-
-        let analytics = destination.pushNotificationAnalytics
-        AmplitudeManager.shared.send(
-            .clickPushNotification(notificationType: analytics.type, page: analytics.page)
-        )
-
+        
+        if let analytics = destination.pushNotificationAnalytics {
+            AmplitudeManager.shared.send(
+                .clickPushNotification(notificationType: analytics.type, page: analytics.page)
+            )
+        }
+        
         DeeplinkManager.shared.pendingDestination = destination
         completionHandler()
     }
