@@ -141,12 +141,19 @@ public final class DiaryReminderLocalDataSource {
     
     private func scheduleSingle(date: Date, hour: Int, minute: Int) -> AnyPublisher<Void, Error> {
         Future { [weak self] promise in
-            guard let self else { return }
+            guard let self else {
+                promise(.failure(CancellationError()))
+                return
+            }
             
             let content = UNMutableNotificationContent()
             content.title = "일기 쓸 시간이에요 ⏰"
             content.body = "지금 떠오르는 생각을 영어로 기록해 보세요."
             content.sound = .default
+            content.userInfo = [
+                "link": "hilingual://app/home",
+                "notification_type": "reminder_custom"
+            ]
             
             var comps = self.calendar.dateComponents([.year, .month, .day], from: date)
             comps.hour = hour

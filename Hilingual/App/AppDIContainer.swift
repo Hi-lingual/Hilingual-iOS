@@ -653,7 +653,7 @@ extension AppDIContainer {
         return DefaultDiaryReminderRepository(localDataSource: makeDiaryReminderLocalDataSource())
     }
     
-    private func makeDiaryReminderUseCase() -> DiaryReminderUseCase {
+    func makeDiaryReminderUseCase() -> DiaryReminderUseCase {
         return DefaultDiaryReminderUseCase(repository: makeDiaryReminderRepository())
     }
     
