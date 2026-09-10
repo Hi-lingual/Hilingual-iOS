@@ -12,7 +12,7 @@ public protocol DiaryReminderUseCase {
     func fetchReminderStatus() -> AnyPublisher<Bool, Never>
     func fetchReminderConfig() -> AnyPublisher<(hour: Int, minute: Int, weekdays: Set<Int>)?, Never>
     func saveReminder(hour: Int, minute: Int, weekdays: Set<Int>) -> AnyPublisher<Void, Error>
-    func toggleReminder(isOn: Bool) -> AnyPublisher<Void, Error>
+    func disableReminder()
     func refreshUpcomingReminders() -> AnyPublisher<Void, Error>
     func skipTodayReminderIfNeeded(for date: Date)
 }
@@ -37,10 +37,9 @@ public final class DefaultDiaryReminderUseCase: DiaryReminderUseCase {
             .eraseToAnyPublisher()
     }
 
-    public func toggleReminder(isOn: Bool) -> AnyPublisher<Void, Error> {
+    public func disableReminder() {
         repository.cancelReminder()
         repository.setReminderEnabled(false)
-        return Just(()).setFailureType(to: Error.self).eraseToAnyPublisher()
     }
     
     public func fetchReminderConfig() -> AnyPublisher<(hour: Int, minute: Int, weekdays: Set<Int>)?, Never> {

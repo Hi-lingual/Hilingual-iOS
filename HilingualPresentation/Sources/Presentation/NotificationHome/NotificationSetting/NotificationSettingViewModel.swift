@@ -161,17 +161,9 @@ public final class NotificationSettingViewModel: BaseViewModel {
     }
     
     private func disableReminder() {
-        diaryReminderUseCase.toggleReminder(isOn: false)
-            .receive(on: DispatchQueue.main)
-            .sink(receiveCompletion: { [weak self] completion in
-                if case .failure(let error) = completion {
-                    self?.errorSubject.send(error)
-                }
-            }, receiveValue: { [weak self] in
-                self?.reminderSubject.send(false)
-                self?.reminderConfigSubject.send(nil) 
-            })
-            .store(in: &cancellables)
+        diaryReminderUseCase.disableReminder()
+        reminderSubject.send(false)
+        reminderConfigSubject.send(nil)
     }
     
     private static func formatReminderSubtitle(hour: Int, minute: Int, weekdays: Set<Int>) -> String {
