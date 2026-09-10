@@ -33,18 +33,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
         if let response = connectionOptions.notificationResponse {
             let userInfo = response.notification.request.content.userInfo
-            if let link = userInfo["link"] as? String,
-               let url = URL(string: link),
-               let destination = DeeplinkParser.parse(
-                url: url,
-                notificationType: userInfo["notification_type"] as? String
-               ) {
-                if let analytics = destination.pushNotificationAnalytics {
-                    AmplitudeManager.shared.send(
-                        .clickPushNotification(notificationType: analytics.type, page: analytics.page)
-                    )
-                }
-                DeeplinkManager.shared.pendingDestination = destination
+            if DeeplinkManager.shared.handlePushTap(userInfo: userInfo) == nil {
+                print("⚠️ link 파싱 실패")
             }
         }
 
@@ -134,10 +124,15 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
 
     // MARK: - Scene Lifecycle (기본 제공 메서드)
-
+    
     func sceneDidBecomeActive(_ scene: UIScene) {
         WidgetSyncService.shared.syncTodayWidgets()
         WidgetSyncService.shared.syncWidgetCountAnalytics()
+        
+        AppDIContainer.shared.makeDiaryReminderUseCase()
+            .refreshUpcomingReminders()
+            .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
+            .store(in: &cancellables)
     }
     func sceneWillResignActive(_ scene: UIScene) { }
     func sceneWillEnterForeground(_ scene: UIScene) { }

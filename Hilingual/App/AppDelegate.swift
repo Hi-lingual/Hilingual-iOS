@@ -89,24 +89,13 @@ extension AppDelegate: @preconcurrency UNUserNotificationCenterDelegate {
         let userInfo = response.notification.request.content.userInfo
         print("🔔 [푸시 탭됨!]")
         print("📱 전체 데이터: \(userInfo)")
-        
-        guard let link = userInfo["link"] as? String,
-              let url = URL(string: link),
-              let destination = DeeplinkParser.parse(url: url) else {
+
+        guard let destination = DeeplinkManager.shared.handlePushTap(userInfo: userInfo) else {
             print("⚠️ link 파싱 실패")
             completionHandler()
             return
         }
-
         print("[Deeplink] 푸시 탭 → \(destination)")
-        
-        if let analytics = destination.pushNotificationAnalytics {
-            AmplitudeManager.shared.send(
-                .clickPushNotification(notificationType: analytics.type, page: analytics.page)
-            )
-        }
-        
-        DeeplinkManager.shared.pendingDestination = destination
         completionHandler()
     }
 }
