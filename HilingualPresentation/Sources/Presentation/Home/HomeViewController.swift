@@ -21,7 +21,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     private let homeView = HomeView()
     let dialog = Dialog()
     private let homeModal = HomeModal()
-    private let notificationPermissionModal = NotificationPermissionModalView()
+    private let notificationPermissionModal = NotificationReminderModalView()
     private let input = HomeViewModel.Input()
     private var currentDateRequestCancellable: AnyCancellable?
     private var pendingDraftDate: Date?

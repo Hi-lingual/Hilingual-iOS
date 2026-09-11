@@ -20,6 +20,7 @@ public final class LoadingViewModel: BaseViewModel {
     private let diaryWritingUseCase: DiaryWritingUseCase
     private let uploadImageUseCase: UploadImageUseCase
     private let diaryAdWatchUseCase: DiaryAdWatchUseCase
+    private let diaryReminderUseCase: DiaryReminderUseCase
     
     // MARK: - Properties
     
@@ -45,11 +46,13 @@ public final class LoadingViewModel: BaseViewModel {
     public init(
         diaryWritingUseCase: DiaryWritingUseCase,
         uploadImageUseCase: UploadImageUseCase,
-        diaryAdWatchUseCase: DiaryAdWatchUseCase
+        diaryAdWatchUseCase: DiaryAdWatchUseCase,
+        diaryReminderUseCase: DiaryReminderUseCase
     ) {
         self.diaryWritingUseCase = diaryWritingUseCase
         self.uploadImageUseCase = uploadImageUseCase
         self.diaryAdWatchUseCase = diaryAdWatchUseCase
+        self.diaryReminderUseCase = diaryReminderUseCase
         super.init()
     }
 
@@ -226,6 +229,7 @@ public final class LoadingViewModel: BaseViewModel {
     private func handleFeedbackCompleted(success: Bool) async {
         if success {
             clearRecoveryDateIfNeeded()
+            skipTodayReminderIfWritingToday()
             errorCount = 0
             NotificationCenter.default.post(name: .hilingualDiaryDidChange, object: nil)
             stateSubject.send(.success)
@@ -233,5 +237,13 @@ public final class LoadingViewModel: BaseViewModel {
             errorCount += 1
             stateSubject.send(.error)
         }
+    }
+
+    private func skipTodayReminderIfWritingToday() {
+        guard let date,
+              let writtenDate = DisplayDateFormatter.parseAPIDate(date),
+              Calendar.current.isDateInToday(writtenDate) else { return }
+
+        diaryReminderUseCase.skipTodayReminderIfNeeded(for: writtenDate)
     }
 }

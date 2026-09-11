@@ -75,7 +75,7 @@ public enum DisplayDateFormatter {
         return formatter.date(from: string)
     }
 
-    private static func parseAPIDate(_ string: String) -> Date? {
+    public static func parseAPIDate(_ string: String) -> Date? {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "en_US_POSIX")
         formatter.calendar = Calendar(identifier: .gregorian)

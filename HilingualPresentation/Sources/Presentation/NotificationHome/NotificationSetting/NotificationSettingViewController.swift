@@ -14,6 +14,7 @@ public final class NotificationSettingViewController: BaseUIViewController<Notif
     
     private var isMarketingOn: Bool = false
     private var isFeedOn: Bool = false
+    private var isReminderOn: Bool = false
 
     // MARK: - UI
 
@@ -24,6 +25,7 @@ public final class NotificationSettingViewController: BaseUIViewController<Notif
 
     private let marketingToggledSubject = PassthroughSubject<Void, Never>()
     private let feedToggledSubject = PassthroughSubject<Void, Never>()
+    private let reminderToggledSubject = PassthroughSubject<Void, Never>()
     private let reloadSubject = PassthroughSubject<Void, Never>()
     private let viewWillAppearSubject = PassthroughSubject<Void, Never>()
     private let permissionSubject = CurrentValueSubject<Bool, Never>(true)
@@ -52,6 +54,7 @@ public final class NotificationSettingViewController: BaseUIViewController<Notif
             viewDidLoad: viewWillAppearSubject.merge(with: reloadSubject).eraseToAnyPublisher(),
             marketingToggled: marketingToggledSubject.eraseToAnyPublisher(),
             feedToggled: feedToggledSubject.eraseToAnyPublisher(),
+            reminderToggled: reminderToggledSubject.eraseToAnyPublisher(),
             isSystemPermissionGranted: permissionSubject.eraseToAnyPublisher()
         )
         
@@ -74,6 +77,22 @@ public final class NotificationSettingViewController: BaseUIViewController<Notif
                 guard let self else { return }
                 self.isFeedOn = isOn
                 self.alarmSettingView.feedToggle.setOn(isOn, animated: true)
+            }
+            .store(in: &cancellables)
+        
+        output.isReminderOn
+            .receive(on: RunLoop.main)
+            .sink { [weak self] isOn in
+                guard let self else { return }
+                self.isReminderOn = isOn
+                self.alarmSettingView.reminderToggle.setOn(isOn, animated: true)
+            }
+            .store(in: &cancellables)
+        
+        output.reminderSubtitle
+            .receive(on: RunLoop.main)
+            .sink { [weak self] text in
+                self?.alarmSettingView.setReminderSubtitle(text)
             }
             .store(in: &cancellables)
 
@@ -122,28 +141,48 @@ public final class NotificationSettingViewController: BaseUIViewController<Notif
         let feedTap = UITapGestureRecognizer(target: self, action: #selector(toggleTapped(_:)))
         alarmSettingView.feedToggle.addGestureRecognizer(feedTap)
         alarmSettingView.feedToggle.isUserInteractionEnabled = true
+        
+        let reminderTap = UITapGestureRecognizer(target: self, action: #selector(toggleTapped(_:)))
+        alarmSettingView.reminderToggle.addGestureRecognizer(reminderTap)
+        alarmSettingView.reminderToggle.isUserInteractionEnabled = true
     }
     
     @objc private func toggleTapped(_ gesture: UITapGestureRecognizer) {
         guard let sender = gesture.view as? CustomToggle else { return }
-        
+
         let isCurrentlyOn = sender.isOn
         let newState = !isCurrentlyOn
-        
+
         if !permissionSubject.value && newState == true {
-            showPermissionDialog()
+            if sender == alarmSettingView.reminderToggle {
+                showReminderPermissionDialog()
+            } else {
+                showPermissionDialog()
+            }
             return
         }
-        
+
         sender.setOn(newState, animated: true)
-        
+
         if sender == alarmSettingView.marketingToggle {
             isMarketingOn = newState
             marketingToggledSubject.send(())
-        } else {
+        } else if sender == alarmSettingView.feedToggle {
             isFeedOn = newState
             feedToggledSubject.send(())
+        } else {
+            if newState {
+                pushReminderTimeSettingScreen()
+            } else {
+                sender.setOn(false, animated: true)
+                isReminderOn = false
+                reminderToggledSubject.send(())
+            }
         }
+    }
+
+    private func pushReminderTimeSettingScreen() {
+        navigationController?.pushViewController(diContainer.makeReminderTimeSettingViewController(), animated: true)
     }
     
     private func showPermissionDialog() {
@@ -157,6 +196,26 @@ public final class NotificationSettingViewController: BaseUIViewController<Notif
             content: "휴대폰 설정 > 알림 > 하이링구얼에서\n설정을 변경해 주세요.",
             leftButtonTitle: "취소하기",
             rightButtonTitle: "확인",
+            leftAction: { [weak self] in self?.dialog.dismiss() },
+            rightAction: { [weak self] in
+                self?.dialog.dismiss()
+                self?.openSystemSettings()
+            }
+        )
+        dialog.showAnimation()
+    }
+    
+    private func showReminderPermissionDialog() {
+        guard let window = self.view.window else { return }
+        window.addSubview(dialog)
+        dialog.snp.remakeConstraints { $0.edges.equalToSuperview() }
+
+        dialog.configure(
+            style: .normal,
+            title: "기기의 알림 설정이 꺼져있어요!",
+            content: "리마인드 알림을 받기 위해선\n기기 알림 설정이 켜져 있어야 해요.",
+            leftButtonTitle: "취소하기",
+            rightButtonTitle: "설정 변경하기",
             leftAction: { [weak self] in self?.dialog.dismiss() },
             rightAction: { [weak self] in
                 self?.dialog.dismiss()

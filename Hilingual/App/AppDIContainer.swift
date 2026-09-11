@@ -561,7 +561,8 @@ extension AppDIContainer {
         return LoadingViewModel(
             diaryWritingUseCase: makeDiaryWritingUseCase(),
             uploadImageUseCase: makeUploadImageUseCase(),
-            diaryAdWatchUseCase: makeDiaryAdWatchUseCase()
+            diaryAdWatchUseCase: makeDiaryAdWatchUseCase(),
+            diaryReminderUseCase: makeDiaryReminderUseCase()
         )
     }
 }
@@ -635,17 +636,48 @@ extension AppDIContainer {
     private func makeNotificationSettingService() -> DefaultNotificationSettingService {
         return DefaultNotificationSettingService()
     }
-
+    
     private func makeNotificationSettingRepository() -> AlarmSettingRepository {
         return DefaultAlarmSettingRepository(service: makeNotificationSettingService())
     }
-
+    
     private func makeNotificationUseCase() -> AlarmSettingUseCase {
         return DefaultAlarmSettingUseCase(repository: makeNotificationSettingRepository())
     }
-
+    
+    private func makeDiaryReminderLocalDataSource() -> DiaryReminderLocalDataSource {
+        return DiaryReminderLocalDataSource()
+    }
+    
+    private func makeDiaryReminderRepository() -> DiaryReminderRepository {
+        return DefaultDiaryReminderRepository(localDataSource: makeDiaryReminderLocalDataSource())
+    }
+    
+    func makeDiaryReminderUseCase() -> DiaryReminderUseCase {
+        return DefaultDiaryReminderUseCase(repository: makeDiaryReminderRepository())
+    }
+    
     private func makeNotificationSettingViewModel() -> NotificationSettingViewModel {
-        return NotificationSettingViewModel(useCase: makeNotificationUseCase())
+        return NotificationSettingViewModel(
+            useCase: makeNotificationUseCase(),
+            diaryReminderUseCase: makeDiaryReminderUseCase()
+        )
+    }
+}
+
+// MARK: - ReminderTimeDIContainer
+
+extension AppDIContainer {
+
+    private func makeReminderTimeSettingViewModel() -> ReminderTimeSettingViewModel {
+        return ReminderTimeSettingViewModel(diaryReminderUseCase: makeDiaryReminderUseCase())
+    }
+
+    func makeReminderTimeSettingViewController() -> ReminderTimeSettingViewController {
+        return ReminderTimeSettingViewController(
+            viewModel: makeReminderTimeSettingViewModel(),
+            diContainer: self
+        )
     }
 }
 
