@@ -89,14 +89,7 @@ public final class TabBarViewController: UIViewController {
     private func setupDeeplinkObserver() {
         DeeplinkManager.shared.onPendingDestinationSet = { [weak self] destination in
             guard let self else { return false }
-
-            let homeNav = self.childNavigationControllers[0]
-            DeeplinkManager.shared.handle(destination, from: homeNav, di: self.factory)
-
-            if self.currentIndex != 0 {
-                self.selectTab(at: 0)
-            }
-
+            self.routeDeeplink(destination)
             return true
         }
     }
@@ -104,12 +97,17 @@ public final class TabBarViewController: UIViewController {
     private func handlePendingDeeplink() {
         guard let destination = DeeplinkManager.shared.pendingDestination else { return }
         DeeplinkManager.shared.pendingDestination = nil
+        routeDeeplink(destination)
+    }
+    
+    private func routeDeeplink(_ destination: DeeplinkDestination) {
+        let targetIndex = destination.requiredTabIndex
+        let targetNav = childNavigationControllers[targetIndex]
 
-        let homeNav = childNavigationControllers[0]
-        DeeplinkManager.shared.handle(destination, from: homeNav, di: factory)
+        DeeplinkManager.shared.handle(destination, from: targetNav, di: factory)
 
-        if currentIndex != 0 {
-            selectTab(at: 0)
+        if currentIndex != targetIndex {
+            selectTab(at: targetIndex)
         }
     }
 
