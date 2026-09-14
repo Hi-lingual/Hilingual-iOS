@@ -12,15 +12,15 @@ public final class FCMTokenManager: Sendable {
     private init() {}
     
     private let lock = NSLock()
-    private nonisolated(unsafe) var _currentToken: String?
+    private nonisolated(unsafe) var currentToken: String?
     public nonisolated(unsafe) var onTokenUpdated: ((String) -> Void)?
     
-    public var currentToken: String? {
+    public var token: String? {
         get {
-            lock.withLock { _currentToken }
+            lock.withLock { currentToken }
         }
         set {
-            lock.withLock { _currentToken = newValue }
+            lock.withLock { currentToken = newValue }
             guard let token = newValue, !token.isEmpty else { return }
             onTokenUpdated?(token)
         }
