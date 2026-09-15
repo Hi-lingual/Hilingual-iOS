@@ -8,6 +8,7 @@
 import Combine
 import Foundation
 
+@MainActor
 public protocol DiaryReminderRepository {
     func isReminderEnabled() -> Bool
     func setReminderEnabled(_ isEnabled: Bool)
