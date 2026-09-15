@@ -8,6 +8,7 @@
 import Combine
 import Foundation
 
+@MainActor
 public protocol DiaryReminderUseCase {
     func fetchReminderStatus() -> AnyPublisher<Bool, Never>
     func fetchReminderConfig() -> AnyPublisher<(hour: Int, minute: Int, weekdays: Set<Int>)?, Never>
@@ -17,6 +18,7 @@ public protocol DiaryReminderUseCase {
     func skipTodayReminderIfNeeded(for date: Date)
 }
 
+@MainActor
 public final class DefaultDiaryReminderUseCase: DiaryReminderUseCase {
 
     private let repository: DiaryReminderRepository
