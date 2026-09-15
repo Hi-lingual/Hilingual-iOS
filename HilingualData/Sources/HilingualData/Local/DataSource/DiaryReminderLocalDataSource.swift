@@ -9,6 +9,7 @@ import Foundation
 import UserNotifications
 import Combine
 
+@MainActor
 public final class DiaryReminderLocalDataSource {
 
     private enum Constant {
@@ -126,51 +127,110 @@ public final class DiaryReminderLocalDataSource {
             return Just(()).setFailureType(to: Error.self).eraseToAnyPublisher()
         }
         
-        let publishers = targetDates.map { scheduleSingle(date: $0, hour: hour, minute: minute) }
-        
+        let userDefaults = self.userDefaults
+        let publishers = targetDates.map {
+            scheduleSingle(
+                date: $0,
+                hour: hour,
+                minute: minute
+            )
+        }
+
         return Publishers.MergeMany(publishers)
             .collect()
-            .handleEvents(receiveOutput: { [weak self] _ in
-                guard let self else { return }
-                targetDates.forEach { alreadyScheduled.insert(self.dateKey($0)) }
-                self.userDefaults.set(Array(alreadyScheduled), forKey: Constant.scheduledDateKeysKey)
-            })
-            .map { _ in () }
+            .tryMap { results in
+                let successfulDates = results.compactMap { result -> Date? in
+                    guard case let .success(date) = result else {
+                        return nil
+                    }
+                    return date
+                }
+
+                let errors = results.compactMap { result -> Error? in
+                    guard case let .failure(error) = result else {
+                        return nil
+                    }
+                    return error
+                }
+
+                if let error = errors.first {
+                    let identifiers = successfulDates.map {
+                        "\(Constant.identifierPrefix)\(self.dateKey($0))"
+                    }
+
+                    self.notificationCenter.removePendingNotificationRequests(
+                        withIdentifiers: identifiers
+                    )
+
+                    throw error
+                }
+
+                successfulDates.forEach {
+                    alreadyScheduled.insert(self.dateKey($0))
+                }
+
+                userDefaults.set(
+                    Array(alreadyScheduled),
+                    forKey: Constant.scheduledDateKeysKey
+                )
+            }
             .eraseToAnyPublisher()
     }
     
-    private func scheduleSingle(date: Date, hour: Int, minute: Int) -> AnyPublisher<Void, Error> {
-        Future { [weak self] promise in
-            guard let self else {
-                promise(.failure(CancellationError()))
-                return
-            }
-            
-            let content = UNMutableNotificationContent()
-            content.title = "일기 쓸 시간이에요 ⏰"
-            content.body = "지금 떠오르는 생각을 영어로 기록해 보세요."
-            content.sound = .default
-            content.userInfo = [
-                "link": "hilingual://app/home",
-                "notification_type": "reminder_custom"
-            ]
-            
-            var comps = self.calendar.dateComponents([.year, .month, .day], from: date)
-            comps.hour = hour
-            comps.minute = minute
-            
-            let trigger = UNCalendarNotificationTrigger(dateMatching: comps, repeats: false)
-            let request = UNNotificationRequest(
-                identifier: "\(Constant.identifierPrefix)\(self.dateKey(date))",
-                content: content,
-                trigger: trigger
-            )
-            
-            self.notificationCenter.add(request) { error in
-                error == nil ? promise(.success(())) : promise(.failure(error!))
+    private func scheduleSingle(
+        date: Date,
+        hour: Int,
+        minute: Int
+    ) -> AnyPublisher<Result<Date, Error>, Never> {
+        Deferred {
+            Future { promise in
+                Task {
+                    do {
+                        try await self.addNotificationRequest(
+                            date: date,
+                            hour: hour,
+                            minute: minute
+                        )
+                        promise(.success(.success(date)))
+                    } catch {
+                        promise(.success(.failure(error)))
+                    }
+                }
             }
         }
         .eraseToAnyPublisher()
+    }
+
+    private func addNotificationRequest(date: Date, hour: Int, minute: Int) async throws {
+        var comps = calendar.dateComponents([.year, .month, .day], from: date)
+        comps.hour = hour
+        comps.minute = minute
+
+        let content = UNMutableNotificationContent()
+        content.title = "일기 쓸 시간이에요 ⏰"
+        content.body = "지금 떠오르는 생각을 영어로 기록해 보세요."
+        content.sound = .default
+        content.userInfo = [
+            "link": "hilingual://app/home",
+            "notification_type": "reminder_custom"
+        ]
+
+        let trigger = UNCalendarNotificationTrigger(dateMatching: comps, repeats: false)
+        let request = UNNotificationRequest(
+            identifier: "\(Constant.identifierPrefix)\(dateKey(date))",
+            content: content,
+            trigger: trigger
+        )
+
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            notificationCenter.add(request) { error in
+                if let error {
+                    continuation.resume(throwing: error)
+                } else {
+                    continuation.resume()
+                }
+            }
+        }
     }
     
     private func dateKey(_ date: Date) -> String {

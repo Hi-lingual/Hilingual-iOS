@@ -9,7 +9,8 @@ import Combine
 import HilingualDomain
 import Foundation
 
-public final class DefaultDiaryReminderRepository: DiaryReminderRepository {
+@MainActor
+public final class DefaultDiaryReminderRepository: DiaryReminderRepository, @unchecked Sendable {
 
     private let localDataSource: DiaryReminderLocalDataSource
 
@@ -17,8 +18,13 @@ public final class DefaultDiaryReminderRepository: DiaryReminderRepository {
         self.localDataSource = localDataSource
     }
 
-    public func isReminderEnabled() -> Bool { localDataSource.isEnabled() }
-    public func setReminderEnabled(_ isEnabled: Bool) { localDataSource.setEnabled(isEnabled) }
+    public func isReminderEnabled() -> Bool {
+        localDataSource.isEnabled()
+    }
+    
+    public func setReminderEnabled(_ isEnabled: Bool) {
+        localDataSource.setEnabled(isEnabled)
+    }
 
     public func scheduleReminder(hour: Int, minute: Int, weekdays: Set<Int>) -> AnyPublisher<Void, Error> {
         localDataSource.schedule(hour: hour, minute: minute, weekdays: weekdays)
@@ -32,7 +38,9 @@ public final class DefaultDiaryReminderRepository: DiaryReminderRepository {
         localDataSource.cancelReminder(for: date)
     }
 
-    public func cancelReminder() { localDataSource.cancel() }
+    public func cancelReminder() {
+        localDataSource.cancel()
+    }
     
     public func fetchReminderConfig() -> (hour: Int, minute: Int, weekdays: Set<Int>)? {
         localDataSource.fetchConfig()

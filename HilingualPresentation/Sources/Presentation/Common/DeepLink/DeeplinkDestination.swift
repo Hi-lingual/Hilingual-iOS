@@ -30,3 +30,13 @@ public enum DeeplinkDestination: Sendable {
         }
     }
 }
+
+extension DeeplinkDestination {
+    var requiredTabIndex: Int {
+        switch self {
+        case .diaryDetail, .userProfile, .home,
+             .reminderStreak, .reminderWinback, .reminderCustom:
+            return 0
+        }
+    }
+}
