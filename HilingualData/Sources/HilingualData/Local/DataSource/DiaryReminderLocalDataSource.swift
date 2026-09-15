@@ -127,30 +127,73 @@ public final class DiaryReminderLocalDataSource {
             return Just(()).setFailureType(to: Error.self).eraseToAnyPublisher()
         }
         
-        let targetKeys = targetDates.map { dateKey($0) }
         let userDefaults = self.userDefaults
-        
-        let publishers = targetDates.map { scheduleSingle(date: $0, hour: hour, minute: minute) }
-        
+        let publishers = targetDates.map {
+            scheduleSingle(
+                date: $0,
+                hour: hour,
+                minute: minute
+            )
+        }
+
         return Publishers.MergeMany(publishers)
             .collect()
-            .handleEvents(receiveOutput: { _ in
-                targetKeys.forEach { alreadyScheduled.insert($0) }
-                userDefaults.set(Array(alreadyScheduled), forKey: Constant.scheduledDateKeysKey)
-            })
-            .map { _ in () }
+            .tryMap { results in
+                let successfulDates = results.compactMap { result -> Date? in
+                    guard case let .success(date) = result else {
+                        return nil
+                    }
+                    return date
+                }
+
+                let errors = results.compactMap { result -> Error? in
+                    guard case let .failure(error) = result else {
+                        return nil
+                    }
+                    return error
+                }
+
+                if let error = errors.first {
+                    let identifiers = successfulDates.map {
+                        "\(Constant.identifierPrefix)\(self.dateKey($0))"
+                    }
+
+                    self.notificationCenter.removePendingNotificationRequests(
+                        withIdentifiers: identifiers
+                    )
+
+                    throw error
+                }
+
+                successfulDates.forEach {
+                    alreadyScheduled.insert(self.dateKey($0))
+                }
+
+                userDefaults.set(
+                    Array(alreadyScheduled),
+                    forKey: Constant.scheduledDateKeysKey
+                )
+            }
             .eraseToAnyPublisher()
     }
     
-    private func scheduleSingle(date: Date, hour: Int, minute: Int) -> AnyPublisher<Void, Error> {
+    private func scheduleSingle(
+        date: Date,
+        hour: Int,
+        minute: Int
+    ) -> AnyPublisher<Result<Date, Error>, Never> {
         Deferred {
             Future { promise in
                 Task {
                     do {
-                        try await self.addNotificationRequest(date: date, hour: hour, minute: minute)
-                        promise(.success(()))
+                        try await self.addNotificationRequest(
+                            date: date,
+                            hour: hour,
+                            minute: minute
+                        )
+                        promise(.success(.success(date)))
                     } catch {
-                        promise(.failure(error))
+                        promise(.success(.failure(error)))
                     }
                 }
             }
