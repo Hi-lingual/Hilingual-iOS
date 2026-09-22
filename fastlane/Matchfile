@@ -2,7 +2,12 @@ git_url "https://github.com/Hi-lingual/Hilingual-certificates"
 storage_mode "git"
 
 type "development"
-app_identifier ["com.Hilingual", "com.Hilingual.dev"]
+app_identifier [
+  "com.Hilingual",
+  "com.Hilingual.dev",
+  "com.Hilingual.HilingualWidget",
+  "com.Hilingual.dev.HilingualWidget"
+]
 team_id "C9XX799UJH"
 
 # ponytail: development만 관리. 배포 서명은 Xcode Cloud가 하므로
