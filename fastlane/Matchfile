@@ -1,0 +1,9 @@
+git_url "https://github.com/Hi-lingual/Hilingual-certificates"
+storage_mode "git"
+
+type "development"
+app_identifier ["com.Hilingual", "com.Hilingual.dev"]
+team_id "C9XX799UJH"
+
+# ponytail: development만 관리. 배포 서명은 Xcode Cloud가 하므로
+# distribution 인증서는 일부러 넣지 않는다 (유출 시 피해 범위 축소).

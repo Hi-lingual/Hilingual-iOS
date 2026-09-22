@@ -145,3 +145,10 @@ Hilingual/App/Config/Config.xcconfig
 Hilingual/App/Config/Debug.xcconfig
 
 Hilingual/App/Config/Release.xcconfig
+
+# fastlane secrets
+fastlane/.env
+fastlane/.env.*
+!fastlane/.env.example
+*.p8
+fastlane/README.md
