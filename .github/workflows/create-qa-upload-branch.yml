@@ -1,4 +1,4 @@
-name: Push New QA Build Upload Branch
+name: Push New Build Upload Branch
 
 on:
   workflow_dispatch:
@@ -10,6 +10,14 @@ on:
       app_version:
         description: "Updating Hilingual Version"
         required: true
+      build_type:
+        description: "Build type"
+        required: true
+        default: "qa"
+        type: choice
+        options:
+          - qa
+          - release
       requested_by:
         description: "Who requested this run"
         required: false
@@ -42,9 +50,21 @@ jobs:
         run: |
           BASE="${{ github.event.inputs.branch }}"
           VERSION="${{ github.event.inputs.app_version }}"
-          SAFE_BASE=$(echo "$BASE" | sed 's/[\/.]/-/g')
-          SAFE_VERSION=$(echo "$VERSION" | sed 's/[\/.]/-/g')
-          echo "name=upload/${SAFE_BASE}-${SAFE_VERSION}-$(date +%Y%m%d-%H%M%S)" >> "$GITHUB_OUTPUT"
+          BUILD_TYPE="${{ github.event.inputs.build_type }}"
+
+          if [ "$BUILD_TYPE" = "release" ]; then
+            NAME="release/${VERSION}"
+            if git ls-remote --exit-code --heads origin "$NAME" >/dev/null 2>&1; then
+              echo "Branch $NAME already exists. Bump the version instead." >&2
+              exit 1
+            fi
+          else
+            SAFE_BASE=$(echo "$BASE" | sed 's/[\/.]/-/g')
+            SAFE_VERSION=$(echo "$VERSION" | sed 's/[\/.]/-/g')
+            NAME="upload/${SAFE_BASE}-${SAFE_VERSION}-$(date +%Y%m%d-%H%M%S)"
+          fi
+
+          echo "name=$NAME" >> "$GITHUB_OUTPUT"
 
       - name: Update marketing version
         id: update_version

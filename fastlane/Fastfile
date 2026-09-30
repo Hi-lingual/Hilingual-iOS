@@ -26,12 +26,33 @@ end
 
 SIGNING_LOCAL = "Signing.local.xcconfig"
 
+SIGNING_INCLUDE = <<~CONFIG
+
+  // MARK: - Code Signing
+  CODE_SIGN_STYLE = Automatic
+  #include? "#{SIGNING_LOCAL}"
+CONFIG
+
+def repair_xcconfig_include!
+  %w[Debug.xcconfig Release.xcconfig].each do |name|
+    path = File.join(CONFIG_DIR, name)
+    body = File.read(path)
+    next if body.include?(SIGNING_LOCAL)
+
+    File.write(path, "#{body.rstrip}\n#{SIGNING_INCLUDE}")
+    UI.important("#{name} 에 서명 include 를 추가했습니다 (오래된 설정 파일)")
+  end
+end
+
 def enable_local_signing!
   target = File.join(CONFIG_DIR, SIGNING_LOCAL)
-  return UI.message("#{SIGNING_LOCAL} 이미 있음") if File.exist?(target)
-
-  FileUtils.cp(File.join(CONFIG_DIR, "#{SIGNING_LOCAL}.example"), target)
-  UI.message("#{SIGNING_LOCAL} 생성 — 로컬 빌드가 match 프로파일로 서명됩니다")
+  if File.exist?(target)
+    UI.message("#{SIGNING_LOCAL} 이미 있음")
+  else
+    FileUtils.cp(File.join(CONFIG_DIR, "#{SIGNING_LOCAL}.example"), target)
+    UI.message("#{SIGNING_LOCAL} 생성 — 로컬 빌드가 match 프로파일로 서명됩니다")
+  end
+  repair_xcconfig_include!
 end
 
 def refuse_local_signing!
