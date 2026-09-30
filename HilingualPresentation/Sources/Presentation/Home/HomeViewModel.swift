@@ -103,8 +103,8 @@ public final class HomeViewModel: BaseViewModel {
 
     // MARK: - Local Push Methods
     
-    public func registerInitialLocalPushes() {
-        localPushUseCase.registerInitialPushes()
+    public func cancelLegacyLocalPushes() {
+        localPushUseCase.cancelLegacyPushes()
     }
     
     @MainActor
