@@ -96,16 +96,11 @@ public final class ReminderTimeSettingViewController: BaseUIViewController<Remin
     }
     
     public override func backButtonTapped() {
-        guard !selectedWeekdays.isEmpty else {
-            navigationController?.popViewController(animated: true)
-            return
-        }
         showLeaveConfirmDialog()
     }
 
     public override func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
-        guard selectedWeekdays.isEmpty else { return false }
-        return super.gestureRecognizerShouldBegin(gestureRecognizer)
+        return false
     }
     
     private func showLeaveConfirmDialog() {
