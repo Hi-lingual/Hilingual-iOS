@@ -275,6 +275,12 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
             self.isRecoveryWritingFlowActive = true
             self.loadInterstitialAdAndPresent()
         }
+        
+        NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)
+            .sink { [weak self] _ in
+                self?.disableReminderIfPermissionDenied()
+            }
+            .store(in: &cancellables)
     }
     
     // MARK: - Private Methods
@@ -1035,11 +1041,23 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     private func checkAndRequestLocalPushPermission() {
         Task { @MainActor [weak self] in
             guard let self else { return }
-            
+
             let shouldRegister = await localPushPermissionService.checkAndRequestPermission()
-            guard shouldRegister else { return }
-            
+            guard shouldRegister else {
+                if await localPushPermissionService.isPermissionDenied() {
+                    self.viewModel?.disableDiaryReminder()
+                }
+                return
+            }
             self.viewModel?.registerInitialLocalPushes()
+        }
+    }
+    
+    private func disableReminderIfPermissionDenied() {
+        Task { @MainActor [weak self] in
+            guard let self,
+                  await localPushPermissionService.isPermissionDenied() else { return }
+            self.viewModel?.disableDiaryReminder()
         }
     }
     

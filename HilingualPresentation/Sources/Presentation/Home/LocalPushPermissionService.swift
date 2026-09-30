@@ -31,4 +31,8 @@ struct LocalPushPermissionService: Sendable {
             }
         }
     }
+    
+    func isPermissionDenied() async -> Bool {
+        await notificationAuthorizationStatus() == .denied
+    }
 }

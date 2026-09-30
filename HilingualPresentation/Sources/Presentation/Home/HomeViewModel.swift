@@ -53,6 +53,7 @@ public final class HomeViewModel: BaseViewModel {
     private let fetchTemporaryDiaryUseCase: FetchTemporaryDiaryUseCase
     private let localPushUseCase: LocalPushUseCase
     private let homeAdWatchUseCase: HomeAdWatchUseCase
+    private let diaryReminderUseCase: DiaryReminderUseCase
 
     public let hasDraft = PassthroughSubject<Bool, Never>()
 
@@ -62,12 +63,14 @@ public final class HomeViewModel: BaseViewModel {
         useCase: HomeUseCase,
         fetchTemporaryDiaryUseCase: FetchTemporaryDiaryUseCase,
         localPushUseCase: LocalPushUseCase,
-        homeAdWatchUseCase: HomeAdWatchUseCase
+        homeAdWatchUseCase: HomeAdWatchUseCase,
+        diaryReminderUseCase: DiaryReminderUseCase
     ) {
         self.useCase = useCase
         self.fetchTemporaryDiaryUseCase = fetchTemporaryDiaryUseCase
         self.localPushUseCase = localPushUseCase
         self.homeAdWatchUseCase = homeAdWatchUseCase
+        self.diaryReminderUseCase = diaryReminderUseCase
     }
 
     // MARK: - Transform
@@ -103,7 +106,11 @@ public final class HomeViewModel: BaseViewModel {
     public func registerInitialLocalPushes() {
         localPushUseCase.registerInitialPushes()
     }
-
+    
+    @MainActor
+    public func disableDiaryReminder() {
+        diaryReminderUseCase.disableReminder()
+    }
 
     // MARK: - Additional Fetch Methods
 
