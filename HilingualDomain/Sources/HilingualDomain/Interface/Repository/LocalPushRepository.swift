@@ -11,4 +11,5 @@ public protocol LocalPushRepository {
     func isScheduled() -> Bool
     func saveScheduledStatus(_ scheduled: Bool)
     func registerNotification(id: String, title: String, body: String, weekday: Int, hour: Int, minute: Int)
+    func cancelNotifications(ids: [String])
 }

@@ -47,4 +47,8 @@ public final class DefaultLocalPushRepository: LocalPushRepository {
             }
         }
     }
+    
+    public func cancelNotifications(ids: [String]) {
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ids)
+    }
 }
