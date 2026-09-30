@@ -1,0 +1,7 @@
+// 복사해서 Signing.local.xcconfig 로 쓰세요. 이 파일은 커밋되지 않습니다.
+// 로컬 실기기 빌드를 match 가 내려받은 개발 프로파일로 서명합니다.
+// 파일이 없으면 Automatic 서명이 유지되므로 Xcode Cloud 아카이브는 영향받지 않습니다.
+
+CODE_SIGN_STYLE = Manual
+CODE_SIGN_IDENTITY = Apple Development
+PROVISIONING_PROFILE_SPECIFIER = match Development $(PRODUCT_BUNDLE_IDENTIFIER)
