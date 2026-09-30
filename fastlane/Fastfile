@@ -1,0 +1,143 @@
+default_platform(:ios)
+
+WORKSPACE_ROOT = File.expand_path("..", __dir__)
+PROJECT = "Hilingual.xcodeproj"
+CONFIG_DIR = File.join(WORKSPACE_ROOT, "Hilingual/App/Config")
+
+# App Store Connect API Key. 2FA 없이 동작하므로 Apple ID 로그인이 필요 없다.
+# 키는 repo 밖(~/.appstoreconnect/)에 두고 fastlane/.env 로 경로만 알려준다.
+def asc_api_key
+  app_store_connect_api_key(
+    key_id: ENV.fetch("ASC_KEY_ID"),
+    issuer_id: ENV.fetch("ASC_ISSUER_ID"),
+    key_filepath: File.expand_path(ENV.fetch("ASC_KEY_PATH")),
+    in_house: false
+  )
+end
+
+def require_xcconfig!
+  missing = %w[Debug.xcconfig Release.xcconfig]
+    .reject { |f| File.exist?(File.join(CONFIG_DIR, f)) }
+  return if missing.empty?
+
+  UI.user_error!("Hilingual/App/Config 에 #{missing.join(', ')} 가 없습니다. " \
+                 "docs/code-signing.md 를 보고 관리자에게 받아 배치하세요.")
+end
+
+SIGNING_LOCAL = "Signing.local.xcconfig"
+
+SIGNING_INCLUDE = <<~CONFIG
+
+  // MARK: - Code Signing
+  CODE_SIGN_STYLE = Automatic
+  #include? "#{SIGNING_LOCAL}"
+CONFIG
+
+def repair_xcconfig_include!
+  %w[Debug.xcconfig Release.xcconfig].each do |name|
+    path = File.join(CONFIG_DIR, name)
+    body = File.read(path)
+    next if body.include?(SIGNING_LOCAL)
+
+    File.write(path, "#{body.rstrip}\n#{SIGNING_INCLUDE}")
+    UI.important("#{name} 에 서명 include 를 추가했습니다 (오래된 설정 파일)")
+  end
+end
+
+def enable_local_signing!
+  target = File.join(CONFIG_DIR, SIGNING_LOCAL)
+  if File.exist?(target)
+    UI.message("#{SIGNING_LOCAL} 이미 있음")
+  else
+    FileUtils.cp(File.join(CONFIG_DIR, "#{SIGNING_LOCAL}.example"), target)
+    UI.message("#{SIGNING_LOCAL} 생성 — 로컬 빌드가 match 프로파일로 서명됩니다")
+  end
+  repair_xcconfig_include!
+end
+
+def refuse_local_signing!
+  return unless File.exist?(File.join(CONFIG_DIR, SIGNING_LOCAL))
+
+  UI.user_error!("#{SIGNING_LOCAL} 이 있으면 개발 프로파일로 서명되어 업로드가 실패합니다. " \
+                 "Hilingual/App/Config/#{SIGNING_LOCAL} 를 지우고 다시 실행하세요.")
+end
+
+def require_match_password!
+  return unless ENV["MATCH_PASSWORD"].to_s.empty?
+
+  UI.user_error!("MATCH_PASSWORD 가 없습니다. " \
+                 "`cp fastlane/.env.example fastlane/.env` 후 값을 채우세요. " \
+                 "자세한 내용은 docs/code-signing.md 참고.")
+end
+
+platform :ios do
+  desc "팀원용: 실기기 빌드 준비 (설정 파일 검사 + 개발 인증서/프로파일 설치)"
+  lane :setup do
+    require_xcconfig!
+    require_match_password!
+    match(type: "development", readonly: true)
+    enable_local_signing!
+    UI.success("준비 완료. Xcode에서 실기기 빌드하세요.")
+  end
+
+  desc "포털에 등록된 기기 목록 보기"
+  lane :devices_list do
+    Spaceship::ConnectAPI.token = Spaceship::ConnectAPI::Token.create(**asc_api_key)
+    Spaceship::ConnectAPI::Device.all.each do |d|
+      UI.message("#{d.udid}\t#{d.name}\t#{d.device_class}\t#{d.status}")
+    end
+  end
+
+  desc "관리자용 최초 1회: 개발 인증서/프로파일 생성 후 암호화하여 push"
+  lane :certs_init do
+    match(type: "development", readonly: false, api_key: asc_api_key)
+    UI.success("생성 완료. MATCH_PASSWORD를 팀 비밀번호 관리자에 보관하세요.")
+  end
+
+  desc "관리자용: fastlane/devices.txt 의 기기를 등록하고 인증서/프로파일 갱신 후 push"
+  lane :certs_refresh do
+    register_devices(devices_file: "fastlane/devices.txt", api_key: asc_api_key)
+    match(
+      type: "development",
+      readonly: false,
+      force_for_new_devices: true,
+      api_key: asc_api_key
+    )
+    UI.success("갱신 완료. 팀원들에게 `fastlane setup` 재실행을 알리세요.")
+  end
+
+  desc "관리자용: 인증서 폐기 후 재발급 (유출/퇴사 대응)"
+  lane :certs_nuke do
+    match_nuke(type: "development", api_key: asc_api_key)
+    UI.important("폐기 완료. `fastlane certs_refresh` 로 재발급하세요.")
+  end
+
+  desc "로컬에서 TestFlight 업로드 (Xcode Cloud 대체가 아닌 긴급용)"
+  lane :beta do
+    require_xcconfig!
+    refuse_local_signing!
+    api_key = asc_api_key
+
+    build = latest_testflight_build_number(
+      app_identifier: "com.Hilingual",
+      api_key: api_key
+    ).to_i + 1
+
+    build_app(
+      project: PROJECT,
+      scheme: "Hilingual",
+      configuration: "Release",
+      export_method: "app-store",
+      # ponytail: pbxproj를 수정하지 않고 빌드 번호만 덮어쓴다
+      xcargs: "CURRENT_PROJECT_VERSION=#{build}",
+      output_directory: "build",
+      clean: true
+    )
+
+    upload_to_testflight(
+      api_key: api_key,
+      skip_waiting_for_build_processing: true
+    )
+    UI.success("TestFlight 업로드 완료 (build #{build})")
+  end
+end

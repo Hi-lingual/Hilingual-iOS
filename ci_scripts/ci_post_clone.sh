@@ -7,13 +7,37 @@ RELEASE_TEMPLATE="$CONFIG_DIR/Release.xcconfig.template"
 DEBUG_OUTPUT="$CONFIG_DIR/Debug.xcconfig"
 RELEASE_OUTPUT="$CONFIG_DIR/Release.xcconfig"
 
+REQUIRED_ENV="
+BASE_URL_DEBUG
+BASE_URL_RELEASE
+MASTERKEY
+AMPLITUDE_API_KEY
+GAD_APPLICATION_IDENTIFIER_DEBUG
+GAD_APPLICATION_IDENTIFIER_RELEASE
+AD_BANNER_UNIT_ID_DEBUG
+AD_BANNER_UNIT_ID_RELEASE
+AD_NATIVE_UNIT_ID_DEBUG
+AD_NATIVE_UNIT_ID_RELEASE
+AD_FEEDBACK_UNIT_ID_DEBUG
+AD_FEEDBACK_UNIT_ID_RELEASE
+AD_INTERSTITIAL_UNIT_ID_DEBUG
+AD_INTERSTITIAL_UNIT_ID_RELEASE
+AD_RECOVERY_UNIT_ID_DEBUG
+AD_RECOVERY_UNIT_ID_RELEASE
+"
+
 require_env() {
-  var_name="$1"
-  eval "var_value=\${$var_name:-}"
-  if [ -z "$var_value" ]; then
-    echo "Missing required environment variable: $var_name" >&2
-    exit 1
-  fi
+  missing=""
+  for var_name in $REQUIRED_ENV; do
+    eval "var_value=\${$var_name:-}"
+    [ -z "$var_value" ] && missing="$missing  $var_name\n"
+  done
+  [ -z "$missing" ] && return 0
+
+  echo "Missing required environment variables:" >&2
+  printf "$missing" >&2
+  echo "Xcode Cloud 워크플로의 환경 변수를 확인하세요. docs/xcode-cloud-secrets.md 참고." >&2
+  exit 1
 }
 
 write_from_template() {
@@ -49,28 +73,13 @@ replacements = {
 
 content = template_path.read_text(encoding="utf-8")
 for placeholder, value in replacements.items():
-    content = content.replace(placeholder, value)
+    content = content.replace(placeholder, value.replace("//", "/$()/"))
 
 output_path.write_text(content, encoding="utf-8")
 PY
 }
 
-require_env BASE_URL_DEBUG
-require_env BASE_URL_RELEASE
-require_env MASTERKEY
-require_env AMPLITUDE_API_KEY
-require_env GAD_APPLICATION_IDENTIFIER_DEBUG
-require_env GAD_APPLICATION_IDENTIFIER_RELEASE
-require_env AD_BANNER_UNIT_ID_DEBUG
-require_env AD_BANNER_UNIT_ID_RELEASE
-require_env AD_NATIVE_UNIT_ID_DEBUG
-require_env AD_NATIVE_UNIT_ID_RELEASE
-require_env AD_FEEDBACK_UNIT_ID_DEBUG
-require_env AD_FEEDBACK_UNIT_ID_RELEASE
-require_env AD_INTERSTITIAL_UNIT_ID_DEBUG
-require_env AD_INTERSTITIAL_UNIT_ID_RELEASE
-require_env AD_RECOVERY_UNIT_ID_DEBUG
-require_env AD_RECOVERY_UNIT_ID_RELEASE
+require_env
 
 write_from_template "$DEBUG_TEMPLATE" "$DEBUG_OUTPUT"
 write_from_template "$RELEASE_TEMPLATE" "$RELEASE_OUTPUT"
