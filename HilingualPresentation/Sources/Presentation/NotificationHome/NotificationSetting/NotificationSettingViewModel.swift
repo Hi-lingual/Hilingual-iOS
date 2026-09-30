@@ -114,6 +114,14 @@ public final class NotificationSettingViewModel: BaseViewModel {
             }
             .store(in: &cancellables)
         
+        input.isSystemPermissionGranted
+            .removeDuplicates()
+            .filter { !$0 }
+            .sink { [weak self] _ in
+                self?.disableReminder()
+            }
+            .store(in: &cancellables)
+        
         let shouldShowBanner = input.isSystemPermissionGranted
             .map { !$0 }
             .eraseToAnyPublisher()
