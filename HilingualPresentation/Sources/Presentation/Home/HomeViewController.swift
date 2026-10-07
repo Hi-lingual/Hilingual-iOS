@@ -1035,8 +1035,6 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     private func checkAndRequestLocalPushPermission() {
         Task { @MainActor [weak self] in
             guard let self else { return }
-            self.viewModel?.cancelLegacyLocalPushes()
-
             let isGranted = await localPushPermissionService.checkAndRequestPermission()
             guard !isGranted else { return }
             if await localPushPermissionService.isPermissionDenied() {

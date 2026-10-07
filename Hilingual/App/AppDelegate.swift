@@ -36,6 +36,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
         
         AppDIContainer.shared.configureFCMTokenSync()
         AppDIContainer.shared.configureWidgetSync()
+        AppDIContainer.shared.makeLocalPushUseCase().cancelLegacyPushes()
 
         Messaging.messaging().delegate = self
         UNUserNotificationCenter.current().delegate = self
