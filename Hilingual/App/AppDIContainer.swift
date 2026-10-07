@@ -493,7 +493,7 @@ extension AppDIContainer {
         return DefaultLocalPushRepository()
     }
 
-    private func makeLocalPushUseCase() -> LocalPushUseCase {
+    func makeLocalPushUseCase() -> LocalPushUseCase {
         return DefaultLocalPushUseCase(repository: makeLocalPushRepository())
     }
 
