@@ -268,19 +268,13 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         homeView.selectedInfo.onTapRecovery = { [weak self] in
             guard let self else { return }
             guard let selectedDate = self.homeView.calendarView.selectedDate else { return }
-
+            
             AmplitudeManager.shared.send(.clickHomeStreakRevive)
-
+            
             self.pendingRecoveryDate = selectedDate
             self.isRecoveryWritingFlowActive = true
             self.loadInterstitialAdAndPresent()
         }
-        
-        NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)
-            .sink { [weak self] _ in
-                self?.disableReminderIfPermissionDenied()
-            }
-            .store(in: &cancellables)
     }
     
     // MARK: - Private Methods
@@ -1048,14 +1042,6 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
             if await localPushPermissionService.isPermissionDenied() {
                 self.viewModel?.disableDiaryReminder()
             }
-        }
-    }
-    
-    private func disableReminderIfPermissionDenied() {
-        Task { @MainActor [weak self] in
-            guard let self,
-                  await localPushPermissionService.isPermissionDenied() else { return }
-            self.viewModel?.disableDiaryReminder()
         }
     }
     
