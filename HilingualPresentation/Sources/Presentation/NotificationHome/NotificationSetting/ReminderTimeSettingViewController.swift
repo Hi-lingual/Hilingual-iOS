@@ -98,6 +98,11 @@ public final class ReminderTimeSettingViewController: BaseUIViewController<Remin
     public override func backButtonTapped() {
         showLeaveConfirmDialog()
     }
+    
+    public override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        dialog.removeFromSuperview()
+    }
 
     public override func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
         if gestureRecognizer === navigationController?.interactivePopGestureRecognizer {
@@ -107,7 +112,7 @@ public final class ReminderTimeSettingViewController: BaseUIViewController<Remin
     }
     
     private func showLeaveConfirmDialog() {
-        guard dialog.superview == nil, let window = self.view.window else { return }
+        guard dialog.isHidden, let window = self.view.window else { return }
         window.addSubview(dialog)
         dialog.snp.remakeConstraints { $0.edges.equalToSuperview() }
 
