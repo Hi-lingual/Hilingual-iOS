@@ -9,6 +9,7 @@ import Foundation
 import Combine
 import HilingualDomain
 
+@MainActor
 public final class ReminderTimeSettingViewModel: BaseViewModel {
 
     public struct Input {

@@ -493,7 +493,7 @@ extension AppDIContainer {
         return DefaultLocalPushRepository()
     }
 
-    private func makeLocalPushUseCase() -> LocalPushUseCase {
+    func makeLocalPushUseCase() -> LocalPushUseCase {
         return DefaultLocalPushUseCase(repository: makeLocalPushRepository())
     }
 
@@ -526,7 +526,8 @@ extension AppDIContainer {
             useCase: makeHomeUseCase(),
             fetchTemporaryDiaryUseCase: makeFetchTemporaryDiaryUseCase(),
             localPushUseCase: makeLocalPushUseCase(),
-            homeAdWatchUseCase: makeHomeAdWatchUseCase()
+            homeAdWatchUseCase: makeHomeAdWatchUseCase(),
+            diaryReminderUseCase: makeDiaryReminderUseCase()
         )
     }
 }

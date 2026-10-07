@@ -1,7 +1,9 @@
 import Foundation
 import UserNotifications
 
-struct LocalPushPermissionService: Sendable {
+public struct LocalPushPermissionService: Sendable {
+    public init() {}
+    
     func checkAndRequestPermission() async -> Bool {
         let status = await notificationAuthorizationStatus()
 
@@ -30,5 +32,9 @@ struct LocalPushPermissionService: Sendable {
                 continuation.resume(returning: granted)
             }
         }
+    }
+    
+    public func isPermissionDenied() async -> Bool {
+        await notificationAuthorizationStatus() == .denied
     }
 }

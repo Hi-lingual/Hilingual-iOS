@@ -65,7 +65,7 @@ public final class FCMTokenSyncService {
     private func syncIfPossible() {
         guard isSessionAuthenticated,
               let deviceUseCase,
-              let token = FCMTokenManager.shared.currentToken,
+              let token = FCMTokenManager.shared.token,
               !token.isEmpty,
               token != syncedToken
         else { return }

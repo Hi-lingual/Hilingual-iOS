@@ -239,6 +239,7 @@ public final class LoadingViewModel: BaseViewModel {
         }
     }
 
+    @MainActor
     private func skipTodayReminderIfWritingToday() {
         guard let date,
               let writtenDate = DisplayDateFormatter.parseAPIDate(date),
