@@ -100,11 +100,14 @@ public final class ReminderTimeSettingViewController: BaseUIViewController<Remin
     }
 
     public override func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+        if gestureRecognizer === navigationController?.interactivePopGestureRecognizer {
+            showLeaveConfirmDialog()
+        }
         return false
     }
     
     private func showLeaveConfirmDialog() {
-        guard let window = self.view.window else { return }
+        guard dialog.superview == nil, let window = self.view.window else { return }
         window.addSubview(dialog)
         dialog.snp.remakeConstraints { $0.edges.equalToSuperview() }
 
