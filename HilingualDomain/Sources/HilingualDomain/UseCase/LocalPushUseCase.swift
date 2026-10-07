@@ -21,5 +21,6 @@ public final class DefaultLocalPushUseCase: LocalPushUseCase {
     public func cancelLegacyPushes() {
         let ids = (2...7).map { "daily_push_\($0)" } + ["weekly_push_sun"]
         repository.cancelNotifications(ids: ids)
+        repository.clearLegacyScheduledFlag()
     }
 }
