@@ -11,6 +11,7 @@ enum HilingualColor: String {
     
     case hilingualBlack = "HilingualBlack"
     case hilingualOrange = "HilingualOrange"
+    case hilingualOrange50 = "HilingualOrange50"
     case hilingualBlue = "HilingualBlue"
     
     case noun_bg = "Noun_bg"
@@ -49,6 +50,7 @@ extension UIColor {
 extension UIColor {
     static var hilingualBlack: UIColor { .color(.hilingualBlack) }
     static var hilingualOrange: UIColor { .color(.hilingualOrange) }
+    static var hilingualOrange50: UIColor { .color(.hilingualOrange50) }
     static var hilingualBlue: UIColor { .color(.hilingualBlue) }
     
     static var noun_bg: UIColor { .color(.noun_bg) }
