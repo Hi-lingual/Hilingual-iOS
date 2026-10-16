@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Photos
 import SnapKit
 
 public final class DiaryExportViewController: BaseUIViewController<DiaryExportViewModel> {
@@ -108,8 +109,47 @@ public final class DiaryExportViewController: BaseUIViewController<DiaryExportVi
     }
 
     private func handleSave() {
+        let image = exportView.renderCardSnapshot()
         shareModal.dismissModal()
-        // TODO: 카드 이미지 생성 후 Photos 라이브러리에 저장
+
+        Task { [weak self] in
+            guard let self else { return }
+            let status = await self.requestPhotoAuthorization()
+            guard status == .authorized || status == .limited else { return }
+            self.writeImageToAlbum(image)
+        }
+    }
+
+    private func requestPhotoAuthorization() async -> PHAuthorizationStatus {
+        let current = PHPhotoLibrary.authorizationStatus(for: .addOnly)
+        if current == .notDetermined {
+            return await PHPhotoLibrary.requestAuthorization(for: .addOnly)
+        }
+        return current
+    }
+
+    private func writeImageToAlbum(_ image: UIImage) {
+        UIImageWriteToSavedPhotosAlbum(
+            image,
+            self,
+            #selector(saveImageCompleted(_:didFinishSavingWithError:contextInfo:)),
+            nil
+        )
+    }
+
+    @objc private func saveImageCompleted(
+        _ image: UIImage,
+        didFinishSavingWithError error: Error?,
+        contextInfo: UnsafeRawPointer
+    ) {
+        guard error == nil else { return }
+        showToast(message: "일기가 이미지로 저장되었어요.")
+    }
+
+    private func showToast(message: String) {
+        let toast = ToastMessage()
+        view.addSubview(toast)
+        toast.configure(type: .basic, message: message)
     }
 
     public override func setLayout() {

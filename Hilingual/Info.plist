@@ -42,6 +42,8 @@
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>카드를 이미지로 저장하기 위해 사진 추가 권한이 필요해요.</string>
 	<key>SKAdNetworkItems</key>
 	<array>
 		<dict>
