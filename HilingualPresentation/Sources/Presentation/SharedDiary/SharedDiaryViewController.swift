@@ -34,6 +34,7 @@ public final class SharedDiaryViewController: BaseUIViewController<SharedDiaryVi
     private lazy var diaryDetailViewController: DiaryDetailViewController = {
         let vc = diContainer.makeDiaryDetailViewController(diaryId: diaryId)
         vc.showsActionButton = false
+        vc.isMyDiary = false
         vc.feedbackPage = .postedDiary
         return vc
     }()
@@ -166,6 +167,7 @@ public final class SharedDiaryViewController: BaseUIViewController<SharedDiaryVi
                     )
 
                     self.isMine = entity.isMine
+                    self.diaryDetailViewController.isMyDiary = entity.isMine
                     self.userId = Int64(entity.profile.userId)
                 }
             )

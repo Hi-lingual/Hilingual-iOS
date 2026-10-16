@@ -55,6 +55,11 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
     private var segmentedControl: SegmentedControl!
 
     public var showsActionButton: Bool = true
+    public var isMyDiary: Bool = true {
+        didSet {
+            feedbackViewController?.isMyDiary = isMyDiary
+        }
+    }
 
     private var entryId: String = ""
     private var entrySource: String = "unknown"
@@ -88,7 +93,7 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
         super.viewDidLoad()
         
         feedbackViewController.showsAdBanner = !showsActionButton
-        feedbackViewController.isMyDiary = showsActionButton
+        feedbackViewController.isMyDiary = isMyDiary
         recommendedExpressionViewController.showsAdBanner = !showsActionButton
 
         hideKeyboardWhenTappedAround()
