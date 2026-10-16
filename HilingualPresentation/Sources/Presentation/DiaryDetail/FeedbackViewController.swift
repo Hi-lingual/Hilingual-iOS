@@ -36,6 +36,7 @@ public final class FeedbackViewController: BaseUIViewController<FeedbackViewMode
     var onDateLoaded: ((String) -> Void)?
     var publishedInfoLoaded: ((Bool) -> Void)?
     var onToggleChanged: ((Bool) -> Void)?
+    var onExportTapped: (() -> Void)?
     private let viewDidLoadSubject = PassthroughSubject<Void, Never>()
     private var date: String = ""
 
@@ -44,6 +45,12 @@ public final class FeedbackViewController: BaseUIViewController<FeedbackViewMode
 
     public var showsAdBanner: Bool = false
     private var bannerView: BannerView?
+
+    public var isMyDiary: Bool = false {
+        didSet {
+            feedbackView.setIsMyDiary(isMyDiary)
+        }
+    }
     
     // MARK: - UI Components
     
@@ -98,6 +105,10 @@ public final class FeedbackViewController: BaseUIViewController<FeedbackViewMode
             AmplitudeManager.shared.send(
                 .clickDiaryPronunciationBtnPlay(isFirstPlay: isFirstPlay, page: self.page)
             )
+        }
+
+        feedbackView.onExportTapped = { [weak self] in
+            self?.onExportTapped?()
         }
         
         if showsAdBanner {
