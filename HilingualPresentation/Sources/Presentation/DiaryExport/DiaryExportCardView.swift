@@ -72,17 +72,12 @@ final class DiaryExportCardView: BaseUIView {
         return imageView
     }()
 
-    private let diaryTextView: UITextView = {
-        let textView = UITextView()
-        textView.isScrollEnabled = false
-        textView.isEditable = false
-        textView.isSelectable = false
-        textView.textContainerInset = .zero
-        textView.textContainer.lineFragmentPadding = 0
-        textView.layoutManager.usesFontLeading = false
-        textView.backgroundColor = .clear
-        textView.textColor = .hilingualBlack
-        return textView
+    private let diaryTextLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = .hilingualBlack
+        label.lineBreakMode = .byTruncatingTail
+        label.numberOfLines = 0
+        return label
     }()
 
     private let logoImageView: UIImageView = {
@@ -98,7 +93,7 @@ final class DiaryExportCardView: BaseUIView {
         layer.cornerRadius = 12
         layer.masksToBounds = true
 
-        addSubviews(topicStackView, dividerView, dateLabel, diaryImageView, diaryTextView, logoImageView)
+        addSubviews(topicStackView, dividerView, dateLabel, diaryImageView, diaryTextLabel, logoImageView)
         topicStackView.addArrangedSubviews(leftQuoteImageView, topicLabel, rightQuoteImageView)
     }
 
@@ -107,7 +102,7 @@ final class DiaryExportCardView: BaseUIView {
         rightQuoteImageView.snp.makeConstraints { $0.size.equalTo(16) }
 
         logoImageView.snp.makeConstraints {
-            $0.top.equalTo(diaryTextView.snp.bottom).offset(16)
+            $0.top.equalTo(diaryTextLabel.snp.bottom).offset(16)
             $0.centerX.equalToSuperview()
             $0.bottom.equalToSuperview().inset(20)
             $0.width.equalTo(80)
@@ -121,6 +116,7 @@ final class DiaryExportCardView: BaseUIView {
         topicStackView.isHidden = !isTopicVisible
         dividerView.isHidden = !isTopicVisible
         diaryImageView.isHidden = !hasImage
+        updateMaxTextLines()
 
         if isTopicVisible {
             topicStackView.snp.remakeConstraints {
@@ -151,7 +147,7 @@ final class DiaryExportCardView: BaseUIView {
                 $0.leading.trailing.equalToSuperview().inset(16)
                 $0.height.equalTo(diaryImageView.snp.width).multipliedBy(178.0 / 311.0)
             }
-            diaryTextView.snp.remakeConstraints {
+            diaryTextLabel.snp.remakeConstraints {
                 $0.top.equalTo(diaryImageView.snp.bottom).offset(12)
                 $0.leading.trailing.equalToSuperview().inset(16)
             }
@@ -161,7 +157,7 @@ final class DiaryExportCardView: BaseUIView {
                 $0.leading.trailing.equalToSuperview().inset(16)
                 $0.height.equalTo(0)
             }
-            diaryTextView.snp.remakeConstraints {
+            diaryTextLabel.snp.remakeConstraints {
                 $0.top.equalTo(dateLabel.snp.bottom).offset(12)
                 $0.leading.trailing.equalToSuperview().inset(16)
             }
@@ -213,15 +209,46 @@ final class DiaryExportCardView: BaseUIView {
         if isHighlightingEnabled {
             let attributedString = makeBaseAttributedText(highlightText, color: .hilingualBlack)
             applyDiffHighlights(to: attributedString, color: .hilingualOrange)
-            diaryTextView.attributedText = attributedString
+            diaryTextLabel.attributedText = attributedString
         } else {
-            diaryTextView.attributedText = makeBaseAttributedText(originalText, color: .hilingualBlack, forceWrap: true)
+            diaryTextLabel.attributedText = makeBaseAttributedText(originalText, color: .hilingualBlack, forceWrap: true)
         }
+        updateMaxTextLines()
+    }
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        updateMaxTextLines()
+    }
+
+    private func updateMaxTextLines() {
+        guard bounds.width > 0 else { return }
+        let maxLines = computeMaxTextLines()
+        if diaryTextLabel.numberOfLines != maxLines {
+            diaryTextLabel.numberOfLines = maxLines
+        }
+    }
+
+    private func computeMaxTextLines() -> Int {
+        let cardMaxHeight: CGFloat = 600
+        let topPadding: CGFloat = 24
+        let topicArea: CGFloat = isTopicVisible ? (21 + 16 + 1 + 16) : 0  // topic label + spacing + divider + spacing
+        let dateHeight: CGFloat = 12  // body_m_12
+        let dateToNext: CGFloat = 12
+        let imageHeight: CGFloat = hasImage ? ((bounds.width - 32) * 178.0 / 311.0) : 0
+        let imageToText: CGFloat = hasImage ? 12 : 0
+        let logoArea: CGFloat = 16 + 20 + 20  // top spacing + logo + bottom padding
+
+        let fixed = topPadding + topicArea + dateHeight + dateToNext + imageHeight + imageToText + logoArea
+        let available = cardMaxHeight - fixed
+        let lineHeight: CGFloat = 21  // body_r_15 * 1.4
+
+        return max(1, Int(floor(available / lineHeight)))
     }
 
     private func makeBaseAttributedText(_ text: String, color: UIColor, forceWrap: Bool = false) -> NSMutableAttributedString {
         let attributedString = NSMutableAttributedString(
-            attributedString: .pretendard(.body_r_15, text: text, lineBreakMode: .byWordWrapping, forceWrap: forceWrap)
+            attributedString: .pretendard(.body_r_15, text: text, lineBreakMode: .byTruncatingTail, forceWrap: forceWrap)
         )
         attributedString.addAttribute(.foregroundColor, value: color, range: NSRange(location: 0, length: attributedString.length))
         return attributedString

@@ -149,6 +149,48 @@ final class DiaryExportView: BaseUIView {
         cardView.setDate(date)
     }
 
+    func renderCardSnapshot() -> UIImage {
+        layoutIfNeeded()
+
+        var cardRegion = cardView.frame
+        for binder in leftBinderCircles + rightBinderCircles + leftBinderCapsules + rightBinderCapsules {
+            cardRegion = cardRegion.union(binder.frame)
+        }
+
+        let padding: CGFloat = 24
+        let targetRatio: CGFloat = 9.0 / 16.0
+
+        let paddedWidth = cardRegion.width + 2 * padding
+        let paddedHeight = cardRegion.height + 2 * padding
+        let paddedRatio = paddedWidth / paddedHeight
+
+        let canvasSize: CGSize = paddedRatio > targetRatio
+            ? CGSize(width: paddedWidth, height: paddedWidth / targetRatio)
+            : CGSize(width: paddedHeight * targetRatio, height: paddedHeight)
+
+        let cardFrameInCanvas = CGRect(
+            x: (canvasSize.width - cardRegion.width) / 2,
+            y: (canvasSize.height - cardRegion.height) / 2,
+            width: cardRegion.width,
+            height: cardRegion.height
+        )
+
+        let renderer = UIGraphicsImageRenderer(size: canvasSize)
+        return renderer.image { context in
+            UIColor.gray100.setFill()
+            context.fill(CGRect(origin: .zero, size: canvasSize))
+
+            context.cgContext.saveGState()
+            context.cgContext.clip(to: cardFrameInCanvas)
+            context.cgContext.translateBy(
+                x: cardFrameInCanvas.minX - cardRegion.minX,
+                y: cardFrameInCanvas.minY - cardRegion.minY
+            )
+            layer.render(in: context.cgContext)
+            context.cgContext.restoreGState()
+        }
+    }
+
     // MARK: - Actions
 
     @objc private func handleToggleChanged() {

@@ -95,8 +95,16 @@ public final class DiaryExportViewController: BaseUIViewController<DiaryExportVi
     }
 
     private func handleShare() {
+        let image = exportView.renderCardSnapshot()
         shareModal.dismissModal()
-        // TODO: 카드 이미지 생성 후 UIActivityViewController로 공유
+
+        let activityVC = UIActivityViewController(activityItems: [image], applicationActivities: nil)
+        if let popover = activityVC.popoverPresentationController {
+            popover.sourceView = view
+            popover.sourceRect = CGRect(x: view.bounds.midX, y: view.bounds.midY, width: 0, height: 0)
+            popover.permittedArrowDirections = []
+        }
+        present(activityVC, animated: true)
     }
 
     private func handleSave() {
