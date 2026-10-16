@@ -14,10 +14,16 @@ enum MilestoneStyle {
     case blue
     case orange
 
-    init(count: Int) {
-        self = count % 100 == 0 ? .orange : .blue
+    init?(count: Int) {
+        if count == 7 || count == 30 || count == 50 {
+            self = .blue
+        } else if count >= 100 && count % 50 == 0 {
+            self = count % 100 == 0 ? .orange : .blue
+        } else {
+            return nil
+        }
     }
-
+    
     var illustration: ImageResource {
         switch self {
         case .blue: return .imgMilestoneBlue
@@ -150,7 +156,7 @@ final class MilestoneCardView: BaseUIView {
     // MARK: - Configure
 
     func configure(count: Int) {
-        let style = MilestoneStyle(count: count)
+        guard let style = MilestoneStyle(count: count) else { return }
 
         countLabel.text = "\(count)"
         countLabel.textColor = style.accentColor
@@ -178,14 +184,55 @@ final class MilestoneCardView: BaseUIView {
 
     // MARK: - Render
 
-    func renderImage(verticalPadding: CGFloat = 24) -> UIImage {
-        let size = CGSize(width: bounds.width, height: bounds.height + verticalPadding * 2)
-        let renderer = UIGraphicsImageRenderer(size: size)
-        return renderer.image { context in
+    func renderImage(
+        horizontalMargin: CGFloat = 16,
+        cardVerticalPadding: CGFloat = 32,
+        cardCornerRadius: CGFloat = 12
+    ) -> UIImage {
+        let originalRadius = layer.cornerRadius
+        let originalClips = clipsToBounds
+        layer.cornerRadius = 0
+        clipsToBounds = false
+        defer {
+            layer.cornerRadius = originalRadius
+            clipsToBounds = originalClips
+        }
+
+        let cardSize = CGSize(
+            width: bounds.width,
+            height: bounds.height + cardVerticalPadding * 2
+        )
+
+        let canvasWidth = cardSize.width + horizontalMargin * 2
+        let canvasHeight = max(canvasWidth * 16 / 9, cardSize.height + horizontalMargin * 2)
+        let canvasSize = CGSize(width: canvasWidth, height: canvasHeight)
+
+        let cardRect = CGRect(
+            x: (canvasWidth - cardSize.width) / 2,
+            y: (canvasHeight - cardSize.height) / 2,
+            width: cardSize.width,
+            height: cardSize.height
+        )
+
+        let format = UIGraphicsImageRendererFormat()
+        format.scale = 3
+        format.opaque = true
+
+        let renderer = UIGraphicsImageRenderer(size: canvasSize, format: format)
+        return renderer.image { _ in
+            UIColor.gray100.setFill()
+            UIRectFill(CGRect(origin: .zero, size: canvasSize))
+
             UIColor.white.setFill()
-            context.fill(CGRect(origin: .zero, size: size))
+            UIBezierPath(roundedRect: cardRect, cornerRadius: cardCornerRadius).fill()
+
             drawHierarchy(
-                in: CGRect(x: 0, y: verticalPadding, width: bounds.width, height: bounds.height),
+                in: CGRect(
+                    x: cardRect.minX,
+                    y: cardRect.minY + cardVerticalPadding,
+                    width: bounds.width,
+                    height: bounds.height
+                ),
                 afterScreenUpdates: true
             )
         }
