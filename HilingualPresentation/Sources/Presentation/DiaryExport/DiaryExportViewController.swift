@@ -20,6 +20,12 @@ public final class DiaryExportViewController: BaseUIViewController<DiaryExportVi
 
     private let exportView = DiaryExportView()
 
+    private let shareModal: Modal = {
+        let modal = Modal()
+        modal.isHidden = true
+        return modal
+    }()
+
     // MARK: - Init
 
     public init(
@@ -51,6 +57,7 @@ public final class DiaryExportViewController: BaseUIViewController<DiaryExportVi
     public override func setUI() {
         view.backgroundColor = .gray100
         view.addSubview(exportView)
+        view.addSubview(shareModal)
 
         let appearance = UINavigationBarAppearance()
         appearance.configureWithOpaqueBackground()
@@ -69,10 +76,40 @@ public final class DiaryExportViewController: BaseUIViewController<DiaryExportVi
             diffRanges: data.diffRanges,
             isHighlightingEnabled: true
         )
+
+        configureShareModal()
+    }
+
+    private func configureShareModal() {
+        shareModal.configure(
+            title: nil,
+            items: [
+                ("이미지 공유하기",
+                 UIImage(named: "ic_export_24_ios", in: .module, with: nil),
+                 { [weak self] in self?.handleShare() }),
+                ("이미지 저장하기",
+                 UIImage(named: "ic_download_24_ios", in: .module, with: nil),
+                 { [weak self] in self?.handleSave() })
+            ]
+        )
+    }
+
+    private func handleShare() {
+        shareModal.dismissModal()
+        // TODO: 카드 이미지 생성 후 UIActivityViewController로 공유
+    }
+
+    private func handleSave() {
+        shareModal.dismissModal()
+        // TODO: 카드 이미지 생성 후 Photos 라이브러리에 저장
     }
 
     public override func setLayout() {
         exportView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
+
+        shareModal.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
     }
@@ -84,6 +121,7 @@ public final class DiaryExportViewController: BaseUIViewController<DiaryExportVi
     }
 
     @objc public override func menuButtonTapped() {
-        // TODO: 외부 공유 액션 구현
+        shareModal.isHidden = false
+        shareModal.showAnimation()
     }
 }
