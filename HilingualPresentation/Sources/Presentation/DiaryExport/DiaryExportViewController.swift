@@ -51,6 +51,23 @@ public final class DiaryExportViewController: BaseUIViewController<DiaryExportVi
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(false, animated: false)
+        attachShareModal()
+    }
+
+    public override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        shareModal.removeFromSuperview()
+    }
+
+    private func attachShareModal() {
+        guard let container = navigationController?.view, shareModal.superview !== container else {
+            return
+        }
+        container.addSubview(shareModal)
+        container.bringSubviewToFront(shareModal)
+        shareModal.snp.remakeConstraints {
+            $0.edges.equalToSuperview()
+        }
     }
 
     // MARK: - Custom Method
@@ -58,7 +75,6 @@ public final class DiaryExportViewController: BaseUIViewController<DiaryExportVi
     public override func setUI() {
         view.backgroundColor = .gray100
         view.addSubview(exportView)
-        view.addSubview(shareModal)
 
         let appearance = UINavigationBarAppearance()
         appearance.configureWithOpaqueBackground()
@@ -89,7 +105,7 @@ public final class DiaryExportViewController: BaseUIViewController<DiaryExportVi
                  UIImage(named: "ic_export_24_ios", in: .module, with: nil),
                  { [weak self] in self?.handleShare() }),
                 ("이미지 저장하기",
-                 UIImage(named: "ic_download_24_ios", in: .module, with: nil),
+                 UIImage(resource: .icDownload24Ios),
                  { [weak self] in self?.handleSave() })
             ]
         )
@@ -154,10 +170,6 @@ public final class DiaryExportViewController: BaseUIViewController<DiaryExportVi
 
     public override func setLayout() {
         exportView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
-        }
-
-        shareModal.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
     }

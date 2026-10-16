@@ -25,7 +25,7 @@ final class DiaryExportBannerView: BaseUIView {
     }()
 
     private let downloadImageView: UIImageView = {
-        let imageView = UIImageView(image: UIImage(named: "ic_download_20_ios", in: .module, with: nil))
+        let imageView = UIImageView(image: UIImage(resource: .icDownload20Ios))
         imageView.tintColor = .hilingualOrange
         imageView.contentMode = .scaleAspectFit
         return imageView
