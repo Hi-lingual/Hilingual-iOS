@@ -306,6 +306,7 @@ final class FeedbackView: BaseUIView {
         data = DiaryViewData(
             imageURL: data.imageURL,
             date: data.date,
+            apiDate: data.apiDate,
             originalText: data.originalText,
             rewriteText: data.rewriteText,
             diffRanges: data.diffRanges,

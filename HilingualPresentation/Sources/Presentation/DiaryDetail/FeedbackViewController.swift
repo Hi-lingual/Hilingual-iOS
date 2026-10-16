@@ -13,9 +13,10 @@ import HilingualCore
 
 // MARK: - Model
 
-struct DiaryViewData {
+public struct DiaryViewData {
     let imageURL: String?
     let date: String
+    let apiDate: String
     let originalText: String
     let rewriteText: String
     let diffRanges: [HighlightTextView.DiffRange]
@@ -37,6 +38,9 @@ public final class FeedbackViewController: BaseUIViewController<FeedbackViewMode
     var publishedInfoLoaded: ((Bool) -> Void)?
     var onToggleChanged: ((Bool) -> Void)?
     var onExportTapped: (() -> Void)?
+
+    private(set) var currentDiaryData: DiaryViewData?
+    private(set) var currentTopicEn: String?
     private let viewDidLoadSubject = PassthroughSubject<Void, Never>()
     private var date: String = ""
 
@@ -193,6 +197,7 @@ public final class FeedbackViewController: BaseUIViewController<FeedbackViewMode
         output.fetchTopicResult
             .receive(on: RunLoop.main)
             .sink { [weak self] topic in
+                self?.currentTopicEn = topic.topicEn
                 self?.feedbackView.setTopic(
                     kor: topic.topicKor,
                     en: topic.topicEn
@@ -250,6 +255,7 @@ public final class FeedbackViewController: BaseUIViewController<FeedbackViewMode
                     let diaryViewData = DiaryViewData(
                         imageURL: entity.image,
                         date: displayDate,
+                        apiDate: entity.date,
                         originalText: entity.originalText,
                         rewriteText: entity.rewriteText,
                         diffRanges: diffRanges,
@@ -257,6 +263,7 @@ public final class FeedbackViewController: BaseUIViewController<FeedbackViewMode
                         isPublished: entity.isPublished
                     )
                     self?.date = displayDate
+                    self?.currentDiaryData = diaryViewData
                     self?.onDateLoaded?(displayDate)
                     self?.publishedInfoLoaded?(entity.isPublished)
 

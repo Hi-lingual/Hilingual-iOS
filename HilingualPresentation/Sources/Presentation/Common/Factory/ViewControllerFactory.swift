@@ -21,6 +21,11 @@ public protocol ViewControllerFactory {
     func makeWordBookStudyViewController(words: [PhraseData]) -> WordBookStudyViewController
     func makeDiaryDetailViewController(diaryId: Int) -> DiaryDetailViewController
     func makeFeedbackViewController(diaryId: Int) -> FeedbackViewController
+    func makeDiaryExportViewController(
+        diaryId: Int,
+        data: DiaryViewData,
+        topic: String
+    ) -> DiaryExportViewController
     func makeRecommendedExpressionViewController(diaryId: Int) -> RecommendedExpressionViewController
     func makeDiaryWritingViewController(
         topicData: (String, String)?,

@@ -88,6 +88,7 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
         super.viewDidLoad()
         
         feedbackViewController.showsAdBanner = !showsActionButton
+        feedbackViewController.isMyDiary = showsActionButton
         recommendedExpressionViewController.showsAdBanner = !showsActionButton
 
         hideKeyboardWhenTappedAround()
@@ -118,7 +119,7 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
         feedbackViewController.onToggleChanged = { [weak self] isEnabled in
             guard let self else { return }
             self.toggleClickCount += 1
-            
+
             AmplitudeManager.shared.send(
                 .clickToggle(
                     page: self.feedbackPage,
@@ -126,6 +127,18 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
                     toggleState: isEnabled
                 )
             )
+        }
+
+        feedbackViewController.onExportTapped = { [weak self] in
+            guard let self,
+                  let data = self.feedbackViewController.currentDiaryData,
+                  let topic = self.feedbackViewController.currentTopicEn else { return }
+            let exportVC = self.diContainer.makeDiaryExportViewController(
+                diaryId: self.diaryId,
+                data: data,
+                topic: topic
+            )
+            self.navigationController?.pushViewController(exportVC, animated: true)
         }
         
         recommendedExpressionViewController.onBookmarkToggle = { [weak self] phraseId, isBookmarked in
