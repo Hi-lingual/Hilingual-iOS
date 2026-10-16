@@ -59,6 +59,8 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
     private var entryId: String = ""
     private var entrySource: String = "unknown"
     private var backSource: String = "ui_button"
+    
+    public var milestoneCount: Int?
 
     // MARK: - Init
 
@@ -143,6 +145,11 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
         if showsActionButton {
             button.addTarget(self, action: #selector(postButtonTapped), for: .touchUpInside)
         }
+    }
+    
+    public override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        showMilestonePopupIfNeeded()
     }
 
     public override func viewWillAppear(_ animated: Bool) {
@@ -417,5 +424,22 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
             }
         )
         dialog.showAnimation()
+    }
+    
+    // MARK: - Milestone
+
+    private func showMilestonePopupIfNeeded() {
+        guard let count = milestoneCount, let window = view.window else { return }
+        milestoneCount = nil
+
+        let popup = MilestonePopupView()
+        popup.configure(count: count)
+        popup.onShareTapped = { image in
+            // TODO: 공유
+        }
+        popup.onSaveTapped = { image in
+            // TODO: 저장
+        }
+        popup.show(on: window)
     }
 }

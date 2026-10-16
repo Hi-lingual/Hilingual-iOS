@@ -226,6 +226,7 @@ public final class LoadingViewController: BaseUIViewController<LoadingViewModel>
     private func pushDiaryDetail(diaryId: Int) {
         let detailVC = diContainer.makeDiaryDetailViewController(diaryId: diaryId)
         detailVC.hidesBottomBarWhenPushed = true
+        detailVC.milestoneCount = 30 // TODO: 실제 마일스톤 값으로 교체
         navigationController?.pushViewController(detailVC, animated: true)
     }
     
