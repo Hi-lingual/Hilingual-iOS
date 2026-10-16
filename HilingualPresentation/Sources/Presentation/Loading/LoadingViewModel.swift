@@ -27,9 +27,11 @@ public final class LoadingViewModel: BaseViewModel {
     private let stateSubject = CurrentValueSubject<State, Never>(.loading)
     private let diaryIdSubject = CurrentValueSubject<Int?, Never>(nil)
     public let feedbackCompletedSubject = PassthroughSubject<Result<Void, Error>, Never>()
+    private let totalDiariesSubject = CurrentValueSubject<Int, Never>(0)
     
     public var statePublisher: AnyPublisher<State, Never> { stateSubject.eraseToAnyPublisher() }
     public var diaryIdPublisher: AnyPublisher<Int?, Never> { diaryIdSubject.eraseToAnyPublisher() }
+    public var totalDiariesPublisher: AnyPublisher<Int, Never> { totalDiariesSubject.eraseToAnyPublisher() }
     
     private var originalText: String?
     private var date: String?
@@ -175,6 +177,7 @@ public final class LoadingViewModel: BaseViewModel {
                 } receiveValue: { [weak self] response in
                     guard let self else { return }
                     self.diaryIdSubject.send(response.diaryId)
+                    self.totalDiariesSubject.send(response.totalDiaries)
                     Task { @MainActor in
                         await self.handleFeedbackCompleted(success: true)
                     }
@@ -200,6 +203,7 @@ public final class LoadingViewModel: BaseViewModel {
                 } receiveValue: { [weak self] response in
                     guard let self else { return }
                     self.diaryIdSubject.send(response.diaryId)
+                    self.totalDiariesSubject.send(response.totalDiaries)
                     Task { @MainActor in
                         await self.handleFeedbackCompleted(success: true)
                     }

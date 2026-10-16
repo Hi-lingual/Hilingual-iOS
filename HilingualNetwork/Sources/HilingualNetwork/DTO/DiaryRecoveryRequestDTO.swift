@@ -42,4 +42,5 @@ public struct DiaryRecoveryResponseDTO: Decodable {
 public struct DiaryRecoveryDataDTO: Decodable {
     public let diaryId: Int
     public let isAdWatched: Bool
+    public let totalDiaries: Int
 }

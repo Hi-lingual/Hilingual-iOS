@@ -30,7 +30,8 @@ public final class DefaultDiaryWritingRepository: DiaryWritingRepository {
             .map { responseDTO in
                 DiaryWritingResponseEntity(
                     diaryId: responseDTO.data.diaryId,
-                    isAdWatched: responseDTO.data.isAdWatched
+                    isAdWatched: responseDTO.data.isAdWatched,
+                    totalDiaries: responseDTO.data.totalDiaries
                 )
             }
             .mapError { $0 as Error }
@@ -48,7 +49,8 @@ public final class DefaultDiaryWritingRepository: DiaryWritingRepository {
             .map { responseDTO in
                 DiaryWritingResponseEntity(
                     diaryId: responseDTO.data.diaryId,
-                    isAdWatched: responseDTO.data.isAdWatched
+                    isAdWatched: responseDTO.data.isAdWatched,
+                    totalDiaries: responseDTO.data.totalDiaries
                 )
             }
             .mapError { $0 as Error }
