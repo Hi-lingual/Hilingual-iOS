@@ -459,8 +459,8 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
     private func saveMilestoneImage(_ image: UIImage, popup: MilestonePopupView?) {
         Task { @MainActor [weak self, weak popup] in
             let status = await PHPhotoLibrary.requestAuthorization(for: .addOnly)
-
-            guard status == .authorized || status == .limited else {
+            
+            guard status == .authorized else {
                 popup?.dismiss()
                 return
             }
