@@ -39,12 +39,12 @@ public final class LoadingViewController: BaseUIViewController<LoadingViewModel>
     
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        navigationController?.setNavigationBarHidden(true, animated: animated)
+        navigationController?.setNavigationBarHidden(true, animated: false)
     }
     
     public override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        navigationController?.setNavigationBarHidden(false, animated: animated)
+        navigationController?.setNavigationBarHidden(false, animated: false)
     }
     
     // MARK: - Setup
@@ -103,6 +103,7 @@ public final class LoadingViewController: BaseUIViewController<LoadingViewModel>
             .receive(on: RunLoop.main)
             .sink { [weak self] diaries in
                 self?.currentTotalDiaries = diaries
+                MilestoneStore.shared.setPending(diaries)
             }
             .store(in: &cancellables)
         
@@ -231,15 +232,11 @@ public final class LoadingViewController: BaseUIViewController<LoadingViewModel>
             .store(in: &cancellables)
     }
     
-    private func pushDiaryDetail(diaryId: Int, totalDiaries: Int? = nil) {
+    private func pushDiaryDetail(diaryId: Int) {
+        MilestoneStore.shared.setPending(currentTotalDiaries)
+
         let detailVC = diContainer.makeDiaryDetailViewController(diaryId: diaryId)
         detailVC.hidesBottomBarWhenPushed = true
-        
-        let count = totalDiaries ?? currentTotalDiaries
-        if MilestoneStyle(count: count) != nil {
-            detailVC.milestoneCount = count
-        }
-        
         navigationController?.pushViewController(detailVC, animated: true)
     }
     
