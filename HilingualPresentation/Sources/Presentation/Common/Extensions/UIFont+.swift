@@ -10,7 +10,7 @@ import UIKit
 extension UIFont {
     
     enum Family: String, CaseIterable {
-        case Medium, Regular, SemiBold
+        case Medium, Regular, SemiBold, Bold, ExtraBold
     }
     
     public static func registerPretendardFonts() {
@@ -48,6 +48,8 @@ extension UIFont {
     }
     
     enum PretendardStyle {
+        case head_eb_90
+        case head_b_36
         case head_sb_20
         case head_m_20
         case head_r_20
@@ -71,6 +73,8 @@ extension UIFont {
     
     static func pretendard(_ style: PretendardStyle) -> UIFont {
         switch style {
+        case .head_eb_90: return .pretendard(weight: .ExtraBold, size: 90)
+        case .head_b_36: return .pretendard(weight: .Bold, size: 36)
         case .head_sb_20: return .pretendard(weight: .SemiBold, size: 20)
         case .head_m_20: return .pretendard(weight: .Medium, size: 20)
         case .head_r_20: return .pretendard(weight: .Regular, size: 20)

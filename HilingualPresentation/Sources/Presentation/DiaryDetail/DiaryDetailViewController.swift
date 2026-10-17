@@ -10,6 +10,7 @@ import UIKit
 import Combine
 import SafariServices
 import HilingualCore
+import Photos
 
 public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailViewModel> {
 
@@ -59,6 +60,8 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
     private var entryId: String = ""
     private var entrySource: String = "unknown"
     private var backSource: String = "ui_button"
+    
+    public var milestoneCount: Int?
 
     // MARK: - Init
 
@@ -143,6 +146,11 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
         if showsActionButton {
             button.addTarget(self, action: #selector(postButtonTapped), for: .touchUpInside)
         }
+    }
+    
+    public override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        showMilestonePopupIfNeeded()
     }
 
     public override func viewWillAppear(_ animated: Bool) {
@@ -417,5 +425,69 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
             }
         )
         dialog.showAnimation()
+    }
+    
+    // MARK: - Milestone
+
+    private func showMilestonePopupIfNeeded() {
+        guard let count = milestoneCount, let window = view.window else { return }
+        milestoneCount = nil
+
+        let popup = MilestonePopupView()
+        popup.configure(count: count)
+        popup.onShareTapped = { [weak self] image in
+            self?.shareMilestoneImage(image)
+        }
+        popup.onSaveTapped = { [weak self, weak popup] image in
+            self?.saveMilestoneImage(image, popup: popup)
+        }
+        popup.show(on: window)
+    }
+
+    private func shareMilestoneImage(_ image: UIImage) {
+        let activityVC = UIActivityViewController(activityItems: [image], applicationActivities: nil)
+        activityVC.popoverPresentationController?.sourceView = view
+        activityVC.popoverPresentationController?.sourceRect = CGRect(
+            x: view.bounds.midX,
+            y: view.bounds.midY,
+            width: 0,
+            height: 0
+        )
+        present(activityVC, animated: true)
+    }
+    
+    private func saveMilestoneImage(_ image: UIImage, popup: MilestonePopupView?) {
+        Task { @MainActor [weak self, weak popup] in
+            let status = await PHPhotoLibrary.requestAuthorization(for: .addOnly)
+            
+            guard status == .authorized else {
+                popup?.dismiss()
+                return
+            }
+
+            do {
+                try await Self.saveToPhotoLibrary(image)
+                popup?.dismiss()
+                self?.showSimpleToast("일기가 이미지로 저장되었어요.")
+            } catch {
+                popup?.dismiss()
+                self?.showSimpleToast("이미지 저장에 실패했어요.")
+            }
+        }
+    }
+
+    nonisolated private static func saveToPhotoLibrary(_ image: UIImage) async throws {
+        try await PHPhotoLibrary.shared().performChanges {
+            PHAssetChangeRequest.creationRequestForAsset(from: image)
+        }
+    }
+
+    private func showSimpleToast(_ message: String) {
+        let toast = ToastMessage()
+        view.addSubview(toast)
+        toast.snp.makeConstraints {
+            $0.bottom.equalToSuperview().inset(58)
+        }
+        toast.configure(type: .basic, message: message)
     }
 }
