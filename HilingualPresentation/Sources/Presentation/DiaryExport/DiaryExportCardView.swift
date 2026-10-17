@@ -23,13 +23,13 @@ final class DiaryExportCardView: BaseUIView {
     // MARK: - UI Components
 
     private let leftQuoteImageView: UIImageView = {
-        let imageView = UIImageView(image: UIImage(named: "ic_quote_L_16_ios", in: .module, with: nil))
+        let imageView = UIImageView(image: UIImage(resource: .icQuoteL16Ios))
         imageView.contentMode = .scaleAspectFit
         return imageView
     }()
 
     private let rightQuoteImageView: UIImageView = {
-        let imageView = UIImageView(image: UIImage(named: "ic_quote_R_16_ios", in: .module, with: nil))
+        let imageView = UIImageView(image: UIImage(resource: .icQuoteR16Ios))
         imageView.contentMode = .scaleAspectFit
         return imageView
     }()
@@ -81,7 +81,7 @@ final class DiaryExportCardView: BaseUIView {
     }()
 
     private let logoImageView: UIImageView = {
-        let imageView = UIImageView(image: UIImage(named: "img_logo_small_ios", in: .module, with: nil))
+        let imageView = UIImageView(image: UIImage(resource: .imgLogoSmallIos))
         imageView.contentMode = .scaleAspectFit
         return imageView
     }()
