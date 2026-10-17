@@ -16,6 +16,7 @@ public final class LoadingViewController: BaseUIViewController<LoadingViewModel>
     
     private var adLoadRetryCount = 0
     private static let maxAdRetryCount = 3
+    private var currentTotalDiaries: Int = 0
     private var pendingDiaryId: Int?
     
     private let loadingView = LoadingView()
@@ -97,6 +98,13 @@ public final class LoadingViewController: BaseUIViewController<LoadingViewModel>
     
     public override func bind(viewModel: LoadingViewModel) {
         super.bind(viewModel: viewModel)
+        
+        viewModel.totalDiariesPublisher
+            .receive(on: RunLoop.main)
+            .sink { [weak self] diaries in
+                self?.currentTotalDiaries = diaries
+            }
+            .store(in: &cancellables)
         
         let input = LoadingViewModel.Input(
             startLoading: Just(()).eraseToAnyPublisher(),
@@ -223,9 +231,15 @@ public final class LoadingViewController: BaseUIViewController<LoadingViewModel>
             .store(in: &cancellables)
     }
     
-    private func pushDiaryDetail(diaryId: Int) {
+    private func pushDiaryDetail(diaryId: Int, totalDiaries: Int? = nil) {
         let detailVC = diContainer.makeDiaryDetailViewController(diaryId: diaryId)
         detailVC.hidesBottomBarWhenPushed = true
+        
+        let count = totalDiaries ?? currentTotalDiaries
+        if MilestoneStyle(count: count) != nil {
+            detailVC.milestoneCount = count
+        }
+        
         navigationController?.pushViewController(detailVC, animated: true)
     }
     
