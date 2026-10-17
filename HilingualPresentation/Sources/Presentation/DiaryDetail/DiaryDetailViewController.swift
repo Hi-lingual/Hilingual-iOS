@@ -486,7 +486,7 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
             do {
                 try await Self.saveToPhotoLibrary(image)
                 popup?.dismiss()
-                self?.showSimpleToast("일기가 이미지로 저장되었어요.")
+                self?.showSimpleToast("카드가 이미지로 저장되었어요.")
             } catch {
                 popup?.dismiss()
                 self?.showSimpleToast("이미지 저장에 실패했어요.")
