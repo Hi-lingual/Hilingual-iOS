@@ -29,10 +29,15 @@ final class HighlightTextView: BaseUIView {
     private var highlightTimer: Timer?
     private var hasPlayedSpeech: Bool = false
     var onSpeechButtonTapped: ((Bool) -> Void)?
-    
-    
+    var onExportTapped: (() -> Void)?
+
+    private var isExportBannerVisible: Bool = false
+    private var hasImage: Bool = true
+
     // MARK: - UI Components
-    
+
+    private let exportBannerView = DiaryExportBannerView()
+
     let diaryImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
@@ -63,7 +68,7 @@ final class HighlightTextView: BaseUIView {
     // MARK: - Custom Method
     
     override func setUI() {
-        addSubviews(diaryImageView, textView, speechButton, textCountLabel)
+        addSubviews(exportBannerView, diaryImageView, textView, speechButton, textCountLabel)
         textView.isUserInteractionEnabled = true
         textView.isEditable = false
         textView.isSelectable = false
@@ -77,19 +82,55 @@ final class HighlightTextView: BaseUIView {
         self.layer.cornerRadius = 12
         diaryImageView.isUserInteractionEnabled = true
         diaryImageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleTapGesture)))
-    }
-    
-    override func setLayout() {
-        diaryImageView.snp.makeConstraints {
-            $0.top.leading.trailing.equalToSuperview().inset(12)
-            $0.height.equalTo(diaryImageView.snp.width).multipliedBy(0.6)
+
+        exportBannerView.isHidden = true
+        exportBannerView.onTap = { [weak self] in
+            self?.onExportTapped?()
         }
-        
-        textView.snp.makeConstraints {
-            $0.top.equalTo(diaryImageView.snp.bottom).offset(12)
+    }
+
+    func setExportBannerVisible(_ visible: Bool) {
+        guard isExportBannerVisible != visible else { return }
+        isExportBannerVisible = visible
+        exportBannerView.isHidden = !visible
+        updateTopLayout()
+    }
+
+    private func updateTopLayout() {
+        exportBannerView.snp.remakeConstraints {
+            $0.top.leading.trailing.equalToSuperview().inset(12)
+            $0.height.equalTo(isExportBannerVisible ? 40 : 0)
+        }
+
+        diaryImageView.snp.remakeConstraints {
+            if isExportBannerVisible {
+                $0.top.equalTo(exportBannerView.snp.bottom).offset(12)
+            } else {
+                $0.top.equalToSuperview().inset(12)
+            }
+            $0.leading.trailing.equalToSuperview().inset(12)
+            if hasImage {
+                $0.height.equalTo(diaryImageView.snp.width).multipliedBy(0.6)
+            } else {
+                $0.height.equalTo(0)
+            }
+        }
+
+        textView.snp.remakeConstraints {
+            if hasImage {
+                $0.top.equalTo(diaryImageView.snp.bottom).offset(12)
+            } else if isExportBannerVisible {
+                $0.top.equalTo(exportBannerView.snp.bottom).offset(12)
+            } else {
+                $0.top.equalToSuperview().inset(12)
+            }
             $0.leading.trailing.equalToSuperview().inset(12)
         }
-        
+    }
+
+    override func setLayout() {
+        updateTopLayout()
+
         speechButton.snp.makeConstraints {
             $0.top.equalTo(textView.snp.bottom).offset(12)
             $0.leading.equalToSuperview().inset(12)
@@ -116,15 +157,12 @@ final class HighlightTextView: BaseUIView {
         if let image = image, !image.isEmpty, let url = URL(string: image) {
             diaryImageView.kf.setImage(with: url)
             diaryImageView.isHidden = false
+            hasImage = true
         } else {
             diaryImageView.isHidden = true
-            diaryImageView.snp.makeConstraints {
-                $0.height.equalTo(0)
-            }
-            textView.snp.makeConstraints {
-                $0.top.equalToSuperview().inset(12)
-            }
+            hasImage = false
         }
+        updateTopLayout()
         
         self.originalText = originalText
         self.highlightText = highlightText

@@ -14,6 +14,7 @@ final class FeedbackView: BaseUIView {
 
     var onToggleChanged: ((Bool) -> Void)?
     var onDiaryPronunciationTapped: ((Bool) -> Void)?
+    var onExportTapped: (() -> Void)?
 
     // MARK: - UI Components
 
@@ -26,6 +27,9 @@ final class FeedbackView: BaseUIView {
     private var isHighlightingEnabled: Bool = true
     private let toggleButton = UIButton(type: .system)
 
+    private var isMyDiary: Bool = false
+    private var isCorrectedViewOn: Bool = true
+
     var dateLabel: UILabel = {
         let label = UILabel()
         label.font = .pretendard(.body_m_16)
@@ -34,7 +38,7 @@ final class FeedbackView: BaseUIView {
     }()
     
     let dropdown = Dropdown(style: .selectedDate)
-    
+
     lazy var segmentToggle: SegmentToggle = {
         let toggle = SegmentToggle(titles: ["교정본", "원본"])
         toggle.onIndexChanged = { [weak self] index in
@@ -129,8 +133,21 @@ final class FeedbackView: BaseUIView {
         headerStackView.addArrangedSubviews(dateLabel, headerSpacer, segmentToggle)
         feedbackStackView.addArrangedSubview(feedbackLabel)
 
+        diaryTextView.onExportTapped = { [weak self] in
+            self?.onExportTapped?()
+        }
+
         backgroundColor = .gray100
         isHighlightingEnabled.toggle()
+    }
+
+    func setIsMyDiary(_ isMyDiary: Bool) {
+        self.isMyDiary = isMyDiary
+        updateExportBannerVisibility()
+    }
+
+    private func updateExportBannerVisibility() {
+        diaryTextView.setExportBannerVisible(isMyDiary && isCorrectedViewOn)
     }
 
     override func setLayout() {
@@ -154,7 +171,7 @@ final class FeedbackView: BaseUIView {
         dropdown.snp.makeConstraints {
             $0.centerX.equalToSuperview()
         }
-        
+
         diaryTextView.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview().inset(16)
         }
@@ -281,11 +298,15 @@ final class FeedbackView: BaseUIView {
     // MARK: - Actions
 
     private func toggleButtonTapped(isEnabled: Bool) {
+        isCorrectedViewOn = isEnabled
+        updateExportBannerVisibility()
+
         guard var data = currentDiaryData else { return }
 
         data = DiaryViewData(
             imageURL: data.imageURL,
             date: data.date,
+            apiDate: data.apiDate,
             originalText: data.originalText,
             rewriteText: data.rewriteText,
             diffRanges: data.diffRanges,

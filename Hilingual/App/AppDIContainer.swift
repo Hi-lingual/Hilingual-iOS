@@ -77,6 +77,20 @@ final class AppDIContainer: ViewControllerFactory {
         )
     }
     
+    public func makeDiaryExportViewController(
+        diaryId: Int,
+        data: DiaryViewData,
+        topic: String
+    ) -> DiaryExportViewController {
+        return DiaryExportViewController(
+            viewModel: DiaryExportViewModel(),
+            diContainer: self,
+            diaryId: diaryId,
+            data: data,
+            topic: topic
+        )
+    }
+
     public func makeRecommendedExpressionViewController(diaryId: Int) -> RecommendedExpressionViewController {
 //        return VocaViewController(viewModel: makeVocaViewModel(diaryId: diaryId), diContainer: self)
         let viewModel = RecommendedExpressionViewModel(

@@ -30,6 +30,20 @@ public enum DisplayDateFormatter {
         return format(date, as: "M월 d일 EEEE")
     }
 
+    // API 날짜 문자열 "yyyy-MM-dd"를 일기 카드 export 표시 형식인 "yyyy.MM.dd EEE"(대문자 요일)로 변환합니다.
+    // 예: "2026-09-28" -> "2026.09.28 MON"
+    public static func diaryExportDate(apiDate: String) -> String {
+        guard let date = parseAPIDate(apiDate) else {
+            return apiDate
+        }
+
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = .autoupdatingCurrent
+        formatter.dateFormat = "yyyy.MM.dd EEE"
+        return formatter.string(from: date).uppercased()
+    }
+
     // topic 조회 등 서버 전송용 날짜를 "yyyy-MM-dd"로 정규화합니다.
     // 이미 API 포맷이면 그대로 반환하고, 구형 표시 문자열만 fallback 변환합니다.
     public static func normalizedAPIDate(_ value: String) -> String {
