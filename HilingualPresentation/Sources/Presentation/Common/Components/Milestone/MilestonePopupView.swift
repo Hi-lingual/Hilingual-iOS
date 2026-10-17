@@ -31,6 +31,8 @@ final class MilestonePopupView: BaseUIView {
     private let closeButton: UIButton = {
         let button = UIButton(type: .custom)
         button.setImage(UIImage(resource: .btnCloseCircle), for: .normal)
+        button.imageView?.contentMode = .scaleAspectFit
+        button.contentEdgeInsets = UIEdgeInsets(top: 11, left: 11, bottom: 11, right: 11)
         return button
     }()
 
@@ -75,8 +77,8 @@ final class MilestonePopupView: BaseUIView {
         }
 
         closeButton.snp.makeConstraints {
-            $0.top.trailing.equalToSuperview().inset(12)
-            $0.size.equalTo(22)
+            $0.top.trailing.equalToSuperview().inset(1)
+            $0.size.equalTo(44)
         }
     }
 
