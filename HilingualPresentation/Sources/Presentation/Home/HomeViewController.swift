@@ -268,9 +268,9 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         homeView.selectedInfo.onTapRecovery = { [weak self] in
             guard let self else { return }
             guard let selectedDate = self.homeView.calendarView.selectedDate else { return }
-
+            
             AmplitudeManager.shared.send(.clickHomeStreakRevive)
-
+            
             self.pendingRecoveryDate = selectedDate
             self.isRecoveryWritingFlowActive = true
             self.loadInterstitialAdAndPresent()
@@ -1035,11 +1035,11 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     private func checkAndRequestLocalPushPermission() {
         Task { @MainActor [weak self] in
             guard let self else { return }
-            
-            let shouldRegister = await localPushPermissionService.checkAndRequestPermission()
-            guard shouldRegister else { return }
-            
-            self.viewModel?.registerInitialLocalPushes()
+            let isGranted = await localPushPermissionService.checkAndRequestPermission()
+            guard !isGranted else { return }
+            if await localPushPermissionService.isPermissionDenied() {
+                self.viewModel?.disableDiaryReminder()
+            }
         }
     }
     

@@ -96,20 +96,23 @@ public final class ReminderTimeSettingViewController: BaseUIViewController<Remin
     }
     
     public override func backButtonTapped() {
-        guard !selectedWeekdays.isEmpty else {
-            navigationController?.popViewController(animated: true)
-            return
-        }
         showLeaveConfirmDialog()
+    }
+    
+    public override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        dialog.removeFromSuperview()
     }
 
     public override func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
-        guard selectedWeekdays.isEmpty else { return false }
-        return super.gestureRecognizerShouldBegin(gestureRecognizer)
+        if gestureRecognizer === navigationController?.interactivePopGestureRecognizer {
+            showLeaveConfirmDialog()
+        }
+        return false
     }
     
     private func showLeaveConfirmDialog() {
-        guard let window = self.view.window else { return }
+        guard dialog.isHidden, let window = self.view.window else { return }
         window.addSubview(dialog)
         dialog.snp.remakeConstraints { $0.edges.equalToSuperview() }
 

@@ -128,11 +128,19 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func sceneDidBecomeActive(_ scene: UIScene) {
         WidgetSyncService.shared.syncTodayWidgets()
         WidgetSyncService.shared.syncWidgetCountAnalytics()
-        
-        AppDIContainer.shared.makeDiaryReminderUseCase()
-            .refreshUpcomingReminders()
-            .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
-            .store(in: &cancellables)
+
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+            let reminderUseCase = AppDIContainer.shared.makeDiaryReminderUseCase()
+
+            if await LocalPushPermissionService().isPermissionDenied() {
+                reminderUseCase.disableReminder()
+            } else {
+                reminderUseCase.refreshUpcomingReminders()
+                    .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
+                    .store(in: &self.cancellables)
+            }
+        }
     }
     func sceneWillResignActive(_ scene: UIScene) { }
     func sceneWillEnterForeground(_ scene: UIScene) { }

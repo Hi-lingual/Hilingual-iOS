@@ -9,6 +9,7 @@ import Foundation
 import Combine
 import HilingualDomain
 
+@MainActor
 public final class NotificationSettingViewModel: BaseViewModel {
 
     // MARK: - Input
@@ -109,6 +110,14 @@ public final class NotificationSettingViewModel: BaseViewModel {
         
         input.reminderToggled
             .sink { [weak self] in
+                self?.disableReminder()
+            }
+            .store(in: &cancellables)
+        
+        input.isSystemPermissionGranted
+            .removeDuplicates()
+            .filter { !$0 }
+            .sink { [weak self] _ in
                 self?.disableReminder()
             }
             .store(in: &cancellables)

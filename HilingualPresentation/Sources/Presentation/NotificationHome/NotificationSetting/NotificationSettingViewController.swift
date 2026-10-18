@@ -229,7 +229,8 @@ public final class NotificationSettingViewController: BaseUIViewController<Notif
         Task {
             let isGranted = await withCheckedContinuation { continuation in
                 UNUserNotificationCenter.current().getNotificationSettings { settings in
-                    continuation.resume(returning: settings.authorizationStatus == .authorized)
+                    continuation.resume(returning: settings.authorizationStatus == .authorized
+                                                || settings.authorizationStatus == .provisional)
                 }
             }
             await MainActor.run { [weak self] in

@@ -36,6 +36,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
         
         AppDIContainer.shared.configureFCMTokenSync()
         AppDIContainer.shared.configureWidgetSync()
+        AppDIContainer.shared.makeLocalPushUseCase().cancelLegacyPushes()
 
         Messaging.messaging().delegate = self
         UNUserNotificationCenter.current().delegate = self
@@ -50,7 +51,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate {
         print("[FCM] 토큰 갱신: \(fcmToken)")
         
         Task { @MainActor in
-            FCMTokenManager.shared.currentToken = fcmToken
+            FCMTokenManager.shared.token = fcmToken
         }
     }
     
