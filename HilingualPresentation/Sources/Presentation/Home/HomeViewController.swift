@@ -75,6 +75,10 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         super.viewDidAppear(animated)
         AmplitudeManager.shared.send(.viewPage(page: .home))
         showOnboardingBottomSheet()
+
+        if !isShowingOnboardingBottomSheet && !isHomeModalVisible {
+            MilestonePopupPresenter.presentIfNeeded(from: self)
+        }
     }
     
     public override func viewDidDisappear(_ animated: Bool) {
