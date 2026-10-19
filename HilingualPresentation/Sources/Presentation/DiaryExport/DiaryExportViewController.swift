@@ -121,6 +121,12 @@ public final class DiaryExportViewController: BaseUIViewController<DiaryExportVi
             popover.sourceRect = CGRect(x: view.bounds.midX, y: view.bounds.midY, width: 0, height: 0)
             popover.permittedArrowDirections = []
         }
+        activityVC.completionWithItemsHandler = { [weak self] activityType, completed, _, error in
+            guard completed, error == nil, activityType == .saveToCameraRoll else { return }
+            Task { @MainActor in
+                self?.showToast(message: "일기가 이미지로 저장되었어요.")
+            }
+        }
         present(activityVC, animated: true)
     }
 
