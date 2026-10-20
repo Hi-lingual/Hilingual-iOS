@@ -52,6 +52,10 @@ public enum AnalyticsEvent {
     case clickErrorCTA(page: Page, action: ErrorCTAAction)
     case clickWidget(widgetType: WidgetType)
     case widgetCount(diaryTopicCount: Int, streakCount: Int, totalCount: Int)
+    case clickCardshareImagePreview
+    case clickCardshareImageExport
+    case clickCardshareImageShare
+    case clickCardshareImageDownload
 }
 
 extension AnalyticsEvent {
@@ -107,6 +111,14 @@ extension AnalyticsEvent {
             return "click_widget"
         case .widgetCount:
             return "widget_count"
+        case .clickCardshareImagePreview:
+            return "click_cardshare.image_preview"
+        case .clickCardshareImageExport:
+            return "click_cardshare.image_export"
+        case .clickCardshareImageShare:
+            return "click_cardshare.image_share"
+        case .clickCardshareImageDownload:
+            return "click_cardshare.image_download"
         default:
             // 공통 이벤트: caseName을 snake_case로 변환
             // (click_back, click_empathy_action, click_dropdown, bookmark_action,
@@ -290,6 +302,11 @@ extension AnalyticsEvent {
                 "widget_count_streak": streakCount,
                 "widget_count_total": totalCount
             ]
+        case .clickCardshareImagePreview,
+             .clickCardshareImageExport,
+             .clickCardshareImageShare,
+             .clickCardshareImageDownload:
+            return nil
         }
     }
 
