@@ -37,6 +37,7 @@ enum MilestonePopupPresenter {
     // MARK: - Share
 
     private static func share(_ image: UIImage, from vc: UIViewController, popup: MilestonePopupView?) {
+        AmplitudeManager.shared.send(.clickMilestoneImageShare)
         let activityVC = UIActivityViewController(activityItems: [image], applicationActivities: nil)
         activityVC.popoverPresentationController?.sourceView = vc.view
         activityVC.popoverPresentationController?.sourceRect = CGRect(
@@ -54,6 +55,7 @@ enum MilestonePopupPresenter {
     // MARK: - Save
 
     private static func save(_ image: UIImage, popup: MilestonePopupView?) {
+        AmplitudeManager.shared.send(.clickMilestoneImageDownload)
         Task { @MainActor [weak popup] in
             let status = await PHPhotoLibrary.requestAuthorization(for: .addOnly)
             guard status == .authorized else { return }

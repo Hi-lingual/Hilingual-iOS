@@ -56,6 +56,8 @@ public enum AnalyticsEvent {
     case clickCardshareImageExport
     case clickCardshareImageShare
     case clickCardshareImageDownload
+    case clickMilestoneImageShare
+    case clickMilestoneImageDownload
 }
 
 extension AnalyticsEvent {
@@ -119,6 +121,10 @@ extension AnalyticsEvent {
             return "click_cardshare.image_share"
         case .clickCardshareImageDownload:
             return "click_cardshare.image_download"
+        case .clickMilestoneImageShare:
+            return "click_milestone.image_share"
+        case .clickMilestoneImageDownload:
+            return "click_milestone.image_download"
         default:
             // 공통 이벤트: caseName을 snake_case로 변환
             // (click_back, click_empathy_action, click_dropdown, bookmark_action,
@@ -305,7 +311,9 @@ extension AnalyticsEvent {
         case .clickCardshareImagePreview,
              .clickCardshareImageExport,
              .clickCardshareImageShare,
-             .clickCardshareImageDownload:
+             .clickCardshareImageDownload,
+             .clickMilestoneImageShare,
+             .clickMilestoneImageDownload:
             return nil
         }
     }
