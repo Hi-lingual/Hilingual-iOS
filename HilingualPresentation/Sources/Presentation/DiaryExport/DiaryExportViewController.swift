@@ -8,6 +8,7 @@
 import UIKit
 import Photos
 import SnapKit
+import HilingualCore
 
 public final class DiaryExportViewController: BaseUIViewController<DiaryExportViewModel> {
 
@@ -112,6 +113,7 @@ public final class DiaryExportViewController: BaseUIViewController<DiaryExportVi
     }
 
     private func handleShare() {
+        AmplitudeManager.shared.send(.clickCardshareImageShare)
         let image = exportView.renderCardSnapshot()
         shareModal.dismissModal()
 
@@ -131,6 +133,7 @@ public final class DiaryExportViewController: BaseUIViewController<DiaryExportVi
     }
 
     private func handleSave() {
+        AmplitudeManager.shared.send(.clickCardshareImageDownload)
         let image = exportView.renderCardSnapshot()
         shareModal.dismissModal()
 
@@ -187,6 +190,7 @@ public final class DiaryExportViewController: BaseUIViewController<DiaryExportVi
     }
 
     @objc public override func menuButtonTapped() {
+        AmplitudeManager.shared.send(.clickCardshareImageExport)
         shareModal.isHidden = false
         shareModal.showAnimation()
     }

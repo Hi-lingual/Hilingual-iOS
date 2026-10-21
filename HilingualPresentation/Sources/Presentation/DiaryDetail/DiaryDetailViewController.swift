@@ -138,6 +138,7 @@ public final class DiaryDetailViewController: BaseUIViewController<DiaryDetailVi
             guard let self,
                   let data = self.feedbackViewController.currentDiaryData,
                   let topic = self.feedbackViewController.currentTopicEn else { return }
+            AmplitudeManager.shared.send(.clickCardshareImagePreview)
             let exportVC = self.diContainer.makeDiaryExportViewController(
                 diaryId: self.diaryId,
                 data: data,

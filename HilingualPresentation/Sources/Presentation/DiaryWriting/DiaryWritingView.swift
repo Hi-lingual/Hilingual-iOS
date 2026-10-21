@@ -75,10 +75,10 @@ final class DiaryWritingView: BaseUIView {
         config.image = UIImage(resource: .icCamera20Ios)
         config.contentInsets = NSDirectionalEdgeInsets(top: 28, leading: 28, bottom: 28, trailing: 28)
         config.baseBackgroundColor = .gray100
+        config.background.cornerRadius = 8
+        config.cornerStyle = .fixed
         
         button.configuration = config
-        button.layer.cornerRadius = 8
-        button.clipsToBounds = true
         return button
     }()
     
