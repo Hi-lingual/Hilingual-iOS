@@ -159,8 +159,7 @@ final class LoadingView: BaseUIView {
     }
 
     private func addTarget() {
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(closeIconTapped))
-        closeIcon.addGestureRecognizer(tapGesture)
+        closeIcon.addTarget(self, action: #selector(closeIconTapped), for: .touchUpInside)
     }
 
     // MARK: - Methods

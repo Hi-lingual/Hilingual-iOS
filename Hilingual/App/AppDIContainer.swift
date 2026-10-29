@@ -541,7 +541,8 @@ extension AppDIContainer {
             fetchTemporaryDiaryUseCase: makeFetchTemporaryDiaryUseCase(),
             localPushUseCase: makeLocalPushUseCase(),
             homeAdWatchUseCase: makeHomeAdWatchUseCase(),
-            diaryReminderUseCase: makeDiaryReminderUseCase()
+            diaryReminderUseCase: makeDiaryReminderUseCase(),
+            diaryAdWatchUseCase: makeDiaryAdWatchUseCase()
         )
     }
 }

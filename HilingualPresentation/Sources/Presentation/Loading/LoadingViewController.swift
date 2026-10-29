@@ -69,7 +69,6 @@ public final class LoadingViewController: BaseUIViewController<LoadingViewModel>
     
     public override func addTarget() {
         loadingView.feedbackButton.addTarget(self, action: #selector(feedbackButtonTapped), for: .touchUpInside)
-        loadingView.closeIcon.addTarget(self, action: #selector(closeButtonTapped), for: .touchUpInside)
     }
     
     // MARK: - Action
@@ -88,10 +87,6 @@ public final class LoadingViewController: BaseUIViewController<LoadingViewModel>
     
     @objc private func retryButtonTapped() {
         retryTappedSubject.send()
-    }
-    
-    @objc private func closeButtonTapped() {
-        closeTappedSubject.send()
     }
     
     // MARK: - Bind
