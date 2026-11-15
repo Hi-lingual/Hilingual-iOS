@@ -20,6 +20,10 @@
 	<array>
 		<string>ko</string>
 	</array>
+	<key>GIDClientID</key>
+	<string>$(GID_IOS_CLIENT_KEY).apps.googleusercontent.com</string>
+	<key>GIDServerClientID</key>
+	<string>$(GID_SERVER_CLIENT_ID)</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -28,6 +32,14 @@
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>hilingual</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>GoogleSignIn</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.$(GID_IOS_CLIENT_KEY)</string>
 			</array>
 		</dict>
 	</array>

@@ -37,6 +37,44 @@ final class LoginView: BaseUIView {
         return imageView
     }()
 
+    let googleLoginButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.backgroundColor = .white
+        button.layer.cornerRadius = 8
+        button.layer.borderWidth = 1
+        button.layer.borderColor = UIColor.gray200.cgColor
+        button.clipsToBounds = true
+
+        let iconImageView = UIImageView()
+        iconImageView.image = UIImage(
+            named: "ic_google_20_ios",
+            in: .module,
+            compatibleWith: nil
+        )?.withRenderingMode(.alwaysOriginal)
+        iconImageView.contentMode = .scaleAspectFit
+
+        let titleLabel = UILabel()
+        titleLabel.text = "Google로 계속하기"
+        titleLabel.font = .pretendard(.body_m_16)
+        titleLabel.textColor = .hilingualBlack
+        titleLabel.textAlignment = .center
+
+        button.addSubview(iconImageView)
+        button.addSubview(titleLabel)
+
+        iconImageView.snp.makeConstraints {
+            $0.leading.equalToSuperview().inset(16)
+            $0.centerY.equalToSuperview()
+            $0.width.height.equalTo(20)
+        }
+
+        titleLabel.snp.makeConstraints {
+            $0.center.equalToSuperview()
+        }
+
+        return button
+    }()
+
     let appleLoginButton: UIButton = {
         let button = UIButton(type: .system)
         button.backgroundColor = UIColor(named: "gray900") ?? .black
@@ -109,6 +147,7 @@ final class LoginView: BaseUIView {
         addSubviews(
             subtitleLabel,
             logoImageView,
+            googleLoginButton,
             appleLoginButton,
             characterImageView,
             privacyPolicyButton
@@ -126,6 +165,12 @@ final class LoginView: BaseUIView {
             $0.centerX.equalToSuperview()
             $0.width.equalTo(200)
             $0.height.equalTo(50)
+        }
+
+        googleLoginButton.snp.makeConstraints {
+            $0.height.equalTo(58)
+            $0.leading.trailing.equalToSuperview().inset(16)
+            $0.bottom.equalTo(appleLoginButton.snp.top).offset(-12)
         }
 
         appleLoginButton.snp.makeConstraints {

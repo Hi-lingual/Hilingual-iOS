@@ -14,6 +14,7 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/Moya/Moya.git", from: "15.0.3"),
+        .package(url: "https://github.com/google/GoogleSignIn-iOS.git", from: "10.1.0"),
         .package(name: "HilingualCore", path: "../HilingualCore")
     ],
     targets: [
@@ -21,6 +22,7 @@ let package = Package(
             name: "HilingualNetwork",
             dependencies: [
                 .product(name: "Moya", package: "Moya"),
+                .product(name: "GoogleSignIn", package: "GoogleSignIn-iOS"),
                 .product(name: "HilingualCore", package: "HilingualCore")
             ]
         )
