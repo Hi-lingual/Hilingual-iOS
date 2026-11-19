@@ -68,11 +68,20 @@ public final class LoginViewController: BaseUIViewController<LoginViewModel> {
 
     private func makeInput() -> LoginViewModel.Input {
         return LoginViewModel.Input(
-            loginTapped: loginView.appleLoginButton.publisher(for: .touchUpInside)
+            appleLoginTapped: loginView.appleLoginButton.publisher(for: .touchUpInside),
+            googleLoginTapped: loginView.googleLoginButton.publisher(for: .touchUpInside)
         )
     }
 
     private func bindOutput(_ output: LoginViewModel.Output) {
+        output.isLoading
+            .receive(on: RunLoop.main)
+            .sink { [weak self] isLoading in
+                self?.loginView.appleLoginButton.isEnabled = !isLoading
+                self?.loginView.googleLoginButton.isEnabled = !isLoading
+            }
+            .store(in: &cancellables)
+
         output.navigateToHome
             .receive(on: RunLoop.main)
             .sink { [weak self] in

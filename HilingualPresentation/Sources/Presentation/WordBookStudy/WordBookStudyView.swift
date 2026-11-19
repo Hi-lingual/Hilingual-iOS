@@ -167,6 +167,7 @@ final class WordBookStudyView: BaseUIView {
             primaryButton.isHidden = true
 
         case .completed:
+            backgroundColor = .white
             configureTerminal(
                 imageName: "img_finish_study_ios",
                 imageHeight: 180,

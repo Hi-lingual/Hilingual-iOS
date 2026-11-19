@@ -40,6 +40,10 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
     private var rewardedInterstitial: RewardedInterstitialAd?
     private var didEarnRecoveryReward = false
     private var recoveryTransitionOverlay: UIView?
+    private var diaryInterstitial: InterstitialAd?
+    private var diaryInterstitialLoadedAt: Date?
+    private var isLoadingDiaryInterstitial = false
+    private var pendingDiaryAd: (ad: InterstitialAd, diaryId: Int?)?
     
     // MARK: - Life Cycle
     
@@ -217,7 +221,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                 .receive(on: RunLoop.main)
                 .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] diary in
                     guard let self, let diary else { return }
-                    self.goToDiaryDetailView(diaryId: diary.diaryId)
+                    self.openDiaryDetail(diaryId: diary.diaryId, isAdWatched: diary.isAdWatched)
                 })
                 .store(in: &self.viewModel!.cancellables)
         }
@@ -559,6 +563,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                     guard let self else { return }
                     
                     if let diary {
+                        if !diary.isAdWatched { self.preloadDiaryInterstitialIfNeeded() }
                         self.homeView.selectedInfo.updateView(
                             for: date,
                             diaryId: diary.diaryId,
@@ -972,7 +977,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
             .receive(on: RunLoop.main)
             .sink(receiveCompletion: { _ in }, receiveValue: { [weak self] diary in
                 guard let self, let diary else { return }
-                self.goToDiaryDetailView(diaryId: diary.diaryId)
+                self.openDiaryDetail(diaryId: diary.diaryId, isAdWatched: diary.isAdWatched)
             })
             .store(in: &viewModel!.cancellables)
     }
@@ -1014,7 +1019,7 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
         }
     }
     
-    private func goToDiaryDetailView(diaryId: Int) {
+    private func goToDiaryDetailView(diaryId: Int, animated: Bool = true) {
         AmplitudeManager.shared.send(
             .clickHomeDiaryView(
                 entryId: String(diaryId),
@@ -1022,11 +1027,10 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
                 openTime: Date().timeIntervalSince1970
             )
         )
-
+        
         let detailVC = diContainer.makeDiaryDetailViewController(diaryId: diaryId)
         detailVC.hidesBottomBarWhenPushed = true
-
-        navigationController?.pushViewController(detailVC, animated: true)
+        navigationController?.pushViewController(detailVC, animated: animated)
     }
     
     private func goToMyFeedProefileView() {
@@ -1234,12 +1238,69 @@ public final class HomeViewController: BaseUIViewController<HomeViewModel> {
             })
             .store(in: &viewModel!.cancellables)
     }
+    
+    // MARK: - Diary Interstitial
+
+    private var hasValidDiaryInterstitial: Bool {
+        guard diaryInterstitial != nil,
+              let loadedAt = diaryInterstitialLoadedAt else { return false }
+        return Date().timeIntervalSince(loadedAt) < 3600
+    }
+
+    private func preloadDiaryInterstitialIfNeeded() {
+        guard !isLoadingDiaryInterstitial, !hasValidDiaryInterstitial else { return }
+        isLoadingDiaryInterstitial = true
+
+        let unitID = Bundle.main.infoDictionary?["AD_INTERSTITIAL_UNIT_ID"] as? String ?? ""
+
+        InterstitialAd.load(with: unitID, request: Request()) { [weak self] ad, _ in
+            nonisolated(unsafe) let loadedAd = ad
+
+            Task { @MainActor [weak self] in
+                guard let self else { return }
+                self.isLoadingDiaryInterstitial = false
+                guard let loadedAd else { return }
+                self.diaryInterstitial = loadedAd
+                self.diaryInterstitialLoadedAt = Date()
+            }
+        }
+    }
+
+    private func openDiaryDetail(diaryId: Int, isAdWatched: Bool) {
+        guard !isAdWatched,
+              hasValidDiaryInterstitial,
+              let ad = diaryInterstitial else {
+            goToDiaryDetailView(diaryId: diaryId)
+            return
+        }
+
+        diaryInterstitial = nil
+        diaryInterstitialLoadedAt = nil
+        pendingDiaryAd = (ad, diaryId)
+        ad.fullScreenContentDelegate = self
+        ad.present(from: self)
+    }
 }
 
 // MARK: - FullScreenContentDelegate
 
 extension HomeViewController: FullScreenContentDelegate {
+    public func adWillDismissFullScreenContent(_ ad: FullScreenPresentingAd) {
+        guard let pending = pendingDiaryAd, ad === pending.ad,
+              let diaryId = pending.diaryId else { return }
+
+        pendingDiaryAd = (pending.ad, nil)
+        AmplitudeManager.shared.send(.viewAdAction(result: .completed, page: .home))
+        viewModel?.patchDiaryAdWatch(diaryId: diaryId)
+        goToDiaryDetailView(diaryId: diaryId, animated: false)
+    }
+    
     public func adDidDismissFullScreenContent(_ ad: FullScreenPresentingAd) {
+        if let pending = pendingDiaryAd, ad === pending.ad {
+            pendingDiaryAd = nil
+            return
+        }
+
         guard let recoveryDate = pendingRecoveryDate else {
             resetRecoveryAdState()
             return
@@ -1273,6 +1334,16 @@ extension HomeViewController: FullScreenContentDelegate {
         _ ad: FullScreenPresentingAd,
         didFailToPresentFullScreenContentWithError error: Error
     ) {
+        if let pending = pendingDiaryAd, ad === pending.ad {
+            pendingDiaryAd = nil
+            print("🚨 일기 전면 광고 표시 실패: \(error)")
+            AmplitudeManager.shared.send(.viewAdAction(result: .failed, page: .home))
+            if let diaryId = pending.diaryId {
+                goToDiaryDetailView(diaryId: diaryId)
+            }
+            return
+        }
+        
         print("🚨 전면 광고 표시 실패: \(error)")
         resetRecoveryAdState()
         showRecoveryAdFailureDialog()

@@ -22,8 +22,8 @@ public final class DefaultAuthRepository: AuthRepository {
         self.tokenStore = tokenStore
     }
 
-    public func loginWithApple(token: String) -> AnyPublisher<LoginResponseEntity, Error> {
-        return authService.loginWithApple(token: token)
+    public func login(provider: SocialLoginProvider, token: String) -> AnyPublisher<LoginResponseEntity, Error> {
+        return authService.login(provider: provider.authProviderType, token: token)
             .map { dto in
                 let entity = dto.toEntity()
                 self.tokenStore.save(
@@ -65,3 +65,11 @@ public final class DefaultAuthRepository: AuthRepository {
     }
 }
 
+private extension SocialLoginProvider {
+    var authProviderType: AuthProviderType {
+        switch self {
+        case .apple: return .apple
+        case .google: return .google
+        }
+    }
+}

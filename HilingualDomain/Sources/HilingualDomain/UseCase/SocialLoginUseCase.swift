@@ -8,32 +8,30 @@
 import Combine
 
 public protocol SocialLoginUseCase {
-    func execute() -> AnyPublisher<LoginResponseEntity, Error>
+    func execute(provider: SocialLoginProvider) -> AnyPublisher<LoginResponseEntity, Error>
     func executeRefresh(with refreshToken: String) -> AnyPublisher<LoginResponseEntity, Error>
 }
 
 public final class DefaultSocialLoginUseCase: SocialLoginUseCase {
-    private let appleLoginUseCase: AppleLoginUseCase
+    private let credentialRepository: SocialCredentialRepository
     private let authRepository: AuthRepository
 
     public init(
-        appleLoginUseCase: AppleLoginUseCase,
+        credentialRepository: SocialCredentialRepository,
         authRepository: AuthRepository
     ) {
-        self.appleLoginUseCase = appleLoginUseCase
+        self.credentialRepository = credentialRepository
         self.authRepository = authRepository
     }
 
-    /// 애플 로그인 → 서버 로그인
-    public func execute() -> AnyPublisher<LoginResponseEntity, Error> {
-        return appleLoginUseCase.executeAppleLogin()
-            .flatMap { token, _ in
-                self.authRepository.loginWithApple(token: token)
+    public func execute(provider: SocialLoginProvider) -> AnyPublisher<LoginResponseEntity, Error> {
+        return credentialRepository.requestIdentityToken(provider: provider)
+            .flatMap { [authRepository] token in
+                authRepository.login(provider: provider, token: token)
             }
             .eraseToAnyPublisher()
     }
 
-    /// refreshToken을 사용한 토큰 재발급
     public func executeRefresh(with refreshToken: String) -> AnyPublisher<LoginResponseEntity, Error> {
         return authRepository.refreshToken(token: refreshToken)
     }

@@ -54,6 +54,7 @@ public final class HomeViewModel: BaseViewModel {
     private let localPushUseCase: LocalPushUseCase
     private let homeAdWatchUseCase: HomeAdWatchUseCase
     private let diaryReminderUseCase: DiaryReminderUseCase
+    private let diaryAdWatchUseCase: DiaryAdWatchUseCase
 
     public let hasDraft = PassthroughSubject<Bool, Never>()
 
@@ -64,13 +65,15 @@ public final class HomeViewModel: BaseViewModel {
         fetchTemporaryDiaryUseCase: FetchTemporaryDiaryUseCase,
         localPushUseCase: LocalPushUseCase,
         homeAdWatchUseCase: HomeAdWatchUseCase,
-        diaryReminderUseCase: DiaryReminderUseCase
+        diaryReminderUseCase: DiaryReminderUseCase,
+        diaryAdWatchUseCase: DiaryAdWatchUseCase
     ) {
         self.useCase = useCase
         self.fetchTemporaryDiaryUseCase = fetchTemporaryDiaryUseCase
         self.localPushUseCase = localPushUseCase
         self.homeAdWatchUseCase = homeAdWatchUseCase
         self.diaryReminderUseCase = diaryReminderUseCase
+        self.diaryAdWatchUseCase = diaryAdWatchUseCase
     }
 
     // MARK: - Transform
@@ -149,5 +152,16 @@ public final class HomeViewModel: BaseViewModel {
     
     public func deleteDiary(diaryId: Int) -> AnyPublisher<Void, Error> {
         return useCase.deleteDiary(diaryId: diaryId)
+    }
+    
+    public func patchDiaryAdWatch(diaryId: Int) {
+        diaryAdWatchUseCase.execute(diaryId: diaryId)
+            .receive(on: DispatchQueue.main)
+            .sink(receiveCompletion: { completion in
+                if case .failure(let error) = completion {
+                    print("🚨 광고 시청 반영 실패: \(error)")
+                }
+            }, receiveValue: { _ in })
+            .store(in: &cancellables)
     }
 }

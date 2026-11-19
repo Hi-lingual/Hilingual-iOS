@@ -13,13 +13,15 @@ import HilingualDomain
 public final class LoginViewModel: BaseViewModel {
     
     public struct Input {
-        let loginTapped: AnyPublisher<Void, Never>
+        let appleLoginTapped: AnyPublisher<Void, Never>
+        let googleLoginTapped: AnyPublisher<Void, Never>
     }
 
     public struct Output {
         let navigateToHome: AnyPublisher<Void, Never>
         let navigateToOnboarding: AnyPublisher<Void, Never>
         let error: AnyPublisher<Error, Never>
+        let isLoading: AnyPublisher<Bool, Never>
     }
 
     private let socialLoginUseCase: SocialLoginUseCase
@@ -29,6 +31,7 @@ public final class LoginViewModel: BaseViewModel {
     private let homeSubject = PassthroughSubject<Void, Never>()
     private let onboardingSubject = PassthroughSubject<Void, Never>()
     private let errorSubject = PassthroughSubject<Error, Never>()
+    private let isLoadingSubject = CurrentValueSubject<Bool, Never>(false)
 
     public init(
         socialLoginUseCase: SocialLoginUseCase,
@@ -41,12 +44,19 @@ public final class LoginViewModel: BaseViewModel {
     }
 
     public func transform(input: Input) -> Output {
-        input.loginTapped
-            .handleEvents(receiveOutput: { _ in
+        Publishers.Merge(
+            input.appleLoginTapped.map { SocialLoginProvider.apple },
+            input.googleLoginTapped.map { SocialLoginProvider.google }
+        )
+            .filter { [weak self] _ in
+                self?.isLoadingSubject.value == false
+            }
+            .handleEvents(receiveOutput: { [weak self] _ in
                 print("[LoginVM] 🔘 로그인 버튼 탭 감지됨")
+                self?.isLoadingSubject.send(true)
             })
-            .flatMap { [weak self] _ in
-                self?.performLogin() ?? Empty<LoginResponseEntity, Never>().eraseToAnyPublisher()
+            .flatMap { [weak self] provider in
+                self?.performLogin(provider: provider) ?? Empty<LoginResponseEntity, Never>().eraseToAnyPublisher()
             }
             .sink { _ in
                 print("[LoginVM] 🔄 sink 완료")
@@ -56,14 +66,15 @@ public final class LoginViewModel: BaseViewModel {
         return Output(
             navigateToHome: homeSubject.eraseToAnyPublisher(),
             navigateToOnboarding: onboardingSubject.eraseToAnyPublisher(),
-            error: errorSubject.eraseToAnyPublisher()
+            error: errorSubject.eraseToAnyPublisher(),
+            isLoading: isLoadingSubject.eraseToAnyPublisher()
         )
     }
 
-    private func performLogin() -> AnyPublisher<LoginResponseEntity, Never> {
+    private func performLogin(provider: SocialLoginProvider) -> AnyPublisher<LoginResponseEntity, Never> {
         print("[LoginVM] 🚀 소셜 로그인 UseCase 실행 시작")
 
-        return socialLoginUseCase.execute()
+        return socialLoginUseCase.execute(provider: provider)
             .handleEvents(
                 receiveOutput: { [weak self] result in
                     guard let self else { return }
@@ -118,6 +129,7 @@ public final class LoginViewModel: BaseViewModel {
 
     private func handleLoginFailure(_ error: Error) {
         print("[LoginVM] ❌ 로그인 실패: \(error.localizedDescription)")
+        isLoadingSubject.send(false)
         errorSubject.send(error)
     }
 

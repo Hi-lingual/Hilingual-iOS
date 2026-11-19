@@ -31,6 +31,12 @@ Add these environment variables in your Xcode Cloud workflow:
 - `AD_INTERSTITIAL_UNIT_ID_RELEASE`
 - `AD_RECOVERY_UNIT_ID_DEBUG`
 - `AD_RECOVERY_UNIT_ID_RELEASE`
+- `GID_IOS_CLIENT_KEY_DEBUG`
+- `GID_IOS_CLIENT_KEY_RELEASE`
+- `GID_SERVER_CLIENT_ID_DEBUG`
+- `GID_SERVER_CLIENT_ID_RELEASE`
+
+`GID_IOS_CLIENT_KEY_*` is the iOS OAuth client ID without the `.apps.googleusercontent.com` suffix (e.g. `123-abc`). `GID_SERVER_CLIENT_ID_*` is the full Web client ID shared with Android.
 
 Mark secret values as secrets in Xcode Cloud where appropriate.
 

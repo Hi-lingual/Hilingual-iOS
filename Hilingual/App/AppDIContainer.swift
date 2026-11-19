@@ -250,16 +250,11 @@ extension AppDIContainer {
 
 extension AppDIContainer {
 
-    private func makeAppleLoginService() -> AppleLoginService {
-        DefaultAppleLoginService()
-    }
-
-    private func makeAppleLoginRepository() -> AppleLoginRepository {
-        DefaultAppleLoginRepository(service: makeAppleLoginService())
-    }
-
-    private func makeAppleLoginUseCase() -> AppleLoginUseCase {
-        DefaultAppleLoginUseCase(repository: makeAppleLoginRepository())
+    private func makeSocialCredentialRepository() -> SocialCredentialRepository {
+        DefaultSocialCredentialRepository(
+            appleLoginService: DefaultAppleLoginService(),
+            googleLoginService: DefaultGoogleLoginService()
+        )
     }
 
     private func makeTokenStoreUseCase() -> TokenStoreUseCase {
@@ -292,7 +287,7 @@ extension AppDIContainer {
 
     private func makeSocialLoginUseCase() -> SocialLoginUseCase {
         DefaultSocialLoginUseCase(
-            appleLoginUseCase: makeAppleLoginUseCase(),
+            credentialRepository: makeSocialCredentialRepository(),
             authRepository: makeAuthRepository()
         )
     }
@@ -541,7 +536,8 @@ extension AppDIContainer {
             fetchTemporaryDiaryUseCase: makeFetchTemporaryDiaryUseCase(),
             localPushUseCase: makeLocalPushUseCase(),
             homeAdWatchUseCase: makeHomeAdWatchUseCase(),
-            diaryReminderUseCase: makeDiaryReminderUseCase()
+            diaryReminderUseCase: makeDiaryReminderUseCase(),
+            diaryAdWatchUseCase: makeDiaryAdWatchUseCase()
         )
     }
 }

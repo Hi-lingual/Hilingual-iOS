@@ -10,7 +10,7 @@ import Combine
 import UIKit
 
 public protocol AuthService {
-    func loginWithApple(token: String) -> AnyPublisher<LoginResponseDTO, Error>
+    func login(provider: AuthProviderType, token: String) -> AnyPublisher<LoginResponseDTO, Error>
     func refreshToken(token: String) -> AnyPublisher<TokenRefreshResponseDTO, Error>
     func withdraw() -> AnyPublisher<Void, Error>
     func logout() -> AnyPublisher<Void, Error>
@@ -19,11 +19,11 @@ public protocol AuthService {
 public final class DefaultAuthService: BaseService<AuthAPI>, AuthService {
 
     //TODO: - Uikit 의존성 제거하기
-    public func loginWithApple(token: String) -> AnyPublisher<LoginResponseDTO, Error> {
+    public func login(provider: AuthProviderType, token: String) -> AnyPublisher<LoginResponseDTO, Error> {
         let deviceInfo = CurrentDeviceInfo.make()
 
         let body = AuthLoginRequestDTO(
-            provider: "APPLE",
+            provider: provider.rawValue,
             role: "USER",
             deviceUuid: deviceInfo.deviceUUID,
             deviceName: deviceInfo.deviceName,
