@@ -57,7 +57,7 @@ final class DiaryWritingView: BaseUIView {
         
         return button
     }()
-    
+
     let headerStackView: UIStackView = {
         let stack = UIStackView()
         stack.axis = .horizontal
